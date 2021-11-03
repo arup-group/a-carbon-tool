@@ -1,0 +1,2 @@
+﻿Database,Material,Subtype,kgCO2e/kg,Comments,density,wastage,densityAssumption,wasteReference,Latest
+ICE v3.0b 2019 (UK),Aggregate,General - incl. secondary & recycled,0.00757,This is an estimate of market average aggregate,2240,5,Single value from CIBSE data,WRAP,FALSE

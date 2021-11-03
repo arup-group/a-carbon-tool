@@ -1,0 +1,32 @@
+﻿Database,Material,Subtype,kgCO2e/kg,Comments,density,wastage,densityAssumption,wasterReference,Latest,
+EPD,Steel,S275JR and S355JR Non-alloy structural steel (Emirates Steel Company LLC 2016),2.56,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Steel,Galvanized Pipe (UAE) (Conares Metal Supply Ltd. 2019),2.2616,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Concrete,C30 - C35 (66%GGBS) (NRMCA Dubai Municipality 2017),0.0926,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C40 (36%GGBS) (NRMCA Dubai Municipality 2017),0.1368,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C40 (66%GGBS) (NRMCA Dubai Municipality 2017),0.0979,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C45 (36%GGBS) (NRMCA Dubai Municipality 2017),0.1392,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C45 (66%GGBS) (NRMCA Dubai Municipality 2017),0.1012,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C50 (36%GGBS) (NRMCA Dubai Municipality 2017),0.142,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C55 (26%GGBS+5%MS) (NRMCA Dubai Municipality 2017),0.1533,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C60 (26%GGBS+5%MS) (NRMCA Dubai Municipality 2017),0.1558,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C65 (26%GGBS+6%MS) (NRMCA Dubai Municipality 2017),0.1545,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C70 (26%GGBS+7%MS) (NRMCA Dubai Municipality 2017),0.1554,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C75 (26%GGBS+7%MS) (NRMCA Dubai Municipality 2017),0.1582,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C80 (26%GGBS+8%MS) (NRMCA Dubai Municipality 2017),0.1602,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C90 (26%GGBS+8%MS) (NRMCA Dubai Municipality 2017),0.1646,taken from EPD,2400,4,from EPD,WRAP,TRUE
+EPD,Concrete,C18 and C20 D11540 OPC + GGBS 40% (Transgulf Readymix 2010),0.1003,taken from EPD,2493,4,from EPD,WRAP,TRUE
+EPD,Concrete,C30 and C35 D09546 OPC + GGBS 66% (Transgulf Readymix 2010),0.0933,taken from EPD,2485,4,from EPD,WRAP,TRUE
+EPD,Concrete,C45 D09695 OPC + GGBS 66% (Transgulf Readymix 2010),0.1011,taken from EPD,2489,4,from EPD,WRAP,TRUE
+EPD,Concrete,C60 D11842 OPC + GGBS 45% +MS 5% (Transgulf Readymix 2010),0.14,taken from EPD,2461.5,4,from EPD,WRAP,TRUE
+EPD,Concrete,C37 and C40 D11485 OPC + GGBS 66% (Transgulf Readymix 2010),0.0973,taken from EPD,2480.5,4,from EPD,WRAP,TRUE
+EPD,Concrete,C45 and C50 D11486 OPC + GGBS 50% (Transgulf Readymix 2010),0.1265,taken from EPD,2506,4,from EPD,WRAP,TRUE
+EPD,Concrete,C45 and C50 D11539 OPC + GGBS 50% (Transgulf Readymix 2010),0.1296,taken from EPD,2490,4,from EPD,WRAP,TRUE
+EPD,Concrete,C40 D09885 OPC + GGBS 50% (Transgulf Readymix 2010),0.1244,taken from EPD,2490.5,4,from EPD,WRAP,TRUE
+EPD,Concrete,C50 D11471 OPC + GGBS 66% (Transgulf Readymix 2010),0.1025,taken from EPD,2496,4,from EPD,WRAP,TRUE
+EPD,Steel,Carbon Steel Reinforcing Bars (Union Iron & Steel Company LLC 2018),0.891,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Steel,Carbon Steel Reinforcing Bars (Hamriyah Steel FZC 2020),0.954,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Steel,Carbon Steel Reinforcing Bars (Conares Metal Supply Ltd. 2018),0.96,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Steel,Carbon Steel Reinforcing Bars (Qatar Steel Company FZE 2020),1.12,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Composite,Floor Deck Comflor 60 1.0mm (Tata Steel International ME ZFE),2.75,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Composite,Floor Deck Comflor 51+ 1.2mm (Tata Steel International ME ZFE),2.90,taken from EPD,7850,0,from EPD,WRAP,TRUE
+EPD,Cement,General (INSEE Easy Flow Vietnam 2020),0.848,taken from EPD,1600,5,assumed average value,WRAP,TRUE

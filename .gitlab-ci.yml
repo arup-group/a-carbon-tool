@@ -1,0 +1,55 @@
+stages:
+  - build
+  - deploy
+
+build_push_img_prod:
+  stage: build
+  script:
+    # Create env var since we can't import from package.json directly in yaml
+    - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+    - docker build -t arup/arup-carbon:latest -t arup/arup-carbon:$VERSION .
+    - docker tag arup/arup-carbon:latest 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:latest
+    - docker tag arup/arup-carbon:$VERSION 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:$VERSION
+    # aws --region eu-west-1 ecr get-login-password | sudo docker login --username AWS --password-stdin 613062224522.dkr.ecr.eu-west-1.amazonaws.com
+    - $(aws ecr get-login --no-include-email --region eu-west-1)
+    - docker push 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:latest
+    - docker push 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:$VERSION
+  only:
+    refs:
+      - master
+
+build_push_img_dev:
+  stage: build
+  script:
+    # Create env var since we can't import from package.json directly in yaml
+    - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+    - docker build -t arup/arup-carbon:latest -t arup/arup-carbon:$VERSION .
+    - docker tag arup/arup-carbon:latest 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:latest
+    - docker tag arup/arup-carbon:$VERSION 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:$VERSION
+    # aws --region eu-west-1 ecr get-login-password | sudo docker login --username AWS --password-stdin 613062224522.dkr.ecr.eu-west-1.amazonaws.com
+    - $(aws ecr get-login --no-include-email --region eu-west-1)
+    - docker push 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:latest
+    - docker push 613062224522.dkr.ecr.eu-west-1.amazonaws.com/arup-carbon-prod:$VERSION
+  only:
+    refs:
+      - dev
+
+deploy_img_prod:
+  stage: deploy
+  script:
+    - aws ecs update-service --force-new-deployment --service arup-carbon-prod  --cluster arup-carbon
+  when: manual
+  only:
+    refs:
+      - master
+  allow_failure: false
+
+deploy_img_dev:
+  stage: deploy
+  script:
+    - aws ecs update-service --force-new-deployment --service arup-carbon-dev  --cluster arup-carbon
+  when: manual
+  only:
+    refs:
+      - dev
+  allow_failure: false

@@ -1,38 +1,75 @@
 {
-  "name": "carbon-assessment-platform",
-  "version": "0.1.0",
+  "name": "carbon-checker",
+  "version": "1.2.12",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit"
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
+    "@tweenjs/tween.js": "^17.2.0",
+    "axios": "^0.18.1",
+    "base64url": "^3.0.1",
+    "color-hash": "^1.0.3",
+    "echarts": "^4.2.0-rc.2",
+    "event-emitter-es6": "^1.1.5",
+    "flat": "^4.1.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.debounce": "^4.0.8",
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2",
+    "lodash.union": "^4.6.0",
+    "lodash.uniq": "^4.5.0",
+    "marked": "^0.8.0",
+    "material-icons": "^0.2.3",
+    "node-sass": "^4.13.1",
+    "papaparse": "^4.6.2",
+    "rainbowvis.js": "^1.0.1",
+    "register-service-worker": "^1.5.2",
+    "sass-loader": "^7.1.0",
+    "three": "^0.100.0",
+    "three-trackballcontrols": "0.0.7",
+    "threejs-orbit-controls": "^1.0.3",
+    "uuid": "^3.3.2",
+    "v-charts": "^1.19.0",
     "vue": "^2.6.11",
-    "vue-class-component": "^7.2.3",
-    "vue-property-decorator": "^9.1.2",
-    "vue-router": "^3.2.0",
-    "vuex": "^3.4.0"
+    "vue-material": "^1.0.0-beta-10.2",
+    "vue-router": "^3.0.1",
+    "vue-slider-component": "^2.8.3",
+    "vue-template-compiler": "^2.6.11",
+    "vue-timeago": "^5.0.0",
+    "vuelidate": "^0.7.4",
+    "vuex": "^3.0.1",
+    "worker-loader": "^2.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.19",
-    "@typescript-eslint/eslint-plugin": "^4.18.0",
-    "@typescript-eslint/parser": "^4.18.0",
-    "@vue/cli-plugin-babel": "^4.5.0",
-    "@vue/cli-plugin-eslint": "^4.5.0",
-    "@vue/cli-plugin-typescript": "^4.5.0",
-    "@vue/cli-plugin-unit-jest": "^4.5.0",
-    "@vue/cli-service": "^4.5.0",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "@vue/eslint-config-typescript": "^7.0.0",
-    "@vue/test-utils": "^1.0.3",
-    "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^6.2.2",
-    "prettier": "^2.2.1",
-    "typescript": "~4.1.5",
-    "vue-template-compiler": "^2.6.11"
+    "@vue/cli-plugin-babel": "^3.2.0",
+    "@vue/cli-plugin-pwa": "^3.2.0",
+    "@vue/cli-service": "^3.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-vue": "^6.2.1"
+  },
+  "eslintConfig": {
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": "warn",
+      "no-prototype-builtins": "off",
+      "no-unused-vars": "off"
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:prettier/recommended",
+      "plugin:vue/essential"
+    ]
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": false
   }
 }

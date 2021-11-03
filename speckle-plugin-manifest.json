@@ -1,0 +1,11 @@
+{
+  "name": "Arup Carbon Checker",
+  "version": "1.0.0-beta",
+  "desc": "This plugin allows you to do basic CO2 cost estimations.",
+  "serveFrom": "/carbon",
+  "serveSource": "/dist",
+  "author": "Dimitrie A. Stefanescu / Arup",
+  "contact": "dimitrie.stefanescu@arup.com",
+  "homepage": "https://arup.com",
+  "git": "https://github.com/speckleworks/SpeckleAdmin"
+}

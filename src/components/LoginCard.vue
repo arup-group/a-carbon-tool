@@ -12,6 +12,8 @@
             :items="items"
             label="Select from existing or define"
             :rules="rules"
+            :error="showError"
+            :error-messages="errorMessage"
           ></v-combobox>
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
@@ -27,6 +29,8 @@
 import { Server } from "@/models/server";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
+import Axios from "axios";
+
 type Rule = (s: string) => boolean | string;
 
 @Component({})
@@ -34,6 +38,9 @@ export default class LoginCard extends Vue {
   @Prop() servers!: Server[];
   model = "";
   valid = false;
+
+  errorMessage = "";
+  showError = false;
 
   defaultCheck: Rule = (s) => {
     console.log("rule checking...", s);
@@ -51,27 +58,28 @@ export default class LoginCard extends Vue {
       });
       if (contained) {
         // if the user has used one of the default servers, return it
-        return true || "this should not show (default)";
+        return true;
       } else {
         // if the user has messed with one of the default servers, something should be done here, probably throw an error
-        return false || "Cannot mess with defaults!!!!!";
+        return false || "Remove region to change default";
       }
     } else {
-      return true || "this also should not show (default)";
+      return true;
     }
   };
-  emptyRule: Rule = (s) => s !== "" || "Enter some text!!!!";
+  emptyRule: Rule = (s) => s !== "" || "Input cannot be empty";
+
   isURL: Rule = (s) => {
     let [region, url] = s.split(" - ");
     if (url) {
-      return true || "this should not show (custom)";
+      return true;
     } else {
       try {
         // below will throw an error if the url is not valid
         let url = new URL(s);
-        return true || "this also should not show (custom)";
+        return true;
       } catch (e) {
-        return false || "Not valid URL!!!!!";
+        return false || "Not valid URL";
       }
     }
   };
@@ -86,27 +94,51 @@ export default class LoginCard extends Vue {
     }
   }
 
-  checkSubmit() {
+  async checkServer(server: string) {
+    if (server && server !== "" && !server.includes("api")) server += "/api";
+    try {
+      let res = await Axios.get(server);
+      if (!Object.prototype.hasOwnProperty.call(res.data, "serverName"))
+        return false;
+      this.errorMessage = ``;
+      this.showError = false;
+      Axios.defaults.baseURL = server;
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  async checkSubmit() {
     let [region, url] = this.model.split(" - ");
     if (url) {
       // if the user has inputted a default server. The rule `defaultCheck` makes sure this has happened
-      this.defaultServer({
+      this.submit({
         region,
         url,
       });
     } else {
       // if the user has inputted their own server, TODO make something happen
-      this.customServer(this.model);
+      try {
+        let check = await this.checkServer(this.model);
+        if (check)
+          this.submit({
+            region: "",
+            url: this.model,
+          });
+        else {
+          this.showError = true;
+          this.errorMessage = "Server problem";
+        }
+      } catch (err) {
+        console.error("err:", err);
+      }
     }
   }
 
-  @Emit("defaultServer")
-  defaultServer(server: Server) {
-    return server;
-  }
-  @Emit("customServer")
-  customServer(server: string) {
-    return server;
+  @Emit("submit")
+  submit(server: Server) {
+    return server.url;
   }
 }
 </script>

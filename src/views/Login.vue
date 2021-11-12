@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <LoginCard :servers="servers" @defaultServer="logIn" @customServer="customLogIn"/>
+    <LoginCard :servers="servers" @submit="logIn" @customServer="customLogIn"/>
   </v-main>
 </template>
 
@@ -15,34 +15,34 @@ import { Server } from "@/models/server";
   components: { LoginCard }
 })
 export default class Login extends Vue {
-  servers: Server[] = [
-      {
-        region: "UKIMEA",
-        url: "https://uk.speckle.arup.com/api",
-      },
-      {
-        region: "Europe",
-        url: "https://ireland.speckle.arup.com/api",
-      },
-      {
-        region: "Canada",
-        url: "https://canada.speckle.arup.com/api",
-      },
-      {
-        region: "Australia",
-        url: "https://australia.speckle.arup.com/api",
-      },
-      {
-        region: "East Asia",
-        url: "https://hongkong.speckle.arup.com/api",
-      },
-    ];
+  servers: Server[] = this.$store.state.servers;
 
-  logIn(server: Server) {
+  errorMessage = '';
+  showError = false;
+
+  logIn(server: string) {
     console.log("default login server:", server);
+    try {
+      let url = new URL(server);
+      window.open(
+          `${url.origin}/signin?redirectUrl=${window.encodeURIComponent(
+            location.origin + "/signin/callback",
+          )}`,
+          "login screen",
+          "height=700,width=800",
+        );
+    } catch(err: any) {
+      this.errorMessage = err.message;
+      this.showError = true;
+    }
   }
-  customLogIn(url: string) {
-    console.log("cutom login url:", url);
+  customLogIn(server: string) {
+    console.log("cutom login url:", server);
+    try {
+      this.logIn(server);
+    } catch(err) {
+      console.log(err);
+    }
   }
 }
 </script>

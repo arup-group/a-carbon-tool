@@ -9,23 +9,7 @@ export default new Vuex.Store({
     servers: [
       {
         region: "UKIMEA",
-        url: "https://uk.speckle.arup.com/api",
-      },
-      {
-        region: "Europe",
-        url: "https://ireland.speckle.arup.com/api",
-      },
-      {
-        region: "Canada",
-        url: "https://canada.speckle.arup.com/api",
-      },
-      {
-        region: "Australia",
-        url: "https://australia.speckle.arup.com/api",
-      },
-      {
-        region: "East Asia",
-        url: "https://hongkong.speckle.arup.com/api",
+        url: "https://v2.speckle.arup.com/api",
       },
     ],
     // The canonical and correct server url, i.e. `https://speckle.server.com/api`

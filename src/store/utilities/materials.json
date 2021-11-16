@@ -1,6 +1,6 @@
 {
     "UK" : {
-        "Steel": {
+        "steel": {
             "density" : 7800,
             "wastage" : 0.1,
             "a1a3Carbon" : 1.46,

@@ -1,7 +1,6 @@
-name: Deploy to Staging
+name: Build Infrastructure
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:

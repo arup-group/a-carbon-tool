@@ -49,6 +49,8 @@ export default class LoginCard extends Vue {
       let server: Server = {
         region,
         url,
+        speckleId: "",
+        speckleSecret: ""
       };
       let contained = false;
       this.servers.forEach((s) => {
@@ -113,10 +115,17 @@ export default class LoginCard extends Vue {
     let [region, url] = this.model.split(" - ");
     if (url) {
       // if the user has inputted a default server. The rule `defaultCheck` makes sure this has happened
-      this.submit({
-        region,
-        url,
-      });
+      let tmpServer = this.servers.find(s => s.url === url);
+      let server: Server;
+      if (!tmpServer) {
+        server = {
+          url,
+          region,
+          speckleId: "",
+          speckleSecret: ""
+        }
+      } else server = tmpServer;
+      this.submit(server);
     } else {
       // if the user has inputted their own server, TODO make something happen
       try {
@@ -125,6 +134,8 @@ export default class LoginCard extends Vue {
           this.submit({
             region: "",
             url: this.model,
+            speckleId: "",
+            speckleSecret: ""
           });
         else {
           this.showError = true;

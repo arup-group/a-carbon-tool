@@ -20,10 +20,10 @@ export default class Login extends Vue {
   errorMessage = '';
   showError = false;
 
-  logIn(server: string) {
+  logIn(server: Server) {
     console.log("default login server:", server);
     try {
-      let url = new URL(server);
+      let url = new URL(server.url);
       window.open(
           `${url.origin}/signin?redirectUrl=${window.encodeURIComponent(
             location.origin + "/signin/callback",
@@ -39,7 +39,12 @@ export default class Login extends Vue {
   customLogIn(server: string) {
     console.log("cutom login url:", server);
     try {
-      this.logIn(server);
+      this.logIn({
+        region: "",
+        url: server,
+        speckleId: "",
+        speckleSecret: ""
+        });
     } catch(err) {
       console.log(err);
     }

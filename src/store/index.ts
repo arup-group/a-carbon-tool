@@ -10,6 +10,8 @@ export default new Vuex.Store({
       {
         region: "UKIMEA",
         url: "https://v2.speckle.arup.com/api",
+        speckleId: process.env.ARUP_VUE_APP_SPECKLE_ID,
+        speckleSecret: process.env.ARUP_VUE_APP_SPECKLE_SECRET
       },
     ],
     // The canonical and correct server url, i.e. `https://speckle.server.com/api`

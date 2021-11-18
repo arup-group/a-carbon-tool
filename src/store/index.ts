@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import Axios from "axios";
+import { exchangeAccessCode, goToSpeckleAuthpage, speckleLogOut } from "./speckleUtil";
+import { Server } from "@/models/server";
 
 Vue.use(Vuex);
 
@@ -9,9 +11,9 @@ export default new Vuex.Store({
     servers: [
       {
         region: "UKIMEA",
-        url: "https://v2.speckle.arup.com/api",
-        speckleId: process.env.ARUP_VUE_APP_SPECKLE_ID,
-        speckleSecret: process.env.ARUP_VUE_APP_SPECKLE_SECRET
+        url: "https://v2.speckle.arup.com",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP
       },
     ],
     // The canonical and correct server url, i.e. `https://speckle.server.com/api`
@@ -94,6 +96,19 @@ export default new Vuex.Store({
   },
   actions: {
     // Auth
+    logout(context) {
+      // wipe the state
+
+      // wipe the tokens
+      speckleLogOut();
+    },
+    exchangeAccessCode(context, accessCode) {
+      return exchangeAccessCode(accessCode, context);
+    },
+    redirectToAuth(context, server: Server) {
+      goToSpeckleAuthpage(server);
+    },
+
     authenticate: (context, payload) =>
       // eslint-disable-next-line
       new Promise(async (resolve, reject) => {

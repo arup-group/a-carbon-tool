@@ -97,7 +97,6 @@ export default class LoginCard extends Vue {
   }
 
   async checkServer(server: string) {
-    if (server && server !== "" && !server.includes("api")) server += "/api";
     try {
       let res = await Axios.get(server);
       if (!Object.prototype.hasOwnProperty.call(res.data, "serverName"))
@@ -149,7 +148,7 @@ export default class LoginCard extends Vue {
 
   @Emit("submit")
   submit(server: Server) {
-    return server.url;
+    return server;
   }
 }
 </script>

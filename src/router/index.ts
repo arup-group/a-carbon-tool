@@ -1,3 +1,4 @@
+import store from "@/store";
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
@@ -22,5 +23,21 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
+
+router.beforeEach(async (to, from, next) => {
+  console.log("thing");
+  if (to.query.access_code) {
+    console.log("contains access code");
+    // If the route contains an access code, exchange it
+    try {
+      await store.dispatch("exchangeAccessCode", to.query.access_code);
+    } catch(err) {
+      console.warn("exchange failed", err);
+    }
+    // Whatever happens, go home.
+    next("/");
+  }
+  next();
+})
 
 export default router;

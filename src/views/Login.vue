@@ -20,21 +20,13 @@ export default class Login extends Vue {
   errorMessage = '';
   showError = false;
 
+  mounted() {
+    console.log("login mounted");
+  }
+
   logIn(server: Server) {
     console.log("default login server:", server);
-    try {
-      let url = new URL(server.url);
-      window.open(
-          `${url.origin}/signin?redirectUrl=${window.encodeURIComponent(
-            location.origin + "/signin/callback",
-          )}`,
-          "login screen",
-          "height=700,width=800",
-        );
-    } catch(err: any) {
-      this.errorMessage = err.message;
-      this.showError = true;
-    }
+    this.$store.dispatch("redirectToAuth", server);
   }
   customLogIn(server: string) {
     console.log("cutom login url:", server);

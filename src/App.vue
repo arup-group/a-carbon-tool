@@ -15,6 +15,6 @@ import Header from "./components/Header.vue";
   components: { Header }
 })
 export default class App extends Vue {
-  loggedIn = this.$store.state.isAuth;
+  loggedIn = false;
 }
 </script>

@@ -10,12 +10,7 @@ const routes: Array<RouteConfig> = [
     name: "Login",
     component: () =>
       import("../views/Login.vue"),
-  },
-  {
-    path: '/signin/callback',
-    name: 'signin-cb',
-    component: () => import('../views/SigninCallback.vue')
-  },
+  }
 ];
 
 const router = new VueRouter({

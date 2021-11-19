@@ -1,5 +1,6 @@
-import { Server } from "@/models/auth/server";
-import { Token } from "@/models/auth/token";
+import { AuthError, Server, Token } from "@/models/auth";
+
+import { userInfoQuery } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -63,3 +64,32 @@ export function getServer(context: any): Server {
     };
   return server;
 }
+
+export async function speckleFetch(query: any, context: any) {
+  const token: string = context.state.token.token;
+  if (token) {
+    try {
+      const url: string = context.state.selectedServer.url;
+      const res = await fetch(`${url}/graphql`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          query: query
+        })
+      });
+      return await res.json();
+    } catch(err) {
+      console.error("API cal failed", err);
+    }
+  } else return Promise.reject(AuthError.NOT_SIGNED_IN);
+}
+
+export const getUserData = (context: any) => speckleFetch(userInfoQuery(), context);
+
+export const getToken = (): Token => ({
+  token: localStorage.getItem(TOKEN) as string,
+  refreshToken: localStorage.getItem(REFRESH_TOKEN) as string
+})

@@ -1,3 +1,4 @@
+import { AuthError } from "@/models/auth";
 import store from "@/store";
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
@@ -8,9 +9,8 @@ const routes: Array<RouteConfig> = [
   {
     path: "/login",
     name: "Login",
-    component: () =>
-      import("../views/Login.vue"),
-  }
+    component: () => import("../views/Login.vue"),
+  },
 ];
 
 const router = new VueRouter({
@@ -20,19 +20,27 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log("thing");
   if (to.query.access_code) {
-    console.log("contains access code");
     // If the route contains an access code, exchange it
     try {
       await store.dispatch("exchangeAccessCode", to.query.access_code);
-    } catch(err) {
+    } catch (err) {
       console.warn("exchange failed", err);
     }
     // Whatever happens, go home.
     next("/");
+  } else {
+    if (to.name !== "Login") {
+      try {
+        const goto = await store.dispatch("getUser");
+        next();
+      } catch (err: any) {
+        if (err.message === AuthError.NOT_SIGNED_IN) next("/login");
+        else next("/")
+      }
+    }
   }
   next();
-})
+});
 
 export default router;

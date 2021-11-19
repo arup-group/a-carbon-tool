@@ -1,3 +1,4 @@
-export { Login } from "./login";
-export { Server } from "./server";
-export { Token } from "./token";
+export { Login } from "./login.interface";
+export { Server } from "./server.interface";
+export { Token } from "./token.interface";
+export { AuthError } from "./authError.enum";

@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" @submit.prevent="checkSubmit" v-model="valid">
+  <v-form ref="form" @submit.prevent="checkSubmit">
     <v-container class="d-flex justify-center align-center">
       <v-card style="width: 50%">
         <v-card-title class="">Log In</v-card-title>
@@ -11,11 +11,10 @@
             v-model="model"
             :items="items"
             label="Select server"
-            :rules="rules"
           ></v-select>
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
-          <v-btn color="primary" text type="submit" :disabled="!valid">
+          <v-btn color="primary" text type="submit">
             Log In
           </v-btn>
         </v-card-actions>
@@ -27,17 +26,12 @@
 import { Server } from "@/models/auth/";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
-type Rule = (s: string) => boolean | string;
+type Rule = (s: Server) => boolean | string;
 
 @Component({})
 export default class LoginCard extends Vue {
   @Prop() servers!: Server[];
   model: Server = {} as Server;
-  valid = false;
-
-  emptyRule: Rule = (s) => s !== "" || "Please select an option";
-
-  rules: Rule[] = [this.emptyRule];
 
   get items() {
     if (this.servers) {

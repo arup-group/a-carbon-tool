@@ -5,10 +5,19 @@ Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
-    path: "/",
+    path: "/login",
     name: "Login",
-    component: () =>
-      import("../views/Login.vue"),
+    component: () => import("../views/Login.vue"),
+  },
+  {
+    path: "/landing",
+    name: "Landing",
+    component: () => import("../views/Landing.vue"),
+  },
+  {
+    path: "/assessment",
+    name: "Assessment",
+    component: () => import("../views/Assessment.vue"),
   },
 ];
 

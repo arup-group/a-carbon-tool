@@ -3,7 +3,7 @@
     <v-toolbar-title class="d-flex align-center">
       <img class="mr-5" src="@/assets/logo.svg" />
 
-      Carbon Assessment Platform
+      A Carbon Tool
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <div v-if="loggedIn" class="d-flex align-center">

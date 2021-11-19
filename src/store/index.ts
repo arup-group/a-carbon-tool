@@ -54,7 +54,7 @@ export default new Vuex.Store({
   actions: {
     // Auth
     logout(context) {
-      // wipe the state TODO
+      // wipe the state
       context.commit("logout");
 
       // wipe the tokens

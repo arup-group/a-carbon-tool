@@ -31,10 +31,12 @@ router.beforeEach(async (to, from, next) => {
     next("/");
   } else {
     if (to.name !== "Login") {
+      // if the user is going to a page that isn't the login page, check that they're logged in
       try {
-        const goto = await store.dispatch("getUser");
+        await store.dispatch("getUser");
         next();
       } catch (err: any) {
+        // redirect to login page if the user is not signed in
         if (err.message === AuthError.NOT_SIGNED_IN) next("/login");
         else next("/")
       }

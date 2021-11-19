@@ -26,8 +26,6 @@
 import { Server } from "@/models/auth/";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
-type Rule = (s: Server) => boolean | string;
-
 @Component({})
 export default class LoginCard extends Vue {
   @Prop() servers!: Server[];
@@ -58,8 +56,3 @@ export default class LoginCard extends Vue {
   }
 }
 </script>
-<style scoped>
-.subtitle {
-  font-size: 1rem;
-}
-</style>

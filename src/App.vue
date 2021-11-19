@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <Header :loggedIn="loggedIn" />
+    <Header :loggedIn="isAuthenticated" />
     <v-main>
       <div v-if="isAuthenticated">
         Welcome

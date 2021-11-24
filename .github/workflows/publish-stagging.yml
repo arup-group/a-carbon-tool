@@ -33,7 +33,7 @@ jobs:
         aws-region: eu-west-1
 
     - name: Upload to S3
-      if: github.ref == 'refs/heads/main'
+      #if: github.ref == 'refs/heads/main'
       run: |
         aws s3 sync --delete dist/ s3://act.staging-speckle.arup.com-dev
 

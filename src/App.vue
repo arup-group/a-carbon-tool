@@ -1,7 +1,17 @@
 <template>
   <v-app>
-    <Header :loggedIn="loggedIn" />
+    <Header :loggedIn="isAuthenticated" />
     <v-main>
+      <div v-if="isAuthenticated">
+        Welcome
+        <b>{{ name }}</b>
+        ! You are connected to
+        <b>
+          {{ company }}'s
+          <em>{{ serverName }}</em>
+        </b>
+        <v-btn @click="logout">logout</v-btn>
+      </div>
       <router-view/>
     </v-main>
   </v-app>
@@ -15,6 +25,25 @@ import Header from "./components/Header.vue";
   components: { Header }
 })
 export default class App extends Vue {
-  loggedIn = true;
+  loggedIn = false;
+  get name() {
+    if (this.isAuthenticated)
+      return this.$store.state.user.name;
+    return "";
+  }
+  get company() {
+    return this.$store.state.serverInfo.company;
+  }
+  get serverName() {
+    return this.$store.state.serverInfo.name;
+  }
+
+  get isAuthenticated() {
+    return this.$store.getters.isAuthenticated;
+  }
+
+  logout() {
+    this.$store.dispatch("logout");
+  }
 }
 </script>

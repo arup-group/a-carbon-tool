@@ -1,11 +1,20 @@
 <template>
   <v-app style="height: 100vh">
     <arc-container theme="ACT-light" style="height:100%">
-      <Header :li="loggedIn" />
-      <v-main>
-        <p>working!</p>
-        <router-view />
-      </v-main>
+    <Header :li="isAuthenticated" />
+    <v-main>
+      <div v-if="isAuthenticated">
+        Welcome
+        <b>{{ name }}</b>
+        ! You are connected to
+        <b>
+          {{ company }}'s
+          <em>{{ serverName }}</em>
+        </b>
+        <v-btn @click="logout">logout</v-btn>
+      </div>
+      <router-view/>
+    </v-main>
     </arc-container>
   </v-app>
 </template>
@@ -31,10 +40,24 @@ import "@/assets/style.css";
   components: { Header },
 })
 export default class App extends Vue {
-  loggedIn = true;
+  get name() {
+    if (this.isAuthenticated)
+      return this.$store.state.user.name;
+    return "";
+  }
+  get company() {
+    return this.$store.state.serverInfo.company;
+  }
+  get serverName() {
+    return this.$store.state.serverInfo.name;
+  }
 
-  test() {
-    console.log("the button has been clicked");
+  get isAuthenticated() {
+    return this.$store.getters.isAuthenticated;
+  }
+
+  logout() {
+    this.$store.dispatch("logout");
   }
 }
 </script>

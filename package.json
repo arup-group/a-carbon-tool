@@ -9,6 +9,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@arc-web/components": "^1.1.1",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
@@ -40,5 +41,10 @@
     "vue-cli-plugin-vuetify": "^2.4.3",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0"
+  },
+  "eslintConfig": {
+    "rules": {
+      "vue/no-deprecated-slot-attribute": "off"
+    }
   }
 }

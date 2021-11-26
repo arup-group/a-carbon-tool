@@ -3,7 +3,6 @@ name: Publish ACT to S3
 # Controls when the action will run. 
 on: 
   push:
-    branches: [dev]
   workflow_dispatch:
 
 jobs:
@@ -25,6 +24,13 @@ jobs:
     - run: npm run build --if-present
     - run: npm run test:unit
 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+
     - name: Upload to S3
       if: github.ref == 'refs/heads/main'
       run: |
@@ -33,5 +39,5 @@ jobs:
     - name: Invalidate Cache
       if: github.ref == 'refs/heads/main'
       run: |
-        distribution_id=$(aws cloudfront list-distributions | jq -r 'select(.DistributionList.Items[0].Aliases.Items[0] == "act.staging-speckle.arup.com") | .DistributionList.Items[0].Id')
+        distribution_id=$(aws cloudfront list-distributions | jq -r 'select(.DistributionList.Items[1].Aliases.Items[0] == "act.staging-speckle.arup.com") | .DistributionList.Items[0].Id')
         aws cloudfront create-invalidation --distribution-id $distribution_id --paths /index.html

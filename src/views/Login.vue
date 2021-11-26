@@ -1,19 +1,24 @@
 <template>
-  <div class="home">
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-  </div>
+  <v-main>
+    <LoginCard :servers="servers" @submit="logIn" />
+  </v-main>
 </template>
 
 <script lang="ts">
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import LoginCard from "@/components/LoginCard.vue";
 
 import { Vue, Component } from "vue-property-decorator";
 
+import { Server } from "@/models/auth/";
+
 @Component({
-  components: { HelloWorld }
+  components: { LoginCard }
 })
 export default class Login extends Vue {
+  servers: Server[] = this.$store.state.servers;
 
+  logIn(server: Server) {
+    this.$store.dispatch("redirectToAuth", server);
+  }
 }
 </script>

@@ -1,0 +1,37 @@
+name: Publish ACT to S3
+
+# Controls when the action will run. 
+on: 
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x] #12.x, 14.x, 
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm run test:unit
+
+    - name: Upload to S3
+      if: github.ref == 'refs/heads/main'
+      run: |
+        aws s3 sync --delete dist/ s3://act.staging-speckle.arup.com-dev
+
+    - name: Invalidate Cache
+      if: github.ref == 'refs/heads/main'
+      run: |
+        distribution_id=$(aws cloudfront list-distributions | jq -r 'select(.DistributionList.Items[0].Aliases.Items[0] == "act.staging-speckle.arup.com") | .DistributionList.Items[0].Id')
+        aws cloudfront create-invalidation --distribution-id $distribution_id --paths /index.html

@@ -1,6 +1,6 @@
 <template>
   <arc-navbar slot="nav" logo="./assets/logo.svg" arup="false">
-    <div slot="name">a carbon tool</div>
+    <div slot="name">act | a carbon tool</div>
     <arc-button v-if="li" type="tab" color="secondary" @click="$router.push('landing')">Home</arc-button>
     <arc-button v-if="li" type="tab" color="secondary">About</arc-button>
     <arc-button v-if="li" type="tab" color="secondary">Help</arc-button>

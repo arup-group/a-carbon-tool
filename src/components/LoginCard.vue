@@ -1,12 +1,12 @@
 <template>
   <v-form ref="form" @submit.prevent="checkSubmit">
     <v-container class="d-flex justify-center align-center">
-      <v-row>
+      <v-row class='justify-center'>
         <v-col cols='12'>
           <v-card flat class='justify-center'>
             <v-img
               src='/assets/logo.svg'
-              max-height='200px'
+              max-height='160px'
               contain
             >
             </v-img>
@@ -14,9 +14,9 @@
             <v-card-subtitle class='text-center pa-4'><i>creating with conscience</i></v-card-subtitle>
           </v-card>
         </v-col>
-        <v-col cols='12' class="d-flex justify-center align-center">
-          <v-card style="width: 50%" outlined>
-            <v-card-title class="">Log In</v-card-title>
+        <v-col cols='12' md='9' class="d-flex justify-center align-center">
+          <v-card outlined>
+            <v-card-title class="">Log in</v-card-title>
             <v-card-subtitle class="text--primary">
               Define the Speckle server you wish to connect to
             </v-card-subtitle>
@@ -29,7 +29,21 @@
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
               <v-btn color="primary" text type="submit">
-                Log In
+                Log in
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+        <v-col cols='12'>
+          <v-card flat>
+            <v-card-actions class='justify-center'>
+              <v-btn
+                icon
+                large
+                href='https://github.com/arup-group/a-carbon-tool'
+                target='_blank'
+              >
+                <v-icon>mdi-github</v-icon>
               </v-btn>
             </v-card-actions>
           </v-card>

@@ -1,0 +1,33 @@
+name: Build Infrastructure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docsInfra:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      # git config --local --remove-section http."https://github.com/"
+      # git config --global url."https://foo:${{ secrets.TERRAFORM_MODULE_READ_PAT }}@github.com/arup-group".insteadOf "https://github.com/arup-group"
+
+      - name: Initialise terraform
+        run: |
+          terraform init -backend-config=backend.config
+        working-directory: infra
+
+      - name: Build Infrastructure
+        working-directory: infra
+        run: |
+          terraform apply -auto-approve \
+            -var-file=staging.tfvars \
+            -var="azure_app_client_secret=${{ secrets.STATIC_PAGES_CLIENT_SECRET }}" \
+            -var="private_key=${{ secrets.STATIC_PAGES_PRIVATE_KEY }}" \
+            -var="public_key=${{ secrets.STATIC_PAGES_PUBLIC_KEY }}"

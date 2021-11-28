@@ -1,4 +1,5 @@
 .DS_Store
+.env
 node_modules
 /dist
 
@@ -21,3 +22,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+.terraform
+id_rsa
+id_rsa.pub

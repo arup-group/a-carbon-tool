@@ -8,6 +8,7 @@
     <arc-button v-if="li" size="large" type="tab" @click="$router.push('assessment')">New Assessment</arc-button>
   </arc-navbar>
 </template>
+
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 

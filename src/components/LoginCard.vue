@@ -1,24 +1,40 @@
 <template>
   <v-form ref="form" @submit.prevent="checkSubmit">
     <v-container class="d-flex justify-center align-center">
-      <v-card style="width: 50%">
-        <v-card-title class="">Log In</v-card-title>
-        <v-card-subtitle class="text--primary">
-          Define the Speckle server you wish to connect to
-        </v-card-subtitle>
-        <v-card-text>
-          <v-select
-            v-model="model"
-            :items="items"
-            label="Select server"
-          ></v-select>
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn color="primary" text type="submit">
-            Log In
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <v-row>
+        <v-col cols='12'>
+          <v-card flat class='justify-center'>
+            <v-img
+              src='/assets/logo.svg'
+              max-height='200px'
+              contain
+            >
+            </v-img>
+            <v-card-title class='text-h4 justify-center'>act | a carbon tool</v-card-title>
+            <v-card-subtitle class='text-center pa-4'><i>creating with conscience</i></v-card-subtitle>
+          </v-card>
+        </v-col>
+        <v-col cols='12' class="d-flex justify-center align-center">
+          <v-card style="width: 50%" outlined>
+            <v-card-title class="">Log In</v-card-title>
+            <v-card-subtitle class="text--primary">
+              Define the Speckle server you wish to connect to
+            </v-card-subtitle>
+            <v-card-text>
+              <v-select
+                v-model="model"
+                :items="items"
+                label="Select server"
+              ></v-select>
+            </v-card-text>
+            <v-card-actions class="d-flex justify-end">
+              <v-btn color="primary" text type="submit">
+                Log In
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </v-form>
 </template>

@@ -1,22 +1,33 @@
 <template>
-    <v-content>
+    <v-main>
         <v-card>
             <v-card-title>{{ title }}</v-card-title>
-            <v-card-subtitle>{{ co2Total }}</v-card-subtitle>
-
-            <v-card-actions></v-card-actions>
+            <v-card-subtitle>{{ co2Total }} tCO2e</v-card-subtitle>
+            <v-card-text>Graph will go here</v-card-text>
+            <v-card-actions>
+                <arc-button type="outlined">{{ buttonText }}</arc-button>
+                <v-spacer></v-spacer>
+                <div>
+                    <v-btn icon color="secondary">
+                        <v-icon>mdi-cog</v-icon>
+                    </v-btn>
+                    <v-btn icon color="secondary">
+                        <v-icon>mdi-share-variant</v-icon>
+                    </v-btn>
+                    <v-btn icon color="secondary">
+                        <v-icon>mdi-open-in-new</v-icon>
+                    </v-btn>
+                </div>
+            </v-card-actions>
         </v-card>
-    </v-content>
+    </v-main>
 </template>
 <script lang="ts">
+import "@arc-web/components/dist/components/button/arc-button.js";
+
 import { Vue, Component, Prop } from "vue-property-decorator";
 
-// TODO: move to shared file
-interface Project {
-  title: string;
-  co2Values: number[];
-  link: string;
-}
+import { Project } from "@/models/project";
 
 @Component({})
 export default class ProjectCard extends Vue {
@@ -33,6 +44,10 @@ export default class ProjectCard extends Vue {
     }
     get link() {
         return this.project.link;
+    }
+    // TODO: find actual name of this
+    get buttonText() {
+        return this.project.button;
     }
 }
 </script>

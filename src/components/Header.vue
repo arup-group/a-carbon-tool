@@ -1,30 +1,23 @@
 <template>
-  <v-card
-    class="overflow-hidden"
-    height="64"
-  >
-    <v-app-bar
-      color='background'
-    >
-      <v-img class="mr-5" src="@/assets/logo.svg" height='64px' max-width='64px' contain/>
-      <v-toolbar-title class="d-flex align-center">
-        a carbon tool
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <div v-if="loggedIn" class="d-flex align-center">
-        <v-btn color="secondary" text to='/about' >About</v-btn>
-        <v-btn color="secondary" text to='/help' >Help</v-btn>
-        <v-btn color="secondary" text class="mr-2">Log Out</v-btn>
-        <v-btn color="secondary" text>New Assessment</v-btn>
-      </div>
-    </v-app-bar>
-  </v-card>
+  <arc-navbar slot="nav" logo="./assets/logo.svg" arup="false">
+    <div slot="name">a carbon tool</div>
+    <arc-button v-if="li" type="tab" color="secondary" @click="$router.push('landing')">Home</arc-button>
+    <arc-button v-if="li" type="tab" color="secondary">About</arc-button>
+    <arc-button v-if="li" type="tab" color="secondary">Help</arc-button>
+    <arc-button v-if="li" type="tab" color="secondary" @click="logout">Log Out</arc-button>
+    <arc-button v-if="li" size="large" type="tab" @click="$router.push('assessment')">New Assessment</arc-button>
+  </arc-navbar>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class Header extends Vue {
-  @Prop() loggedIn!: boolean;
+  @Prop() li!: boolean; // li = Logged In
+
+  @Emit("logout")
+  logout() {
+    console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
+  }
 }
 </script>

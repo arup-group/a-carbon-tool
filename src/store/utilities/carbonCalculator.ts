@@ -1,6 +1,6 @@
 // DEFINITIONS
 // definitions to be superceded elsewhere once we hook up speckle
-interface speckleObject {
+interface SpeckleObject {
     id : string;
     volume : number;
     transport: string;
@@ -12,7 +12,7 @@ interface speckleObject {
 }
 
 // as shown in materials.json
-interface material {
+interface Material {
     density: number;
     wastage: number;
     a1a3Carbon: number; //kgCO2e/kg
@@ -43,7 +43,7 @@ const transportFactors = {
 
 // CALCULATIONS
 // calculate the a1a3 carbon for any speckle object against a specified material
-function a1a3Carbon(obj: speckleObject, mat: material) {
+function a1a3Carbon(obj: SpeckleObject, mat: Material) {
     // calculate mass of object
     var mass = obj.volume * mat.density
     // calculate a1a3 carbon of object
@@ -52,7 +52,7 @@ function a1a3Carbon(obj: speckleObject, mat: material) {
 }
 
 // calculate the carbon associated with transport
-function a4Carbon(obj: speckleObject, mat: material) {
+function a4Carbon(obj: SpeckleObject, mat: Material) {
     
     const mode = transportType
     const factors = transportFactors
@@ -80,7 +80,7 @@ function a5CarbonSite(sysCost: number) {
 }
 
 // calculate the carbon associated with material wastage
-function a5CarbonWaste(obj: speckleObject, mat: material) {
+function a5CarbonWaste(obj: SpeckleObject, mat: Material) {
     var wasteVolume = obj.volume * ((1/(1-mat.wastage))-1)
 
     // create new object with waste volume
@@ -96,7 +96,7 @@ function a5CarbonWaste(obj: speckleObject, mat: material) {
     return a5waste
 }
 
-function a5Carbon(sysCost: number, obj: speckleObject, mat: material) {
+function a5Carbon(sysCost: number, obj: SpeckleObject, mat: Material) {
     var a5 = a5CarbonSite(sysCost) + a5CarbonWaste(obj, mat)
 
     return a5

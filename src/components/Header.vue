@@ -12,8 +12,8 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <div v-if="loggedIn" class="d-flex align-center">
-        <v-btn color="secondary" text>About</v-btn>
-        <v-btn color="secondary" text>Help</v-btn>
+        <v-btn color="secondary" text to='/about' >About</v-btn>
+        <v-btn color="secondary" text to='/help' >Help</v-btn>
         <v-btn color="secondary" text class="mr-2">Log Out</v-btn>
         <v-btn color="secondary" text>New Assessment</v-btn>
       </div>

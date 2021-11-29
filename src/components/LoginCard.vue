@@ -22,6 +22,7 @@
     </v-container>
   </v-form>
 </template>
+
 <script lang="ts">
 import { Server } from "@/models/auth/";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";

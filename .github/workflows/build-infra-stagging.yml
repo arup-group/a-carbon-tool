@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     paths:
-    - 'infra/**
-    - '.github/workflows/build-infra-staging.yml'
+      - 'infra/**'
+      - '.github/workflows/build-infra-staging.yml'
 
 jobs:
   infra:

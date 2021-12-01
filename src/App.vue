@@ -56,8 +56,8 @@ export default class App extends Vue {
     return this.$store.getters.isAuthenticated;
   }
 
-  logout() {
-    this.$store.dispatch("logout");
+  async logout() {
+    await this.$store.dispatch("logout");
   }
 }
 </script>

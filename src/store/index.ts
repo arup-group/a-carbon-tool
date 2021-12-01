@@ -9,6 +9,7 @@ import {
   speckleLogOut,
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError } from "@/models/auth/";
+import router from "@/router";
 
 Vue.use(Vuex);
 
@@ -59,6 +60,8 @@ export default new Vuex.Store({
 
       // wipe the tokens
       speckleLogOut();
+
+      router.push("login")
     },
     async exchangeAccessCode(context, accessCode: string) {
       const server = getServer(context);

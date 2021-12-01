@@ -61,7 +61,7 @@ export default new Vuex.Store({
       // wipe the tokens
       speckleLogOut();
 
-      router.push("login")
+      router.push("login");
     },
     async exchangeAccessCode(context, accessCode: string) {
       const server = getServer(context);

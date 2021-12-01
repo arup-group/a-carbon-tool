@@ -9,13 +9,13 @@
         Speckle
       </h2>
     </div>
-    <div class="grid">
-        <project-card
-          v-for="project in projects"
-          :key="project.title"
-          :project="project"
-        />
-      </div>
+    <div class="grid mt-15">
+      <project-card
+        v-for="project in projects"
+        :key="project.title"
+        :project="project"
+      />
+    </div>
   </v-main>
 </template>
 <script lang="ts">
@@ -30,27 +30,60 @@ export default class Landing extends Vue {
   projects: Project[] = [
     {
       title: "Super great project",
-      co2Values: [50, 20, 10],
+      co2Values: [
+        {
+          label: "some value 1",
+          value: 50,
+        },
+        {
+          label: "some value 2",
+          value: 20,
+        },
+        {
+          label: "some value 3",
+          value: 10,
+        },
+      ],
       link: "",
-      button: "Superstructure",
+      category: "Superstructure",
     },
     {
       title: "Imaginary project 3",
-      co2Values: [50, 20, 10],
+      co2Values: [
+        {
+          label: "some value 1",
+          value: 50,
+        },
+        {
+          label: "some value 2",
+          value: 20,
+        },
+        {
+          label: "some value 3",
+          value: 10,
+        },
+      ],
       link: "",
-      button: "Substructure",
+      category: "Substructure",
     },
     {
       title: "Some other project",
-      co2Values: [50, 20, 10],
+      co2Values: [
+        {
+          label: "some value 1",
+          value: 50,
+        },
+        {
+          label: "some value 2",
+          value: 20,
+        },
+        {
+          label: "some value 3",
+          value: 10,
+        },
+      ],
       link: "",
-      button: "Services",
-    },
-    {
-      title: "Some other project",
-      co2Values: [50, 20, 10],
-      link: "",
-      button: "Services",
+      category: "Services",
     },
   ];
 }
@@ -67,7 +100,7 @@ export default class Landing extends Vue {
 .grid {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 33% 33% 33%;
   column-gap: 1rem;
   row-gap: 1rem;
 }

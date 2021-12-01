@@ -4,7 +4,8 @@
       <v-card-title>{{ title }}</v-card-title>
       <v-card-subtitle>{{ co2Total }} tCO2e</v-card-subtitle>
       <v-card-text>
-        <DoughnutChart :data="co2Values" />
+        <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
+        <DoughnutChart :data="co2Values" :chartData="{}" />
       </v-card-text>
       <v-card-actions>
         <v-chip outlined>{{ category }}</v-chip>
@@ -25,8 +26,6 @@
   </v-main>
 </template>
 <script lang="ts">
-import "@arc-web/components/dist/components/button/arc-button.js";
-
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 import { Project } from "@/models/project";

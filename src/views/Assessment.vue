@@ -11,7 +11,7 @@ import { Component, Vue } from "vue-property-decorator";
 
 @Component({
   components: { Menu1b }
-  })
+})
 export default class Assessment extends Vue {}
 </script>
 

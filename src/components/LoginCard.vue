@@ -5,43 +5,39 @@
         <v-card-title class="">Log In here</v-card-title>
         <!-- added some text to show the user what to do -->
         <v-card-subtitle class="text--primary"> 
-          Please let us know where you belong!
+          Select a server root:
         </v-card-subtitle>
         <div id="arup-xyz">
           <!-- added button to direct to arup server -->
-          <v-btn name="arup_btn" @click="setServerType($event)" color="secondary" text>
+          <v-btn @click="setServerType('arup')" color="secondary" text>
             Arup Servers
           </v-btn>
           <!-- added button to direct to some other server function -->
-          <v-btn name="xyz_btn" @click="setServerType($event)" color="secondary" text>
+          <v-btn @click="setServerType('xyz_btn')" color="secondary" text>
             XYZ Servers
           </v-btn>
         </div>
         <!-- updated the text slightly to be more descriptive of action -->
-
-        <!-- TODO: the below should be conditionally rendered -->
         <template v-if="serverType">
-          <label>arup server</label>
+          <v-card-subtitle class="text--primary">
+            Define the Speckle server you wish to connect to
+          </v-card-subtitle>
+          <v-card-text>
+            <v-select
+              v-model="model"
+              :items="items"
+              label="Select server location"
+            ></v-select>
+          </v-card-text>
+          <v-card-actions class="d-flex justify-end">
+            <v-btn color="primary" text type="submit">Log In</v-btn>
+          </v-card-actions>
         </template>
         <template v-else>
-          <label>xyz server</label>
+          <v-card-subtitle class="text--secondary">
+            non arup server list shown?
+          </v-card-subtitle>
         </template>
-
-        <v-card-subtitle class="text--primary">
-          Define the Speckle server you wish to connect to
-        </v-card-subtitle>
-        <v-card-text>
-          <v-select
-            v-model="model"
-            :items="items"
-            label="Select server location"
-          ></v-select>
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn color="primary" text type="submit">
-            Log In
-          </v-btn>
-        </v-card-actions>
       </v-card>
     </v-container>
   </v-form>
@@ -55,18 +51,19 @@ export default class LoginCard extends Vue {
   @Prop() servers!: Server[];
   model: Server = {} as Server;
 
-  serverType = true;
+  serverType = false;
 
-  setServerType(event: any) {
-    console.log(event);
-    console.log(event.target.nodeName);
-    // could do an if span get target parent and then name
-    // then we'd say if the name was arup show one thing if not show the other
-    this.serverType = !this.serverType;
+
+  setServerType(btn_type : string) {
+    // TODO: make conditinal to show arup of XYZ
+    if (btn_type === 'arup') {
+      this.serverType = true;
+    } else {
+      this.serverType = false;
+    }
+    
     return this.serverType;
-    //console.dir(this.serverType);
   };
- 
 
   get items() {
     if (this.servers) {

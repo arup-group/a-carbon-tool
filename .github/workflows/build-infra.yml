@@ -1,0 +1,59 @@
+name: Build Infrastructure
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infra/**'
+      - '.github/workflows/build-infra.yml'
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [staging, production]
+        include:
+          - environment: staging
+            accessKey: AWS_ACCESS_KEY_ID
+            secretAccessKey: AWS_SECRET_ACCESS_KEY
+          - environment: production
+            accessKey: PROD_AWS_ACCESS_KEY_ID
+            secretAccessKey: PROD_AWS_SECRET_ACCESS_KEY
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets[matrix.accessKey] }}
+          aws-secret-access-key: ${{ secrets[matrix.secretAccessKey] }}
+          aws-region: eu-west-1
+
+      - name: Initialise terraform
+        run: |
+          git config --local --remove-section http."https://github.com/"
+          git config --global url."https://foo:${{ secrets.TERRAFORM_MODULE_READ_PAT }}@github.com/arup-group".insteadOf "https://github.com/arup-group"
+          terraform init -backend-config=${{ matrix.environment }}.config
+        working-directory: infra
+
+      - name: Build Infrastructure
+        working-directory: infra
+        run: |
+          terraform plan \
+            -var-file=${{ matrix. environment }}.tfvars \
+            -var="azure_app_client_secret=${{ secrets.STATIC_PAGES_CLIENT_SECRET }}" \
+            -var="private_key=${{ secrets.STATIC_PAGES_PRIVATE_KEY }}" \
+            -var="public_key=${{ secrets.STATIC_PAGES_PUBLIC_KEY }}"
+
+
+      - name: Build Infrastructure
+        if: github.ref == 'refs/heads/main'
+        working-directory: infra
+        run: |
+          terraform apply -auto-approve -no-color \
+            -var-file=${{ matrix. environment }}.tfvars \
+            -var="azure_app_client_secret=${{ secrets.STATIC_PAGES_CLIENT_SECRET }}" \
+            -var="private_key=${{ secrets.STATIC_PAGES_PRIVATE_KEY }}" \
+            -var="public_key=${{ secrets.STATIC_PAGES_PUBLIC_KEY }}"

@@ -25,7 +25,7 @@
                 v-model="component"
                 :items="items_comp"
                 :rules="selectionRules"
-                label="component"
+                label="Component"
               ></v-select>
               <v-text-field
                 v-model="projectValue"
@@ -84,9 +84,11 @@ export default class Menu1b extends Vue {
       isFormValid: false,
       project: "",
       speckleStream: "",
-      textRules: [(v) => !!v || "Text is required"],
-      selectionRules: [(v) => !!v || "Input is required"],
-      valueRules: [(v) => Number.isInteger(Number(v)) || "Number is required"]
+      textRules: [(v: string) => !!v || "Text is required"],
+      selectionRules: [(v: string) => !!v || "Input is required"],
+      valueRules: [
+        (v: number) => Number.isInteger(Number(v)) || "Number is required",
+      ],
     };
   }
 }

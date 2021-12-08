@@ -14,7 +14,7 @@
           </v-btn>
           <!-- added button to direct to some other server function -->
           <v-btn @click="setServerType('xyz_btn')" color="secondary" text>
-            XYZ Servers
+            XYZ Server
           </v-btn>
         </div>
         <!-- updated the text slightly to be more descriptive of action -->

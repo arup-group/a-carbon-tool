@@ -5,7 +5,7 @@
         <v-card-title class="">Log In here</v-card-title>
         <!-- added some text to show the user what to do -->
         <v-card-subtitle class="text--primary"> 
-          Select a server root:
+          Select a server:
         </v-card-subtitle>
         <div id="arup-xyz">
           <!-- added button to direct to arup server -->

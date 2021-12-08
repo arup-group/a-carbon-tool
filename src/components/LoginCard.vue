@@ -12,7 +12,7 @@
           <v-btn @click="setServerType('arup')" color="secondary" text>
             Arup Servers
           </v-btn>
-          <!-- added button to direct to some other server function -->
+          <!-- added button to direct to some other server function-->
           <v-btn @click="setServerType('xyz_btn')" color="secondary" text>
             XYZ Server
           </v-btn>

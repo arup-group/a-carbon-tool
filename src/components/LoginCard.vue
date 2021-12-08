@@ -17,7 +17,7 @@
             XYZ Server
           </v-btn>
         </div>
-        <!-- updated the text slightly to be more descriptive of action -->
+        <!-- updated the text slightly to be more descriptive of request -->
         <template v-if="serverType">
           <v-card-subtitle class="text--primary">
             Define the Speckle server you wish to connect to:

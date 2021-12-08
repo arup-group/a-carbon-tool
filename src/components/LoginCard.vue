@@ -8,7 +8,7 @@
           Select a server:
         </v-card-subtitle>
         <div id="arup-xyz">
-          <!-- added button to direct to arup server -->
+          <!-- added button to direct to arup server-->
           <v-btn @click="setServerType('arup')" color="secondary" text>
             Arup Servers
           </v-btn>

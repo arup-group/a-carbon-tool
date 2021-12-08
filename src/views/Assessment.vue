@@ -1,16 +1,16 @@
 <template>
   <v-main>
-    <Menu1b/>
+    <AssessmentStepper />
   </v-main>
 </template>
 
 <script lang="ts">
-import Menu1b from "@/components/Menu1b.vue";
+import AssessmentStepper from "@/components/AssessmentStepper.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({
-  components: { Menu1b }
+  components: { AssessmentStepper }
 })
 export default class Assessment extends Vue {}
 </script>

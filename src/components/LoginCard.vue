@@ -20,7 +20,7 @@
         <!-- updated the text slightly to be more descriptive of action -->
         <template v-if="serverType">
           <v-card-subtitle class="text--primary">
-            Define the Speckle server you wish to connect to
+            Define the Speckle server you wish to connect to:
           </v-card-subtitle>
           <v-card-text>
             <v-select

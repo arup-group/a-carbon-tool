@@ -7,3 +7,15 @@ export const userInfoQuery = () => `query {
       company
     }
   }`;
+
+export const streamReferencedObjects = (id: string) => `query {
+  stream(id: "${id}") {
+    branch {
+      commits {
+        items {
+          referencedObject
+        }
+      }
+    }
+  }
+}`;

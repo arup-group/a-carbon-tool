@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@arc-web/components": "^1.1.1",
-    "@speckle/viewer": "^2.2.3",
+    "@speckle/objectloader": "^2.2.0",
+    "@speckle/viewer": "^2.0.12",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",

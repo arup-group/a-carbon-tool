@@ -1,6 +1,7 @@
 import { AuthError, Server, Token } from "@/models/auth";
+import { StreamReferenceObjects } from "@/models/graphql";
 
-import { userInfoQuery } from "./graphql/speckleQueries";
+import { streamReferencedObjects, userInfoQuery } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -88,6 +89,7 @@ export async function speckleFetch(query: any, context: any) {
 }
 
 export const getUserData = (context: any) => speckleFetch(userInfoQuery(), context);
+export const getStreamObjects = (context: any, streamid: string): Promise<StreamReferenceObjects> => speckleFetch(streamReferencedObjects(streamid), context)
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

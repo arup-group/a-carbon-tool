@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import {
   exchangeAccessCode,
   getServer,
+  getStreamObjects,
   getToken,
   getUserData,
   goToSpeckleAuthpage,
@@ -22,7 +23,7 @@ export default new Vuex.Store({
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
     ],
-    selectedServer: {}, // should be a server object
+    selectedServer: {} as Server, // should be a server object
     token: {}, // should be a Token object
     authed: false,
     user: null,
@@ -34,7 +35,7 @@ export default new Vuex.Store({
   mutations: {
     logout(state) {
       state.token = {};
-      state.selectedServer = {};
+      state.selectedServer = {} as Server;
       state.authed = false;
       state.user = null;
       state.serverInfo = null;
@@ -93,8 +94,19 @@ export default new Vuex.Store({
       } catch (err) {
         console.error(err);
         if (err === AuthError.NOT_SIGNED_IN)
-          throw new Error(AuthError.NOT_SIGNED_IN)
+          throw new Error(AuthError.NOT_SIGNED_IN);
       }
+    },
+    async getObjectUrls(context, streamid: string) {
+      const objectIds = await getStreamObjects(context, streamid);
+
+      console.log("objectIds:", objectIds);
+
+      return objectIds.data.stream.branch.commits.items.map(
+        (item) =>{
+          console.log("item.reference")
+          return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`}
+      );
     },
   },
   modules: {},

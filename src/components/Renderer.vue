@@ -61,11 +61,6 @@ export default class extends Vue {
       this.selectedObjects.push(...objects);
       this.$emit("selection", this.selectedObjects);
     });
-    window.addEventListener("load", () => {
-      console.log("LOADED!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    });
-
-    // this.viewer.loadObject("https://latest.speckle.dev/streams/010b3af4c3/objects/a401baf38fe5809d0eb9d3c902a36e8f");
   }
 }
 </script>
@@ -74,7 +69,6 @@ export default class extends Vue {
   position: absolute;
   top: 0;
   width: 100%;
-  height: 100%;
-  z-index: 1;
+  height: 80vh;
 }
 </style>

@@ -17,7 +17,7 @@
             XYZ Server
           </v-btn>
         </div>
-        <!-- updated the text slightly to be more descriptive-->
+        <!-- updated the text slightly to be more descriptive -->
         <template v-if="serverType">
           <v-card-subtitle class="text--primary">
             Define the Speckle server you wish to connect to:
@@ -35,6 +35,7 @@
         </template>
         <template v-else>
           <v-card-subtitle class="text--secondary">
+            <!-- TODO: redirect to speckle xyz server speckle.xyz -->
             non arup server list shown?
           </v-card-subtitle>
         </template>

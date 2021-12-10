@@ -10,7 +10,7 @@
       :token="token"
       class="renderer"
     />
-    <div class="d-flex flex-column justify-space-between" height="100%">
+    <div class="d-flex flex-column justify-space-between card-container">
       <a-breakdown-card class="card" />
       <material-breakdown-card class="card" />
     </div>

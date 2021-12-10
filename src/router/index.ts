@@ -48,7 +48,7 @@ router.beforeEach(async (to, from, next) => {
       } catch (err: any) {
         // redirect to login page if the user is not signed in
         if (err.message === AuthError.NOT_SIGNED_IN) next("/login");
-        else next("/")
+        else next("/");
       }
     }
   }

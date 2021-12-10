@@ -3,16 +3,6 @@
     <arc-container theme="ACT-light" style="height:100%">
     <Header :li="isAuthenticated" @logout="logout" />
     <v-main>
-      <div v-if="isAuthenticated">
-        Welcome
-        <b>{{ name }}</b>
-        ! You are connected to
-        <b>
-          {{ company }}'s
-          <em>{{ serverName }}</em>
-        </b>
-        <v-btn @click="logout">logout</v-btn>
-      </div>
       <router-view/>
     </v-main>
     </arc-container>
@@ -28,7 +18,6 @@ import "@arc-web/components/dist/themes/index.css";
 import "@arc-web/components/dist/themes/light.css";
 
 import "@arc-web/components/dist/components/container/arc-container.js";
-import "@arc-web/components/dist/components/button/arc-button.js";
 import "@arc-web/components/dist/components/navbar/arc-navbar.js";
 
 import { setBasePath } from "@arc-web/components/dist/utilities/base-path";

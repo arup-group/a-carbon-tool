@@ -1,7 +1,15 @@
 <template>
   <v-container class="d-flex justify-space-between pt-5 container">
-    <project-info-card class="card" />
-    <Renderer v-if="urlsLoaded" :objecturls="objectUrls" :token="token" class="renderer" />
+    <div class="d-flex flex-column justify-space-between" height="100%">
+      <project-info-card class="card" />
+      <view-assessment-buttons class="card" />
+    </div>
+    <Renderer
+      v-if="urlsLoaded"
+      :objecturls="objectUrls"
+      :token="token"
+      class="renderer"
+    />
     <div class="d-flex flex-column justify-space-between" height="100%">
       <a-breakdown-card class="card" />
       <material-breakdown-card class="card" />
@@ -17,12 +25,38 @@ import Renderer from "@/components/Renderer.vue";
 import ProjectInfoCard from "@/components/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/MaterialBreakdownCard.vue";
+import ViewAssessmentButtons from "@/components/ViewAssessmentButtons.vue";
 
 @Component({
-  components: { Renderer, ProjectInfoCard, ABreakdownCard, MaterialBreakdownCard },
+  components: {
+    Renderer,
+    ProjectInfoCard,
+    ABreakdownCard,
+    MaterialBreakdownCard,
+    ViewAssessmentButtons
+  },
 })
 export default class ViewAssessment extends Vue {
+  objectUrls: string[] = [];
+  token!: string;
+
+  mounted() {
+    this.$store
+      .dispatch("getObjectUrls", this.assessment.streamId)
+      .then((res: string[]) => {
+        this.objectUrls = res;
+      });
+
+    console.log("token:", this.$store.state.token.token);
+    this.token = this.$store.state.token.token;
+  }
+
+  get urlsLoaded() {
+    return this.objectUrls.length > 0;
+  }
+
   assessment: AssessmentComplete = {
+    // dummy data
     streamId: "67899fd79d",
     projectInfo: {
       reportDate: new Date("02-11-21"),
@@ -70,25 +104,6 @@ export default class ViewAssessment extends Vue {
       ],
     },
   };
-
-  objectUrls: string[] = [];
-  token!: string;
-
-  mounted() {
-    this.$store
-      .dispatch("getObjectUrls", this.assessment.streamId)
-      .then((res: string[]) => {
-        console.log("res:", res);
-        this.objectUrls = res;
-      });
-
-    console.log("token:", this.$store.state.token.token);
-    this.token = this.$store.state.token.token;
-  }
-
-  get urlsLoaded() {
-    return this.objectUrls.length > 0;
-  }
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex justify-space-between pt-5 container">
-    <div class="d-flex flex-column justify-space-between" height="100%">
-      <project-info-card class="card" />
+    <div class="d-flex flex-column justify-space-between card-container">
+      <project-info-card class="card" :projectInfo="projectInfo" />
       <view-assessment-buttons class="card" />
     </div>
     <Renderer
@@ -55,12 +55,18 @@ export default class ViewAssessment extends Vue {
     return this.objectUrls.length > 0;
   }
 
+  get projectInfo() {
+    return this.assessment.projectInfo;
+  }
+
   assessment: AssessmentComplete = {
     // dummy data
     streamId: "67899fd79d",
     projectInfo: {
-      reportDate: new Date("02-11-21"),
-      Author: "Tom Bunn",
+      name: "Super great project",
+      type: "Superstructure",
+      reportDate: new Date(2021, 11, 2),
+      author: "Tom Bunn",
       JN: "000001",
       systemCost: 100000,
       floorArea: 10000,
@@ -120,5 +126,9 @@ export default class ViewAssessment extends Vue {
 }
 .container {
   height: 80vh;
+}
+.card-container {
+  width: 25%;
+  min-width: 20rem;
 }
 </style>

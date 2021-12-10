@@ -1,6 +1,8 @@
 export interface ProjectInfo {
+  name: string;
+  type: string;
   reportDate: Date;
-  Author: string;
+  author: string;
   JN: string;
   systemCost: number;
   floorArea: number;

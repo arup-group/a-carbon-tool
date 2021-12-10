@@ -4,8 +4,11 @@
     </v-card>
 </template>
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { ProjectInfo } from "@/models/assessment";
+import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
-export default class ABreakdownCard extends Vue {}
+export default class ABreakdownCard extends Vue {
+  
+}
 </script>

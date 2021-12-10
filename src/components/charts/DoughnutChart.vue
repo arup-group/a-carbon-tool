@@ -1,14 +1,14 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import VueChart from "vue-chartjs";
-import { DoughnutData } from "@/models/project";
+import { ChartData } from "@/models/chart";
 
 @Component
 export default class DoughnutChart extends Mixins(
   VueChart.Doughnut,
   VueChart.mixins.reactiveProp
 ) {
-  @Prop() readonly data!: Array<DoughnutData>;
+  @Prop() readonly data!: Array<ChartData>;
 
   mounted() {
     this.renderChart(

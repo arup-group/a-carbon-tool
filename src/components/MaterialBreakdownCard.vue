@@ -1,13 +1,8 @@
 <template>
-  <v-card>
-    <v-expand-transition>
-      <doughtnut-chart v-show="show" :data="chartData" :chartData="{}" />
-    </v-expand-transition>
-    <v-card-title class="d-flex justify-space-between mb-5">
+  <v-card class="card">
+    <doughtnut-chart :data="chartData" :chartData="{}" style="height: 80%" />
+    <v-card-title class="mb-5">
       <span class="text-h7">MATERIAL BREAKDOWN</span>
-      <v-btn icon @click="show = !show">
-        <v-icon>{{ show ? "mdi-chevron-down" : "mdi-chevron-up" }}</v-icon>
-      </v-btn>
     </v-card-title>
   </v-card>
 </template>
@@ -24,8 +19,6 @@ import DoughtnutChart from "./charts/DoughnutChart.vue";
 export default class MaterialBreakdownCard extends Vue {
   @Prop() materialBreakdown!: MaterialBreakdown;
 
-  show = true;
-
   get materials() {
     return this.materialBreakdown.materials;
   }
@@ -38,3 +31,8 @@ export default class MaterialBreakdownCard extends Vue {
   }
 }
 </script>
+<style scoped>
+.card {
+  max-height: 50%;
+}
+</style>

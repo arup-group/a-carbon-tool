@@ -12,7 +12,10 @@
     />
     <div class="d-flex flex-column justify-space-between card-container">
       <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
-      <material-breakdown-card class="card" :materialBreakdown="materialBreakdown" />
+      <material-breakdown-card
+        class="card"
+        :materialBreakdown="materialBreakdown"
+      />
     </div>
   </v-container>
 </template>
@@ -33,7 +36,7 @@ import ViewAssessmentButtons from "@/components/ViewAssessmentButtons.vue";
     ProjectInfoCard,
     ABreakdownCard,
     MaterialBreakdownCard,
-    ViewAssessmentButtons
+    ViewAssessmentButtons,
   },
 })
 export default class ViewAssessment extends Vue {
@@ -47,7 +50,6 @@ export default class ViewAssessment extends Vue {
         this.objectUrls = res;
       });
 
-    console.log("token:", this.$store.state.token.token);
     this.token = this.$store.state.token.token;
   }
 

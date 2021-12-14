@@ -28,7 +28,6 @@ export default class extends Vue {
   failed = false;
   mounted() {
     let renderDomElement = document.getElementById("renderer");
-    console.log("objecturls:", this.objecturls);
 
     if (!renderDomElement) {
       renderDomElement = document.createElement("div");
@@ -37,14 +36,10 @@ export default class extends Vue {
 
     this.domElement = renderDomElement;
     this.domElement.style.display = "inline-block";
-    // if (this.$refs.rendererparent) {
-    console.log("rendererparent", this.$refs.rendererparent);
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
-    // }
 
     this.viewer = new Viewer({ contained: renderDomElement });
     this.objecturls.forEach((url) => {
-      console.log("[Renderer mounted] url:", url);
       this.viewer.loadObject(url, this.token);
     });
 
@@ -52,11 +47,7 @@ export default class extends Vue {
       this.loading = args.progress * 100;
       this.viewer.interactions.zoomExtents();
     });
-    this.viewer.on("load-warning", ({ message }: any) => {
-      console.log("load-warning", message);
-    });
     this.viewer.on("select", (objects: any[]) => {
-      // console.log(objects)
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
       this.$emit("selection", this.selectedObjects);

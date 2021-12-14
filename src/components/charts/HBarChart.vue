@@ -1,17 +1,15 @@
 <script lang="ts">
-import { Component, Mixins, Prop, Watch } from "vue-property-decorator";
+import { Component, Mixins, Prop } from "vue-property-decorator";
 import VueChart from "vue-chartjs";
 import { ChartData } from "@/models/chart";
 
 @Component
 export default class HBarChart extends Mixins(
-  VueChart.HorizontalBar,
-//   VueChart.mixins.reactiveProp
+  VueChart.HorizontalBar
 ) {
   @Prop() readonly data!: Array<ChartData>;
 
   mounted() {
-    console.log("data:", this.data);
     if (this.data) {
       this.renderChart(
         {

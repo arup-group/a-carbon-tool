@@ -103,13 +103,9 @@ export default new Vuex.Store({
     async getObjectUrls(context, streamid: string) {
       const objectIds = await getStreamObjects(context, streamid);
 
-      console.log("objectIds:", objectIds);
-
-      return objectIds.data.stream.branch.commits.items.map(
-        (item) =>{
-          console.log("item.reference")
-          return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`}
-      );
+      return objectIds.data.stream.branch.commits.items.map((item) => {
+        return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
+      });
     },
   },
   modules: {},

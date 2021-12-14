@@ -12,7 +12,7 @@
     />
     <div class="d-flex flex-column justify-space-between card-container">
       <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
-      <material-breakdown-card class="card" />
+      <material-breakdown-card class="card" :materialBreakdown="materialBreakdown" />
     </div>
   </v-container>
 </template>
@@ -60,6 +60,9 @@ export default class ViewAssessment extends Vue {
   }
   get aBreakdown() {
     return this.assessment.aBreakdown;
+  }
+  get materialBreakdown() {
+    return this.assessment.materialBreakdown;
   }
 
   assessment: AssessmentComplete = {

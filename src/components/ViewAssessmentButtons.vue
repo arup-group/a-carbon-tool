@@ -1,12 +1,12 @@
 <template>
   <div class="d-flex">
-    <v-btn x-large icon color="secondary">
+    <v-btn x-large icon color="primary">
       <v-icon>mdi-cog</v-icon>
     </v-btn>
-    <v-btn x-large icon color="secondary">
+    <v-btn x-large icon color="primary">
       <v-icon>mdi-share-variant</v-icon>
     </v-btn>
-    <v-btn x-large icon color="secondary">
+    <v-btn x-large icon color="primary">
       <v-icon>mdi-open-in-new</v-icon>
     </v-btn>
   </div>

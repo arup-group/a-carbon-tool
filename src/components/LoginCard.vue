@@ -1,10 +1,10 @@
 <template>
   <v-form ref="form" @submit.prevent="checkSubmit">
     <v-container class="d-flex justify-center align-center">
-      <v-card style="width: 50%">
-        <v-card-title class="">Log In here</v-card-title>
+      <v-card outlined>
+        <v-card-title class="">Log In</v-card-title>
         <!-- added some text to show the user what to do -->
-        <v-card-subtitle class="text--primary"> 
+        <v-card-subtitle class="text--primary">
           Select a server:
         </v-card-subtitle>
         <div id="arup-xyz">
@@ -26,7 +26,7 @@
             <v-select
               v-model="model"
               :items="items"
-              label="Select server location"
+              label="Select server"
             ></v-select>
           </v-card-text>
           <v-card-actions class="d-flex justify-end">
@@ -43,6 +43,7 @@
     </v-container>
   </v-form>
 </template>
+
 <script lang="ts">
 import { Server } from "@/models/auth/";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";

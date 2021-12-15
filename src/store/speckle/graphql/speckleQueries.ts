@@ -7,3 +7,14 @@ export const userInfoQuery = () => `query {
       company
     }
   }`;
+
+export const streamsQuery = () => `query {
+  user {
+  name,
+  streams {
+  items {
+  name
+  }
+  }
+  }
+  }`;

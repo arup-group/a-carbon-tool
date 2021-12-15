@@ -5,6 +5,7 @@ import {
   getServer,
   getToken,
   getUserData,
+  getUserStreams,
   goToSpeckleAuthpage,
   speckleLogOut,
 } from "./speckle/speckleUtil";
@@ -99,6 +100,10 @@ export default new Vuex.Store({
           throw new Error(AuthError.NOT_SIGNED_IN)
       }
     },
+  async getUserStreams(context) {
+    const streams = await getUserStreams(context);
+      return streams;
+  }
   },
   modules: {},
 });

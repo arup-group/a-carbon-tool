@@ -6,6 +6,10 @@
     color: #2092D3;
 }
 
+ul {
+    list-style-type: none;
+}
+
 :host,
 arc-container[theme="ACT-light"] {
     /* Base */

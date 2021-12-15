@@ -1,12 +1,13 @@
 <template>
   <v-form v-model="isFormValid">
     <v-card-text>
-      <v-text-field
-        v-model="form.speckleStream"
+      <v-combobox
+        v-model="speckleStream"
         :rules="textRules"
         label="Speckle Stream"
+        :items="streams"
         required
-      ></v-text-field>
+      ></v-combobox>
       <v-text-field
         v-model="form.project"
         :rules="textRules"
@@ -36,10 +37,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component({})
 export default class Menu1b extends Vue {
+  @Prop() streams!: any;
+  mounted() {
+    console.log("[menu1b]", this.streams);
+  }
+  speckleStream = "";
   data() {
     return {
       items_comp: ["Substructure", "Superstructure"],

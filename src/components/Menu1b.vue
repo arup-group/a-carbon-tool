@@ -46,17 +46,21 @@ export default class Menu1b extends Vue {
     console.log("[menu1b]", this.streams);
   }
   speckleStream = "";
-  data() {
-    return {
-      items_comp: ["Substructure", "Superstructure"],
-      isFormValid: false,
-      form: {},
-      textRules: [(v: string) => !!v || "Text is required"],
-      selectionRules: [(v: string) => !!v || "Input is required"],
-      valueRules: [
-        (v: number) => Number.isInteger(Number(v)) || "Number is required",
-      ],
-    };
-  }
+  items_comp = [
+    "Substructure",
+    "Superstructure",
+    "Mechanical Services",
+    "Electrical Services",
+    "Public Health & Hydraulics",
+    "Skin",
+    "Space Plan",
+  ];
+  isFormValid = false;
+  form = {};
+  textRules = [(v: string) => !!v || "Text is required"];
+  selectionRules = [(v: string) => !!v || "Input is required"];
+  valueRules = [
+    (v: number) => Number.isInteger(Number(v)) || "Number is required",
+  ];
 }
 </script>

@@ -1,9 +1,36 @@
+:host,
+arc-container[theme="ACT-light"] {
+  /* Base */
+  --arc-font-color: var(--arc-grey-100);
+  --arc-input-color: var(--arc-font-color);
+  --arc-background-color: var(--arc-grey-010);
+  --arc-container-color: var(--arc-white-000);
+
+  /* Palette */
+  --arc-color-default: var(--arc-grey-010);
+  --arc-color-primary: var(--arc-blue-070);
+  --arc-color-secondary: var(--arc-blue-050);
+  --arc-color-error: var(--arc-red-050);
+  --arc-color-warning: var(--arc-orange-050);
+  --arc-color-info: var(--arc-blue-050);
+  --arc-color-success: var(--arc-green-050);
+
+  /* Hover */
+  --arc-hover-darker: rgba(var(--arc-black-100), 0.3);
+  --arc-hover-dark: rgba(var(--arc-black-100), 0.1);
+  --arc-hover-light: rgba(var(--arc-white-000), 0.7);
+  --arc-hover-lighter: rgba(var(--arc-white-000), 0.9);
+
+  /* Changing other defaults */
+  --arc-brand-height: 3rem;
+}
+
 .primary-text {
-    color: #2962B2;
+  color: rgba(var(--arc-color-primary));
 }
 
 .secondary-text {
-    color: #2092D3;
+  color: rgba(var(--arc-color-secondary));
 }
 
 ul {

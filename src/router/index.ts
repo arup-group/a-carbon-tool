@@ -17,9 +17,26 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Landing.vue"),
   },
   {
+    path: "/assessment/view",
+    name: "ViewAssessment",
+    component: () => import("../views/ViewAssessment.vue"),
+  },
+  {
     path: "/assessment",
-    name: "Assessment",
+    name: "NewAssessment",
     component: () => import("../views/Assessment.vue"),
+  },
+  {
+    path: "/about",
+    name: "About",
+    component: () =>
+      import("../views/About.vue"),
+  },
+  {
+    path: "/help",
+    name: "Help",
+    component: () =>
+      import("../views/Help.vue"),
   },
 ];
 
@@ -48,7 +65,7 @@ router.beforeEach(async (to, from, next) => {
       } catch (err: any) {
         // redirect to login page if the user is not signed in
         if (err.message === AuthError.NOT_SIGNED_IN) next("/login");
-        else next("/")
+        else next("/");
       }
     }
   }

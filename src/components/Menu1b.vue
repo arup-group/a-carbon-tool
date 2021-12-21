@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 interface StreamObject {label: string, value: string}
 
 @Component({})
@@ -49,14 +49,21 @@ export default class Menu1b extends Vue {
   mounted() {
     console.log("[menu1b]", this.streams);
   }
-  speckleStream = {} as StreamObject;
+  speckleStream: StreamObject = { label: "", value: "" };
   streamSelected(){
     try {
       const id = this.speckleStream.value;
       console.log(id);
+      if (id !== undefined) {
+        this.loadStream(id);
+      }
     } catch (error) {
       console.log(error);
     }
+  }
+  @Emit("loadStream")
+  loadStream(id : string){
+    return id;
   }
   items_comp = [
     "Substructure",

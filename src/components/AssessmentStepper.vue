@@ -7,7 +7,7 @@
           Data
         </v-stepper-step>
         <v-stepper-content step="1">
-          <Menu1b v-if="streams.length !== 0" :streams="streams" />
+          <Menu1b @loadStream="loadStream" v-if="streams.length !== 0" :streams="streams" />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="2" @click.native="e6 = 2">
           Materials
@@ -38,7 +38,7 @@
   </v-container>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import Menu1b from "@/components/Menu1b.vue";
 import Menu2 from "@/components/Menu2.vue";
 import Menu3 from "@/components/Menu3.vue";
@@ -50,5 +50,9 @@ export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
   "completed" = false;
   "e6" = 1;
+  @Emit("loadStream")
+  loadStream(id : string){
+    return id;
+  }
 }
 </script>

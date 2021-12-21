@@ -1,0 +1,53 @@
+name: Publish ACT to S3
+
+# Controls when the action will run. 
+on: 
+  push:
+  workflow_dispatch:
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, prod]
+        include:
+          - environment: dev
+            accessKey: AWS_ACCESS_KEY_ID
+            secretAccessKey: AWS_SECRET_ACCESS_KEY
+            domain: act.staging-speckle.arup.com
+          - environment: prod
+            accessKey: PROD_AWS_ACCESS_KEY_ID
+            secretAccessKey: PROD_AWS_SECRET_ACCESS_KEY
+            domain: act.speckle.arup.com
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js16
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm run test:unit
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets[matrix.accessKey] }}
+        aws-secret-access-key: ${{ secrets[matrix.secretAccessKey] }}
+        aws-region: eu-west-1
+
+    - name: Upload to S3
+      if: github.ref == 'refs/heads/main'
+      run: |
+        aws s3 sync --delete dist/ s3://${{ matrix.domain }}-${{ matrix.environment }}
+
+    - name: Invalidate Cache
+      if: github.ref == 'refs/heads/main'
+      run: |
+        distribution_id=$(aws cloudfront list-distributions | jq -r 'select(.DistributionList.Items[1].Aliases.Items[0] == "${{ matrix.domain }}") | .DistributionList.Items[0].Id')
+        aws cloudfront create-invalidation --distribution-id $distribution_id --paths /index.html

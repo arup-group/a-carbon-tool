@@ -1,4 +1,4 @@
-export interface DoughnutData {
+export interface ChartData {
     value: number;
     label: string;
 }

@@ -17,9 +17,9 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Landing.vue"),
   },
   {
-    path: "/assessment",
-    name: "Assessment",
-    component: () => import("../views/Assessment.vue"),
+    path: "/assessment/view",
+    name: "ViewAssessment",
+    component: () => import("../views/ViewAssessment.vue"),
   },
   {
     path: "/about",

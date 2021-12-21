@@ -6,6 +6,9 @@
         :rules="textRules"
         label="Speckle Stream"
         :items="streams"
+        :item-text="(streams) => streams['label']"
+        :item-value="(streams) => streams['value']"
+        @change="streamSelected"
         required
       ></v-combobox>
       <v-text-field
@@ -38,14 +41,23 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
+interface StreamObject {label: string, value: string}
 
 @Component({})
 export default class Menu1b extends Vue {
-  @Prop() streams!: any;
+  @Prop() streams!: StreamObject;
   mounted() {
     console.log("[menu1b]", this.streams);
   }
-  speckleStream = "";
+  speckleStream = {} as StreamObject;
+  streamSelected(){
+    try {
+      const id = this.speckleStream.value;
+      console.log(id);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   items_comp = [
     "Substructure",
     "Superstructure",

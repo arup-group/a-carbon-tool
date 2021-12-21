@@ -13,7 +13,7 @@ export const streamsQuery = () => `query {
   name,
   streams {
   items {
-  name
+  name, id
   }
   }
   }

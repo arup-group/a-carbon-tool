@@ -20,7 +20,7 @@ export default class Assessment extends Vue {
   mounted() {
     this.$store.dispatch("getUserStreams").then((res) => {
       this.availableStreams = res.data.user.streams.items.map((i: any) => {
-        return i.name
+        return { label: i.name, value: i.id };
       })
       console.log(res);
     });

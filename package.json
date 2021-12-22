@@ -9,15 +9,22 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@arc-web/components": "^1.1.1",
+    "@speckle/objectloader": "^2.2.0",
+    "@speckle/viewer": "^2.0.12",
+    "axios": "^0.24.0",
+    "chart.js": "^2.9.4",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "vue-chartjs": "^3.5.1",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0",
-    "vuex": "^3.4.0"
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@mdi/font": "^6.5.95",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
@@ -39,5 +46,10 @@
     "vue-cli-plugin-vuetify": "^2.4.3",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0"
+  },
+  "eslintConfig": {
+    "rules": {
+      "vue/no-deprecated-slot-attribute": "off"
+    }
   }
 }

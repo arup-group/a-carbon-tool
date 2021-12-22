@@ -3,35 +3,32 @@
     <v-card-text>
       <v-combobox
         v-model="speckleStream"
-        :rules="textRules"
         label="Speckle Stream"
         :items="streams"
         :item-text="(streams) => streams['label']"
-        :item-value="(streams) => streams['value']"
         @change="streamSelected"
         required
       ></v-combobox>
       <v-text-field
         v-model="form.project"
-        :rules="textRules"
-        label="Project"
+        label="Project name"
         required
       ></v-text-field>
       <v-select
         v-model="form.component"
         :items="items_comp"
         :rules="selectionRules"
-        label="Component"
+        label="Primary element category"
       ></v-select>
       <v-text-field
         v-model="form.projectValue"
         :rules="valueRules"
-        label="Project Value (£)"
+        label="System cost (£)"
         required
       ></v-text-field>
       <v-text-field
         v-model="form.gia"
-        label="Gross Internal Area (m2)"
+        label="System gross floor area (m2)"
         :rules="valueRules"
         required
       ></v-text-field>
@@ -41,7 +38,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
-interface StreamObject {label: string, value: string}
+import { StreamObject } from "@/models/newAssessment";
 
 @Component({})
 export default class Menu1b extends Vue {
@@ -49,8 +46,8 @@ export default class Menu1b extends Vue {
   mounted() {
     console.log("[menu1b]", this.streams);
   }
-  speckleStream: StreamObject = { label: "", value: "" };
-  streamSelected(){
+  speckleStream!: StreamObject;
+  streamSelected() {
     try {
       const id = this.speckleStream.value;
       console.log(id);
@@ -62,7 +59,7 @@ export default class Menu1b extends Vue {
     }
   }
   @Emit("loadStream")
-  loadStream(id : string){
+  loadStream(id: string) {
     return id;
   }
   items_comp = [
@@ -76,7 +73,7 @@ export default class Menu1b extends Vue {
   ];
   isFormValid = false;
   form = {};
-  textRules = [(v: string) => !!v || "Text is required"];
+  // textRules = [(v: string) => !!v || "Text is required"];
   selectionRules = [(v: string) => !!v || "Input is required"];
   valueRules = [
     (v: number) => Number.isInteger(Number(v)) || "Number is required",

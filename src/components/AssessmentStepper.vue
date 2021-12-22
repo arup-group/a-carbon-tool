@@ -1,6 +1,6 @@
 <template>
   <v-container class="d-flex justify-center align-center">
-    <v-card style="width: 60%">
+    <v-card style="width: 100%">
       <v-card-title class="">New Assessment</v-card-title>
       <v-stepper v-model="e6" vertical>
         <v-stepper-step :complete="completed" step="1" @click.native="e6 = 1">

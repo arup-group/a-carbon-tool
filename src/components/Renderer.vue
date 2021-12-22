@@ -46,6 +46,10 @@ export default class extends Vue {
     this.viewer.on("load-progress", (args: any) => {
       this.loading = args.progress * 100;
       this.viewer.interactions.zoomExtents();
+      if (this.loading === 100) {
+        console.log("loaded");
+        console.log("objectProperties:", this.viewer.getObjectsProperties());
+      }
     });
     this.viewer.on("select", (objects: any[]) => {
       this.selectedObjects.splice(0, this.selectedObjects.length);

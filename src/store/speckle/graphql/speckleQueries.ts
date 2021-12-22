@@ -10,14 +10,16 @@ export const userInfoQuery = () => `query {
 
 export const streamsQuery = () => `query {
   user {
-  name,
-  streams {
-  items {
-  name, id
-  }
-  }
-  }
+    name,
+      streams {
+        items {
+          name,
+          id
+        }
+      }
+    }
   }`;
+
 export const streamReferencedObjects = (id: string) => `query {
   stream(id: "${id}") {
     branch {

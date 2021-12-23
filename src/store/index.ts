@@ -10,7 +10,7 @@ import {
   goToSpeckleAuthpage,
   speckleLogOut,
 } from "./speckle/speckleUtil";
-import { Login, Server, AuthError } from "@/models/auth/";
+import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 
 Vue.use(Vuex);
@@ -26,7 +26,7 @@ export default new Vuex.Store({
       },
     ],
     selectedServer: {} as Server, // should be a server object
-    token: {}, // should be a Token object
+    token: {} as Token, // should be a Token object
     authed: false,
     user: null,
     serverInfo: null,
@@ -36,7 +36,7 @@ export default new Vuex.Store({
   },
   mutations: {
     logout(state) {
-      state.token = {};
+      state.token = {} as Token;
       state.selectedServer = {} as Server;
       state.authed = false;
       state.user = null;
@@ -101,10 +101,10 @@ export default new Vuex.Store({
           throw new Error(AuthError.NOT_SIGNED_IN);
       }
     },
-  async getUserStreams(context) {
-    const streams = await getUserStreams(context);
+    async getUserStreams(context) {
+      const streams = await getUserStreams(context);
       return streams;
-  },
+    },
     async getObjectUrls(context, streamid: string) {
       const objectIds = await getStreamObjects(context, streamid);
 
@@ -112,6 +112,54 @@ export default new Vuex.Store({
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
     },
+    async getObjectDetails(context, input: ObjectDetailsInput) {
+      const { streamid, objecturl } = input;
+      const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
+
+      console.log("inputs:", input);
+      console.log("url:", `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`);
+      const response = await fetch(
+        `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`,
+        {
+          headers: {
+            Accept: "text/plain",
+            Authorization: `Bearer ${context.state.token.token}`,
+          },
+        }
+      );
+      const rawObj = await response.text();
+      const rootObj = JSON.parse(rawObj);
+
+      console.log("[getObjectDetails] rootObj:", rootObj);
+
+      const childrenIds = Object.keys(rootObj.__closure).sort(
+        (a, b) => rootObj.__closure[a] - rootObj.__closure[b]
+      );
+      console.log("[getObjectDetails] childrenIds:", childrenIds);
+
+      const childrenObjects = await fetch(
+        `${context.state.selectedServer.url}/api/getobjects/${streamid}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${context.state.token.token}`,
+          },
+          body: JSON.stringify({ objects: JSON.stringify(childrenIds) }),
+        }
+      ).then( res => res.json()).then(data => {
+        console.log("[getObjectDetails] data:", data);
+        return data;
+      });
+
+      console.log("[getObjectDetails] childrenObjects:", childrenObjects);
+      return childrenObjects;
+    },
   },
   modules: {},
 });
+
+interface ObjectDetailsInput {
+  streamid: string;
+  objecturl: string;
+}

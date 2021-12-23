@@ -26,6 +26,16 @@ import Renderer from "@/components/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
+interface SpeckleType {
+  type: string;
+  ids: string[];
+}
+
+interface SpeckleObject {
+  id: string;
+  speckle_type: string;
+}
+
 @Component({
   components: { AssessmentStepper, Renderer },
 })
@@ -46,6 +56,26 @@ export default class Assessment extends Vue {
     console.log("id loaded", id);
     this.objectURLs = await this.$store.dispatch("getObjectUrls", id);
     console.log("URL", this.objectURLs);
+
+    const objects = await this.$store.dispatch("getObjectDetails", { streamid: id, objecturl: this.objectURLs[0] });
+    console.log("objects:", objects);
+
+    this.findTypes(objects);
+  }
+
+  findTypes(objects: SpeckleObject[]) {
+    let types: SpeckleType[] = [];
+
+    objects.forEach(o => {
+      let typeIndex = -1;
+      types.forEach((t, i) => {
+        if (t.type === o.speckle_type) typeIndex = i;
+      });
+      if (typeIndex !== -1) types[typeIndex].ids.push(o.id);
+      else types.push({ type: o.speckle_type, ids: [o.id]});
+    });
+
+    console.log("[findTypes] types:", types);
   }
 }
 </script>

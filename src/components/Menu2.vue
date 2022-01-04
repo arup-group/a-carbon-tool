@@ -1,53 +1,50 @@
 <template>
   <div>
     <v-form>
-      <v-card-text>
-        <v-combobox
-          v-model="source"
-          label="Source"
-          :items="sourceItems"
-          required
-        ></v-combobox>
-        <v-combobox
-          v-model="groupBy"
-          label="Group Objects By"
-          :items="groupByItems"
-          required
-        ></v-combobox>
-      </v-card-text>
+      <p>Grouping objects by speckle type</p>
+      <div
+        v-for="type in loadedTypes"
+        :key="type.type"
+        class="d-flex align-center justify-space-between"
+        style="width: 100%"
+      >
+        <material-type
+          :materials="materials"
+          :type="type"
+          @materialUpdated="materialUpdated"
+        />
+      </div>
     </v-form>
-    <v-btn color="secondary"> Review Materials </v-btn>
-    <ul>
-      <li v-for="item in materials" :key="item">
-        <v-hover v-slot="{ hover }">
-          <v-card :elevation="hover ? 16 : 2" :class="{ 'on-hover': hover }">
-            <v-form>
-              {{ item }}
-              <v-combobox
-                v-model="setMaterial"
-                label="Set Material"
-                :items="materialItems"
-                required
-              ></v-combobox>
-            </v-form>
-          </v-card>
-        </v-hover>
-      </li>
-    </ul>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
-@Component({})
+import MaterialType from "./MaterialType.vue";
+
+@Component({
+  components: { MaterialType },
+})
 export default class Menu2 extends Vue {
+  @Prop() types!: SpeckleType[];
+  @Prop() materials!: string[];
+
+  get loadedTypes() {
+    return this.types ? this.types : [];
+  }
+
+  @Emit("materialUpdated")
+  materialUpdated(material: MaterialUpdateOut) {
+    return material;
+  }
+
   setMaterial = "";
   groupBy = "";
   source = "";
   sourceItems = [];
   groupByItems = [];
   materialItems = [];
-  materials = [1, 2, 3];
 }
 </script>

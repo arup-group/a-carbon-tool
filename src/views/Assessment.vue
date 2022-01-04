@@ -5,8 +5,11 @@
         <AssessmentStepper
           style="z-index: 1"
           @loadStream="loadStream"
+          @materialUpdated="materialUpdated"
           v-if="availableStreams.length !== 0"
           :streams="availableStreams"
+          :types="types"
+          :materials="materials"
         />
       </v-col>
       <v-col cols="8">
@@ -26,15 +29,7 @@ import Renderer from "@/components/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
-interface SpeckleType {
-  type: string;
-  ids: string[];
-}
-
-interface SpeckleObject {
-  id: string;
-  speckle_type: string;
-}
+import { MaterialUpdateOut, SpeckleObject, SpeckleType } from "@/models/newAssessment";
 
 @Component({
   components: { AssessmentStepper, Renderer },
@@ -43,6 +38,10 @@ export default class Assessment extends Vue {
   availableStreams = [];
   objectURLs = [];
   token = "";
+  types: SpeckleType[] = [];
+  objects: SpeckleObject[] = [];
+  materials: string[] = this.$store.getters.materialsArrUK;
+
   mounted() {
     this.token = this.$store.state.token.token;
     this.$store.dispatch("getUserStreams").then((res) => {
@@ -57,13 +56,17 @@ export default class Assessment extends Vue {
     this.objectURLs = await this.$store.dispatch("getObjectUrls", id);
     console.log("URL", this.objectURLs);
 
-    const objects = await this.$store.dispatch("getObjectDetails", { streamid: id, objecturl: this.objectURLs[0] });
-    console.log("objects:", objects);
+    this.objects = await this.$store.dispatch("getObjectDetails", { streamid: id, objecturl: this.objectURLs[0] });
+    console.log("objects:", this.objects);
 
-    this.findTypes(objects);
+    this.types = this.findTypes(this.objects);
   }
 
-  findTypes(objects: SpeckleObject[]) {
+  materialUpdated(material: MaterialUpdateOut) {
+    console.log("[Assessment] material:", material);
+  }
+
+  findTypes(objects: SpeckleObject[]): SpeckleType[] {
     let types: SpeckleType[] = [];
 
     objects.forEach(o => {
@@ -76,6 +79,7 @@ export default class Assessment extends Vue {
     });
 
     console.log("[findTypes] types:", types);
+    return types;
   }
 }
 </script>

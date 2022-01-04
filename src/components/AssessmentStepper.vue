@@ -1,18 +1,28 @@
 <template>
   <v-container class="d-flex justify-center align-center">
-    <v-card style="width: 100%">
+    <v-card style="width: 100%; overflow-y: scroll; height: 85vh">
       <v-card-title class="">New Assessment</v-card-title>
       <v-stepper v-model="e6" vertical>
         <v-stepper-step :complete="completed" step="1" @click.native="e6 = 1">
           Data
         </v-stepper-step>
         <v-stepper-content step="1">
-          <Menu1b @loadStream="loadStream" v-if="streams.length !== 0" :streams="streams" />
+          <Menu1b
+            @loadStream="loadStream"
+            v-if="streams.length !== 0"
+            :streams="streams"
+          />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="2" @click.native="e6 = 2">
           Materials
         </v-stepper-step>
-        <v-stepper-content step="2"> <Menu2 /> </v-stepper-content>
+        <v-stepper-content step="2">
+          <Menu2
+            :types="types"
+            :materials="materials"
+            @materialUpdated="materialUpdated"
+          />
+        </v-stepper-content>
         <v-stepper-step :complete="completed" step="3" @click.native="e6 = 3">
           Transport
         </v-stepper-step>
@@ -42,16 +52,26 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import Menu1b from "@/components/Menu1b.vue";
 import Menu2 from "@/components/Menu2.vue";
 import Menu3 from "@/components/Menu3.vue";
+import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
 
 @Component({
   components: { Menu1b, Menu2, Menu3 },
 })
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
-  "completed" = false;
-  "e6" = 1;
+  @Prop() types!: SpeckleType[];
+  @Prop() materials!: string[];
+
+  completed = false;
+  e6 = 1;
+
+  @Emit("materialUpdated")
+  materialUpdated(material: MaterialUpdateOut) {
+    return material;
+  }
+
   @Emit("loadStream")
-  loadStream(id : string){
+  loadStream(id: string) {
     return id;
   }
 }

@@ -12,6 +12,10 @@ import {
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
+import {
+  materialCarbonFactors,
+  UKMaterialCarbonFactors,
+} from "./utilities/material-carbon-factors";
 
 Vue.use(Vuex);
 
@@ -33,6 +37,26 @@ export default new Vuex.Store({
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
+    materialsArrUK: (state): string[] => {
+      const tmparr = (
+        Object.keys(materialCarbonFactors.UK) as Array<
+          keyof UKMaterialCarbonFactors
+        >
+      ).map((type) => {
+        const arr: string[] = [];
+        Object.keys(materialCarbonFactors.UK[type]).forEach((t) => {
+          arr.push(`${type} - ${t}`);
+        });
+        return arr;
+      });
+      const arr: string[] = [];
+
+      tmparr.forEach((ta) => {
+        arr.push(...ta);
+      });
+
+      return arr;
+    },
   },
   mutations: {
     logout(state) {
@@ -117,7 +141,10 @@ export default new Vuex.Store({
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
       console.log("inputs:", input);
-      console.log("url:", `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`);
+      console.log(
+        "url:",
+        `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`
+      );
       const response = await fetch(
         `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`,
         {
@@ -147,10 +174,12 @@ export default new Vuex.Store({
           },
           body: JSON.stringify({ objects: JSON.stringify(childrenIds) }),
         }
-      ).then( res => res.json()).then(data => {
-        console.log("[getObjectDetails] data:", data);
-        return data;
-      });
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("[getObjectDetails] data:", data);
+          return data;
+        });
 
       console.log("[getObjectDetails] childrenObjects:", childrenObjects);
       return childrenObjects;

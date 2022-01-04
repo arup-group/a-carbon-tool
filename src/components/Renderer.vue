@@ -1,5 +1,6 @@
 <template>
   <div>
+    <v-btn @click="reset" style="z-index: 1">Reset colours</v-btn>
     <div
       ref="rendererparent"
       id="rendererparent"
@@ -47,8 +48,22 @@ export default class extends Vue {
       this.loading = args.progress * 100;
       this.viewer.interactions.zoomExtents();
       if (this.loading === 100) {
-        console.log("loaded");
+        console.log("loaded", this.viewer);
         console.log("objectProperties:", this.viewer.getObjectsProperties());
+        this.viewer.applyFilter({
+          colorBy: {
+            type: "category",
+            property: "speckle_type",
+            values: {
+              'Speckle.Core.Models.DataChunk': 'hsl(91, 100%, 50%)',
+              'Objects.BuiltElements.Revit.RevitRailing': 'hsl(0, 100%, 50%)',
+              'Objects.Geometry.Mesh': 'hsl(244, 100%, 50%)',
+              'Objects.BuiltElements.Revit.FamilyInstance': 'hsl(291, 100%, 50%)'
+            }
+          }
+        }).then((res: any) => {
+          console.log("[applyFilter] res:", res);
+        })
       }
     });
     this.viewer.on("select", (objects: any[]) => {
@@ -56,6 +71,11 @@ export default class extends Vue {
       this.selectedObjects.push(...objects);
       this.$emit("selection", this.selectedObjects);
     });
+  }
+
+  reset() {
+    console.log("reset");
+    this.viewer.applyFilter(null);
   }
 }
 </script>

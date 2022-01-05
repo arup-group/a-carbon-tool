@@ -1,3 +1,16 @@
+export interface MaterialFull extends Material {
+  name: string;
+  color: string; // will be a color hex code
+}
+
+export interface Material {
+  productStageCarbonA1A3: number;
+  density: number;
+  wastage: number;
+  units: string;
+  source: string;
+}
+
 export interface MaterialCarbonFactors {
   UK: UKMaterialCarbonFactors;
   Australia: any;
@@ -6,7 +19,9 @@ export interface MaterialCarbonFactors {
 }
 
 export interface UKMaterialCarbonFactors {
-  concrete: any;
+  concrete: {
+    [key: string]: Material;
+  };
   steel: any;
   blockwork: any;
   brick: any;

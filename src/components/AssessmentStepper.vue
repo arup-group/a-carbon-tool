@@ -53,6 +53,7 @@ import Menu1b from "@/components/Menu1b.vue";
 import Menu2 from "@/components/Menu2.vue";
 import Menu3 from "@/components/Menu3.vue";
 import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
+import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 @Component({
   components: { Menu1b, Menu2, Menu3 },
@@ -60,7 +61,7 @@ import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
   @Prop() types!: SpeckleType[];
-  @Prop() materials!: string[];
+  @Prop() materials!: MaterialFull[];
 
   completed = false;
   e6 = 1;

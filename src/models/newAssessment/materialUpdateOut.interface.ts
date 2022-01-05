@@ -1,6 +1,7 @@
+import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { SpeckleType } from ".";
 
 export interface MaterialUpdateOut {
-    material: string;
+    material: MaterialFull;
     type: SpeckleType;
 }

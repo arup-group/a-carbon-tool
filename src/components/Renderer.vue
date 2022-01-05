@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn @click="reset" style="z-index: 1">Reset colours</v-btn>
+    <v-btn @click="resetColors" style="z-index: 1">Reset colours</v-btn>
     <div
       ref="rendererparent"
       id="rendererparent"
@@ -11,13 +11,27 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { Viewer } from "@speckle/viewer";
+
+export interface ObjectColor {
+  color: string | null;
+  object: string; // should be unique to each item, making it a primary key
+}
 
 @Component
 export default class extends Vue {
   @Prop() objecturls!: string[];
   @Prop() token!: string;
+  @Prop() colors!: ObjectColor[];
+
+  currentColors: ObjectColor[] = [];
+
+  @Watch("colors")
+  onObjectColorChanged(value: ObjectColor[], oldValue: ObjectColor[]) {
+    console.log("watch:", value);
+    this.setColors(value);
+  }
 
   domElement!: any;
   alertMessage!: string;
@@ -28,6 +42,8 @@ export default class extends Vue {
   loading = 0;
   failed = false;
   mounted() {
+    console.log("objectUrls:", this.objecturls)
+
     let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
@@ -50,20 +66,10 @@ export default class extends Vue {
       if (this.loading === 100) {
         console.log("loaded", this.viewer);
         console.log("objectProperties:", this.viewer.getObjectsProperties());
-        this.viewer.applyFilter({
-          colorBy: {
-            type: "category",
-            property: "speckle_type",
-            values: {
-              'Speckle.Core.Models.DataChunk': 'hsl(91, 100%, 50%)',
-              'Objects.BuiltElements.Revit.RevitRailing': 'hsl(0, 100%, 50%)',
-              'Objects.Geometry.Mesh': 'hsl(244, 100%, 50%)',
-              'Objects.BuiltElements.Revit.FamilyInstance': 'hsl(291, 100%, 50%)'
-            }
-          }
-        }).then((res: any) => {
-          console.log("[applyFilter] res:", res);
-        })
+        // set initial colors if needed
+        if (this.colors) {
+          this.setColors(this.colors);
+        }
       }
     });
     this.viewer.on("select", (objects: any[]) => {
@@ -73,9 +79,42 @@ export default class extends Vue {
     });
   }
 
-  reset() {
+  async setColors(colors: ObjectColor[]) {
+    if (colors && colors.length > 0) {
+      const changeList: any[] = colors.map((c) => {
+        // return {
+        //   [c.object]: c.color,
+        // };
+        return {
+          key: c.object,
+          value: c.color
+        }
+      });
+
+      console.log("[setColors] changeList:", changeList, { ...changeList });
+      const changeListObj = changeList.reduce((obj, item) => Object.assign(obj, { [item.key]: item.value }), {});
+      console.log("changeListObj:", changeListObj);
+
+      const res = await this.viewer.applyFilter({
+        colorBy: {
+          type: "category",
+          property: "speckle_type",
+          values: changeListObj,
+          default: '#636363'
+        },
+      });
+
+      console.log("[setColors] done:", res);
+    }
+  }
+
+  resetColors() {
     console.log("reset");
     this.viewer.applyFilter(null);
+  }
+
+  instanceOfObjectColor(object: any): object is ObjectColor {
+    return object && "object" in object;
   }
 }
 </script>

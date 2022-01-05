@@ -14,8 +14,10 @@ import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 import {
   materialCarbonFactors,
+  MaterialFull,
   UKMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
+import { TransportType } from "@/models/newAssessment";
 
 Vue.use(Vuex);
 
@@ -34,22 +36,37 @@ export default new Vuex.Store({
     authed: false,
     user: null,
     serverInfo: null,
+    transportTypes: [{
+      name: "local",
+      color: "#53ac8b"
+    }, {
+      name: "regional",
+      color: "#2d8486"
+    }, {
+      name: "global",
+      color: "#1f9321"
+    }] as TransportType[]
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
-    materialsArrUK: (state): string[] => {
+    materialsArrUK: (state): MaterialFull[] => {
       const tmparr = (
         Object.keys(materialCarbonFactors.UK) as Array<
           keyof UKMaterialCarbonFactors
         >
       ).map((type) => {
-        const arr: string[] = [];
+        const arr: MaterialFull[] = [];
         Object.keys(materialCarbonFactors.UK[type]).forEach((t) => {
-          arr.push(`${type} - ${t}`);
+          const toPush: MaterialFull = {
+            name: `${type} - ${t}`,
+            ...materialCarbonFactors.UK[type][t],
+            color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
+          }
+          arr.push(toPush);
         });
         return arr;
       });
-      const arr: string[] = [];
+      const arr: MaterialFull[] = [];
 
       tmparr.forEach((ta) => {
         arr.push(...ta);

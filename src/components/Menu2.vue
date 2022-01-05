@@ -5,7 +5,6 @@
       <div
         v-for="type in loadedTypes"
         :key="type.type"
-        class="d-flex align-center justify-space-between"
         style="width: 100%"
       >
         <material-type
@@ -20,6 +19,7 @@
 
 <script lang="ts">
 import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
+import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import MaterialType from "./MaterialType.vue";
@@ -29,7 +29,7 @@ import MaterialType from "./MaterialType.vue";
 })
 export default class Menu2 extends Vue {
   @Prop() types!: SpeckleType[];
-  @Prop() materials!: string[];
+  @Prop() materials!: MaterialFull[];
 
   get loadedTypes() {
     return this.types ? this.types : [];

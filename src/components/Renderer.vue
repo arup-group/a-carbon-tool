@@ -14,23 +14,24 @@
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { Viewer } from "@speckle/viewer";
 
-export interface ObjectColor {
+export interface Color {
   color: string | null;
-  object: string; // should be unique to each item, making it a primary key
+  id: string; // should be unique to each item, making it a primary key
 }
 
 @Component
 export default class extends Vue {
   @Prop() objecturls!: string[];
   @Prop() token!: string;
-  @Prop() colors!: ObjectColor[];
+  @Prop() colors!: Color[];
 
-  currentColors: ObjectColor[] = [];
+  currentColors: Color[] = [];
 
   @Watch("colors")
-  onObjectColorChanged(value: ObjectColor[], oldValue: ObjectColor[]) {
+  onObjectColorChanged(value: Color[]) {
     console.log("watch:", value);
-    this.setColors(value);
+    if (value.length === 0) this.resetColors();
+    else this.setColors(value);
   }
 
   domElement!: any;
@@ -79,14 +80,11 @@ export default class extends Vue {
     });
   }
 
-  async setColors(colors: ObjectColor[]) {
+  async setColors(colors: Color[]) {
     if (colors && colors.length > 0) {
-      const changeList: any[] = colors.map((c) => {
-        // return {
-        //   [c.object]: c.color,
-        // };
+      const changeList = colors.map((c) => {
         return {
-          key: c.object,
+          key: c.id,
           value: c.color
         }
       });
@@ -113,8 +111,8 @@ export default class extends Vue {
     this.viewer.applyFilter(null);
   }
 
-  instanceOfObjectColor(object: any): object is ObjectColor {
-    return object && "object" in object;
+  instanceOfObjectColor(object: any): object is Color {
+    return object && "color" in object;
   }
 }
 </script>

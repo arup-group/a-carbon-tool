@@ -4,12 +4,15 @@
       <v-col cols="4">
         <AssessmentStepper
           style="z-index: 1"
+          v-if="availableStreams.length !== 0"
           @loadStream="loadStream"
           @materialUpdated="materialUpdated"
-          v-if="availableStreams.length !== 0"
+          @stepperUpdate="stepperUpdate"
+          @transportSelected="transportSelected"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
+          :transportTypes="transportTypes"
         />
       </v-col>
       <v-col cols="8">
@@ -26,7 +29,7 @@
 
 <script lang="ts">
 import AssessmentStepper from "@/components/AssessmentStepper.vue";
-import Renderer, { ObjectColor } from "@/components/Renderer.vue";
+import Renderer, { Color } from "@/components/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -34,6 +37,9 @@ import {
   MaterialUpdateOut,
   SpeckleObject,
   SpeckleType,
+  Step,
+  TransportSelected,
+  TransportType,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -47,7 +53,10 @@ export default class Assessment extends Vue {
   types: SpeckleType[] = [];
   objects: SpeckleObject[] = [];
   materials: MaterialFull[] = this.$store.getters.materialsArrUK;
-  colors: ObjectColor[] = [];
+  colors: Color[] = [];
+  transportTypes: TransportType[] = [];
+
+  materialsOut!: MaterialUpdateOut;
 
   mounted() {
     this.token = this.$store.state.token.token;
@@ -57,11 +66,25 @@ export default class Assessment extends Vue {
       });
       console.log(res);
     });
+    this.transportTypes = this.$store.state.transportTypes;
   }
+
+  stepperUpdate(step: Step) {
+    switch (step) {
+      case Step.MATERIALS:
+        if (this.materialsOut) this.materialUpdated(this.materialsOut);
+        else this.colors = [];
+        break;
+      default:
+        this.colors = [];
+        break;
+    }
+  }
+
   async loadStream(id: string) {
     console.log("id loaded", id);
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
-    this.objectURLs = [tmpurls[0]]
+    this.objectURLs = [tmpurls[0]];
     console.log("URL", this.objectURLs);
 
     this.objects = await this.$store.dispatch("getObjectDetails", {
@@ -71,25 +94,40 @@ export default class Assessment extends Vue {
     console.log("objects:", this.objects);
 
     this.types = this.findTypes(this.objects);
+  }
 
-    // const defaultColors: ObjectColor[] = this.types.map(t => ({
-    //   object: t.type,
-    //   color: null
-    // }));
+  transportSelected(selected: TransportSelected) {
+    // TURN THIS INTO IT'S OWN FUNCTION
+    let added = false;
+    this.colors = this.colors.map((c) => {
+      if (c.id === selected.speckleType.type) {
+        added = true;
+        return {
+          id: selected.speckleType.type,
+          color: selected.transportType.color,
+        };
+      } else return c;
+    });
 
-    // this.colors = defaultColors;
+    if (!added)
+      this.colors.push({
+        id: selected.speckleType.type,
+        color: selected.transportType.color,
+      });
   }
 
   materialUpdated(material: MaterialUpdateOut) {
+    this.materialsOut = material; // THIS IS WRONG
+
     console.log("[Assessment] material:", material);
 
     // update material in `colors`, or add the material if it is not already there
     let added = false;
     this.colors = this.colors.map((c) => {
-      if (c.object === material.type.type) {
+      if (c.id === material.type.type) {
         added = true;
         return {
-          object: material.type.type,
+          id: material.type.type,
           color: material.material.color,
         };
       } else return c;
@@ -97,7 +135,7 @@ export default class Assessment extends Vue {
 
     if (!added)
       this.colors.push({
-        object: material.type.type,
+        id: material.type.type,
         color: material.material.color,
       });
   }

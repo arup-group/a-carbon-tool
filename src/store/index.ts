@@ -38,13 +38,36 @@ export default new Vuex.Store({
     serverInfo: null,
     transportTypes: [{
       name: "local",
-      color: "#53ac8b"
+      color: "#53ac8b",
+      defaults: {
+        road: 50,
+        rail: 0,
+        sea: 0,
+      }
     }, {
       name: "regional",
-      color: "#2d8486"
+      color: "#2d8486",
+      defaults: {
+        road: 300,
+        rail: 0,
+        sea: 0,
+      }
     }, {
       name: "global",
-      color: "#1f9321"
+      color: "#683a78",
+      defaults: {
+        road: 200,
+        rail: 0,
+        sea: 10000
+      }
+    }, {
+      name: "custom",
+      color: "#1f9321",
+      defaults: {
+        road: 0,
+        rail: 0,
+        sea: 0
+      }
     }] as TransportType[]
   },
   getters: {

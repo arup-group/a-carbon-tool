@@ -35,7 +35,7 @@
         <v-stepper-step :complete="completed" step="4" @click.native="step = 4">
           Quantities
         </v-stepper-step>
-        <v-stepper-content step="5"> </v-stepper-content>
+        <v-stepper-content step="4"><menu-4 /></v-stepper-content>
         <v-stepper-step :complete="completed" step="5" @click.native="step = 5">
           Review
         </v-stepper-step>
@@ -57,6 +57,7 @@ import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 import Menu1b from "@/components/Menu1b.vue";
 import Menu2 from "@/components/Menu2.vue";
 import Menu3 from "@/components/Menu3.vue";
+import Menu4 from "./Menu4.vue";
 import {
   MaterialUpdateOut,
   SpeckleType,
@@ -67,7 +68,7 @@ import {
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 @Component({
-  components: { Menu1b, Menu2, Menu3 },
+  components: { Menu1b, Menu2, Menu3, Menu4 },
 })
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;

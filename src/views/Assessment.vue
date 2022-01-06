@@ -34,6 +34,7 @@ import Renderer, { Color } from "@/components/Renderer.vue";
 import { Component, Vue } from "vue-property-decorator";
 
 import {
+  CalcModes,
   MaterialUpdateOut,
   SpeckleObject,
   SpeckleType,
@@ -55,6 +56,7 @@ export default class Assessment extends Vue {
   materials: MaterialFull[] = this.$store.getters.materialsArrUK;
   colors: Color[] = [];
   transportTypes: TransportType[] = [];
+  volumeCalcMode: CalcModes = CalcModes.PROPERTY;
 
   materialsOut!: MaterialUpdateOut;
 
@@ -75,10 +77,17 @@ export default class Assessment extends Vue {
         if (this.materialsOut) this.materialUpdated(this.materialsOut);
         else this.colors = [];
         break;
+      case Step.QUANTITIES:
+        this.calcQuant();
+        break;
       default:
         this.colors = [];
         break;
     }
+  }
+
+  calcQuant() {
+    return;
   }
 
   async loadStream(id: string) {

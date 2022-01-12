@@ -1,1 +1,1 @@
-declare module '@speckle/viewer';
+declare module "@speckle/viewer";

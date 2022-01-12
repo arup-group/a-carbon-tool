@@ -1,11 +1,11 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import App from './App.vue';
-import router from './router';
-import store from './store';
-import vuetify from './plugins/vuetify';
+import Vue from "vue";
+import Vuex from "vuex";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import vuetify from "./plugins/vuetify";
 
-import '@/assets/style.css';
+import "@/assets/style.css";
 
 Vue.config.productionTip = false;
 
@@ -16,4 +16,4 @@ new Vue({
   store,
   vuetify,
   render: (h) => h(App),
-}).$mount('#app');
+}).$mount("#app");

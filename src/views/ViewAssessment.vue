@@ -21,14 +21,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { AssessmentComplete } from '@/models/assessment';
+import { Component, Vue } from "vue-property-decorator";
+import { AssessmentComplete } from "@/models/assessment";
 
-import Renderer from '@/components/Renderer.vue';
-import ProjectInfoCard from '@/components/ProjectInfoCard.vue';
-import ABreakdownCard from '@/components/ABreakdownCard.vue';
-import MaterialBreakdownCard from '@/components/MaterialBreakdownCard.vue';
-import ViewAssessmentButtons from '@/components/ViewAssessmentButtons.vue';
+import Renderer from "@/components/Renderer.vue";
+import ProjectInfoCard from "@/components/ProjectInfoCard.vue";
+import ABreakdownCard from "@/components/ABreakdownCard.vue";
+import MaterialBreakdownCard from "@/components/MaterialBreakdownCard.vue";
+import ViewAssessmentButtons from "@/components/ViewAssessmentButtons.vue";
 
 @Component({
   components: {
@@ -45,7 +45,7 @@ export default class ViewAssessment extends Vue {
 
   mounted() {
     this.$store
-      .dispatch('getObjectUrls', this.assessment.streamId)
+      .dispatch("getObjectUrls", this.assessment.streamId)
       .then((res: string[]) => {
         this.objectUrls = res;
       });
@@ -69,31 +69,31 @@ export default class ViewAssessment extends Vue {
 
   assessment: AssessmentComplete = {
     // dummy data
-    streamId: '67899fd79d',
+    streamId: "67899fd79d",
     projectInfo: {
-      name: 'Super great project',
-      type: 'Superstructure',
+      name: "Super great project",
+      type: "Superstructure",
       reportDate: new Date(2021, 11, 2),
-      author: 'Tom Bunn',
-      JN: '000001',
+      author: "Tom Bunn",
+      JN: "000001",
       systemCost: 100000,
       floorArea: 10000,
-      notes: '',
+      notes: "",
       totalCO2e: 3400,
       totalkgCO2e: 340,
     },
     materialBreakdown: {
       materials: [
         {
-          name: 'some value 1',
+          name: "some value 1",
           value: 50,
         },
         {
-          name: 'some value 2',
+          name: "some value 2",
           value: 20,
         },
         {
-          name: 'some value 3',
+          name: "some value 3",
           value: 10,
         },
       ],
@@ -101,17 +101,17 @@ export default class ViewAssessment extends Vue {
     aBreakdown: {
       levels: [
         {
-          name: 'A1-A3',
+          name: "A1-A3",
           tCO2e: 2800,
           kgCO2e: 280,
         },
         {
-          name: 'A4',
+          name: "A4",
           tCO2e: 150,
           kgCO2e: 15,
         },
         {
-          name: 'A5',
+          name: "A5",
           tCO2e: 250,
           kgCO2e: 25,
         },

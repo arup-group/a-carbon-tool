@@ -26,10 +26,10 @@
   </v-main>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop } from "vue-property-decorator";
 
-import { Project } from '@/models/project';
-import DoughnutChart from './charts/DoughnutChart.vue';
+import { Project } from "@/models/project";
+import DoughnutChart from "./charts/DoughnutChart.vue";
 
 @Component({
   components: { DoughnutChart },

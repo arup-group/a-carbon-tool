@@ -22,11 +22,11 @@
   </v-card>
 </template>
 <script lang="ts">
-import { ABreakdown, Level } from '@/models/assessment';
-import { ChartData } from '@/models/chart';
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { ABreakdown, Level } from "@/models/assessment";
+import { ChartData } from "@/models/chart";
+import { Vue, Component, Prop } from "vue-property-decorator";
 
-import HBarChart from './charts/HBarChart.vue';
+import HBarChart from "./charts/HBarChart.vue";
 
 @Component({
   components: { HBarChart },
@@ -48,10 +48,10 @@ export default class ABreakdownCard extends Vue {
     return level.name;
   }
   getTCO2e(level: Level) {
-    return level.tCO2e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return level.tCO2e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
   getKgCO2e(level: Level) {
-    return level.kgCO2e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return level.kgCO2e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 }
 </script>

@@ -1,5 +1,5 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import Vue from "vue";
+import Vuex from "vuex";
 import {
   exchangeAccessCode,
   getServer,
@@ -8,9 +8,9 @@ import {
   getUserData,
   goToSpeckleAuthpage,
   speckleLogOut,
-} from './speckle/speckleUtil';
-import { Login, Server, AuthError } from '@/models/auth/';
-import router from '@/router';
+} from "./speckle/speckleUtil";
+import { Login, Server, AuthError } from "@/models/auth/";
+import router from "@/router";
 
 Vue.use(Vuex);
 
@@ -18,8 +18,8 @@ export default new Vuex.Store({
   state: {
     servers: [
       {
-        region: 'UKIMEA',
-        url: 'https://v2.speckle.arup.com',
+        region: "UKIMEA",
+        url: "https://v2.speckle.arup.com",
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
@@ -57,18 +57,18 @@ export default new Vuex.Store({
     // Auth
     logout(context) {
       // wipe the state
-      context.commit('logout');
+      context.commit("logout");
 
       // wipe the tokens
       speckleLogOut();
 
-      router.push('login');
+      router.push("login");
     },
     async exchangeAccessCode(context, accessCode: string) {
       const server = getServer(context);
 
       const token = await exchangeAccessCode(accessCode, server);
-      context.commit('login', {
+      context.commit("login", {
         token,
         server,
       });
@@ -84,7 +84,7 @@ export default new Vuex.Store({
         ) {
           const server = getServer(context);
           const token = getToken();
-          context.commit('login', {
+          context.commit("login", {
             token,
             server,
           });
@@ -92,8 +92,8 @@ export default new Vuex.Store({
 
         const json = await getUserData(context);
         const data = json.data;
-        context.commit('setUser', data.user);
-        context.commit('setServerInfo', data.serverInfo);
+        context.commit("setUser", data.user);
+        context.commit("setServerInfo", data.serverInfo);
       } catch (err) {
         console.error(err);
         if (err === AuthError.NOT_SIGNED_IN)

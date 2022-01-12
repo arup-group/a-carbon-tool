@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Viewer } from '@speckle/viewer';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { Viewer } from "@speckle/viewer";
 
 @Component
 export default class extends Vue {
@@ -27,15 +27,15 @@ export default class extends Vue {
   loading = 0;
   failed = false;
   mounted() {
-    let renderDomElement = document.getElementById('renderer');
+    let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
-      renderDomElement = document.createElement('div');
-      renderDomElement.id = 'renderer';
+      renderDomElement = document.createElement("div");
+      renderDomElement.id = "renderer";
     }
 
     this.domElement = renderDomElement;
-    this.domElement.style.display = 'inline-block';
+    this.domElement.style.display = "inline-block";
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
     this.viewer = new Viewer({ contained: renderDomElement });
@@ -43,14 +43,14 @@ export default class extends Vue {
       this.viewer.loadObject(url, this.token);
     });
 
-    this.viewer.on('load-progress', (args: any) => {
+    this.viewer.on("load-progress", (args: any) => {
       this.loading = args.progress * 100;
       this.viewer.interactions.zoomExtents();
     });
-    this.viewer.on('select', (objects: any[]) => {
+    this.viewer.on("select", (objects: any[]) => {
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
-      this.$emit('selection', this.selectedObjects);
+      this.$emit("selection", this.selectedObjects);
     });
   }
 }

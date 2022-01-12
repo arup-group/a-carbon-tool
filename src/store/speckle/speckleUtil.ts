@@ -1,10 +1,10 @@
-import { AuthError, Server, Token } from '@/models/auth';
-import { StreamReferenceObjects } from '@/models/graphql';
+import { AuthError, Server, Token } from "@/models/auth";
+import { StreamReferenceObjects } from "@/models/graphql";
 
 import {
   streamReferencedObjects,
   userInfoQuery,
-} from './graphql/speckleQueries';
+} from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -33,9 +33,9 @@ export function speckleLogOut() {
 // Exchanges the provided access code with a token/refreshToken pair, and saves them to local storage.
 export async function exchangeAccessCode(accessCode: string, server: Server) {
   const res = await fetch(`${server.url}/auth/token/`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       accessCode: accessCode,
@@ -61,10 +61,10 @@ export function getServer(context: any): Server {
   if (tmpServer) server = tmpServer;
   else
     server = {
-      region: '',
+      region: "",
       url: url,
-      speckleId: '',
-      speckleSecret: '',
+      speckleId: "",
+      speckleSecret: "",
     };
   return server;
 }
@@ -75,10 +75,10 @@ export async function speckleFetch(query: any, context: any) {
     try {
       const url: string = context.state.selectedServer.url;
       const res = await fetch(`${url}/graphql`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json',
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           query: query,
@@ -86,7 +86,7 @@ export async function speckleFetch(query: any, context: any) {
       });
       return await res.json();
     } catch (err) {
-      console.error('API cal failed', err);
+      console.error("API cal failed", err);
     }
   } else return Promise.reject(AuthError.NOT_SIGNED_IN);
 }

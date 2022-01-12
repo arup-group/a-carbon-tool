@@ -58,9 +58,9 @@ function transportCarbonA4(obj: SpeckleObject, mat: Material) {
 
   let trans = { road: 0, sea: 0 };
   // set transport distance based on object definition
-  if (obj.transport == 'regional') {
+  if (obj.transport == "regional") {
     trans = mode.regional;
-  } else if (obj.transport == 'global') {
+  } else if (obj.transport == "global") {
     trans = mode.global;
   } else {
     trans = mode.local;

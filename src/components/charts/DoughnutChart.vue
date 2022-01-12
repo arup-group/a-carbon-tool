@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Component, Prop, Mixins } from 'vue-property-decorator';
-import VueChart from 'vue-chartjs';
-import { ChartData } from '@/models/chart';
+import { Component, Prop, Mixins } from "vue-property-decorator";
+import VueChart from "vue-chartjs";
+import { ChartData } from "@/models/chart";
 
 @Component
 export default class DoughnutChart extends Mixins(
@@ -16,8 +16,8 @@ export default class DoughnutChart extends Mixins(
         labels: this.data.map((d) => d.label),
         datasets: [
           {
-            label: 'Data One',
-            backgroundColor: ['#2962B2', '#2092D3', '#20acd3'],
+            label: "Data One",
+            backgroundColor: ["#2962B2", "#2092D3", "#20acd3"],
             data: this.data.map((d) => d.value),
           },
         ],

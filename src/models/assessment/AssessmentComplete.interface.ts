@@ -1,4 +1,4 @@
-import { ProjectInfo, MaterialBreakdown, ABreakdown } from '.';
+import { ProjectInfo, MaterialBreakdown, ABreakdown } from ".";
 
 export interface AssessmentComplete {
   streamId: string;

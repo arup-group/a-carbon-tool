@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts">
-import { Server } from '@/models/auth/';
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Server } from "@/models/auth/";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class LoginCard extends Vue {
@@ -49,7 +49,7 @@ export default class LoginCard extends Vue {
     }
   }
 
-  @Emit('submit')
+  @Emit("submit")
   submit(server: Server) {
     return server;
   }

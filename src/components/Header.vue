@@ -30,17 +30,17 @@
 </template>
 
 <script lang="ts">
-import '@arc-web/components/dist/components/button/arc-button.js';
+import "@arc-web/components/dist/components/button/arc-button.js";
 
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class Header extends Vue {
   @Prop() li!: boolean; // li = Logged In
 
-  @Emit('logout')
+  @Emit("logout")
   logout() {
-    console.log(''); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
+    console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
   }
 }
 </script>

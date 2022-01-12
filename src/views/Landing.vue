@@ -19,9 +19,9 @@
   </v-main>
 </template>
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
-import ProjectCard from "../components/ProjectCard.vue";
-import { Project } from "@/models/project";
+import { Vue, Component } from 'vue-property-decorator';
+import ProjectCard from '../components/ProjectCard.vue';
+import { Project } from '@/models/project';
 
 @Component({
   components: { ProjectCard },
@@ -29,61 +29,61 @@ import { Project } from "@/models/project";
 export default class Landing extends Vue {
   projects: Project[] = [
     {
-      title: "Super great project",
+      title: 'Super great project',
       co2Values: [
         {
-          label: "some value 1",
+          label: 'some value 1',
           value: 50,
         },
         {
-          label: "some value 2",
+          label: 'some value 2',
           value: 20,
         },
         {
-          label: "some value 3",
+          label: 'some value 3',
           value: 10,
         },
       ],
-      link: "",
-      category: "Superstructure",
+      link: '',
+      category: 'Superstructure',
     },
     {
-      title: "Imaginary project 3",
+      title: 'Imaginary project 3',
       co2Values: [
         {
-          label: "some value 1",
+          label: 'some value 1',
           value: 50,
         },
         {
-          label: "some value 2",
+          label: 'some value 2',
           value: 20,
         },
         {
-          label: "some value 3",
+          label: 'some value 3',
           value: 10,
         },
       ],
-      link: "",
-      category: "Substructure",
+      link: '',
+      category: 'Substructure',
     },
     {
-      title: "Some other project",
+      title: 'Some other project',
       co2Values: [
         {
-          label: "some value 1",
+          label: 'some value 1',
           value: 50,
         },
         {
-          label: "some value 2",
+          label: 'some value 2',
           value: 20,
         },
         {
-          label: "some value 3",
+          label: 'some value 3',
           value: 10,
         },
       ],
-      link: "",
-      category: "Services",
+      link: '',
+      category: 'Services',
     },
   ];
 }

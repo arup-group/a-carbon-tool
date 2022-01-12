@@ -1,1 +1,1 @@
-export { StreamReferenceObjects } from "./StreamReferenceObjects.interface";
+export { StreamReferenceObjects } from './StreamReferenceObjects.interface';

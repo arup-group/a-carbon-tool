@@ -1,1 +1,1 @@
-export { ChartData } from "./ChartData.interface";
+export { ChartData } from './ChartData.interface';

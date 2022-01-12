@@ -3,7 +3,7 @@
     <v-card-title class="d-flex justify-space-between mb-5">
       <span class="text-h5">{{ name }}</span>
       <v-btn icon @click="show = !show">
-        <v-icon>{{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}</v-icon>
+        <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
       </v-btn>
     </v-card-title>
     <v-card-subtitle>
@@ -55,8 +55,8 @@
   </v-card>
 </template>
 <script lang="ts">
-import { ProjectInfo } from "@/models/assessment";
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { ProjectInfo } from '@/models/assessment';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class ProjectInfoCard extends Vue {
@@ -72,18 +72,18 @@ export default class ProjectInfoCard extends Vue {
   get totalCO2e() {
     return this.projectInfo.totalCO2e
       .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   get totalkgCO2e() {
     return this.projectInfo.totalkgCO2e
       .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   get reportDate() {
-    return this.projectInfo.reportDate.toLocaleString("en-UK", {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
+    return this.projectInfo.reportDate.toLocaleString('en-UK', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
     });
   }
   get author() {
@@ -95,12 +95,12 @@ export default class ProjectInfoCard extends Vue {
   get systemCost() {
     return `£${this.projectInfo.systemCost
       .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
   }
   get floorArea() {
     return `${this.projectInfo.floorArea
       .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} m2`;
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')} m2`;
   }
   get notes() {
     return this.projectInfo.notes;

@@ -1,4 +1,4 @@
-import { ChartData } from "../chart";
+import { ChartData } from '../chart';
 
 export interface Project {
   title: string;

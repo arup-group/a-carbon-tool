@@ -1,4 +1,4 @@
-import { Level } from ".";
+import { Level } from '.';
 
 export interface ABreakdown {
   levels: Level[];

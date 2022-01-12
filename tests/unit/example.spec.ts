@@ -1,4 +1,4 @@
-import { shallowMount } from "@vue/test-utils";
+import { shallowMount } from '@vue/test-utils';
 
 // describe("HelloWorld.vue", () => {
 //   it("renders props.msg when passed", () => {
@@ -10,8 +10,8 @@ import { shallowMount } from "@vue/test-utils";
 //   });
 // });
 
-describe("basic", () => {
-  it("passes", () => {
+describe('basic', () => {
+  it('passes', () => {
     expect(true).toBe(true);
-  })
-})
+  });
+});

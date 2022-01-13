@@ -2,60 +2,17 @@
   <v-form ref="form" @submit.prevent="checkSubmit">
     <v-container class="d-flex justify-center align-center">
       <v-card outlined>
-<<<<<<< HEAD
-        <v-card-title class="">Log in</v-card-title>
-        <v-card-subtitle class="text--primary">
-          Define the Speckle server you wish to connect to
-        </v-card-subtitle>
-        <v-card-text>
-          <v-select
-            v-model="model"
-            :items="items"
-            label="Select server"
-          ></v-select>
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn color="primary" text type="submit">
-            Log in
-=======
-        <v-card-title class="">Log In</v-card-title>
-        <!-- added some text to show the user what to do -->
-        <v-card-subtitle class="text--primary">
-          Select a server:
-        </v-card-subtitle>
-        <div id="arup-xyz">
-          <!-- added button to direct to arup server-->
-          <v-btn @click="setServerType('arup')" color="secondary" text>
-            Arup Servers
->>>>>>> 9c13321d70dd34fa129688154a0600b6fc7ceb0c
-          </v-btn>
-          <!-- added button to direct to some other server function-->
-          <v-btn @click="setServerType('xyz_btn')" color="secondary" text>
-            XYZ Server
-          </v-btn>
-        </div>
-        <!-- updated the text slightly to be more descriptive -->
-        <template v-if="serverType">
-          <v-card-subtitle class="text--primary">
-            Define the Speckle server you wish to connect to:
-          </v-card-subtitle>
-          <v-card-text>
-            <v-select
-              v-model="model"
-              :items="items"
-              label="Select server"
-            ></v-select>
-          </v-card-text>
+        <div>
+          <v-card-subtitle class="d-flex justify-center"> Please select your server</v-card-subtitle>
           <v-card-actions class="d-flex justify-end">
-            <v-btn color="primary" text type="submit">Log In</v-btn>
+            <v-btn color="primary" text type="submit" @click="signIn('arup')">
+              arup Staff
+            </v-btn>
+            <v-btn color="secondary" text @click="signIn('xyz')">
+              xyzServer
+            </v-btn>
           </v-card-actions>
-        </template>
-        <template v-else>
-          <v-card-subtitle class="text--secondary">
-            <!-- TODO: redirect to speckle xyz server speckle.xyz -->
-            non arup server list shown?
-          </v-card-subtitle>
-        </template>
+        </div>
       </v-card>
     </v-container>
   </v-form>
@@ -67,40 +24,11 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class LoginCard extends Vue {
-  @Prop() servers!: Server[];
-  model: Server = {} as Server;
+  @Prop() servers!: {arup: Server; xyz: Server;};
 
-  serverType = false;
-
-
-  setServerType(btn_type : string) {
-    // TODO: make conditinal to show arup of XYZ
-    if (btn_type === 'arup') {
-      this.serverType = true;
-    } else {
-      this.serverType = false;
-    }
-    
-    return this.serverType;
-  };
-
-  get items() {
-    if (this.servers) {
-      return this.servers.map((server) => {// updated s to server to be more descriptive
-        return {
-          text: `${server.region}`, //removed  - ${s.url} as we didnt want the user seeing url
-          value: server,
-        };
-      });
-    } else {
-      return [];
-    }
-  }
-
-  checkSubmit() {
-    if (this.model.region) {
-      this.submit(this.model);
-    }
+  signIn(serverDestination:string) {
+    if (serverDestination === "arup") this.submit(this.servers.arup);
+    else if (serverDestination === "xyz") this.submit(this.servers.xyz);
   }
 
   @Emit("submit")

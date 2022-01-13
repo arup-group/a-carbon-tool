@@ -16,14 +16,20 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    servers: [
-      {
+    servers: {
+      arup: {
         region: "UKIMEA",
         url: "https://v2.speckle.arup.com",
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
-    ],
+      xyz: {
+        region: "PUBLIC",
+        url: "https://speckle.xyz/",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
+      },
+    },
     selectedServer: {} as Server, // should be a server object
     token: {}, // should be a Token object
     authed: false,

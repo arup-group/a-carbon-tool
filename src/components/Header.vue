@@ -32,7 +32,7 @@
       color="secondary"
       :active="this.$store.state.darkMode"
       @click="$store.dispatch('setDarkMode')"
-      >Dark Mode</arc-button
+      >{{ this.$store.state.darkMode ? "Light Mode" : "Dark Mode" }}</arc-button
     >
   </arc-navbar>
 </template>

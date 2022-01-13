@@ -1,16 +1,21 @@
 <template>
   <v-form ref="form" @submit.prevent="checkSubmit">
     <v-container class="d-flex justify-center align-center">
-      <v-card style="width: 50%">
-        <v-card-title class="">Log In here</v-card-title>
-        <!-- added some text to show the user what to do -->
-        <v-card-subtitle class="text--primary"> 
-          Select a server:
+      <v-card outlined>
+        <v-card-title class="">Log in</v-card-title>
+        <v-card-subtitle class="text--primary">
+          Define the Speckle server you wish to connect to
         </v-card-subtitle>
-        <div id="arup-xyz">
-          <!-- added button to direct to arup server-->
-          <v-btn @click="setServerType('arup')" color="secondary" text>
-            Arup Servers
+        <v-card-text>
+          <v-select
+            v-model="model"
+            :items="items"
+            label="Select server"
+          ></v-select>
+        </v-card-text>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="primary" text type="submit">
+            Log in
           </v-btn>
           <!-- added button to direct to some other server function-->
           <v-btn @click="setServerType('xyz_btn')" color="secondary" text>
@@ -43,6 +48,7 @@
     </v-container>
   </v-form>
 </template>
+
 <script lang="ts">
 import { Server } from "@/models/auth/";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";

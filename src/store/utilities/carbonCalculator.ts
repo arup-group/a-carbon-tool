@@ -6,16 +6,16 @@ interface SpeckleObject {
     transport: string;
     material: string; // blank by default - to be assigned as part of process
     // carbon values to default to 0 once initiated
-    a1a3Carbon : number;
-    a4Carbon: number;
-    a5Carbon: number;
+    productStageCarbonA1A3 : number;
+    transportCarbonA4: number;
+    constructionCarbonA5: number;
 }
 
 // as shown in materials.json
 interface Material {
     density: number;
     wastage: number;
-    a1a3Carbon: number; //kgCO2e/kg
+    productStageCarbonA1A3: number; //kgCO2e/kg
     source: string;
 }
 
@@ -43,16 +43,16 @@ const transportFactors = {
 
 // CALCULATIONS
 // calculate the a1a3 carbon for any speckle object against a specified material
-function a1a3Carbon(obj: SpeckleObject, mat: Material) {
+function productStageCarbonA1A3(obj: SpeckleObject, mat: Material) {
     // calculate mass of object
     var mass = obj.volume * mat.density
     // calculate a1a3 carbon of object
-    var a1a3 = mass * mat.a1a3Carbon
+    var a1a3 = mass * mat.productStageCarbonA1A3
     return a1a3
 }
 
 // calculate the carbon associated with transport
-function a4Carbon(obj: SpeckleObject, mat: Material) {
+function transportCarbonA4(obj: SpeckleObject, mat: Material) {
     
     const mode = transportType
     const factors = transportFactors
@@ -74,13 +74,13 @@ function a4Carbon(obj: SpeckleObject, mat: Material) {
 }
 
 // calculate the carbon associated with site activities
-function a5CarbonSite(sysCost: number) {
+function constructionCarbonA5Site(sysCost: number) {
     var a5Site = sysCost * 1400 / 100000
     return a5Site
 }
 
 // calculate the carbon associated with material wastage
-function a5CarbonWaste(obj: SpeckleObject, mat: Material) {
+function constructionCarbonA5Waste(obj: SpeckleObject, mat: Material) {
     var wasteVolume = obj.volume * ((1/(1-mat.wastage))-1)
 
     // create new object with waste volume
@@ -88,16 +88,16 @@ function a5CarbonWaste(obj: SpeckleObject, mat: Material) {
     wasteObj.volume = wasteVolume
 
     // compute a1-a4 for waste materials
-    var a1a3 = a1a3Carbon(wasteObj, mat)
-    var a4 = a4Carbon(wasteObj,mat)
+    var a1a3 = productStageCarbonA1A3(wasteObj, mat)
+    var a4 = transportCarbonA4(wasteObj,mat)
 
     var a5waste = a1a3 + a4
 
     return a5waste
 }
 
-function a5Carbon(sysCost: number, obj: SpeckleObject, mat: Material) {
-    var a5 = a5CarbonSite(sysCost) + a5CarbonWaste(obj, mat)
+function constructionCarbonA5(sysCost: number, obj: SpeckleObject, mat: Material) {
+    var a5 = constructionCarbonA5Site(sysCost) + constructionCarbonA5Waste(obj, mat)
 
     return a5
 }

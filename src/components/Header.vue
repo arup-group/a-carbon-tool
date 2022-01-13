@@ -1,24 +1,26 @@
 <template>
-  <v-app-bar app color="white">
-    <v-toolbar-title class="d-flex align-center">
-      <img class="mr-5" src="@/assets/logo.svg" />
-
-      Carbon Assessment Platform
-    </v-toolbar-title>
-    <v-spacer></v-spacer>
-    <div v-if="loggedIn" class="d-flex align-center">
-      <v-btn color="secondary" text>About</v-btn>
-      <v-btn color="secondary" text>Help</v-btn>
-      <v-btn color="secondary" text class="mr-2">Log Out</v-btn>
-      <v-btn color="secondary" text>New Assessment</v-btn>
-    </div>
-  </v-app-bar>
+  <arc-navbar slot="nav" logo="/assets/logo.svg" arup="false">
+    <div slot="name">act | a carbon tool</div>
+    <arc-button v-if="li" type="tab" color="secondary" @click="$router.push('/landing')">Home</arc-button>
+    <arc-button v-if="li" type="tab" color="secondary" @click="$router.push('/about')">About</arc-button>
+    <arc-button v-if="li" type="tab" color="secondary">Help</arc-button>
+    <arc-button v-if="li" type="tab" color="secondary" @click="logout">Log Out</arc-button>
+    <arc-button v-if="li" size="large" type="tab" @click="$router.push('/assessment')">New Assessment</arc-button>
+  </arc-navbar>
 </template>
+
 <script lang="ts">
+import "@arc-web/components/dist/components/button/arc-button.js";
+
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class Header extends Vue {
-  @Prop() loggedIn!: boolean;
+  @Prop() li!: boolean; // li = Logged In
+
+  @Emit("logout")
+  logout() {
+    console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
+  }
 }
 </script>

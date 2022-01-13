@@ -1,6 +1,9 @@
 <template>
   <v-app style="height: 100vh">
-    <arc-container theme="ACT-light" style="height: 100%">
+    <arc-container
+      :theme="this.$store.state.darkMode ? 'dark' : 'ACT-light'"
+      style="height: 100%"
+    >
       <Header :li="isAuthenticated" @logout="logout" />
       <v-main>
         <router-view />
@@ -16,6 +19,7 @@ import Header from "./components/Header.vue";
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";
 import "@arc-web/components/dist/themes/light.css";
+import "@arc-web/components/dist/themes/dark.css";
 
 import "@arc-web/components/dist/components/container/arc-container.js";
 import "@arc-web/components/dist/components/navbar/arc-navbar.js";

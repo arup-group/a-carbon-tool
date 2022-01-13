@@ -26,6 +26,14 @@
       @click="$router.push('/assessment')"
       >New Assessment</arc-button
     >
+    <arc-button
+      v-if="li"
+      type="tab"
+      color="secondary"
+      :active="this.$store.state.darkMode"
+      @click="$store.dispatch('setDarkMode')"
+      >Dark Mode</arc-button
+    >
   </arc-navbar>
 </template>
 
@@ -37,7 +45,7 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 @Component({})
 export default class Header extends Vue {
   @Prop() li!: boolean; // li = Logged In
-
+  // @Prop() dm!: boolean; // dm = dark mode
   @Emit("logout")
   logout() {
     console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits

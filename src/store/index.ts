@@ -29,6 +29,7 @@ export default new Vuex.Store({
     authed: false,
     user: null,
     serverInfo: null,
+    darkMode: false,
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
@@ -51,6 +52,9 @@ export default new Vuex.Store({
     },
     setServerInfo(state, info) {
       state.serverInfo = info;
+    },
+    setDarkMode(state) {
+      state.darkMode = state.darkMode ? false : true;
     },
   },
   actions: {
@@ -106,6 +110,9 @@ export default new Vuex.Store({
       return objectIds.data.stream.branch.commits.items.map((item) => {
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
+    },
+    setDarkMode({ commit }) {
+      commit("setDarkMode");
     },
   },
   modules: {},

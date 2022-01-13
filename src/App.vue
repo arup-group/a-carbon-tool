@@ -3,7 +3,7 @@
     <arc-container theme="ACT-light" style="height:100%">
     <Header :li="isAuthenticated" @logout="logout" />
     <v-main>
-      <router-view/>
+      <router-view />
     </v-main>
     </arc-container>
   </v-app>

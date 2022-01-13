@@ -2,6 +2,7 @@
   <v-form ref="form" @submit.prevent="checkSubmit">
     <v-container class="d-flex justify-center align-center">
       <v-card outlined>
+<<<<<<< HEAD
         <v-card-title class="">Log in</v-card-title>
         <v-card-subtitle class="text--primary">
           Define the Speckle server you wish to connect to
@@ -16,6 +17,17 @@
         <v-card-actions class="d-flex justify-end">
           <v-btn color="primary" text type="submit">
             Log in
+=======
+        <v-card-title class="">Log In</v-card-title>
+        <!-- added some text to show the user what to do -->
+        <v-card-subtitle class="text--primary">
+          Select a server:
+        </v-card-subtitle>
+        <div id="arup-xyz">
+          <!-- added button to direct to arup server-->
+          <v-btn @click="setServerType('arup')" color="secondary" text>
+            Arup Servers
+>>>>>>> 9c13321d70dd34fa129688154a0600b6fc7ceb0c
           </v-btn>
           <!-- added button to direct to some other server function-->
           <v-btn @click="setServerType('xyz_btn')" color="secondary" text>
@@ -31,7 +43,7 @@
             <v-select
               v-model="model"
               :items="items"
-              label="Select server location"
+              label="Select server"
             ></v-select>
           </v-card-text>
           <v-card-actions class="d-flex justify-end">

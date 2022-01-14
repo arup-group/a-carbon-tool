@@ -2,13 +2,13 @@
   <v-main>
     <v-card>
       <v-card-title>{{ title }}</v-card-title>
+      <v-card-actions><v-chip outlined>{{ category }}</v-chip></v-card-actions>
       <v-card-subtitle>{{ co2Total }} tCO2e</v-card-subtitle>
-      <v-card-text>
+      <v-card-actions max-width='80%'>
         <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
         <DoughnutChart :data="co2Values" :chartData="{}" />
-      </v-card-text>
+      </v-card-actions>
       <v-card-actions>
-        <v-chip outlined>{{ category }}</v-chip>
         <v-spacer></v-spacer>
         <div>
           <v-btn icon color="secondary">

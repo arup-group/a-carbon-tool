@@ -1,21 +1,20 @@
 <template>
   <v-main class="page">
-    <div class="titles">
-      <h1 class="text-h3 mb-5 mt-5">
-        Estimate the equivalent carbon emissions of your design
-      </h1>
-      <h2 class="text-h4 secondary-text">
-        Browse your existing assessments below or create a new assessment from
-        Speckle
-      </h2>
-    </div>
-    <div class="grid mt-15">
+    <v-card flat class="titles mt-6">
+      <v-card-title class="text-h4">
+        Welcome to act | a carbon tool
+      </v-card-title>
+      <v-card-subtitle>
+        An open-source platform for performing embodied carbon emission calculations from Building Information Models through <a href='https://speckle.systems/' target='_blank' class='secondary--text'>Speckle</a>
+      </v-card-subtitle>
+    </v-card>
+    <v-card class="grid mt-15">
       <project-card
         v-for="project in projects"
         :key="project.title"
         :project="project"
       />
-    </div>
+    </v-card>
   </v-main>
 </template>
 <script lang="ts">

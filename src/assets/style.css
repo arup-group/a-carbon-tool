@@ -22,7 +22,7 @@ arc-container[theme="ACT-light"] {
   --arc-hover-lighter: rgba(var(--arc-white-000), 0.9);
 
   /* Changing other defaults */
-  --arc-brand-height: 3rem;
+  /* --arc-brand-height: 3rem; */
 }
 
 .primary-text {

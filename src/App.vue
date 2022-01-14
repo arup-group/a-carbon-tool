@@ -4,7 +4,13 @@
       :theme="this.$store.state.darkMode ? 'dark' : 'ACT-light'"
       style="height: 100%"
     >
-      <Header :li="isAuthenticated" @logout="logout" />
+      <Header
+        :li="isAuthenticated"
+        :darkModeButtonText="darkModeButtonText"
+        :darkModeState="darkModeState"
+        @logout="logout"
+        @toggleDarkMode="toggleDarkMode"
+      />
       <v-main>
         <router-view />
       </v-main>
@@ -48,8 +54,21 @@ export default class App extends Vue {
     return this.$store.getters.isAuthenticated;
   }
 
+  get darkModeButtonText() {
+    return this.darkModeState ? "Light Mode" : "Dark Mode";
+  }
+
+  get darkModeState() {
+    return this.$store.state.darkMode;
+  }
+
   logout() {
     this.$store.dispatch("logout");
+  }
+
+  toggleDarkMode() {
+    this.$store.dispatch("setDarkMode");
+    this.$vuetify.theme.dark = this.$store.state.darkMode ? true : false;
   }
 }
 </script>

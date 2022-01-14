@@ -30,9 +30,9 @@
       v-if="li"
       type="tab"
       color="secondary"
-      :active="this.$store.state.darkMode"
-      @click="$store.dispatch('setDarkMode')"
-      >{{ this.$store.state.darkMode ? "Light Mode" : "Dark Mode" }}</arc-button
+      :active="darkModeState"
+      @click="toggleDarkMode"
+      >{{ darkModeButtonText }}</arc-button
     >
   </arc-navbar>
 </template>
@@ -45,10 +45,17 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 @Component({})
 export default class Header extends Vue {
   @Prop() li!: boolean; // li = Logged In
-  // @Prop() dm!: boolean; // dm = dark mode
+  @Prop() darkModeButtonText!: string;
+  @Prop() darkModeState!: boolean;
+
   @Emit("logout")
   logout() {
     console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
+  }
+
+  @Emit("toggleDarkMode")
+  toggleDarkMode() {
+    return;
   }
 }
 </script>

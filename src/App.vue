@@ -1,10 +1,10 @@
 <template>
   <v-app style="height: 100vh">
-    <arc-container theme="ACT-light" style="height:100%">
-    <Header :li="isAuthenticated" @logout="logout" />
-    <v-main>
-      <router-view/>
-    </v-main>
+    <arc-container theme="ACT-light" style="height: 100%">
+      <Header :li="isAuthenticated" @logout="logout" />
+      <v-main>
+        <router-view />
+      </v-main>
     </arc-container>
   </v-app>
 </template>
@@ -30,8 +30,7 @@ import "@/assets/style.css";
 })
 export default class App extends Vue {
   get name() {
-    if (this.isAuthenticated)
-      return this.$store.state.user.name;
+    if (this.isAuthenticated) return this.$store.state.user.name;
     return "";
   }
   get company() {

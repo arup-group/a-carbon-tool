@@ -1,28 +1,44 @@
 <template>
   <v-main>
-    <v-card>
-      <v-card-title>{{ title }}</v-card-title>
-      <v-card-actions><v-chip outlined>{{ category }}</v-chip></v-card-actions>
-      <v-card-subtitle>{{ co2Total }} tCO2e</v-card-subtitle>
-      <v-card-actions max-width='80%'>
-        <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
-        <DoughnutChart :data="co2Values" :chartData="{}" />
-      </v-card-actions>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <div>
-          <v-btn icon color="secondary">
-            <v-icon>mdi-cog</v-icon>
-          </v-btn>
-          <v-btn icon color="secondary">
-            <v-icon>mdi-share-variant</v-icon>
-          </v-btn>
-          <v-btn icon color="secondary">
-            <v-icon>mdi-open-in-new</v-icon>
-          </v-btn>
-        </div>
-      </v-card-actions>
-    </v-card>
+    <v-sheet outlined color='primary' rounded>
+      <v-card flat>
+        <v-card-title>
+          {{ title }}
+        </v-card-title>
+        <v-card-text>
+          <v-row justify='center'>
+            <v-col cols='6'>
+              {{ co2Total }} tCO2e
+            </v-col>
+            <v-col cols='6' align='right'>
+              <v-chip outlined color='primary'>{{ category }}</v-chip>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-row class='mx-auto'>
+            <v-col cols='12' align='center'>
+               <DoughnutChart :data="co2Values" :chartData="{}" />
+            </v-col>
+          </v-row>
+          <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
+        </v-card-actions>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <div>
+            <v-btn icon color="primary">
+              <v-icon>mdi-cog</v-icon>
+            </v-btn>
+            <v-btn icon color="primary">
+              <v-icon>mdi-share-variant</v-icon>
+            </v-btn>
+            <v-btn icon color="primary">
+              <v-icon>mdi-open-in-new</v-icon>
+            </v-btn>
+          </div>
+        </v-card-actions>
+      </v-card>
+    </v-sheet>
   </v-main>
 </template>
 <script lang="ts">

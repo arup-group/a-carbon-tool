@@ -8,7 +8,7 @@
         An open-source platform for performing embodied carbon emission calculations from Building Information Models through <a href='https://speckle.systems/' target='_blank' class='secondary--text'>Speckle</a>
       </v-card-subtitle>
     </v-card>
-    <v-card class="grid mt-15">
+    <v-card flat class="grid mt-15">
       <project-card
         v-for="project in projects"
         :key="project.title"

@@ -18,7 +18,9 @@
         <v-card-actions>
           <v-row class='mx-auto'>
             <v-col cols='12' align='center'>
-               <DoughnutChart :data="co2Values" :chartData="{}" />
+              <v-card flat width=80%>
+                <DoughnutChart :data="co2Values" :chartData="{}" />
+              </v-card>
             </v-col>
           </v-row>
           <!-- a warning appears if `chartData` is not passed in. The prop is not used -->

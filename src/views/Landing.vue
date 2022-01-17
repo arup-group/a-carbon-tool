@@ -2,13 +2,13 @@
   <v-main class="page">
     <v-row justify='center'>
       <v-col cols='12'>
-        <v-card flat>
+        <v-card flat class='mt-8'>
           <v-img src="/assets/logo.svg" height='80px' class='ma-4' contain>
           </v-img>
         </v-card>
       </v-col>
       <v-col cols='12' md='6'>
-        <v-card flat class="mt-6 mx-4 justify-center">
+        <v-card flat class="mx-4 justify-center">
           <v-card-title class="text-h4">
             Welcome to act | a carbon tool
           </v-card-title>

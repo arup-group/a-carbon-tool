@@ -4,6 +4,7 @@ import { StreamReferenceObjects } from "@/models/graphql";
 import {
   streamReferencedObjects,
   userInfoQuery,
+  streamsQuery
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;

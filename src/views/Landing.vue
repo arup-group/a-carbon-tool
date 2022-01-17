@@ -40,11 +40,31 @@
         <template v-slot:default='props' class='my-2'>
           <v-row>
             <v-col
+              cols='12'
+              md='6'
+              lg='4'
+            >
+              <v-container class='ma-0 pa-0' fluid>
+                <v-sheet outlined color='primary' rounded class='my-1'>
+                  <v-card flat height='600' class='d-flex align-center justify-center'>
+                    <v-card-actions class='justify-center'>
+                      <v-btn x-large outlined color='primary' @click="$router.push('/assessment')">
+                          <v-icon>
+                            mdi-plus
+                          </v-icon>
+                          New Assessment
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-sheet>
+              </v-container>
+            </v-col>
+            <v-col
               v-for='item in props.items'
               :key='item.id'
               cols='12'
-              sm='6'
-              md='4'
+              md='6'
+              lg='4'
             >
               <project-card
                 :project='item'
@@ -206,6 +226,9 @@ export default {
     }
   },
   computed: {
+    // TODO
+    // - fix number of pages
+
     numberOfPages () {
       return 1
       // const items = this.projects.length
@@ -213,6 +236,9 @@ export default {
     }
   },
   methods: {
+    // TODO
+    // Get functions working for next page / previous page
+
     // nextPage: () => {
     //   if (this.page + 1 <= this.numberOfPages) this.page += 1
     // },

@@ -1,7 +1,7 @@
 <template>
   <v-main>
     <v-sheet outlined color='primary' rounded class='my-1'>
-      <v-card flat>
+      <v-card flat height='600'>
         <v-card-title>
           <v-row>
             <v-col cols='7'>
@@ -24,7 +24,7 @@
           <v-row class='mx-auto'>
             <v-col cols='12' align='center'>
               <v-card flat width=80%>
-                <DoughnutChart :data="co2Values" :chartData="{}" />
+                <DoughnutChart :data="co2Values" :chartData="{}"/>
               </v-card>
             </v-col>
           </v-row>

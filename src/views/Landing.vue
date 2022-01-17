@@ -10,7 +10,7 @@
       <v-col cols='12' md='6'>
         <v-card flat class="mx-4 justify-center">
           <v-card-title class="text-h4">
-            Welcome to act | a carbon tool
+            act | a carbon tool
           </v-card-title>
           <v-card-subtitle>
             An open-source platform for performing embodied carbon emission calculations from Building Information Models through <a href='https://speckle.systems/' target='_blank' class='secondary--text'>Speckle</a>

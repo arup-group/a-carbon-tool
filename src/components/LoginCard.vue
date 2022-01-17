@@ -14,9 +14,7 @@
           ></v-select>
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
-          <v-btn color="primary" text type="submit">
-            Log in
-          </v-btn>
+          <v-btn color="primary" text type="submit"> Log in </v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -37,8 +35,8 @@ export default class LoginCard extends Vue {
       return this.servers.map((s) => {
         return {
           text: `${s.region} - ${s.url}`,
-          value: s
-        }
+          value: s,
+        };
       });
     } else {
       return [];

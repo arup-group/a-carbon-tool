@@ -4,9 +4,7 @@ import VueChart from "vue-chartjs";
 import { ChartData } from "@/models/chart";
 
 @Component
-export default class HBarChart extends Mixins(
-  VueChart.HorizontalBar
-) {
+export default class HBarChart extends Mixins(VueChart.HorizontalBar) {
   @Prop() readonly data!: Array<ChartData>;
 
   mounted() {

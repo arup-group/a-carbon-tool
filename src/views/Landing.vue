@@ -7,7 +7,7 @@
           </v-img>
         </v-card>
       </v-col>
-      <v-col cols='12'>
+      <v-col cols='12' md='6'>
         <v-card flat class="mt-6 mx-4 justify-center">
           <v-card-title class="text-h4">
             Welcome to act | a carbon tool

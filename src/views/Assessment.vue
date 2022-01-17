@@ -13,11 +13,13 @@
           :types="types"
           :materials="materials"
           :transportTypes="transportTypes"
+          :totalVolume="totalVolume"
         />
       </v-col>
       <v-col cols="8">
         <Renderer
           v-if="objectURLs.length !== 0"
+          @loaded="rendererLoaded"
           :objecturls="objectURLs"
           :token="token"
           :colors="colors"
@@ -44,6 +46,8 @@ import {
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
+import * as THREE from "three";
+
 @Component({
   components: { AssessmentStepper, Renderer },
 })
@@ -57,6 +61,7 @@ export default class Assessment extends Vue {
   colors: Color[] = [];
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
+  totalVolume = 0;
 
   materialsOut!: MaterialUpdateOut;
 
@@ -69,6 +74,68 @@ export default class Assessment extends Vue {
       console.log(res);
     });
     this.transportTypes = this.$store.state.transportTypes;
+  }
+
+  rendererLoaded(allMesh: THREE.Mesh[]) {
+    console.log("window.renderer.scene", (window as any).renderer.scene);
+    console.log("[rendererLoaded] allMesh:", allMesh);
+    let totalVol = 0; // in m3 (I think)
+    const volumes: (number | "> 0" | "no index")[] = [];
+    allMesh.forEach(m => {
+      const vol = this.getMeshVolume(m);
+      volumes.push(vol);
+      totalVol += typeof vol === "number" ? vol : 0;
+    });
+    console.log("calculated volumes\ntotalVol:", totalVol, "\nvolumes:", volumes);
+    this.totalVolume = totalVol;
+  }
+  getMeshVolume(obj: THREE.Mesh) {
+    // TODO: Check for V+F-E = 2 (ie is closed mesh) https://gamedev.stackexchange.com/a/119368
+    let buffGeom = obj.geometry;
+    let volumes = [];
+    if (buffGeom.index) {
+      for (let i = 0; i < buffGeom.index.count; i += 3) {
+        let A = buffGeom.index.array[i],
+          B = buffGeom.index.array[i + 1],
+          C = buffGeom.index.array[i + 2];
+
+        volumes.push(
+          this.getSignedVolumeOfTriangle(
+            buffGeom.attributes.position.array[A * 3 + 0],
+            buffGeom.attributes.position.array[A * 3 + 1],
+            buffGeom.attributes.position.array[A * 3 + 2],
+            buffGeom.attributes.position.array[B * 3 + 0],
+            buffGeom.attributes.position.array[B * 3 + 1],
+            buffGeom.attributes.position.array[B * 3 + 2],
+            buffGeom.attributes.position.array[C * 3 + 0],
+            buffGeom.attributes.position.array[C * 3 + 1],
+            buffGeom.attributes.position.array[C * 3 + 2]
+          )
+        );
+      }
+      let sum = volumes.reduce((a, b) => a + b, 0);
+      return sum > 0 ? sum : "> 0";
+    } else return "no index";
+  }
+  // https://stackoverflow.com/a/1568551/3446736
+  getSignedVolumeOfTriangle(
+    p1x: number,
+    p1y: number,
+    p1z: number,
+    p2x: number,
+    p2y: number,
+    p2z: number,
+    p3x: number,
+    p3y: number,
+    p3z: number
+  ) {
+    let v321 = p3x * p2y * p1z;
+    let v231 = p2x * p3y * p1z;
+    let v312 = p3x * p1y * p2z;
+    let v132 = p1x * p3y * p2z;
+    let v213 = p2x * p1y * p3z;
+    let v123 = p1x * p2y * p3z;
+    return (1.0 / 6.0) * (-v321 + v231 + v312 - v132 - v213 + v123);
   }
 
   stepperUpdate(step: Step) {
@@ -103,6 +170,20 @@ export default class Assessment extends Vue {
     console.log("objects:", this.objects);
 
     this.types = this.findTypes(this.objects);
+
+    this.findVolumes(this.objects);
+  }
+
+  findVolumes(objects: SpeckleObject[]) {
+    let total = 0;
+    let volumes: number[] = [];
+    objects.forEach((o) => {
+      if (o.volume !== undefined) {
+        total++;
+        volumes.push(o.volume);
+      }
+    });
+    console.log("[findVolumes]\ntotal:", total, "\nvolumes:", volumes);
   }
 
   transportSelected(selected: TransportSelected) {

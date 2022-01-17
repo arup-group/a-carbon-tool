@@ -11,8 +11,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Emit, Prop, Vue, Watch } from "vue-property-decorator";
 import { Viewer } from "@speckle/viewer";
+
+import * as THREE from "three";
 
 export interface Color {
   color: string | null;
@@ -67,10 +69,26 @@ export default class extends Vue {
       if (this.loading === 100) {
         console.log("loaded", this.viewer);
         console.log("objectProperties:", this.viewer.getObjectsProperties());
+        console.log("sceneManager:", this.viewer.sceneManager);
+        console.log("sceneObjects:", this.viewer.sceneManager.sceneObjects);
+        console.log("allObjects:", this.viewer.sceneManager.sceneObjects.allObjects);
+        const allObjects = this.viewer.sceneManager.sceneObjects.allObjects as THREE.Group;
+        const allObjectsChildren = allObjects.children;
+        const allMesh: THREE.Mesh[] = [];
+        allObjectsChildren.forEach(oc => {
+          const meshChildren = oc.children.filter(c => c.type === "Mesh") as THREE.Mesh[];
+          allMesh.push(...meshChildren);
+        });
+        console.log("allMesh:", allMesh);
+        // const allSolidObjects = allObjects.getObjectByName("allSolidObjects");
+        // console.log("allSolidObjects:", allSolidObjects);
+        // const allMesh = allSolidObjects?.children.filter(c => c.type === "Mesh");
+        // console.log("allMesh:", allMesh);
         // set initial colors if needed
         if (this.colors) {
           this.setColors(this.colors);
         }
+        this.loaded(allMesh);
       }
     });
     this.viewer.on("select", (objects: any[]) => {
@@ -113,6 +131,11 @@ export default class extends Vue {
 
   instanceOfObjectColor(object: any): object is Color {
     return object && "color" in object;
+  }
+
+  @Emit("loaded")
+  loaded(allMesh: THREE.Mesh[]) {
+    return allMesh;
   }
 }
 </script>

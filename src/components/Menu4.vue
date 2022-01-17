@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-select
+    <!-- <v-select
       v-model="calcMode"
       label="How do you want to calculate object quantities?"
       :items="calcModes"
@@ -10,7 +10,9 @@
     <v-text-field
       label="Volume Conversion Factor"
       v-model="convFact"
-    ></v-text-field>
+    ></v-text-field> -->
+    <p>Volume automatically calculated as:</p>
+    <p class="text-center">{{ displayVolume }}m3</p>
   </div>
 </template>
 <script lang="ts">
@@ -25,6 +27,7 @@ type CalcMode = {
 @Component
 export default class Menu4 extends Vue {
   @Prop() objWithProp!: number;
+  @Prop() totalVolume!: number;
   calcMode = null;
   convFact = null;
 
@@ -32,6 +35,10 @@ export default class Menu4 extends Vue {
     { name: "Using an Object's volume property", id: 0 },
     { name: "Try calculating volumes automatically", id: 1 },
   ];
+
+  get displayVolume() {
+    return Math.round(this.totalVolume * 100) / 100;
+  }
 
   @Watch("calcMode")
   @Emit("calcChange")

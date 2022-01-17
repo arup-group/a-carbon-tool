@@ -35,7 +35,7 @@
         <v-stepper-step :complete="completed" step="4" @click.native="step = 4">
           Quantities
         </v-stepper-step>
-        <v-stepper-content step="4"><menu-4 /></v-stepper-content>
+        <v-stepper-content step="4"><menu-4 :totalVolume="totalVolume" /></v-stepper-content>
         <v-stepper-step :complete="completed" step="5" @click.native="step = 5">
           Review
         </v-stepper-step>
@@ -76,6 +76,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() types!: SpeckleType[];
   @Prop() materials!: MaterialFull[];
   @Prop() transportTypes!: TransportType[];
+  @Prop() totalVolume!: number;
 
   completed = false;
   step: Step = 1;

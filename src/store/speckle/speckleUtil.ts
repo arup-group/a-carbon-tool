@@ -1,14 +1,10 @@
 import { AuthError, Server, Token } from "@/models/auth";
 import { StreamReferenceObjects } from "@/models/graphql";
 
-<<<<<<< HEAD
-import { streamsQuery, userInfoQuery, streamReferencedObjects  } from "./graphql/speckleQueries";
-=======
 import {
   streamReferencedObjects,
   userInfoQuery,
 } from "./graphql/speckleQueries";
->>>>>>> 06527efb2f9ca7f6ec2f6e1164b3d3282d3e9649
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;

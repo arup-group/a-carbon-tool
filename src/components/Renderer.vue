@@ -1,6 +1,5 @@
 <template>
   <div>
-    <v-btn @click="resetColors" style="z-index: 1">Reset colours</v-btn>
     <div
       ref="rendererparent"
       id="rendererparent"
@@ -80,10 +79,6 @@ export default class extends Vue {
           allMesh.push(...meshChildren);
         });
         console.log("allMesh:", allMesh);
-        // const allSolidObjects = allObjects.getObjectByName("allSolidObjects");
-        // console.log("allSolidObjects:", allSolidObjects);
-        // const allMesh = allSolidObjects?.children.filter(c => c.type === "Mesh");
-        // console.log("allMesh:", allMesh);
         // set initial colors if needed
         if (this.colors) {
           this.setColors(this.colors);

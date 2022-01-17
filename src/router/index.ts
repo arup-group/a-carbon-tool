@@ -29,14 +29,12 @@ const routes: Array<RouteConfig> = [
   {
     path: "/about",
     name: "About",
-    component: () =>
-      import("../views/About.vue"),
+    component: () => import("../views/About.vue"),
   },
   {
     path: "/help",
     name: "Help",
-    component: () =>
-      import("../views/Help.vue"),
+    component: () => import("../views/Help.vue"),
   },
 ];
 

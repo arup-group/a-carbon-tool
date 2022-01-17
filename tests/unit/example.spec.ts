@@ -13,5 +13,5 @@ import { shallowMount } from "@vue/test-utils";
 describe("basic", () => {
   it("passes", () => {
     expect(true).toBe(true);
-  })
-})
+  });
+});

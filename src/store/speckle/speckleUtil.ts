@@ -1,7 +1,14 @@
 import { AuthError, Server, Token } from "@/models/auth";
 import { StreamReferenceObjects } from "@/models/graphql";
 
+<<<<<<< HEAD
 import { streamsQuery, userInfoQuery, streamReferencedObjects  } from "./graphql/speckleQueries";
+=======
+import {
+  streamReferencedObjects,
+  userInfoQuery,
+} from "./graphql/speckleQueries";
+>>>>>>> 06527efb2f9ca7f6ec2f6e1164b3d3282d3e9649
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -75,25 +82,30 @@ export async function speckleFetch(query: any, context: any) {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          query: query
-        })
+          query: query,
+        }),
       });
       return await res.json();
-    } catch(err) {
+    } catch (err) {
       console.error("API cal failed", err);
     }
   } else return Promise.reject(AuthError.NOT_SIGNED_IN);
 }
 
-export const getUserData = (context: any) => speckleFetch(userInfoQuery(), context);
-export const getStreamObjects = (context: any, streamid: string): Promise<StreamReferenceObjects> => speckleFetch(streamReferencedObjects(streamid), context)
+export const getUserData = (context: any) =>
+  speckleFetch(userInfoQuery(), context);
+export const getStreamObjects = (
+  context: any,
+  streamid: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(streamReferencedObjects(streamid), context);
 
 export const getUserStreams = (context: any) => speckleFetch(streamsQuery(),context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,
-  refreshToken: localStorage.getItem(REFRESH_TOKEN) as string
-})
+  refreshToken: localStorage.getItem(REFRESH_TOKEN) as string,
+});

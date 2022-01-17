@@ -73,7 +73,7 @@
           </v-row>
         </template>
         <template v-slot:footer>
-          <v-row>
+          <v-row class='pb-2'>
             <v-spacer></v-spacer>
             <span
               class="mr-4

@@ -29,7 +29,7 @@ export default new Vuex.Store({
     authed: false,
     user: null,
     serverInfo: null,
-    darkMode: false,
+    darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
   },
   getters: {
     isAuthenticated: (state) => state.user != null,

@@ -5,7 +5,7 @@ Vue.use(Vuetify);
 
 export default new Vuetify({
   theme: {
-    dark: false,
+    dark: window.matchMedia("(prefers-color-scheme: dark)").matches,
     themes: {
       light: {
         primary: "#4EC0EB",

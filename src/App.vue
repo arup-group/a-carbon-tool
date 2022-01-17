@@ -55,7 +55,7 @@ export default class App extends Vue {
   }
 
   get darkModeButtonText() {
-    return this.darkModeState ? "Light Mode" : "Dark Mode";
+    return this.darkModeState ? "🌞" : "🌚";
   }
 
   get darkModeState() {

@@ -20,9 +20,6 @@ arc-container[theme="ACT-light"] {
   --arc-hover-dark: rgba(var(--arc-black-100), 0.1);
   --arc-hover-light: rgba(var(--arc-white-000), 0.7);
   --arc-hover-lighter: rgba(var(--arc-white-000), 0.9);
-
-  /* Changing other defaults */
-  /* --arc-brand-height: 3rem; */
 }
 
 .primary-text {

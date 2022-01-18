@@ -4,6 +4,7 @@ import { StreamReferenceObjects } from "@/models/graphql";
 import {
   streamReferencedObjects,
   userInfoQuery,
+  streamsQuery
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
@@ -90,6 +91,8 @@ export const getStreamObjects = (
   streamid: string
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(streamReferencedObjects(streamid), context);
+
+export const getUserStreams = (context: any) => speckleFetch(streamsQuery(),context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

@@ -1,4 +1,39 @@
-export const materialCarbonFactors = {
+export interface MaterialFull extends Material {
+  name: string;
+  color: string; // will be a color hex code
+}
+
+export interface Material {
+  productStageCarbonA1A3: number;
+  density: number;
+  wastage: number;
+  units: string;
+  source: string;
+}
+
+export interface MaterialCarbonFactors {
+  UK: UKMaterialCarbonFactors;
+  Australia: any;
+  EU: any;
+  "East Asia": any;
+}
+
+export interface UKMaterialCarbonFactors {
+  concrete: {
+    [key: string]: Material;
+  };
+  steel: any;
+  blockwork: any;
+  brick: any;
+  stone: any;
+  timber: any;
+  aluminium: any;
+  glass: any;
+  plasterboard: any;
+  "fire protection": any;
+}
+
+export const materialCarbonFactors: MaterialCarbonFactors = {
   UK: {
     concrete: {
       "in situ, unreinforced c30/37": {

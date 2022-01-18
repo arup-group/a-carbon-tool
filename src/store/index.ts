@@ -186,6 +186,7 @@ export default new Vuex.Store({
 
     setDarkMode({ commit }) {
       commit("setDarkMode");
+    },
       
     async getObjectDetails(context, input: ObjectDetailsInput) {
       const { streamid, objecturl } = input;

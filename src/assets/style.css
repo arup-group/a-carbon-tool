@@ -8,11 +8,11 @@ arc-container[theme="ACT-light"] {
 
   /* Palette */
   --arc-color-default: var(--arc-grey-010);
-  --arc-color-primary: var(--arc-blue-070);
-  --arc-color-secondary: var(--arc-blue-050);
+  --arc-color-primary: var(--arc-teal-070);
+  --arc-color-secondary: var(--arc-teal-050);
   --arc-color-error: var(--arc-red-050);
   --arc-color-warning: var(--arc-orange-050);
-  --arc-color-info: var(--arc-blue-050);
+  --arc-color-info: var(--arc-pink-050);
   --arc-color-success: var(--arc-green-050);
 
   /* Hover */

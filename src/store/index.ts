@@ -110,6 +110,7 @@ export default new Vuex.Store({
       const objectIds = await getStreamObjects(context, streamid);
 
       return objectIds.data.stream.branch.commits.items.map((item) => {
+        console.log(`context.state.selectedServer\n${context.state.selectedServer}`)
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
     },

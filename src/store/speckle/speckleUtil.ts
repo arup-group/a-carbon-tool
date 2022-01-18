@@ -16,9 +16,9 @@ export function goToSpeckleAuthpage(server: Server) {
   const challenge =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
-  // Save challenge and server url in localStorage
+  // Save challenge and server JSON string in localStorage for later use
   localStorage.setItem(CHALLENGE, challenge);
-  localStorage.setItem(SERVER, server.url);
+  localStorage.setItem(SERVER, JSON.stringify(server));
 
   // Send user to auth page
   window.location.href = `${server.url}/authn/verify/${server.speckleId}/${challenge}`;
@@ -55,18 +55,10 @@ export async function exchangeAccessCode(accessCode: string, server: Server) {
 }
 
 export function getServer(context: any): Server {
-  const url = localStorage.getItem(SERVER) as string;
-  const tmpServer = context.state.servers.find((s: Server) => s.url === url);
-  let server: Server;
-  if (tmpServer) server = tmpServer;
-  else
-    server = {
-      region: "",
-      url: url,
-      speckleId: "",
-      speckleSecret: "",
-    };
-  return server;
+  //gets server info stored as a JSON string in local storage
+  const server = localStorage.getItem(SERVER) as string;
+  const serverJson = JSON.parse(server);
+  return serverJson;
 }
 
 export async function speckleFetch(query: any, context: any) {

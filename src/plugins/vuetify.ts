@@ -8,8 +8,8 @@ export default new Vuetify({
     dark: window.matchMedia("(prefers-color-scheme: dark)").matches,
     themes: {
       light: {
-        primary: "#4EC0EB",
-        secondary: "#FF79C0",
+        primary: "#32A4A0",
+        secondary: "#C83C96",
         background: "#FFFFFF",
         border: "BEBEBE",
         warning: "#FFE011",

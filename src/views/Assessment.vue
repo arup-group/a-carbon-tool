@@ -48,6 +48,13 @@ import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 import * as THREE from "three";
 
+interface SpeckleObjectComplete {
+  id: string;
+  transport: TransportType;
+  material: MaterialFull;
+  volume: number;
+}
+
 @Component({
   components: { AssessmentStepper, Renderer },
 })
@@ -62,6 +69,7 @@ export default class Assessment extends Vue {
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
   totalVolume = 0;
+  allMesh: THREE.Mesh[] = [];
 
   materialsOut!: MaterialUpdateOut;
 
@@ -77,17 +85,7 @@ export default class Assessment extends Vue {
   }
 
   rendererLoaded(allMesh: THREE.Mesh[]) {
-    console.log("window.renderer.scene", (window as any).renderer.scene);
-    console.log("[rendererLoaded] allMesh:", allMesh);
-    let totalVol = 0; // in m3 (I think)
-    const volumes: (number | "> 0" | "no index")[] = [];
-    allMesh.forEach(m => {
-      const vol = this.getMeshVolume(m);
-      volumes.push(vol);
-      totalVol += typeof vol === "number" ? vol : 0;
-    });
-    console.log("calculated volumes\ntotalVol:", totalVol, "\nvolumes:", volumes);
-    this.totalVolume = totalVol;
+    this.allMesh = allMesh;
   }
   getMeshVolume(obj: THREE.Mesh) {
     // TODO: Check for V+F-E = 2 (ie is closed mesh) https://gamedev.stackexchange.com/a/119368
@@ -154,7 +152,25 @@ export default class Assessment extends Vue {
   }
 
   calcQuant() {
-    return;
+    let totalVol = 0; // in m3 (I think)
+    const volumes: (number | "> 0" | "no index")[] = [];
+    this.allMesh.forEach((m) => {
+      const vol = this.getMeshVolume(m);
+      // find the speckle object that this mesh relates to and add the volume to that. Probably not the best way to do this...
+      this.objects = this.objects.map((o) => {
+        if (o.id === m.userData.id) {
+          return {
+            ...o,
+            formData: {
+              volume: typeof vol === "number" ? vol : 0,
+            },
+          };
+        } else return o;
+      });
+      volumes.push(vol);
+      totalVol += typeof vol === "number" ? vol : 0;
+    });
+    this.totalVolume = totalVol;
   }
 
   async loadStream(id: string) {
@@ -163,27 +179,19 @@ export default class Assessment extends Vue {
     this.objectURLs = [tmpurls[0]];
     console.log("URL", this.objectURLs);
 
-    this.objects = await this.$store.dispatch("getObjectDetails", {
+    const res = await this.$store.dispatch("getObjectDetails", {
       streamid: id,
       objecturl: this.objectURLs[0],
     });
+
+    this.objects = res.map((r: any) => ({
+      id: r.id,
+      speckle_type: r.speckle_type,
+    }));
+
     console.log("objects:", this.objects);
 
     this.types = this.findTypes(this.objects);
-
-    this.findVolumes(this.objects);
-  }
-
-  findVolumes(objects: SpeckleObject[]) {
-    let total = 0;
-    let volumes: number[] = [];
-    objects.forEach((o) => {
-      if (o.volume !== undefined) {
-        total++;
-        volumes.push(o.volume);
-      }
-    });
-    console.log("[findVolumes]\ntotal:", total, "\nvolumes:", volumes);
   }
 
   transportSelected(selected: TransportSelected) {

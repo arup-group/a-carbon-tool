@@ -14,7 +14,7 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="9" class="d-flex justify-center align-center">
-        <LoginCard :servers="servers" @submit="logIn" />
+        <LoginCard :servers="servers" @submit="logIn"/>
       </v-col>
       <v-col cols="12">
         <v-card flat>
@@ -48,7 +48,7 @@ import { Server } from "@/models/auth/";
   components: { LoginCard },
 })
 export default class Login extends Vue {
-  servers: Server[] = this.$store.state.servers;
+  servers: { arup: Server; xyz: Server } = this.$store.state.servers;
 
   logIn(server: Server) {
     this.$store.dispatch("redirectToAuth", server);

@@ -23,14 +23,20 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    servers: [
-      {
+    servers: {
+      arup: {
         region: "UKIMEA",
         url: "https://v2.speckle.arup.com",
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
-    ],
+      xyz: {
+        region: "PUBLIC",
+        url: "https://speckle.xyz/",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
+      },
+    },
     selectedServer: {} as Server, // should be a server object
     token: {} as Token, // should be a Token object
     authed: false,
@@ -173,6 +179,7 @@ export default new Vuex.Store({
       const objectIds = await getStreamObjects(context, streamid);
 
       return objectIds.data.stream.branch.commits.items.map((item) => {
+        console.log(`context.state.selectedServer\n${context.state.selectedServer}`)
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
     },

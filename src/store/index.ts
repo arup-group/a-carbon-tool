@@ -18,6 +18,7 @@ import {
   UKMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
 import { TransportType } from "@/models/newAssessment";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
@@ -39,40 +40,44 @@ export default new Vuex.Store({
 
     darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
 
-    transportTypes: [{
-      name: "local",
-      color: "#53ac8b",
-      defaults: {
-        road: 50,
-        rail: 0,
-        sea: 0,
-      }
-    }, {
-      name: "regional",
-      color: "#2d8486",
-      defaults: {
-        road: 300,
-        rail: 0,
-        sea: 0,
-      }
-    }, {
-      name: "global",
-      color: "#683a78",
-      defaults: {
-        road: 200,
-        rail: 0,
-        sea: 10000
-      }
-    }, {
-      name: "custom",
-      color: "#1f9321",
-      defaults: {
-        road: 0,
-        rail: 0,
-        sea: 0
-      }
-    }] as TransportType[]
-
+    transportTypes: [
+      {
+        name: "local",
+        color: "#53ac8b",
+        defaults: {
+          road: 50,
+          rail: 0,
+          sea: 0,
+        },
+      },
+      {
+        name: "regional",
+        color: "#2d8486",
+        defaults: {
+          road: 300,
+          rail: 0,
+          sea: 0,
+        },
+      },
+      {
+        name: "global",
+        color: "#683a78",
+        defaults: {
+          road: 200,
+          rail: 0,
+          sea: 10000,
+        },
+      },
+      {
+        name: "custom",
+        color: "#1f9321",
+        defaults: {
+          road: 0,
+          rail: 0,
+          sea: 0,
+        },
+      },
+    ] as TransportType[],
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
@@ -88,7 +93,7 @@ export default new Vuex.Store({
             name: `${type} - ${t}`,
             ...materialCarbonFactors.UK[type][t],
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
-          }
+          };
           arr.push(toPush);
         });
         return arr;
@@ -187,7 +192,7 @@ export default new Vuex.Store({
     setDarkMode({ commit }) {
       commit("setDarkMode");
     },
-      
+
     async getObjectDetails(context, input: ObjectDetailsInput) {
       const { streamid, objecturl } = input;
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
@@ -238,6 +243,7 @@ export default new Vuex.Store({
     },
   },
   modules: {},
+  plugins: [createPersistedState()],
 });
 
 interface ObjectDetailsInput {

@@ -30,7 +30,6 @@
       v-if="li"
       type="tab"
       color="secondary"
-      :active="darkModeState"
       @click="toggleDarkMode"
       >{{ darkModeButtonText }}</arc-button
     >

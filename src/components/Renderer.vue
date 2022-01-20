@@ -30,7 +30,6 @@ export default class extends Vue {
 
   @Watch("colors")
   onObjectColorChanged(value: Color[]) {
-    console.log("watch:", value);
     if (value.length === 0) this.resetColors();
     else this.setColors(value);
   }
@@ -44,8 +43,6 @@ export default class extends Vue {
   loading = 0;
   failed = false;
   mounted() {
-    console.log("objectUrls:", this.objecturls)
-
     let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
@@ -66,11 +63,6 @@ export default class extends Vue {
       this.loading = args.progress * 100;
       this.viewer.interactions.zoomExtents();
       if (this.loading === 100) {
-        console.log("loaded", this.viewer);
-        console.log("objectProperties:", this.viewer.getObjectsProperties());
-        console.log("sceneManager:", this.viewer.sceneManager);
-        console.log("sceneObjects:", this.viewer.sceneManager.sceneObjects);
-        console.log("allObjects:", this.viewer.sceneManager.sceneObjects.allObjects);
         const allObjects = this.viewer.sceneManager.sceneObjects.allObjects as THREE.Group;
         const allObjectsChildren = allObjects.children;
         const allMesh: THREE.Mesh[] = [];
@@ -78,7 +70,6 @@ export default class extends Vue {
           const meshChildren = oc.children.filter(c => c.type === "Mesh") as THREE.Mesh[];
           allMesh.push(...meshChildren);
         });
-        console.log("allMesh:", allMesh);
         // set initial colors if needed
         if (this.colors) {
           this.setColors(this.colors);
@@ -102,9 +93,7 @@ export default class extends Vue {
         }
       });
 
-      console.log("[setColors] changeList:", changeList, { ...changeList });
       const changeListObj = changeList.reduce((obj, item) => Object.assign(obj, { [item.key]: item.value }), {});
-      console.log("changeListObj:", changeListObj);
 
       const res = await this.viewer.applyFilter({
         colorBy: {
@@ -114,13 +103,10 @@ export default class extends Vue {
           default: '#636363'
         },
       });
-
-      console.log("[setColors] done:", res);
     }
   }
 
   resetColors() {
-    console.log("reset");
     this.viewer.applyFilter(null);
   }
 

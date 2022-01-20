@@ -51,20 +51,16 @@ export default class Menu1b extends Vue {
     cost: null,
     floorArea: null,
   };
-
-  mounted() {
-    console.log("[menu1b]", this.streams);
-  }
   speckleStream!: StreamObject;
+
   streamSelected() {
     try {
       const id = this.speckleStream.value;
-      console.log(id);
       if (id !== undefined) {
         this.loadStream(id);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
   @Emit("loadStream")

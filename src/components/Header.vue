@@ -38,7 +38,7 @@ export default class Header extends Vue {
   @Prop() li!: boolean; // li = Logged In
   @Emit("logout")
   logout() {
-    console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
+    return;
   }
 }
 </script>

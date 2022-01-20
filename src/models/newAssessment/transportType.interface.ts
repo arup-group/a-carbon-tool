@@ -1,7 +1,7 @@
 export interface TransportType {
   name: "local" | "regional" | "global" | "custom";
   color: string;
-  defaults: {
+  values: {
     road: number;
     rail: number;
     sea: number;

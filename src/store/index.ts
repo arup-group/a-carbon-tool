@@ -45,7 +45,7 @@ export default new Vuex.Store({
     transportTypes: [{
       name: "local",
       color: "#53ac8b",
-      defaults: {
+      values: {
         road: 50,
         rail: 0,
         sea: 0,
@@ -53,7 +53,7 @@ export default new Vuex.Store({
     }, {
       name: "regional",
       color: "#2d8486",
-      defaults: {
+      values: {
         road: 300,
         rail: 0,
         sea: 0,
@@ -61,7 +61,7 @@ export default new Vuex.Store({
     }, {
       name: "global",
       color: "#683a78",
-      defaults: {
+      values: {
         road: 200,
         rail: 0,
         sea: 10000
@@ -69,7 +69,7 @@ export default new Vuex.Store({
     }, {
       name: "custom",
       color: "#1f9321",
-      defaults: {
+      values: {
         road: 0,
         rail: 0,
         sea: 0
@@ -179,7 +179,6 @@ export default new Vuex.Store({
       const objectIds = await getStreamObjects(context, streamid);
 
       return objectIds.data.stream.branch.commits.items.map((item) => {
-        console.log(`context.state.selectedServer\n${context.state.selectedServer}`)
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
     },
@@ -187,11 +186,6 @@ export default new Vuex.Store({
       const { streamid, objecturl } = input;
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
-      console.log("inputs:", input);
-      console.log(
-        "url:",
-        `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`
-      );
       const response = await fetch(
         `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`,
         {
@@ -204,12 +198,9 @@ export default new Vuex.Store({
       const rawObj = await response.text();
       const rootObj = JSON.parse(rawObj);
 
-      console.log("[getObjectDetails] rootObj:", rootObj);
-
       const childrenIds = Object.keys(rootObj.__closure).sort(
         (a, b) => rootObj.__closure[a] - rootObj.__closure[b]
       );
-      console.log("[getObjectDetails] childrenIds:", childrenIds);
 
       const childrenObjects = await fetch(
         `${context.state.selectedServer.url}/api/getobjects/${streamid}`,
@@ -224,11 +215,9 @@ export default new Vuex.Store({
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log("[getObjectDetails] data:", data);
           return data;
         });
 
-      console.log("[getObjectDetails] childrenObjects:", childrenObjects);
       return childrenObjects;
     },
   },

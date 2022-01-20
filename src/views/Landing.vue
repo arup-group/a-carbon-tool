@@ -95,6 +95,7 @@
             </span>
             <v-btn
               color='primary'
+              outlined
               class='mr-1'
               @click="formerPage"
             >
@@ -102,6 +103,7 @@
             </v-btn>
             <v-btn
               color='primary'
+              outlined
               class='ml-1'
               @click="nextPage"
             >

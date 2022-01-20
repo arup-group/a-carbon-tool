@@ -1,17 +1,22 @@
 <template>
   <v-container class="d-flex justify-center align-center">
-    <v-card outlined>
-      <div>
-        <v-card-subtitle class="d-flex justify-center"> Please select your server</v-card-subtitle>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn color="primary" text type="submit" @click="signIn('arup')">
-            arup Staff
-          </v-btn>
-          <v-btn color="secondary" text @click="signIn('xyz')">
-            xyzServer
-          </v-btn>
-        </v-card-actions>
-      </div>
+    <v-card outlined class='align-center justify-center'>
+      <v-card-title>Login</v-card-title>
+      <v-card-subtitle>Select server to connect to:</v-card-subtitle>
+      <v-card-actions class='justify-center'>
+        <v-row dense>
+          <v-col cols='12' align='center'>
+            <v-btn outlined color="secondary" class='mb-2' @click="signIn('xyz')">
+              Speckle XYZ
+            </v-btn>
+          </v-col>
+          <v-col cols='12' align='center'>
+            <v-btn outlined color="primary" class='mb-4' type="submit" @click="signIn('arup')">
+              Arup Staff
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
     </v-card>
   </v-container>
 </template>

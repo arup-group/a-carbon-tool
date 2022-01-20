@@ -1,24 +1,19 @@
 <template>
-  <v-form ref="form" @submit.prevent="checkSubmit">
-    <v-container class="d-flex justify-center align-center">
-      <v-card outlined>
-        <v-card-title class="">Log in</v-card-title>
-        <v-card-subtitle class="text--primary">
-          Define the Speckle server you wish to connect to
-        </v-card-subtitle>
-        <v-card-text>
-          <v-select
-            v-model="model"
-            :items="items"
-            label="Select server"
-          ></v-select>
-        </v-card-text>
+  <v-container class="d-flex justify-center align-center">
+    <v-card outlined>
+      <div>
+        <v-card-subtitle class="d-flex justify-center"> Please select your server</v-card-subtitle>
         <v-card-actions class="d-flex justify-end">
-          <v-btn color="primary" text type="submit"> Log in </v-btn>
+          <v-btn color="primary" text type="submit" @click="signIn('arup')">
+            arup Staff
+          </v-btn>
+          <v-btn color="secondary" text @click="signIn('xyz')">
+            xyzServer
+          </v-btn>
         </v-card-actions>
-      </v-card>
-    </v-container>
-  </v-form>
+      </div>
+    </v-card>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -27,26 +22,14 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class LoginCard extends Vue {
-  @Prop() servers!: Server[];
-  model: Server = {} as Server;
+  @Prop() servers!: {arup: Server; xyz: Server;};
 
-  get items() {
-    if (this.servers) {
-      return this.servers.map((s) => {
-        return {
-          text: `${s.region} - ${s.url}`,
-          value: s,
-        };
-      });
-    } else {
-      return [];
+  signIn(serverDestination:string) {
+    if (serverDestination === "arup") {
+      //console.log(this.servers.arup);
+      this.submit(this.servers.arup);
     }
-  }
-
-  checkSubmit() {
-    if (this.model.region) {
-      this.submit(this.model);
-    }
+    else if (serverDestination === "xyz") this.submit(this.servers.xyz);
   }
 
   @Emit("submit")

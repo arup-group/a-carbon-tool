@@ -38,7 +38,6 @@
 
 <script lang="ts">
 import "@arc-web/components/dist/components/button/arc-button.js";
-
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component
@@ -58,3 +57,5 @@ export default class Header extends Vue {
   }
 }
 </script>
+
+

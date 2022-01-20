@@ -18,57 +18,72 @@ import {
   UKMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
 import { TransportType } from "@/models/newAssessment";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    servers: [
-      {
+    servers: {
+      arup: {
         region: "UKIMEA",
         url: "https://v2.speckle.arup.com",
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
-    ],
+      xyz: {
+        region: "PUBLIC",
+        url: "https://speckle.xyz/",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
+      },
+    },
     selectedServer: {} as Server, // should be a server object
     token: {} as Token, // should be a Token object
     authed: false,
     user: null,
     serverInfo: null,
-    transportTypes: [{
-      name: "local",
-      color: "#53ac8b",
-      defaults: {
-        road: 50,
-        rail: 0,
-        sea: 0,
-      }
-    }, {
-      name: "regional",
-      color: "#2d8486",
-      defaults: {
-        road: 300,
-        rail: 0,
-        sea: 0,
-      }
-    }, {
-      name: "global",
-      color: "#683a78",
-      defaults: {
-        road: 200,
-        rail: 0,
-        sea: 10000
-      }
-    }, {
-      name: "custom",
-      color: "#1f9321",
-      defaults: {
-        road: 0,
-        rail: 0,
-        sea: 0
-      }
-    }] as TransportType[]
+
+    darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
+
+    transportTypes: [
+      {
+        name: "local",
+        color: "#53ac8b",
+        defaults: {
+          road: 50,
+          rail: 0,
+          sea: 0,
+        },
+      },
+      {
+        name: "regional",
+        color: "#2d8486",
+        defaults: {
+          road: 300,
+          rail: 0,
+          sea: 0,
+        },
+      },
+      {
+        name: "global",
+        color: "#683a78",
+        defaults: {
+          road: 200,
+          rail: 0,
+          sea: 10000,
+        },
+      },
+      {
+        name: "custom",
+        color: "#1f9321",
+        defaults: {
+          road: 0,
+          rail: 0,
+          sea: 0,
+        },
+      },
+    ] as TransportType[],
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
@@ -84,7 +99,7 @@ export default new Vuex.Store({
             name: `${type} - ${t}`,
             ...materialCarbonFactors.UK[type][t],
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
-          }
+          };
           arr.push(toPush);
         });
         return arr;
@@ -116,6 +131,9 @@ export default new Vuex.Store({
     },
     setServerInfo(state, info) {
       state.serverInfo = info;
+    },
+    setDarkMode(state) {
+      state.darkMode = state.darkMode ? false : true;
     },
   },
   actions: {
@@ -173,9 +191,15 @@ export default new Vuex.Store({
       const objectIds = await getStreamObjects(context, streamid);
 
       return objectIds.data.stream.branch.commits.items.map((item) => {
+        console.log(`context.state.selectedServer\n${context.state.selectedServer}`)
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
     },
+
+    setDarkMode({ commit }) {
+      commit("setDarkMode");
+    },
+
     async getObjectDetails(context, input: ObjectDetailsInput) {
       const { streamid, objecturl } = input;
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
@@ -226,6 +250,7 @@ export default new Vuex.Store({
     },
   },
   modules: {},
+  plugins: [createPersistedState()],
 });
 
 interface ObjectDetailsInput {

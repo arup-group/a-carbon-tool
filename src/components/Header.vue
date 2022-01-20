@@ -26,21 +26,36 @@
       @click="$router.push('/assessment')"
       >New Assessment</arc-button
     >
+    <arc-button
+      v-if="li"
+      type="tab"
+      color="secondary"
+      @click="toggleDarkMode"
+      >{{ darkModeButtonText }}</arc-button
+    >
   </arc-navbar>
 </template>
 
 <script lang="ts">
 import "@arc-web/components/dist/components/button/arc-button.js";
-
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component
 export default class Header extends Vue {
   @Prop() li!: boolean; // li = Logged In
+  @Prop() darkModeButtonText!: string;
+  @Prop() darkModeState!: boolean;
 
   @Emit("logout")
   logout() {
     console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
   }
+
+  @Emit("toggleDarkMode")
+  toggleDarkMode() {
+    return;
+  }
 }
 </script>
+
+

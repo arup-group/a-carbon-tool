@@ -9,6 +9,7 @@
           @materialUpdated="materialUpdated"
           @stepperUpdate="stepperUpdate"
           @transportSelected="transportSelected"
+          @uploadData="uploadData"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -37,6 +38,7 @@ import { Component, Vue } from "vue-property-decorator";
 
 import {
   CalcModes,
+  ProjectDataComplete,
   MaterialUpdateOut,
   SpeckleObject,
   SpeckleType,
@@ -70,6 +72,8 @@ export default class Assessment extends Vue {
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
   totalVolume = 0;
   allMesh: THREE.Mesh[] = [];
+
+  projectData!: ProjectDataComplete;
 
   materialsOut!: MaterialUpdateOut;
 
@@ -256,6 +260,10 @@ export default class Assessment extends Vue {
 
     console.log("[findTypes] types:", types);
     return types;
+  }
+
+  uploadData(data: ProjectDataComplete) { // form data from step 1
+    this.projectData = data;
   }
 }
 </script>

@@ -8,9 +8,11 @@
         </v-stepper-step>
         <v-stepper-content step="1">
           <Menu1b
-            @loadStream="loadStream"
             v-if="streams.length !== 0"
+            @loadStream="loadStream"
+            @uploadData="uploadData"
             :streams="streams"
+            :step="step"
           />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="2" @click.native="step = 2">
@@ -60,6 +62,7 @@ import Menu3 from "@/components/Menu3.vue";
 import Menu4 from "./Menu4.vue";
 import Menu5 from "./Menu5.vue";
 import {
+  ProjectDataComplete,
   MaterialUpdateOut,
   SpeckleType,
   Step,
@@ -94,6 +97,11 @@ export default class AssessmentStepper extends Vue {
   @Emit("transportSelected")
   transportSelected(selected: TransportSelected) {
     return selected;
+  }
+
+  @Emit("uploadData")
+  uploadData(data: ProjectDataComplete) {
+    return data;
   }
 
   @Watch("step")

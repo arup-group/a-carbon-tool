@@ -11,6 +11,13 @@
         @logout="logout"
         @toggleDarkMode="toggleDarkMode"
       />
+      <Sidebar
+        :li="isAuthenticated"
+        :darkModeButtonText="darkModeButtonText"
+        :darkModeState="darkModeState"
+        @logout="logout"
+        @toggleDarkMode="toggleDarkMode"
+      />
       <v-main>
         <router-view />
       </v-main>
@@ -21,6 +28,7 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import Header from "./components/Header.vue";
+import Sidebar from "./components/Sidebar.vue";
 
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";
@@ -36,7 +44,7 @@ setBasePath("/");
 import "@/assets/style.css";
 
 @Component({
-  components: { Header },
+  components: { Header, Sidebar },
 })
 export default class App extends Vue {
   get name() {

@@ -1,7 +1,6 @@
 <template>
   <v-form v-model="isFormValid">
     <v-card-text>
-      {{ isFormValid }}
       <v-combobox
         v-model="speckleStream"
         label="Speckle Stream"

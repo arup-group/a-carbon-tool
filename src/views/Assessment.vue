@@ -83,7 +83,7 @@ export default class Assessment extends Vue {
       this.availableStreams = res.data.user.streams.items.map((i: any) => {
         return { label: i.name, value: i.id };
       });
-      console.log(res);
+      // console.log(res);
     });
     this.transportTypes = this.$store.state.transportTypes;
   }
@@ -178,10 +178,10 @@ export default class Assessment extends Vue {
   }
 
   async loadStream(id: string) {
-    console.log("id loaded", id);
+    // console.log("id loaded", id);
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
-    console.log("URL", this.objectURLs);
+    // console.log("URL", this.objectURLs);
 
     const res = await this.$store.dispatch("getObjectDetails", {
       streamid: id,
@@ -193,7 +193,7 @@ export default class Assessment extends Vue {
       speckle_type: r.speckle_type,
     }));
 
-    console.log("objects:", this.objects);
+    // console.log("objects:", this.objects);
 
     this.types = this.findTypes(this.objects);
   }
@@ -221,7 +221,7 @@ export default class Assessment extends Vue {
   materialUpdated(material: MaterialUpdateOut) {
     this.materialsOut = material; // THIS IS WRONG
 
-    console.log("[Assessment] material:", material);
+    // console.log("[Assessment] material:", material);
 
     // update material in `colors`, or add the material if it is not already there
     let added = false;
@@ -240,6 +240,18 @@ export default class Assessment extends Vue {
         id: material.type.type,
         color: material.material.color,
       });
+
+    // update the objects to include this new material
+    material.type.ids.forEach(i => {
+      this.objects = this.objects.map(o => ({
+        ...o,
+        formData: {
+          transport: o.formData?.transport,
+          material: o.id === i ? material.material : o.formData?.material,
+          volume: o.formData?.volume
+        }
+      }));
+    });
   }
 
   findTypes(objects: SpeckleObject[]): SpeckleType[] {
@@ -258,11 +270,12 @@ export default class Assessment extends Vue {
         });
     });
 
-    console.log("[findTypes] types:", types);
+    // console.log("[findTypes] types:", types);
     return types;
   }
 
-  uploadData(data: ProjectDataComplete) { // form data from step 1
+  uploadData(data: ProjectDataComplete) {
+    // form data from step 1
     this.projectData = data;
   }
 }

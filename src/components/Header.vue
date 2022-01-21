@@ -1,7 +1,7 @@
 <template>
   <arc-navbar slot="nav" logo="/assets/logo.svg" arup="false">
     <div slot="name">act | a carbon tool</div>
-    <arc-button
+    <!-- <arc-button
       v-if="li"
       type="tab"
       color="secondary"
@@ -18,7 +18,7 @@
     <arc-button v-if="li" type="tab" color="secondary">Help</arc-button>
     <arc-button v-if="li" type="tab" color="secondary" @click="logout"
       >Log Out</arc-button
-    >
+    > -->
     <arc-button
       v-if="li"
       size="large"
@@ -57,5 +57,3 @@ export default class Header extends Vue {
   }
 }
 </script>
-
-

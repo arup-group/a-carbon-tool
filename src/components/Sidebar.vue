@@ -3,36 +3,47 @@
     slot="side"
     :title="username"
     v-if="li"
-    style="--sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width))"
+    style="
+      --sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width));
+      --gap-distance: var(--arc-spacing-normal);
+    "
   >
     <arc-menu>
       <arc-menu-item v-if="li" @click="$router.push('/assessment')">
-        <arc-icon name="note" slot="prefix" size="small"></arc-icon>
+        <arc-icon
+          name="note"
+          slot="prefix"
+          size="small"
+          style="margin-right: 7px"
+        ></arc-icon>
         New Assessment
       </arc-menu-item>
       <arc-menu-item @click="$router.push('/landing')">
-        <arc-icon name="home" slot="prefix" size="small"></arc-icon>
+        <arc-icon name="home" slot="prefix" size="small" style="margin-right: 7px"></arc-icon>
         Home
       </arc-menu-item>
       <arc-menu-item @click="$router.push('/about')">
-        <arc-icon name="info" slot="prefix" size="small"></arc-icon>
+        <arc-icon name="info" slot="prefix" size="small" style="margin-right: 7px"></arc-icon>
         About
       </arc-menu-item>
       <arc-menu-item>
-        <arc-icon name="question" slot="prefix" size="small"></arc-icon>
+        <arc-icon name="question" slot="prefix" size="small" style="margin-right: 7px"></arc-icon>
         Help
       </arc-menu-item>
     </arc-menu>
-    <arc-menu>
+    <arc-menu style="flex-shrink: 6">
       <arc-menu-item>
-        <arc-icon name="settings" slot="prefix" size="medium"></arc-icon>
+        <arc-icon name="settings" slot="prefix" size="medium" style="margin-right: 7px"></arc-icon>
         Settings
       </arc-menu-item>
       <arc-menu-item v-if="li" @click="logout">
-        <arc-icon name="lock-open" slot="prefix" size="medium"></arc-icon>Sign
+        <arc-icon name="lock-open" slot="prefix" size="medium" style="margin-right: 7px"></arc-icon>Sign
         out</arc-menu-item
       >
-      <arc-menu-item v-if="li" @click="toggleDarkMode"
+      <arc-menu-item
+        v-if="li"
+        style="text-align: center"
+        @click="toggleDarkMode"
         >{{ darkModeButtonText }}
       </arc-menu-item>
     </arc-menu>

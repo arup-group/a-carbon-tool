@@ -1,11 +1,16 @@
 <template>
-  <arc-sidebar slot="side" title="title">
+  <arc-sidebar
+    slot="side"
+    title="asd"
+    v-if="li"
+    style="--sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width))"
+  >
     <arc-menu>
-      <arc-menu-item>
+      <arc-menu-item @click="$router.push('/landing')">
         <arc-icon name="home" slot="prefix" size="small"></arc-icon>
         Home
       </arc-menu-item>
-      <arc-menu-item>
+      <arc-menu-item @click="$router.push('/about')">
         <arc-icon name="info" slot="prefix" size="small"></arc-icon>
         About
       </arc-menu-item>
@@ -13,19 +18,15 @@
         <arc-icon name="question" slot="prefix" size="small"></arc-icon>
         Help
       </arc-menu-item>
-      <arc-menu-item>
-        <arc-icon name="speech" slot="prefix" size="small"></arc-icon>
-        New Assessment
-      </arc-menu-item>
     </arc-menu>
     <arc-menu>
       <arc-menu-item>
         <arc-icon name="settings" slot="prefix" size="medium"></arc-icon>
         Settings
       </arc-menu-item>
-      <arc-menu-item @click="logout">
-        <arc-icon name="settings" slot="prefix" size="medium"></arc-icon
-        >Log</arc-menu-item
+      <arc-menu-item v-if="li" @click="logout">
+        <arc-icon name="lock-open" slot="prefix" size="medium"></arc-icon>Sign
+        out</arc-menu-item
       >
     </arc-menu>
   </arc-sidebar>

@@ -141,10 +141,40 @@ export default class Assessment extends Vue {
       case Step.QUANTITIES:
         this.calcQuant();
         break;
+      case Step.REVIEW:
+        this.review();
+        break;
       default:
         this.colors = [];
         break;
     }
+  }
+
+  review() {
+    console.log("this.projectData:", this.projectData)
+    const projectEmpty = this.projectData ? true : false;
+    const materialsEmpty: string[] = [];
+    const transportsEmpty: string[] = [];
+    const volumesEmpty: string[] = [];
+
+    this.objects.forEach((o) => {
+      const formData = o.formData;
+
+      if (formData?.material === undefined) materialsEmpty.push(o.id);
+      if (formData?.transport === undefined) transportsEmpty.push(o.id);
+      if (formData?.volume === undefined) volumesEmpty.push(o.id);
+    });
+
+    console.log(
+      "projectEmtpy:",
+      projectEmpty,
+      "\nmaterialsEmpty:",
+      materialsEmpty,
+      "\ntransportsEmpty:",
+      transportsEmpty,
+      "\nvolumesEmpty:",
+      volumesEmpty
+    );
   }
 
   calcQuant() {
@@ -271,6 +301,7 @@ export default class Assessment extends Vue {
 
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
+    console.log("[uploadData] data:", data);
     this.projectData = data;
   }
 }

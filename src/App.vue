@@ -8,16 +8,9 @@
         :li="isAuthenticated"
         :darkModeButtonText="darkModeButtonText"
         :darkModeState="darkModeState"
-        @logout="logout"
         @toggleDarkMode="toggleDarkMode"
       />
-      <Sidebar
-        :li="isAuthenticated"
-        :darkModeButtonText="darkModeButtonText"
-        :darkModeState="darkModeState"
-        @logout="logout"
-        @toggleDarkMode="toggleDarkMode"
-      />
+      <Sidebar :li="isAuthenticated" :username="name" @logout="logout" />
       <v-main>
         <router-view />
       </v-main>

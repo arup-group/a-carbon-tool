@@ -1,7 +1,7 @@
 <template>
   <arc-sidebar
     slot="side"
-    title="asd"
+    :title="username"
     v-if="li"
     style="--sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width))"
   >
@@ -45,17 +45,11 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 @Component
 export default class Sidebar extends Vue {
   @Prop() li!: boolean; // li = Logged In
-  @Prop() darkModeButtonText!: string;
-  @Prop() darkModeState!: boolean;
+  @Prop() username!: string;
 
   @Emit("logout")
   logout() {
     console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
-  }
-
-  @Emit("toggleDarkMode")
-  toggleDarkMode() {
-    return;
   }
 }
 </script>

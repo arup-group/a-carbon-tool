@@ -50,13 +50,6 @@ import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 import * as THREE from "three";
 
-interface SpeckleObjectComplete {
-  id: string;
-  transport: TransportType;
-  material: MaterialFull;
-  volume: number;
-}
-
 @Component({
   components: { AssessmentStepper, Renderer },
 })
@@ -70,7 +63,7 @@ export default class Assessment extends Vue {
   colors: Color[] = [];
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
-  totalVolume = 0;
+  totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
 
   projectData!: ProjectDataComplete;
@@ -115,8 +108,8 @@ export default class Assessment extends Vue {
         );
       }
       let sum = volumes.reduce((a, b) => a + b, 0);
-      return sum > 0 ? sum : "> 0";
-    } else return "no index";
+      return sum > 0 ? sum : 0; // the volume can sometimes be negative, this is an error, so is treated as 0
+    } else return 0;
   }
   // https://stackoverflow.com/a/1568551/3446736
   getSignedVolumeOfTriangle(
@@ -156,22 +149,20 @@ export default class Assessment extends Vue {
 
   calcQuant() {
     let totalVol = 0; // in m3 (I think)
-    const volumes: (number | "> 0" | "no index")[] = [];
+    const volumes: number[] = [];
     this.allMesh.forEach((m) => {
       const vol = this.getMeshVolume(m);
       // find the speckle object that this mesh relates to and add the volume to that. Probably not the best way to do this...
-      this.objects = this.objects.map((o) => {
-        if (o.id === m.userData.id) {
-          return {
-            ...o,
-            formData: {
-              volume: typeof vol === "number" ? vol : 0,
-            },
-          };
-        } else return o;
-      });
+      this.objects = this.objects.map((o) => ({
+        ...o,
+        formData: {
+          transport: o.formData?.transport,
+          material: o.formData?.material,
+          volume: o.id === m.userData.id ? vol : o.formData?.volume,
+        },
+      }));
       volumes.push(vol);
-      totalVol += typeof vol === "number" ? vol : 0;
+      totalVol += vol > 0 ? vol : 0;
     });
     this.totalVolume = totalVol;
   }
@@ -212,14 +203,15 @@ export default class Assessment extends Vue {
         color: selected.transportType.color,
       });
 
-    selected.speckleType.ids.forEach(i => {
-      this.objects = this.objects.map(o => ({
+    selected.speckleType.ids.forEach((i) => {
+      this.objects = this.objects.map((o) => ({
         ...o,
         formData: {
-          transport: o.id === i ? selected.transportType : o.formData?.transport,
+          transport:
+            o.id === i ? selected.transportType : o.formData?.transport,
           material: o.formData?.material,
-          volume: o.formData?.volume
-        }
+          volume: o.formData?.volume,
+        },
       }));
     });
   }
@@ -246,14 +238,14 @@ export default class Assessment extends Vue {
       });
 
     // update the objects to include this new material
-    material.type.ids.forEach(i => {
-      this.objects = this.objects.map(o => ({
+    material.type.ids.forEach((i) => {
+      this.objects = this.objects.map((o) => ({
         ...o,
         formData: {
           transport: o.formData?.transport,
           material: o.id === i ? material.material : o.formData?.material,
-          volume: o.formData?.volume
-        }
+          volume: o.formData?.volume,
+        },
       }));
     });
   }

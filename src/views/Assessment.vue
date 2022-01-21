@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import AssessmentStepper from "@/components/AssessmentStepper.vue";
+import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import Renderer, { Color } from "@/components/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";

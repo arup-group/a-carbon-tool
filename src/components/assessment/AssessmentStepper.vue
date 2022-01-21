@@ -56,9 +56,9 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
-import Menu1b from "@/components/Menu1b.vue";
-import Menu2 from "@/components/Menu2.vue";
-import Menu3 from "@/components/Menu3.vue";
+import Menu1b from "./Menu1b.vue";
+import Menu2 from "./Menu2.vue";
+import Menu3 from "./Menu3.vue";
 import Menu4 from "./Menu4.vue";
 import Menu5 from "./Menu5.vue";
 import {

@@ -15,6 +15,7 @@
           :materials="materials"
           :transportTypes="transportTypes"
           :totalVolume="totalVolume"
+          :emptyProps="emptyProps"
         />
       </v-col>
       <v-col cols="8">
@@ -45,6 +46,8 @@ import {
   Step,
   TransportSelected,
   TransportType,
+  EmptyProps,
+  EmptyPropsPassdown,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -69,6 +72,8 @@ export default class Assessment extends Vue {
   projectData!: ProjectDataComplete;
 
   materialsOut!: MaterialUpdateOut;
+
+  emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   mounted() {
     this.token = this.$store.state.token.token;
@@ -151,30 +156,24 @@ export default class Assessment extends Vue {
   }
 
   review() {
-    console.log("this.projectData:", this.projectData)
-    const projectEmpty = this.projectData ? true : false;
-    const materialsEmpty: string[] = [];
-    const transportsEmpty: string[] = [];
-    const volumesEmpty: string[] = [];
+    const emptyProps: EmptyProps = {
+      projectEmpty: this.projectData ? true : false,
+      materialsEmpty: ([] as string[]),
+      transportsEmpty: ([] as string[]),
+      // can ignore volumes for now: REMOVE COMMENT ONCE TALKED TO STAM
+      volumesEmpty: ([] as string[]),
+    }
 
     this.objects.forEach((o) => {
       const formData = o.formData;
 
-      if (formData?.material === undefined) materialsEmpty.push(o.id);
-      if (formData?.transport === undefined) transportsEmpty.push(o.id);
-      if (formData?.volume === undefined) volumesEmpty.push(o.id);
+      if (formData?.material === undefined) emptyProps.materialsEmpty.push(o.id);
+      if (formData?.transport === undefined) emptyProps.transportsEmpty.push(o.id);
+      // can ignore volumes for now
+      if (formData?.volume === undefined) emptyProps.volumesEmpty.push(o.id);
     });
 
-    console.log(
-      "projectEmtpy:",
-      projectEmpty,
-      "\nmaterialsEmpty:",
-      materialsEmpty,
-      "\ntransportsEmpty:",
-      transportsEmpty,
-      "\nvolumesEmpty:",
-      volumesEmpty
-    );
+    this.emptyProps = emptyProps;
   }
 
   calcQuant() {
@@ -301,7 +300,6 @@ export default class Assessment extends Vue {
 
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
-    console.log("[uploadData] data:", data);
     this.projectData = data;
   }
 }

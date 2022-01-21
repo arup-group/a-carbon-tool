@@ -41,7 +41,7 @@
         <v-stepper-step :complete="completed" step="5" @click.native="step = 5">
           Review
         </v-stepper-step>
-        <v-stepper-content step="5"><menu-5 /></v-stepper-content>
+        <v-stepper-content step="5"><menu-5 :emptyProps="emptyProps" /></v-stepper-content>
         <v-stepper-step :complete="completed" step="6" @click.native="step = 6">
           Preview
         </v-stepper-step>
@@ -68,6 +68,8 @@ import {
   Step,
   TransportSelected,
   TransportType,
+  EmptyProps,
+  EmptyPropsPassdown,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -80,6 +82,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() transportTypes!: TransportType[];
   @Prop() totalVolume!: number;
+  @Prop() emptyProps!: EmptyPropsPassdown;
 
   completed = false;
   step: Step = 1;

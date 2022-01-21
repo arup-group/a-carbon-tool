@@ -6,6 +6,10 @@
     style="--sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width))"
   >
     <arc-menu>
+      <arc-menu-item v-if="li" @click="$router.push('/assessment')">
+        <arc-icon name="note" slot="prefix" size="small"></arc-icon>
+        New Assessment
+      </arc-menu-item>
       <arc-menu-item @click="$router.push('/landing')">
         <arc-icon name="home" slot="prefix" size="small"></arc-icon>
         Home
@@ -28,6 +32,9 @@
         <arc-icon name="lock-open" slot="prefix" size="medium"></arc-icon>Sign
         out</arc-menu-item
       >
+      <arc-menu-item v-if="li" @click="toggleDarkMode"
+        >{{ darkModeButtonText }}
+      </arc-menu-item>
     </arc-menu>
   </arc-sidebar>
 </template>
@@ -46,6 +53,13 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 export default class Sidebar extends Vue {
   @Prop() li!: boolean; // li = Logged In
   @Prop() username!: string;
+  @Prop() darkModeButtonText!: string;
+  @Prop() darkModeState!: boolean;
+
+  @Emit("toggleDarkMode")
+  toggleDarkMode() {
+    return;
+  }
 
   @Emit("logout")
   logout() {

@@ -2,18 +2,25 @@
   <v-app style="height: 100vh">
     <arc-container
       :theme="this.$store.state.darkMode ? 'dark' : 'ACT-light'"
-      style="height: 100%"
+      style="height: 100vh"
     >
-      <Header
+      <Sidebar
         :li="isAuthenticated"
+        :username="name"
         :darkModeButtonText="darkModeButtonText"
         :darkModeState="darkModeState"
         @toggleDarkMode="toggleDarkMode"
+        @logout="logout"
       />
-      <Sidebar :li="isAuthenticated" :username="name" @logout="logout" />
-      <v-main>
-        <router-view />
-      </v-main>
+      <arc-container
+        :theme="this.$store.state.darkMode ? 'dark' : 'ACT-light'"
+        style="height: 100%"
+      >
+        <Header :li="isAuthenticated" />
+        <v-main>
+          <router-view />
+        </v-main>
+      </arc-container>
     </arc-container>
   </v-app>
 </template>

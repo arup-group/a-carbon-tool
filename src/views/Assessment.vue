@@ -149,10 +149,17 @@ export default class Assessment extends Vue {
       case Step.REVIEW:
         this.review();
         break;
+      case Step.PREVIEW:
+        this.carbonCalc();
+        break;
       default:
         this.colors = [];
         break;
     }
+  }
+
+  carbonCalc() {
+    return;
   }
 
   review() {

@@ -1,39 +1,5 @@
-// DEFINITIONS
-// definitions to be superceded elsewhere once we hook up speckle
-interface SpeckleObject {
-  id: string;
-  volume: number;
-  transport: string;
-  material: string; // blank by default - to be assigned as part of process
-  // carbon values to default to 0 once initiated
-  productStageCarbonA1A3: number;
-  transportCarbonA4: number;
-  constructionCarbonA5: number;
-}
-
-// as shown in materials.json
-interface Material {
-  density: number;
-  wastage: number;
-  productStageCarbonA1A3: number; //kgCO2e/kg
-  source: string;
-}
-
-const transportType = {
-  // values taken from RICS guidance
-  local: {
-    road: 50, // km
-    sea: 0, //km
-  },
-  regional: {
-    road: 300, // km
-    sea: 0, // km
-  },
-  global: {
-    road: 200, // km
-    sea: 10000, // km
-  },
-};
+import { Material } from "./material-carbon-factors";
+import { SpeckleObjectFormComplete } from "@/models/newAssessment";
 
 const transportFactors = {
   // values taken from RICS guidance
@@ -43,32 +9,23 @@ const transportFactors = {
 
 // CALCULATIONS
 // calculate the a1a3 carbon for any speckle object against a specified material
-function productStageCarbonA1A3(obj: SpeckleObject, mat: Material) {
+function productStageCarbonA1A3(obj: SpeckleObjectFormComplete, mat: Material) {
   // calculate mass of object
-  const mass = obj.volume * mat.density;
+  const mass = obj.formData.volume * mat.density;
   // calculate a1a3 carbon of object
   const a1a3 = mass * mat.productStageCarbonA1A3;
   return a1a3;
 }
 
 // calculate the carbon associated with transport
-function transportCarbonA4(obj: SpeckleObject, mat: Material) {
-  const mode = transportType;
+function transportCarbonA4(obj: SpeckleObjectFormComplete, mat: Material) {
   const factors = transportFactors;
 
-  let trans = { road: 0, sea: 0 };
-  // set transport distance based on object definition
-  if (obj.transport == "regional") {
-    trans = mode.regional;
-  } else if (obj.transport == "global") {
-    trans = mode.global;
-  } else {
-    trans = mode.local;
-  }
+  let trans = obj.formData.transport.values;
 
   const transCarb =
     mat.density *
-    obj.volume *
+    obj.formData.volume *
     (trans.road * factors.road + (trans.sea * factors.sea) / 1000);
   return transCarb;
 }
@@ -80,12 +37,15 @@ function constructionCarbonA5Site(sysCost: number) {
 }
 
 // calculate the carbon associated with material wastage
-function constructionCarbonA5Waste(obj: SpeckleObject, mat: Material) {
-  const wasteVolume = obj.volume * (1 / (1 - mat.wastage) - 1);
+function constructionCarbonA5Waste(
+  obj: SpeckleObjectFormComplete,
+  mat: Material
+) {
+  const wasteVolume = obj.formData.volume * (1 / (1 - mat.wastage) - 1);
 
   // create new object with waste volume
   const wasteObj = obj;
-  wasteObj.volume = wasteVolume;
+  wasteObj.formData.volume = wasteVolume;
 
   // compute a1-a4 for waste materials
   const a1a3 = productStageCarbonA1A3(wasteObj, mat);
@@ -96,13 +56,29 @@ function constructionCarbonA5Waste(obj: SpeckleObject, mat: Material) {
   return a5waste;
 }
 
-function constructionCarbonA5(
-  sysCost: number,
-  obj: SpeckleObject,
-  mat: Material
-) {
-  const a5 =
-    constructionCarbonA5Site(sysCost) + constructionCarbonA5Waste(obj, mat);
+type FullA5Calc = {
+  sysCost: number;
+  obj: SpeckleObjectFormComplete;
+  mat: Material;
+};
+type PartialA5Calc = {
+  site: number;
+  waste: number;
+};
+
+function instanceOfFullA5Calc(object: any): object is FullA5Calc {
+  return object && "sysCost" in object;
+}
+
+function constructionCarbonA5(ops: FullA5Calc | PartialA5Calc) {
+  let a5: number;
+  if (instanceOfFullA5Calc(ops)) {
+    a5 =
+      constructionCarbonA5Site(ops.sysCost) +
+      constructionCarbonA5Waste(ops.obj, ops.mat);
+  } else {
+    a5 = ops.site + ops.waste;
+  }
 
   return a5;
 }

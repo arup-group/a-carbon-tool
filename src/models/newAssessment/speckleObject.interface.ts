@@ -28,10 +28,18 @@ export interface ObjectFormDataComplete {
   volume: number;
 }
 
+// repeat of SpeckleObjectFormComplete, but with ReportData confirmed present
+export interface SpeckleObjectComplete {
+  id: string;
+  speckle_type: string;
+  formData: ObjectFormDataComplete,
+  reportData: ReportData;
+}
+
 export interface ReportData {
-  transportCarbonA4?: number;
-  productStageCarbonA1A3?: number;
-  constructionCarbonA5?: number;
+  transportCarbonA4: number;
+  productStageCarbonA1A3: number;
+  constructionCarbonA5: CarbonA5;
 }
 
 export interface CarbonA5 {

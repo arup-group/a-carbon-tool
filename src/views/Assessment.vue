@@ -48,10 +48,13 @@ import {
   TransportType,
   EmptyProps,
   EmptyPropsPassdown,
+  SpeckleObjectFormComplete,
+  SpeckleObjectComplete,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 import * as THREE from "three";
+import { constructionCarbonA5, constructionCarbonA5Site, constructionCarbonA5Waste, productStageCarbonA1A3, transportCarbonA4 } from "@/store/utilities/carbonCalculator";
 
 @Component({
   components: { AssessmentStepper, Renderer },
@@ -158,24 +161,75 @@ export default class Assessment extends Vue {
     }
   }
 
+  // for now we're just assuming that all data is filled in if the user reaches this step TODO: ONLY ALLOW USER ON THIS PAGE IF REVIEW IS SUCCESSFUL
   carbonCalc() {
-    return;
+    // convert objects from SpeckleObject to SpeckleObjectFormComplete
+    const objs = this.convertToFormComplete();
+
+    const reportObjs = objs.map((o): SpeckleObjectComplete => {
+      const A1A3 = productStageCarbonA1A3(o);
+      const A4 = transportCarbonA4(o);
+      const A5Site = constructionCarbonA5Site(this.projectData.cost);
+      const A5Waste = constructionCarbonA5Waste(o);
+      const A5Value = constructionCarbonA5({
+        site: A5Site,
+        waste: A5Waste
+      });
+      return {
+        ...o,
+        reportData: {
+          transportCarbonA4: A4,
+          productStageCarbonA1A3: A1A3,
+          constructionCarbonA5: {
+            value: A5Value,
+            waste: A5Waste,
+            site: A5Site
+          }
+        }
+      }
+    });
+
+    console.log("[carbonCalc] reportObjs:", reportObjs);
+  }
+
+  convertToFormComplete() {
+    const objs: SpeckleObjectFormComplete[] = [];
+    this.objects.forEach((o) => {
+      if (
+        o.formData &&
+        o.formData.transport &&
+        o.formData.material &&
+        o.formData.volume
+      ) {
+        objs.push({
+          ...o,
+          formData: {
+            transport: o.formData.transport,
+            material: o.formData.material,
+            volume: o.formData.volume,
+          },
+        });
+      }
+    });
+    return objs;
   }
 
   review() {
     const emptyProps: EmptyProps = {
       projectEmpty: this.projectData ? true : false,
-      materialsEmpty: ([] as string[]),
-      transportsEmpty: ([] as string[]),
+      materialsEmpty: [] as string[],
+      transportsEmpty: [] as string[],
       // can ignore volumes for now: REMOVE COMMENT ONCE TALKED TO STAM
-      volumesEmpty: ([] as string[]),
-    }
+      volumesEmpty: [] as string[],
+    };
 
     this.objects.forEach((o) => {
       const formData = o.formData;
 
-      if (formData?.material === undefined) emptyProps.materialsEmpty.push(o.id);
-      if (formData?.transport === undefined) emptyProps.transportsEmpty.push(o.id);
+      if (formData?.material === undefined)
+        emptyProps.materialsEmpty.push(o.id);
+      if (formData?.transport === undefined)
+        emptyProps.transportsEmpty.push(o.id);
       // can ignore volumes for now
       if (formData?.volume === undefined) emptyProps.volumesEmpty.push(o.id);
     });

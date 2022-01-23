@@ -50,6 +50,7 @@ import {
   EmptyPropsPassdown,
   SpeckleObjectFormComplete,
   SpeckleObjectComplete,
+  ReportTotals,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -190,6 +191,36 @@ export default class Assessment extends Vue {
     });
 
     console.log("[carbonCalc] reportObjs:", reportObjs);
+    const totals = this.calcTotals(reportObjs);
+    console.log("[carbonCalc] totals:", totals);
+  }
+
+  calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {
+    let A1A3 = 0;
+    let A4 = 0;
+    let A5Site = 0;
+    let A5Waste = 0;
+    let A5Value = 0;
+    reportObjs.forEach(o => {
+      const rd = o.reportData;
+      A1A3 += rd.productStageCarbonA1A3;
+      A4 += rd.transportCarbonA4;
+      A5Site += rd.constructionCarbonA5.site;
+      A5Waste += rd.constructionCarbonA5.waste;
+      A5Value += rd.constructionCarbonA5.value;
+    });
+    let totalCO2 = A1A3 + A4 + A5Value;
+
+    return {
+      transportCarbonA4: A4,
+      productStageCarbonA1A3: A1A3,
+      constructionCarbonA5: {
+        value: A5Value,
+        waste: A5Waste,
+        site: A5Site
+      },
+      totalCO2
+    }
   }
 
   convertToFormComplete() {

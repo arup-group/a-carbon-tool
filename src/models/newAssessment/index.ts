@@ -6,6 +6,7 @@ export {
   SpeckleObjectFormComplete,
   ObjectFormDataComplete,
   SpeckleObjectComplete,
+  ReportTotals
 } from "./speckleObject.interface";
 export { SpeckleType } from "./speckleType.interface";
 export { MaterialUpdateOut } from "./materialUpdateOut.interface";

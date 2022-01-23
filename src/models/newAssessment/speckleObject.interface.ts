@@ -47,3 +47,7 @@ export interface CarbonA5 {
   waste: number;
   site: number;
 }
+
+export interface ReportTotals extends ReportData {
+  totalCO2: number;
+}

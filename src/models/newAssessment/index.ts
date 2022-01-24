@@ -18,3 +18,4 @@ export { TransportSelected } from "./transportSelected.interface";
 export { CalcModes } from "./calcModes.enum";
 export { ProjectDataTemp, ProjectDataComplete } from "./projectData.interface";
 export { EmptyProps, EmptyPropsPassdown } from "./emptyProps.interface";
+export { ObjectDetails, ObjectDetailsComplete } from "./objectDetails.interface";

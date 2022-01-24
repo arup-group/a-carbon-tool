@@ -54,11 +54,19 @@ import {
   SpeckleObjectComplete,
   ReportTotals,
   ReportPassdown,
+  ObjectDetails,
+  ObjectDetailsComplete,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 import * as THREE from "three";
-import { constructionCarbonA5, constructionCarbonA5Site, constructionCarbonA5Waste, productStageCarbonA1A3, transportCarbonA4 } from "@/store/utilities/carbonCalculator";
+import {
+  constructionCarbonA5,
+  constructionCarbonA5Site,
+  constructionCarbonA5Waste,
+  productStageCarbonA1A3,
+  transportCarbonA4,
+} from "@/store/utilities/carbonCalculator";
 
 @Component({
   components: { AssessmentStepper, Renderer },
@@ -101,54 +109,6 @@ export default class Assessment extends Vue {
   rendererLoaded(allMesh: THREE.Mesh[]) {
     this.allMesh = allMesh;
   }
-  getMeshVolume(obj: THREE.Mesh) {
-    // TODO: Check for V+F-E = 2 (ie is closed mesh) https://gamedev.stackexchange.com/a/119368
-    let buffGeom = obj.geometry;
-    let volumes = [];
-    if (buffGeom.index) {
-      for (let i = 0; i < buffGeom.index.count; i += 3) {
-        let A = buffGeom.index.array[i],
-          B = buffGeom.index.array[i + 1],
-          C = buffGeom.index.array[i + 2];
-
-        volumes.push(
-          this.getSignedVolumeOfTriangle(
-            buffGeom.attributes.position.array[A * 3 + 0],
-            buffGeom.attributes.position.array[A * 3 + 1],
-            buffGeom.attributes.position.array[A * 3 + 2],
-            buffGeom.attributes.position.array[B * 3 + 0],
-            buffGeom.attributes.position.array[B * 3 + 1],
-            buffGeom.attributes.position.array[B * 3 + 2],
-            buffGeom.attributes.position.array[C * 3 + 0],
-            buffGeom.attributes.position.array[C * 3 + 1],
-            buffGeom.attributes.position.array[C * 3 + 2]
-          )
-        );
-      }
-      let sum = volumes.reduce((a, b) => a + b, 0);
-      return sum > 0 ? sum : 0; // the volume can sometimes be negative, this is an error, so is treated as 0
-    } else return 0;
-  }
-  // https://stackoverflow.com/a/1568551/3446736
-  getSignedVolumeOfTriangle(
-    p1x: number,
-    p1y: number,
-    p1z: number,
-    p2x: number,
-    p2y: number,
-    p2z: number,
-    p3x: number,
-    p3y: number,
-    p3z: number
-  ) {
-    let v321 = p3x * p2y * p1z;
-    let v231 = p2x * p3y * p1z;
-    let v312 = p3x * p1y * p2z;
-    let v132 = p1x * p3y * p2z;
-    let v213 = p2x * p1y * p3z;
-    let v123 = p1x * p2y * p3z;
-    return (1.0 / 6.0) * (-v321 + v231 + v312 - v132 - v213 + v123);
-  }
 
   stepperUpdate(step: Step) {
     switch (step) {
@@ -156,9 +116,10 @@ export default class Assessment extends Vue {
         if (this.materialsOut) this.materialUpdated(this.materialsOut);
         else this.colors = [];
         break;
-      case Step.QUANTITIES:
-        this.calcQuant();
-        break;
+      // TODO: CREATE HEAT MAP BASED ON VOLUME
+      // case Step.QUANTITIES:
+      //   this.calcQuant();
+      //   break;
       case Step.REVIEW:
         this.colors = [];
         this.review();
@@ -184,7 +145,7 @@ export default class Assessment extends Vue {
       const A5Waste = constructionCarbonA5Waste(o);
       const A5Value = constructionCarbonA5({
         site: A5Site,
-        waste: A5Waste
+        waste: A5Waste,
       });
       return {
         ...o,
@@ -194,10 +155,10 @@ export default class Assessment extends Vue {
           constructionCarbonA5: {
             value: A5Value,
             waste: A5Waste,
-            site: A5Site
-          }
-        }
-      }
+            site: A5Site,
+          },
+        },
+      };
     });
 
     console.log("[carbonCalc] reportObjs:", reportObjs);
@@ -206,7 +167,7 @@ export default class Assessment extends Vue {
 
     this.report = {
       reportObjs,
-      totals
+      totals,
     };
   }
 
@@ -216,7 +177,7 @@ export default class Assessment extends Vue {
     let A5Site = 0;
     let A5Waste = 0;
     let A5Value = 0;
-    reportObjs.forEach(o => {
+    reportObjs.forEach((o) => {
       const rd = o.reportData;
       A1A3 += rd.productStageCarbonA1A3;
       A4 += rd.transportCarbonA4;
@@ -232,10 +193,10 @@ export default class Assessment extends Vue {
       constructionCarbonA5: {
         value: A5Value,
         waste: A5Waste,
-        site: A5Site
+        site: A5Site,
       },
-      totalCO2
-    }
+      totalCO2,
+    };
   }
 
   convertToFormComplete() {
@@ -265,7 +226,6 @@ export default class Assessment extends Vue {
       projectEmpty: this.projectData ? true : false,
       materialsEmpty: [] as string[],
       transportsEmpty: [] as string[],
-      // can ignore volumes for now: REMOVE COMMENT ONCE TALKED TO STAM
       volumesEmpty: [] as string[],
     };
 
@@ -276,48 +236,53 @@ export default class Assessment extends Vue {
         emptyProps.materialsEmpty.push(o.id);
       if (formData?.transport === undefined)
         emptyProps.transportsEmpty.push(o.id);
-      // can ignore volumes for now
       if (formData?.volume === undefined) emptyProps.volumesEmpty.push(o.id);
     });
 
     this.emptyProps = emptyProps;
   }
 
-  calcQuant() {
-    let totalVol = 0; // in m3 (I think)
-    const volumes: number[] = [];
-    this.allMesh.forEach((m) => {
-      const vol = this.getMeshVolume(m);
-      // find the speckle object that this mesh relates to and add the volume to that. Probably not the best way to do this...
-      this.objects = this.objects.map((o) => ({
-        ...o,
-        formData: {
-          transport: o.formData?.transport,
-          material: o.formData?.material,
-          volume: o.id === m.userData.id ? vol : o.formData?.volume,
-        },
-      }));
-      volumes.push(vol);
-      totalVol += vol > 0 ? vol : 0;
-    });
-    this.totalVolume = totalVol;
-  }
-
   async loadStream(id: string) {
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
 
-    const res = await this.$store.dispatch("getObjectDetails", {
-      streamid: id,
-      objecturl: this.objectURLs[0],
+    const res: ObjectDetails[] = await this.$store.dispatch(
+      "getObjectDetails",
+      {
+        streamid: id,
+        objecturl: this.objectURLs[0],
+      }
+    );
+
+    let totalVol = 0;
+
+    const filteredRes: ObjectDetailsComplete[] = [];
+    res.forEach((r) => {
+      if (r.parameters && r.parameters.HOST_VOLUME_COMPUTED) {
+        filteredRes.push({
+          id: r.id,
+          speckle_type: r.speckle_type,
+          paramters: {
+            HOST_VOLUME_COMPUTED: {
+              value: r.parameters.HOST_VOLUME_COMPUTED.value,
+            },
+          },
+        });
+        // also find total volume here to avoid needing to loop through objects again
+        totalVol += r.parameters.HOST_VOLUME_COMPUTED.value;
+      }
     });
 
-    this.objects = res.map((r: any) => ({
+    this.objects = filteredRes.map((r) => ({
       id: r.id,
       speckle_type: r.speckle_type,
+      formData: {
+        volume: r.paramters.HOST_VOLUME_COMPUTED.value,
+      },
     }));
 
     this.types = this.findTypes(this.objects);
+    this.totalVolume = totalVol;
   }
 
   transportSelected(selected: TransportSelected) {

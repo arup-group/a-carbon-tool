@@ -33,19 +33,26 @@
             @transportSelected="transportSelected"
             :transportTypes="transportTypes"
             :types="types"
-        /></v-stepper-content>
+          />
+        </v-stepper-content>
         <v-stepper-step :complete="completed" step="4" @click.native="step = 4">
           Quantities
         </v-stepper-step>
-        <v-stepper-content step="4"><menu-4 :totalVolume="totalVolume" /></v-stepper-content>
+        <v-stepper-content step="4">
+          <menu-4 :totalVolume="totalVolume"/>
+        </v-stepper-content>
         <v-stepper-step :complete="completed" step="5" @click.native="step = 5">
           Review
         </v-stepper-step>
-        <v-stepper-content step="5"><menu-5 :emptyProps="emptyProps" /></v-stepper-content>
+        <v-stepper-content step="5">
+          <menu-5 :emptyProps="emptyProps"/>
+        </v-stepper-content>
         <v-stepper-step :complete="completed" step="6" @click.native="step = 6">
           Preview
         </v-stepper-step>
-        <v-stepper-content step="6"> </v-stepper-content>
+        <v-stepper-content step="6">
+          <menu-6 :report="report" />
+        </v-stepper-content>
         <v-stepper-step :complete="completed" step="7" @click.native="step = 7">
           Report
         </v-stepper-step>
@@ -61,6 +68,7 @@ import Menu2 from "./Menu2.vue";
 import Menu3 from "./Menu3.vue";
 import Menu4 from "./Menu4.vue";
 import Menu5 from "./Menu5.vue";
+import Menu6 from "./Menu6.vue";
 import {
   ProjectDataComplete,
   MaterialUpdateOut,
@@ -68,13 +76,13 @@ import {
   Step,
   TransportSelected,
   TransportType,
-  EmptyProps,
   EmptyPropsPassdown,
+  ReportPassdown,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 @Component({
-  components: { Menu1b, Menu2, Menu3, Menu4, Menu5 },
+  components: { Menu1b, Menu2, Menu3, Menu4, Menu5, Menu6 },
 })
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
@@ -83,6 +91,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() transportTypes!: TransportType[];
   @Prop() totalVolume!: number;
   @Prop() emptyProps!: EmptyPropsPassdown;
+  @Prop() report!: ReportPassdown;
 
   completed = false;
   step: Step = 1;

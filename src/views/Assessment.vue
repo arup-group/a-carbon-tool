@@ -16,6 +16,7 @@
           :transportTypes="transportTypes"
           :totalVolume="totalVolume"
           :emptyProps="emptyProps"
+          :report="report"
         />
       </v-col>
       <v-col cols="8">
@@ -51,6 +52,7 @@ import {
   SpeckleObjectFormComplete,
   SpeckleObjectComplete,
   ReportTotals,
+  ReportPassdown,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -78,6 +80,8 @@ export default class Assessment extends Vue {
   materialsOut!: MaterialUpdateOut;
 
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
+
+  report: ReportPassdown = false;
 
   mounted() {
     this.token = this.$store.state.token.token;
@@ -151,6 +155,7 @@ export default class Assessment extends Vue {
         this.calcQuant();
         break;
       case Step.REVIEW:
+        this.colors = [];
         this.review();
         break;
       case Step.PREVIEW:
@@ -193,6 +198,11 @@ export default class Assessment extends Vue {
     console.log("[carbonCalc] reportObjs:", reportObjs);
     const totals = this.calcTotals(reportObjs);
     console.log("[carbonCalc] totals:", totals);
+
+    this.report = {
+      reportObjs,
+      totals
+    };
   }
 
   calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {

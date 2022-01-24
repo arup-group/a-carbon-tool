@@ -1,7 +1,7 @@
 <template>
   <v-app style="height: 100vh">
     <arc-container
-      :theme="this.$store.state.darkMode ? 'dark' : 'ACT-light'"
+      :theme="this.$store.state.darkMode ? 'ACT-dark' : 'ACT-light'"
       style="height: 100vh"
     >
       <Sidebar

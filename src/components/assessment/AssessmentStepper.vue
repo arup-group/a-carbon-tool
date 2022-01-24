@@ -39,13 +39,13 @@
           Quantities
         </v-stepper-step>
         <v-stepper-content step="4">
-          <menu-4 :totalVolume="totalVolume"/>
+          <menu-4 :totalVolume="totalVolume" />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="5" @click.native="step = 5">
           Review
         </v-stepper-step>
         <v-stepper-content step="5">
-          <menu-5 :emptyProps="emptyProps"/>
+          <menu-5 :emptyProps="emptyProps" />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="6" @click.native="step = 6">
           Preview
@@ -56,7 +56,9 @@
         <v-stepper-step :complete="completed" step="7" @click.native="step = 7">
           Report
         </v-stepper-step>
-        <v-stepper-content step="7"> </v-stepper-content>
+        <v-stepper-content step="7">
+          <menu-7 :canSave="canSave" @save="save" />
+        </v-stepper-content>
       </v-stepper>
     </v-card>
   </v-container>
@@ -69,6 +71,7 @@ import Menu3 from "./Menu3.vue";
 import Menu4 from "./Menu4.vue";
 import Menu5 from "./Menu5.vue";
 import Menu6 from "./Menu6.vue";
+import Menu7 from "./Menu7.vue";
 import {
   ProjectDataComplete,
   MaterialUpdateOut,
@@ -82,7 +85,7 @@ import {
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 @Component({
-  components: { Menu1b, Menu2, Menu3, Menu4, Menu5, Menu6 },
+  components: { Menu1b, Menu2, Menu3, Menu4, Menu5, Menu6, Menu7 },
 })
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
@@ -95,6 +98,10 @@ export default class AssessmentStepper extends Vue {
 
   completed = false;
   step: Step = 1;
+
+  get canSave() {
+    return this.report ? true : false;
+  }
 
   @Emit("materialUpdated")
   materialUpdated(material: MaterialUpdateOut) {
@@ -120,6 +127,11 @@ export default class AssessmentStepper extends Vue {
   @Emit("stepperUpdate")
   stepperUpdate(step: Step) {
     return step;
+  }
+
+  @Emit("save")
+  save() {
+    return;
   }
 }
 </script>

@@ -10,6 +10,7 @@
           @stepperUpdate="stepperUpdate"
           @transportSelected="transportSelected"
           @uploadData="uploadData"
+          @save="save"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -91,6 +92,10 @@ export default class Assessment extends Vue {
       });
     });
     this.transportTypes = this.$store.state.transportTypes;
+  }
+
+  save() {
+    console.log("[Assessment] save");
   }
 
   rendererLoaded(allMesh: THREE.Mesh[]) {

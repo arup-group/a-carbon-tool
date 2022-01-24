@@ -3,10 +3,7 @@
     slot="side"
     :title="username"
     v-if="li"
-    style="
-      --sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width));
-      --gap-distance: var(--arc-spacing-0);
-    "
+    :theme="this.$store.state.darkMode ? 'ACT-dark' : 'ACT-light'"
   >
     <arc-menu>
       <arc-menu-item v-if="li" @click="$router.push('/assessment')">

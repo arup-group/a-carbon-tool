@@ -44,6 +44,26 @@ arc-container[theme="ACT-dark"] {
   --arc-hover-light: rgba(var(--arc-black-100), 0.85);
 }
 
+:host,
+arc-sidebar[theme="ACT-light"] {
+  /* Base */
+  --arc-container-color: var(--arc-teal-070);
+
+  /* Size */
+  --sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width));
+  --gap-distance: 0;
+}
+
+:host,
+arc-sidebar[theme="ACT-dark"] {
+  /* Base */
+  --arc-container-color: var(--arc-grey-090);
+
+  /* Size */
+  --sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width));
+  --gap-distance: 0;
+}
+
 .primary-text {
   color: rgba(var(--arc-color-primary));
 }

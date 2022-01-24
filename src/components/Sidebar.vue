@@ -36,7 +36,7 @@
         ></arc-icon>
         About
       </arc-menu-item>
-      <arc-menu-item>
+      <!-- <arc-menu-item>
         <arc-icon
           name="question"
           slot="prefix"
@@ -44,10 +44,10 @@
           style="margin-right: 7px"
         ></arc-icon>
         Help
-      </arc-menu-item>
+      </arc-menu-item> -->
     </arc-menu>
-    <arc-menu style="flex-shrink: 6">
-      <arc-menu-item>
+    <arc-menu style="flex-shrink: 100">
+      <!-- <arc-menu-item>
         <arc-icon
           name="settings"
           slot="prefix"
@@ -55,20 +55,22 @@
           style="margin-right: 7px"
         ></arc-icon>
         Settings
-      </arc-menu-item>
-      <arc-menu-item v-if="li" @click="logout">
-        <arc-icon
-          name="lock-open"
-          slot="prefix"
-          size="medium"
-          style="margin-right: 7px"
-        ></arc-icon
-        >Sign out</arc-menu-item
+      </arc-menu-item> -->
+      <arc-button
+        v-if="li"
+        type="tab"
+        size="small"
+        style="width: 50%"
+        @click="logout"
+      >
+        <arc-icon name="lock-open" slot="prefix" size="small"></arc-icon>Sign
+        out</arc-button
       >
       <arc-button
         v-if="li"
         type="tab"
-        style="width: 100%"
+        size="small"
+        style="width: 50%"
         @click="toggleDarkMode"
         >{{ darkModeButtonText }}
       </arc-button>

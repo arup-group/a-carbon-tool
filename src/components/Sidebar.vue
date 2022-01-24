@@ -5,7 +5,7 @@
     v-if="li"
     style="
       --sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width));
-      --gap-distance: var(--arc-spacing-normal);
+      --gap-distance: var(--arc-spacing-0);
     "
   >
     <arc-menu>

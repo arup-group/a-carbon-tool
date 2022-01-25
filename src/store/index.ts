@@ -7,6 +7,8 @@ import {
   getToken,
   getUserData,
   getUserStreams,
+  getStreamBranches,
+  getBranchData,
   goToSpeckleAuthpage,
   speckleLogOut,
 } from "./speckle/speckleUtil";
@@ -187,6 +189,16 @@ export default new Vuex.Store({
       const streams = await getUserStreams(context);
       return streams;
     },
+    async getStreamBranches(context, streamid: string) {
+      const streams = await getStreamBranches(context, streamid);
+      return streams;
+    },  
+
+    async getBranchData(context, streamid: string) {
+      const streams = await getBranchData(context, streamid);
+      return streams;
+    }, 
+
     async getObjectUrls(context, streamid: string) {
       const objectIds = await getStreamObjects(context, streamid);
 

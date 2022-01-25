@@ -102,7 +102,10 @@ export const getStreamBranches = (context: any,
 ): Promise<StreamReferenceBranches> =>
   speckleFetch(streamReferencedBranches(streamid), context);
 
-export const getBranchData = (context: any, streamid: string) => speckleFetch(streamsDataQuery(streamid), context);
+export const getBranchData = (context: any, 
+  streamid: string
+): Promise<StreamReferenceObjects> => 
+  speckleFetch(streamsDataQuery(streamid), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

@@ -22,7 +22,7 @@ export const streamsQuery = () => `query {
 
 export const streamsDataQuery = (id: string) => `query {
   stream(id: "${id}") {
-    branch (name: "actCarbonReport") {
+    branch (name: "actcarbonreport") {
       commits {
         items {
           referencedObject

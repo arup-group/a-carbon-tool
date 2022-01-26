@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import {
+  createCommit,
+  createReportBranch,
   exchangeAccessCode,
   getServer,
   getStreamObjects,
@@ -9,6 +11,8 @@ import {
   getUserStreams,
   goToSpeckleAuthpage,
   speckleLogOut,
+  uploadObjects,
+  uploadObjectWithChildren,
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
@@ -17,7 +21,15 @@ import {
   MaterialFull,
   UKMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
-import { TransportType } from "@/models/newAssessment";
+import {
+  ProjectDataComplete,
+  ReportTotals,
+  SpeckleObjectComplete,
+  TransportType,
+} from "@/models/newAssessment";
+import { gzip } from "pako";
+
+declare const Buffer: any;
 
 Vue.use(Vuex);
 
@@ -42,39 +54,44 @@ export default new Vuex.Store({
     authed: false,
     user: null,
     serverInfo: null,
-    transportTypes: [{
-      name: "local",
-      color: "#53ac8b",
-      values: {
-        road: 50,
-        rail: 0,
-        sea: 0,
-      }
-    }, {
-      name: "regional",
-      color: "#2d8486",
-      values: {
-        road: 300,
-        rail: 0,
-        sea: 0,
-      }
-    }, {
-      name: "global",
-      color: "#683a78",
-      values: {
-        road: 200,
-        rail: 0,
-        sea: 10000
-      }
-    }, {
-      name: "custom",
-      color: "#1f9321",
-      values: {
-        road: 0,
-        rail: 0,
-        sea: 0
-      }
-    }] as TransportType[]
+    transportTypes: [
+      {
+        name: "local",
+        color: "#53ac8b",
+        values: {
+          road: 50,
+          rail: 0,
+          sea: 0,
+        },
+      },
+      {
+        name: "regional",
+        color: "#2d8486",
+        values: {
+          road: 300,
+          rail: 0,
+          sea: 0,
+        },
+      },
+      {
+        name: "global",
+        color: "#683a78",
+        values: {
+          road: 200,
+          rail: 0,
+          sea: 10000,
+        },
+      },
+      {
+        name: "custom",
+        color: "#1f9321",
+        values: {
+          road: 0,
+          rail: 0,
+          sea: 0,
+        },
+      },
+    ] as TransportType[],
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
@@ -90,7 +107,7 @@ export default new Vuex.Store({
             name: `${type} - ${t}`,
             ...materialCarbonFactors.UK[type][t],
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
-          }
+          };
           arr.push(toPush);
         });
         return arr;
@@ -220,9 +237,112 @@ export default new Vuex.Store({
 
       return childrenObjects;
     },
+    async uploadReport(context, input: UploadReportInput) {
+      const { streamid, objects, reportTotals, projectData } = input;
+
+      // TODO: ADD ERROR HANDLING
+      const uploadObjectsRes: UploadObjectsRes = await uploadObjects(
+        context,
+        streamid,
+        objects
+      );
+      const children = uploadObjectsRes.data.objectCreate;
+      const formData = new FormData();
+      // below line means that some objects may be given duplicate strings and the report won't save properly
+      // TODO: FIND SOME BETTER WAY OF SETTING THE OBJECT ID
+      const objectid = Math.floor(Math.random() * 1000000).toString();
+      formData.append(
+        "batch1",
+        new Blob([
+          JSON.stringify([
+            {
+              id: objectid,
+              __closure: Object.fromEntries(children.map((c) => [c, 1])),
+              speckleType: "act-totals",
+              speckle_type: "act-totals",
+              transportCarbonA4: reportTotals.transportCarbonA4,
+              productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
+              constructionCarbonA5: reportTotals.constructionCarbonA5,
+              totalCO2: reportTotals.totalCO2,
+              projectData,
+            },
+          ]),
+        ])
+      );
+      await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${context.state.token.token}`,
+        },
+        body: formData,
+      });
+      // TODO: DELETE BRANCH FIRST TO ENSURE THE BRANCH ONLY CONTAINS OBJECTS FROM MOST RECENT REPORT
+      const createBranch: SpeckleBranchRes = await createReportBranch(
+        context,
+        streamid
+      );
+
+      const totalChildrenCount = uploadObjectsRes.data.objectCreate.length;
+
+      const createCommitRes: CreateCommitRes = await createCommit(
+        context,
+        streamid,
+        objectid,
+        totalChildrenCount
+      );
+    },
   },
   modules: {},
 });
+
+interface CreateCommitRes {
+  data: {
+    commitCreate: string;
+  };
+}
+
+interface SpeckleBranchRes {
+  error?: {
+    message: string;
+    locations: {
+      line: number;
+      column: number;
+    }[];
+    path: string[];
+    extensions: {
+      code: string;
+      exception: {
+        length: number;
+        name: string;
+        severity: string;
+        code: string;
+        detail: string;
+        schema: string;
+        table: string;
+        constraint: string;
+        file: string;
+        line: string;
+        routine: string;
+      };
+    };
+  }[];
+  data: {
+    branchCreate: string;
+  };
+}
+
+interface UploadObjectsRes {
+  data: {
+    objectCreate: string[];
+  };
+}
+
+export interface UploadReportInput {
+  streamid: string;
+  objects: SpeckleObjectComplete[];
+  reportTotals: ReportTotals;
+  projectData: ProjectDataComplete;
+}
 
 interface ObjectDetailsInput {
   streamid: string;

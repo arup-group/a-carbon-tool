@@ -21,13 +21,13 @@
         label="Primary element category"
       ></v-select>
       <v-text-field
-        v-model="form.projectValue"
+        v-model="form.cost"
         :rules="valueRules"
         label="System cost (£)"
         required
       ></v-text-field>
       <v-text-field
-        v-model="form.gia"
+        v-model="form.floorArea"
         label="System gross floor area (m2)"
         :rules="valueRules"
         required
@@ -93,11 +93,12 @@ export default class Menu1b extends Vue {
 
   @Emit("uploadData")
   uploadData(): ProjectDataComplete {
+    console.log("[Menu1b] this.form:", this.form)
     return {
       name: this.form.name ? this.form.name : "",
       component: this.form.component ? this.form.component : "",
-      cost: this.form.cost ? this.form.cost : 0,
-      floorArea: this.form.floorArea ? this.form.floorArea : 0,
+      cost: this.form.cost ? +this.form.cost : 0,
+      floorArea: this.form.floorArea ? +this.form.floorArea : 0,
     };
   }
 }

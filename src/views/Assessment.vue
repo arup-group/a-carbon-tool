@@ -67,6 +67,7 @@ import {
   productStageCarbonA1A3,
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
+import { UploadReportInput } from "@/store";
 
 @Component({
   components: { AssessmentStepper, Renderer },
@@ -91,6 +92,7 @@ export default class Assessment extends Vue {
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
+  streamid!: string;
 
   mounted() {
     this.token = this.$store.state.token.token;
@@ -102,8 +104,17 @@ export default class Assessment extends Vue {
     this.transportTypes = this.$store.state.transportTypes;
   }
 
-  save() {
-    console.log("[Assessment] save");
+  async save() {
+    if (this.report) {
+      const uploadReportInput: UploadReportInput = {
+        streamid: this.streamid,
+        objects: this.report.reportObjs,
+        reportTotals: this.report.totals,
+        projectData: this.projectData,
+      };
+
+      await this.$store.dispatch("uploadReport", uploadReportInput);
+    }
   }
 
   rendererLoaded(allMesh: THREE.Mesh[]) {
@@ -243,6 +254,7 @@ export default class Assessment extends Vue {
   }
 
   async loadStream(id: string) {
+    this.streamid = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
 

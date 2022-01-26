@@ -1,10 +1,15 @@
 import { AuthError, Server, Token } from "@/models/auth";
 import { StreamReferenceObjects } from "@/models/graphql";
+import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 
 import {
   streamReferencedObjects,
   userInfoQuery,
-  streamsQuery
+  streamsQuery,
+  uploadObjectsMutation,
+  createBranchMutation,
+  uploadObjectWithChildrenMutation,
+  createCommitMutation,
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
@@ -73,6 +78,7 @@ export async function speckleFetch(query: any, context: any) {
           Authorization: "Bearer " + token,
           "Content-Type": "application/json",
         },
+        // body: `{ query: ${query} }`
         body: JSON.stringify({
           query: query,
         }),
@@ -86,13 +92,46 @@ export async function speckleFetch(query: any, context: any) {
 
 export const getUserData = (context: any) =>
   speckleFetch(userInfoQuery(), context);
+
 export const getStreamObjects = (
   context: any,
   streamid: string
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(streamReferencedObjects(streamid), context);
 
-export const getUserStreams = (context: any) => speckleFetch(streamsQuery(),context);
+export const getUserStreams = (context: any) =>
+  speckleFetch(streamsQuery(), context);
+
+export const uploadObjects = (
+  context: any,
+  streamid: string,
+  objects: SpeckleObjectComplete[]
+) => speckleFetch(uploadObjectsMutation(streamid, objects), context);
+
+export const createReportBranch = (context: any, streamid: string) =>
+  speckleFetch(createBranchMutation(streamid), context);
+
+export const uploadObjectWithChildren = (
+  context: any,
+  streamid: string,
+  object: ReportTotals,
+  children: string[]
+) =>
+  speckleFetch(
+    uploadObjectWithChildrenMutation(streamid, object, children),
+    context
+  );
+
+export const createCommit = (
+  context: any,
+  streamid: string,
+  objectid: string,
+  totalChildrenCount: number
+) =>
+  speckleFetch(
+    createCommitMutation(streamid, objectid, totalChildrenCount),
+    context
+  );
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

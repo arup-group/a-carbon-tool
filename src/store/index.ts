@@ -27,9 +27,7 @@ import {
   SpeckleObjectComplete,
   TransportType,
 } from "@/models/newAssessment";
-import { gzip } from "pako";
-
-declare const Buffer: any;
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
@@ -54,6 +52,9 @@ export default new Vuex.Store({
     authed: false,
     user: null,
     serverInfo: null,
+
+    darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
+
     transportTypes: [
       {
         name: "local",
@@ -140,6 +141,9 @@ export default new Vuex.Store({
     setServerInfo(state, info) {
       state.serverInfo = info;
     },
+    setDarkMode(state) {
+      state.darkMode = state.darkMode ? false : true;
+    },
   },
   actions: {
     // Auth
@@ -199,6 +203,11 @@ export default new Vuex.Store({
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
     },
+
+    setDarkMode({ commit }) {
+      commit("setDarkMode");
+    },
+
     async getObjectDetails(context, input: ObjectDetailsInput) {
       const { streamid, objecturl } = input;
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
@@ -293,6 +302,7 @@ export default new Vuex.Store({
     },
   },
   modules: {},
+  plugins: [createPersistedState()],
 });
 
 interface CreateCommitRes {

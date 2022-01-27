@@ -26,6 +26,13 @@
       @click="$router.push('/assessment')"
       >New Assessment</arc-button
     >
+    <arc-button
+      v-if="li"
+      type="tab"
+      color="secondary"
+      @click="toggleDarkMode"
+      >{{ darkModeButtonText }}</arc-button
+    >
   </arc-navbar>
 </template>
 
@@ -36,8 +43,16 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 @Component
 export default class Header extends Vue {
   @Prop() li!: boolean; // li = Logged In
+  @Prop() darkModeButtonText!: string;
+  @Prop() darkModeState!: boolean;
+
   @Emit("logout")
   logout() {
+    return;
+  }
+
+  @Emit("toggleDarkMode")
+  toggleDarkMode() {
     return;
   }
 }

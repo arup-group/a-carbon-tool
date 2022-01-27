@@ -12,12 +12,10 @@
     "@arc-web/components": "^1.1.1",
     "@speckle/objectloader": "^2.2.0",
     "@speckle/viewer": "^2.0.12",
-    "@types/pako": "^1.0.3",
     "@types/three": "^0.136.1",
     "axios": "^0.24.0",
     "chart.js": "^2.9.4",
     "core-js": "^3.6.5",
-    "pako": "^1.0.11",
     "three": "^0.134.0",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.1",
@@ -25,7 +23,8 @@
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@mdi/font": "^6.5.95",

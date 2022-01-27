@@ -1,7 +1,16 @@
 <template>
   <v-app style="height: 100vh">
-    <arc-container theme="ACT-light" style="height: 100%">
-      <Header :li="isAuthenticated" @logout="logout" />
+    <arc-container
+      :theme="this.$store.state.darkMode ? 'dark' : 'ACT-light'"
+      style="height: 100%"
+    >
+      <Header
+        :li="isAuthenticated"
+        :darkModeButtonText="darkModeButtonText"
+        :darkModeState="darkModeState"
+        @logout="logout"
+        @toggleDarkMode="toggleDarkMode"
+      />
       <v-main>
         <router-view />
       </v-main>
@@ -16,6 +25,7 @@ import Header from "./components/Header.vue";
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";
 import "@arc-web/components/dist/themes/light.css";
+import "@arc-web/components/dist/themes/dark.css";
 
 import "@arc-web/components/dist/components/container/arc-container.js";
 import "@arc-web/components/dist/components/navbar/arc-navbar.js";
@@ -44,8 +54,21 @@ export default class App extends Vue {
     return this.$store.getters.isAuthenticated;
   }
 
+  get darkModeButtonText() {
+    return this.darkModeState ? "🌞" : "🌚";
+  }
+
+  get darkModeState() {
+    return this.$store.state.darkMode;
+  }
+
   logout() {
     this.$store.dispatch("logout");
+  }
+
+  toggleDarkMode() {
+    this.$store.dispatch("setDarkMode");
+    this.$vuetify.theme.dark = this.$store.state.darkMode ? true : false;
   }
 }
 </script>

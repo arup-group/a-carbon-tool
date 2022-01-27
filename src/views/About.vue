@@ -55,11 +55,6 @@
           </v-card-actions>
         </v-card>
       </v-col>
-      <!-- <v-col cols='12'>
-        <v-card flat>
-          <v-card-title>Definitions</v-card-title>
-        </v-card>
-      </v-col> -->
       <v-col cols="12" xl='8'>
         <v-card flat outlined>
           <v-card-title class="text-h4">Methodology</v-card-title>
@@ -100,7 +95,7 @@
             waste can then be estimated using the A1-A4 equations above.<br /><br />
           </v-card-text>
           <v-img src='/assets/a5-waste-volume-equation.png' height='120' contain></v-img>
-          <v-img src='/assets/a5-site-equation.png' height='320' contain></v-img>
+          <v-img src='/assets/a5-site-equation.png' height='320' contain class="mb-4"></v-img>
         </v-card>
       </v-col>
       <v-col cols="12" xl='8'>
@@ -129,8 +124,19 @@
           <v-card-title class="text-h4">Contributing</v-card-title>
           <v-card-text>
             <strong>act</strong> is an open-source initiative with a GPL3 licence. Anyone is welcome to contribute.
-            Check out our repository for guidance on how best to get involved - <a href='https://github.com/arup-group/a-carbon-tool'>github</a>
+            Check out our repository for guidance on how best to get involved
           </v-card-text>
+          <v-card-actions class="justify-center">
+            <v-btn
+              outlined
+              color='primary'
+              href="https://github.com/arup-group/a-carbon-tool"
+              target="_blank"
+              class='mx-2'
+            >
+              Github
+            </v-btn>
+          </v-card-actions>
           <v-card-title >Contributors</v-card-title>
             <v-card-actions class="mb-4 mx-4">
               <v-row style="width:100%">

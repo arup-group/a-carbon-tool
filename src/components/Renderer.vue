@@ -20,18 +20,42 @@ export interface Color {
   id: string; // should be unique to each item, making it a primary key
 }
 
+export type GradientColor = Gradient | null;
+export interface Gradient {
+  property: string;
+  minValue: number;
+  maxValue: number;
+  colors: string[];
+}
+
 @Component
 export default class extends Vue {
   @Prop() objecturls!: string[];
   @Prop() token!: string;
   @Prop() colors!: Color[];
+  @Prop() gradientColorProperty!: GradientColor;
 
   currentColors: Color[] = [];
 
   @Watch("colors")
   onObjectColorChanged(value: Color[]) {
-    if (value.length === 0) this.resetColors();
+    if (value.length === 0 || this.gradientColorProperty) this.resetColors();
     else this.setColors(value);
+  }
+
+  @Watch("gradientColorProperty")
+  async onGradientChange(value: GradientColor) {
+    if (value) {
+      await this.viewer.applyFilter({
+        colorBy: {
+          type: "gradient",
+          property: value.property,
+          minValue: value.minValue,
+          maxValue: value.maxValue,
+          gradientColors: value.colors
+        },
+      });
+    }
   }
 
   domElement!: any;

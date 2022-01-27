@@ -93,7 +93,6 @@ export default class Menu1b extends Vue {
 
   @Emit("uploadData")
   uploadData(): ProjectDataComplete {
-    console.log("[Menu1b] this.form:", this.form)
     return {
       name: this.form.name ? this.form.name : "",
       component: this.form.component ? this.form.component : "",

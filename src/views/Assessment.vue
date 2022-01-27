@@ -27,6 +27,7 @@
           :objecturls="objectURLs"
           :token="token"
           :colors="colors"
+          :gradientColorProperty="volumeGradientPassdown"
         />
       </v-col>
     </v-row>
@@ -35,7 +36,7 @@
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, { Color } from "@/components/Renderer.vue";
+import Renderer, { Color, Gradient, GradientColor } from "@/components/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -79,7 +80,6 @@ export default class Assessment extends Vue {
   types: SpeckleType[] = [];
   objects: SpeckleObject[] = [];
   materials: MaterialFull[] = this.$store.getters.materialsArrUK;
-  colors: Color[] = [];
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
   totalVolume = -1;
@@ -87,12 +87,18 @@ export default class Assessment extends Vue {
 
   projectData!: ProjectDataComplete;
 
-  materialsOut!: MaterialUpdateOut;
-
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
   streamid!: string;
+
+  colors: Color[] = [];
+  materialsColors: Color[] = [];
+  transportColors: Color[] = [];
+
+  // two separate values so that the colors can be found at the same time as the volume is calculated, rather than whenever the user goes onto the volume step
+  volumeGradient!: Gradient;
+  volumeGradientPassdown: GradientColor = null;
 
   mounted() {
     this.token = this.$store.state.token.token;
@@ -123,24 +129,66 @@ export default class Assessment extends Vue {
 
   stepperUpdate(step: Step) {
     switch (step) {
-      case Step.MATERIALS:
-        if (this.materialsOut) this.materialUpdated(this.materialsOut);
-        else this.colors = [];
+      case Step.DATA:
+        this.resetColors();
         break;
-      // TODO: CREATE HEAT MAP BASED ON VOLUME
-      // case Step.QUANTITIES:
-      //   this.calcQuant();
-      //   break;
+      case Step.MATERIALS:
+        this.resetColors();
+        this.colors = this.materialsColors;
+        break;
+      case Step.TRANSPORT:
+        this.resetColors();
+        this.colors = this.transportColors;
+        break;
+       case Step.QUANTITIES:
+         this.resetColors();
+         if (this.volumeGradient) this.volumeGradientPassdown = this.volumeGradient;
+         break;
       case Step.REVIEW:
-        this.colors = [];
+        this.resetColors();
         this.review();
         break;
       case Step.PREVIEW:
         this.carbonCalc();
+        this.resetColors();
+        break;
+      case Step.REPORT:
+        this.resetColors();
         break;
       default:
-        this.colors = [];
+        this.resetColors();
         break;
+    }
+  }
+
+  resetColors() {
+    this.colors = [];
+    this.volumeGradientPassdown = null;
+  }
+
+  updateVolumeGradient() {
+    let minVol = -1;
+    let maxVol = -1;
+
+    this.objects.forEach((o, i) => {
+      if (o.formData?.volume) {
+        let volume = o.formData.volume;
+        if (i === 0) {
+          // if on the first index, then min and max have not yet been set, so set them to the first vol value
+          minVol = volume;
+          maxVol = volume;
+        } else {
+          if (minVol > volume) minVol = volume;
+          if (maxVol < volume) maxVol = volume;
+        }
+      }
+    });
+
+    this.volumeGradient = {
+      property: "parameters.HOST_VOLUME_COMPUTED.value",
+      minValue: minVol,
+      maxValue: maxVol,
+      colors: ["#4f7bff", "#ff4f84"]
     }
   }
 
@@ -172,9 +220,7 @@ export default class Assessment extends Vue {
       };
     });
 
-    console.log("[carbonCalc] reportObjs:", reportObjs);
     const totals = this.calcTotals(reportObjs);
-    console.log("[carbonCalc] totals:", totals);
 
     this.report = {
       reportObjs,
@@ -295,6 +341,8 @@ export default class Assessment extends Vue {
 
     this.types = this.findTypes(this.objects);
     this.totalVolume = totalVol;
+
+    this.updateVolumeGradient();
   }
 
   transportSelected(selected: TransportSelected) {
@@ -315,6 +363,7 @@ export default class Assessment extends Vue {
         id: selected.speckleType.type,
         color: selected.transportType.color,
       });
+    this.transportColors = this.colors;
 
     selected.speckleType.ids.forEach((i) => {
       this.objects = this.objects.map((o) => ({
@@ -330,8 +379,6 @@ export default class Assessment extends Vue {
   }
 
   materialUpdated(material: MaterialUpdateOut) {
-    this.materialsOut = material; // THIS IS WRONG
-
     // update material in `colors`, or add the material if it is not already there
     let added = false;
     this.colors = this.colors.map((c) => {
@@ -349,6 +396,7 @@ export default class Assessment extends Vue {
         id: material.type.type,
         color: material.material.color,
       });
+    this.materialsColors = this.colors;
 
     // update the objects to include this new material
     material.type.ids.forEach((i) => {

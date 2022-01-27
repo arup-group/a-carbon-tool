@@ -68,9 +68,10 @@ export default class ProjectCard extends Vue {
     return this.project.co2Values;
   }
   get co2Total() {
-    return this.project.co2Values
-      .map((c) => c.value)
-      .reduce((prev, curr) => prev + curr);
+    return Math.round(this.project.totalCO2e)
+    //return this.project.co2Values
+    // .map((c) => c.value)
+    // .reduce((prev, curr) => prev + curr);
   }
   get link() {
     return this.project.link;

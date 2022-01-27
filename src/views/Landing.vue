@@ -18,6 +18,15 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-list>
+      <v-list-item
+        v-for="(item, i) in availableStreams"
+        :key="i">
+        <v-list-item-content>
+          <v-list-item-title v-text="item.label"></v-list-item-title>
+        </v-list-item-content>
+        </v-list-item>
+    </v-list>
     <v-container>
       <v-data-iterator
         :items='projects'
@@ -115,14 +124,19 @@
   </v-main>
 </template>
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+
+import { Vue, Component, Emit } from "vue-property-decorator";
 import ProjectCard from "../components/ProjectCard.vue";
 import { Project } from "@/models/project";
+
 
 @Component ({ components: {ProjectCard} })
 
 export default class Landing extends Vue {
-  
+    carbonBranches : string[] = [];
+    availableStreams : string[] = [];
+    branchData : any[] = []
+    token = "";
     itemsPerPage = 8
     search = ''
     filter = {}
@@ -247,7 +261,37 @@ export default class Landing extends Vue {
   formerPage () {
     if (this.page - 1 >= 1) this.page -= 1
   }
+  
+  mounted() {
+    this.token = this.$store.state.token.token;
+    this.loadStreams()
+    }
 
+    async loadStreams(){
+    const streams = await this.$store.dispatch("getUserStreams")
+    const streamID = streams.data.user.streams.items.map((stream : any) => {
+      return stream.id
+    })
+    const streamBranches  : any[] = [];
+    for (let i = 0; i< streamID.length; i++) {
+    const branches = await this.$store.dispatch("getStreamBranches", streamID[i])
+    console.log(branches);
+    streamBranches.push([branches, streamID[i]])
+    }
+    for (let i = 0; i< streamBranches.length; i++) {
+    streamBranches[i][0].data.stream.branches.items.forEach((branch : any) => {
+      if(branch.name === 'actcarbonreport') {
+      this.carbonBranches.push(streamBranches[i][1])
+      }
+    })
+    }
+    console.log(this.carbonBranches, 'cb')
+    for (let i = 0; i< this.carbonBranches.length; i++){
+    const branch = await this.$store.dispatch("getBranchData", this.carbonBranches[i])
+    this.branchData.push([this.carbonBranches[i], branch])
+    }
+    console.log(this.branchData, 'data')
+  }
 }
 </script>
 <style scoped>

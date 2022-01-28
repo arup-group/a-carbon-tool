@@ -212,7 +212,7 @@ export default class About extends Vue {
     {
       name: "Rob Salca",
       img: "/assets/contributors/placeholder-2.png",
-      byline: "Software engineer @ Arup | Sustainability and salsa enthusiast",
+      byline: "Software engineer @ Arup | sustainability and salsa enthusiast",
       git: "https://github.com/ro-sa",
       linkedin: "https://www.linkedin.com/in/robert-salca"
     },

@@ -85,10 +85,20 @@
             <span class="mr-4 grey--text">
               Page {{ page }} of {{ numberOfPages }}
             </span>
-            <v-btn color="primary" class="mr-1" @click="formerPage">
+            <v-btn
+              color='primary'
+              outlined
+              class='mr-1'
+              @click="formerPage"
+            >
               <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
-            <v-btn color="primary" class="ml-1" @click="nextPage">
+            <v-btn
+              color='primary'
+              outlined
+              class='ml-1'
+              @click="nextPage"
+            >
               <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
           </v-row>

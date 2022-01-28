@@ -5,7 +5,7 @@
       v-if="li"
       type="tab"
       color="secondary"
-      @click="$router.push('/landing')"
+      @click="$router.push('/')"
       >Home</arc-button
     >
     <arc-button
@@ -27,7 +27,6 @@
       >New Assessment</arc-button
     >
     <arc-button
-      v-if="li"
       type="tab"
       color="secondary"
       @click="toggleDarkMode"

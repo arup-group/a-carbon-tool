@@ -150,7 +150,6 @@ export default class Landing extends Vue {
     for (let i = 0; i < streamBranches.length; i++) {
       streamBranches[i][0].data.stream.branches.items.forEach((branch: any) => {
         if (branch.name === "actcarbonreport") {
-          console.log(streamBranches[i][1]);
           this.carbonBranches.push(streamBranches[i][1]);
         }
       });

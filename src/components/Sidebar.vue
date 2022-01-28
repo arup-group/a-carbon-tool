@@ -1,78 +1,53 @@
 <template>
-  <arc-sidebar
-    slot="side"
-    :title="username"
-    v-if="li"
-    :theme="this.$store.state.darkMode ? 'ACT-dark' : 'ACT-light'"
-  >
-    <arc-menu>
-      <arc-menu-item v-if="li" @click="$router.push('/assessment')">
-        <arc-icon
-          name="note"
-          slot="prefix"
-          size="small"
-          style="margin-right: 7px"
-        ></arc-icon>
-        New Assessment
-      </arc-menu-item>
-      <arc-menu-item @click="$router.push('/landing')">
-        <arc-icon
-          name="home"
-          slot="prefix"
-          size="small"
-          style="margin-right: 7px"
-        ></arc-icon>
-        Home
-      </arc-menu-item>
-      <arc-menu-item @click="$router.push('/about')">
-        <arc-icon
-          name="info"
-          slot="prefix"
-          size="small"
-          style="margin-right: 7px"
-        ></arc-icon>
-        About
-      </arc-menu-item>
-      <!-- <arc-menu-item>
-        <arc-icon
-          name="question"
-          slot="prefix"
-          size="small"
-          style="margin-right: 7px"
-        ></arc-icon>
-        Help
-      </arc-menu-item> -->
-    </arc-menu>
-    <arc-menu style="flex-shrink: 100">
-      <!-- <arc-menu-item>
-        <arc-icon
-          name="settings"
-          slot="prefix"
-          size="medium"
-          style="margin-right: 7px"
-        ></arc-icon>
-        Settings
-      </arc-menu-item> -->
-      <arc-button
-        v-if="li"
-        type="tab"
-        size="small"
-        style="width: 50%"
-        @click="logout"
-      >
-        <arc-icon name="lock-open" slot="prefix" size="small"></arc-icon>Sign
-        out</arc-button
-      >
-      <arc-button
-        v-if="li"
-        type="tab"
-        size="small"
-        style="width: 50%"
-        @click="toggleDarkMode"
-        >{{ darkModeButtonText }}
-      </arc-button>
-    </arc-menu>
-  </arc-sidebar>
+  <v-card>
+    <v-navigation-drawer v-model="drawer" :mini-variant.sync="mini" permanent>
+      <v-list-item class="px-2">
+        <v-list-item-avatar>
+          <v-icon>mdi-menu</v-icon>
+        </v-list-item-avatar>
+        <v-list-item-title>{{ username }}</v-list-item-title>
+        <v-btn icon @click.stop="mini = !mini">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+      </v-list-item>
+      <v-divider></v-divider>
+      <v-list dense>
+        <v-list-item
+          v-for="item in items"
+          :key="item.title"
+          link
+          @click="$router.push(item.route)"
+        >
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <v-divider></v-divider>
+      <v-list dense>
+        <v-list-item @click="logout">
+          <v-list-item-icon>
+            <v-icon>mdi-logout-variant </v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Sign out</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="toggleDarkMode">
+          <v-list-item-icon>
+            <v-icon>mdi-theme-light-dark </v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ darkModeButtonText }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -100,6 +75,22 @@ export default class Sidebar extends Vue {
   @Emit("logout")
   logout() {
     console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
+  }
+
+  data() {
+    return {
+      drawer: true,
+      items: [
+        {
+          title: "New Assessment",
+          icon: "mdi-molecule-co2",
+          route: "/assessment",
+        },
+        { title: "Home", icon: "mdi-home", route: "/landing" },
+        { title: "About", icon: "mdi-information-outline", route: "/about" },
+      ],
+      mini: true,
+    };
   }
 }
 </script>

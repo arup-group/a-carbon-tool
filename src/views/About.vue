@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" xl='8'>
+      <v-col cols="12" lg='8'>
         <v-card flat outlined class="mt-8">
           <v-card-title class="text-h4">Declaration</v-card-title>
           <v-card-text>
@@ -19,8 +19,7 @@
           </v-card-text>
           <v-img src='/assets/globe.png' contain height='480'></v-img>
         </v-card>
-      </v-col>
-      <v-col cols="12" xl='8'>
+      
         <v-card flat outlined>
           <v-card-title class="text-h4">Speckle</v-card-title>
           <v-card-text class='mb-4'>
@@ -42,20 +41,19 @@
           <v-card-actions class="my-4">
             <v-row dense>
               <v-col cols='6' align='right'>
-                <v-btn color='primary' outlined src='https://speckle.systems/' target='_blank'>
+                <v-btn color='primary' outlined href='https://speckle.systems/' target='_blank'>
                   Speckle Home
                 </v-btn>
               </v-col>
-              <v-col cols='6' align='left' scr='https://speckle.xyz/' target='_blank'>
-                <v-btn color='secondary' outlined>
+              <v-col cols='6' align='left'>
+                <v-btn color='secondary' outlined href='https://speckle.xyz/' target='_blank'>
                   Speckle XYZ
                 </v-btn>
               </v-col>
             </v-row>
           </v-card-actions>
         </v-card>
-      </v-col>
-      <v-col cols="12" xl='8'>
+      
         <v-card flat outlined>
           <v-card-title class="text-h4">Methodology</v-card-title>
           <v-card-text>
@@ -97,8 +95,7 @@
           <v-img src='/assets/a5-waste-volume-equation.png' height='120' contain></v-img>
           <v-img src='/assets/a5-site-equation.png' height='320' contain class="mb-4"></v-img>
         </v-card>
-      </v-col>
-      <v-col cols="12" xl='8'>
+ 
         <v-card flat outlined>
           <v-card-title class='text-h4'>Data</v-card-title>
           <v-card-text>
@@ -110,7 +107,7 @@
               <v-col v-for='geo in dataSources' :key='geo.name' cols='12'>
                 <div><strong>{{ geo.name }}</strong></div>
                 <div v-for='source in geo.sources' :key='source.name'>
-                  <v-btn outlined small :src='source.url' class='my-1' color='secondary' target="_blank">
+                  <v-btn outlined small :href='source.url' class='my-1' color='secondary' target="_blank">
                     {{ source.name }}
                   </v-btn>
                 </div>
@@ -118,13 +115,13 @@
             </v-row>
           </v-card-actions>
         </v-card>
-      </v-col>
-      <v-col cols="12" xl='8'>
+
         <v-card flat outlined>
           <v-card-title class="text-h4">Contributing</v-card-title>
           <v-card-text>
             <strong>act</strong> is an open-source initiative with a GPL3 licence. Anyone is welcome to contribute.
-            Check out our repository for guidance on how best to get involved
+            Check out our repository for guidance on how best to get involved or engage with us via the Speckle
+            community forum.
           </v-card-text>
           <v-card-actions class="justify-center">
             <v-btn
@@ -135,6 +132,15 @@
               class='mx-2'
             >
               Github
+            </v-btn>
+            <v-btn
+              outlined
+              color='secondary'
+              href="https://speckle.community/"
+              target="_blank"
+              class='mx-2'
+            >
+              Speckle Community
             </v-btn>
           </v-card-actions>
           <v-card-title >Contributors</v-card-title>
@@ -153,12 +159,12 @@
                       <v-card-title>{{ item.name }}</v-card-title>
                       <v-card-subtitle>{{ item.byline }}</v-card-subtitle>
                       <v-card-actions fill-height class='card-actions'>
-                        <v-btn icon color='primary' class="ma-2" :disabled="item.git===''" :src="item.git">
+                        <v-btn icon color='primary' class="ma-2" :disabled="item.git===''" :href="item.git" target="_blank">
                           <v-icon>
                             mdi-github
                           </v-icon>
                         </v-btn>
-                        <v-btn icon color='primary' class="ma-2" :disabled="item.linkedin===''">
+                        <v-btn icon color='primary' class="ma-2" :disabled="item.linkedin===''" :href="item.linkedin" target="_blank">
                           <v-icon>
                             mdi-linkedin
                           </v-icon>

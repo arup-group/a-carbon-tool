@@ -64,6 +64,7 @@
           would like to contribute. Unlike other lifecycle analysis tools, act is intended to be used by designers as they work to provide quick feedback and enable carbon 
           to be included as a factor in design as it happens.
         </v-card-text>
+        <v-img src='/assets/globe.png' contain height='200'></v-img>
         <v-card-title>Getting started</v-card-title>
         <v-card-text>
           Create an account on <a href='https://speckle.xyz/' target='_blank'>Speckle XYZ</a> to use act. Or, if you're a member of Arup staff, follow the login links to use 

@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12" lg='8'>
-        <v-card flat outlined class="mt-8">
+        <v-card flat outlined class="mt-8 mb-4">
           <v-card-title class="text-h4">Declaration</v-card-title>
           <v-card-text>
             The construction industry currently faces significant challenges in reducing its environmental impact. The built environment is directly responsible for
@@ -20,7 +20,7 @@
           <v-img src='/assets/globe.png' contain height='480'></v-img>
         </v-card>
       
-        <v-card flat outlined>
+        <v-card flat outlined class="my-4">
           <v-card-title class="text-h4">Speckle</v-card-title>
           <v-card-text class='mb-4'>
             <strong>act</strong> is built on top of Speckle - a cloud based solution for the AEC industry that provides honest interoperability, real time collaboration, 
@@ -54,7 +54,7 @@
           </v-card-actions>
         </v-card>
       
-        <v-card flat outlined>
+        <v-card flat outlined class="my-4">
           <v-card-title class="text-h4">Methodology</v-card-title>
           <v-card-text>
             <strong>act</strong> follows the methodology set out in <a href='https://www.rics.org/globalassets/rics-website/media/news/whole-life-carbon-assessment-for-the--built-environment-november-2017.pdf' target='_blank'>
@@ -96,7 +96,7 @@
           <v-img src='/assets/a5-site-equation.png' height='320' contain class="mb-4"></v-img>
         </v-card>
  
-        <v-card flat outlined>
+        <v-card flat outlined class="my-4">
           <v-card-title class='text-h4'>Data</v-card-title>
           <v-card-text>
             The data within <strong>act</strong> has been segregated by region. Carbon factors have been selected from the following, openly available, 
@@ -116,7 +116,7 @@
           </v-card-actions>
         </v-card>
 
-        <v-card flat outlined>
+        <v-card flat outlined class="my-4">
           <v-card-title class="text-h4">Contributing</v-card-title>
           <v-card-text>
             <strong>act</strong> is an open-source initiative with a GPL3 licence. Anyone is welcome to contribute.

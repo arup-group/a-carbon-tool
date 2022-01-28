@@ -1,27 +1,28 @@
 <template>
   <v-app style="height: 100vh">
-    <arc-container
-      :theme="this.$store.state.darkMode ? 'ACT-dark' : 'ACT-light'"
-      style="height: 100vh"
-    >
-      <Sidebar
-        :li="isAuthenticated"
-        :username="name"
-        :darkModeButtonText="darkModeButtonText"
-        :darkModeState="darkModeState"
-        @toggleDarkMode="toggleDarkMode"
-        @logout="logout"
-      />
-      <arc-container
-        :theme="this.$store.state.darkMode ? 'ACT-dark' : 'ACT-light'"
-        style="height: 100%"
-      >
-        <Header :li="isAuthenticated" />
-        <v-main>
-          <router-view />
-        </v-main>
-      </arc-container>
-    </arc-container>
+    <Sidebar
+      :li="isAuthenticated"
+      :username="name"
+      :darkModeButtonText="darkModeButtonText"
+      :darkModeState="darkModeState"
+      :drawer="drawer"
+      :clipped="clipped"
+      :mini="mini"
+      @toggleDarkMode="toggleDarkMode"
+      @logout="logout"
+      @toggleDrawer="toggleDrawer"
+    />
+
+    <Header
+      :li="isAuthenticated"
+      :drawer="drawer"
+      :clipped="clipped"
+      @toggleDrawer="toggleDrawer"
+      @toogleClipped="toggleClipped"
+    />
+    <v-main>
+      <router-view />
+    </v-main>
   </v-app>
 </template>
 
@@ -68,6 +69,26 @@ export default class App extends Vue {
 
   get darkModeState() {
     return this.$store.state.darkMode;
+  }
+
+  data() {
+    return {
+      drawer: true,
+      clipped: false,
+      mini: true,
+    };
+  }
+
+  toggleDrawer() {
+    this.$data.drawer = this.$data.drawer ? false : true;
+  }
+
+  // toggleMini() {
+  //   this.$data.mini = this.$data.mini ? false : true;
+  // }
+
+  toggleClipped() {
+    this.$data.clipped = this.$data.clipped ? false : true;
   }
 
   logout() {

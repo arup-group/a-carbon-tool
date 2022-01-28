@@ -1,12 +1,16 @@
 import { AuthError, Server, Token } from "@/models/auth";
-import { StreamReferenceObjects, StreamReferenceBranches} from "@/models/graphql";
+import {
+  StreamReferenceObjects,
+  StreamReferenceBranches,
+} from "@/models/graphql";
 
 import {
   streamReferencedObjects,
   streamsDataQuery,
   userInfoQuery,
   streamsQuery,
-  streamReferencedBranches
+  streamReferencedBranches,
+  streamCommmitObjects
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
@@ -89,23 +93,33 @@ export async function speckleFetch(query: any, context: any) {
 export const getUserData = (context: any) =>
   speckleFetch(userInfoQuery(), context);
 
-  export const getStreamObjects = (
+export const getStreamObjects = (
   context: any,
   streamid: string
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(streamReferencedObjects(streamid), context);
 
-export const getUserStreams = (context: any) => speckleFetch(streamsQuery(),context);
+export const getStreamCommit = (
+  context: any,
+  streamid: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(streamCommmitObjects(streamid), context);
 
-export const getStreamBranches = (context: any,
+export const getUserStreams = (context: any) =>
+  speckleFetch(streamsQuery(), context);
+
+export const getStreamBranches = (
+  context: any,
   streamid: string
 ): Promise<StreamReferenceBranches> =>
   speckleFetch(streamReferencedBranches(streamid), context);
 
-export const getBranchData = (context: any, 
-  streamid: string
-): Promise<StreamReferenceObjects> => 
-  speckleFetch(streamsDataQuery(streamid), context);
+export const getBranchData = (
+  context: any,
+  streamid: string,
+  objId: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(streamsDataQuery(streamid, objId), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

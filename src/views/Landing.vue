@@ -277,30 +277,31 @@ export default class Landing extends Vue {
     }
     for (let i = 0; i< this.carbonBranches.length; i++){
     const branch = await this.$store.dispatch("getBranchData", this.carbonBranches[i].id)
+    console.log(branch, 'branch')
     const id = JSON.stringify(this.carbonBranches[i].id);
+    if (!Object.prototype.hasOwnProperty.call(branch, 'errors')){
     this.branchData.push({ id : this.carbonBranches[i].id, name: this.carbonBranches[i].name, data: branch })
     }
-    // remove once branches fixed //
-    this.branchData = [this.branchData[0]]
+    }
     const co2Obj: {[key: string]: number} = {}
     this.projects = this.branchData.map((proj) => {
       const children = proj.data.data.stream.object.children.objects
         children.forEach((material : any) => {
-        const value = (parseFloat(material.data.act.reportData.productStageCarbonA1A3) +
+        const materialValue = (parseFloat(material.data.act.reportData.productStageCarbonA1A3) +
           parseFloat(material.data.act.reportData.transportCarbonA4) +
           parseFloat(material.data.act.reportData.constructionCarbonA5.site) +
           parseFloat(material.data.act.reportData.constructionCarbonA5.value) +
           parseFloat(material.data.act.reportData.constructionCarbonA5.waste))
         const materialKey = material.data.act.formData.material.name
         if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)){
-        co2Obj[materialKey] += value
+        co2Obj[materialKey] += materialValue
         } else {
-        co2Obj[materialKey] = value
+        co2Obj[materialKey] = materialValue
         }
         })
       console.log(co2Obj, "<<<")
-      const chartObj = Object.entries(co2Obj)
-      const co2Data = chartObj.map((obj) => {
+      const co2Arr = Object.entries(co2Obj)
+      const co2Data = co2Arr.map((obj) => {
         return {
             label: obj[0],
             value: obj[1],

@@ -18,6 +18,7 @@ import router from "@/router";
 import {
   materialCarbonFactors,
   MaterialFull,
+  RegionMaterialCarbonFactors,
   AllMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
 import { TransportType } from "@/models/newAssessment";
@@ -124,10 +125,10 @@ export default new Vuex.Store({
 
     // needs updating to cover region selection
     materialsArr: (state): MaterialFull[] => {
-      const region = state.selectedRegion
+      // const region = state.selectedRegion
       const tmparr = (
         Object.keys(materialCarbonFactors.UK) as Array<
-          keyof AllMaterialCarbonFactors
+          keyof RegionMaterialCarbonFactors
         >
       ).map((type) => {
         const arr: MaterialFull[] = [];

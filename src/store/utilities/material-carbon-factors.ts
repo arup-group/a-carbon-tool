@@ -11,21 +11,19 @@ export interface Material {
   source: string;
 }
 
-export interface MaterialCarbonFactors {
+export interface RegionMaterialCarbonFactors {
   [key: string]: {
-    [key: string]: {
-      [key: string]: Material;
-    }
+    [key: string]: Material;
   }
 }
 
 export interface AllMaterialCarbonFactors {
-  India: MaterialCarbonFactors;
-  UK: MaterialCarbonFactors;
+  India: RegionMaterialCarbonFactors;
+  UK: RegionMaterialCarbonFactors;
 }
 
 
-export const materialCarbonFactors: MaterialCarbonFactors = {
+export const materialCarbonFactors: AllMaterialCarbonFactors = {
   India: {
     Aluminum: {
       "Aluminum ingot": {

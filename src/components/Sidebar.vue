@@ -12,7 +12,8 @@
   >
     <v-list-item class="px-2">
       <v-list-item-avatar>
-        <v-icon>mdi-account</v-icon>
+        <v-img src="/assets/logo.svg" contain alt="logo"></v-img>
+        <!-- <v-icon>mdi-account</v-icon> -->
       </v-list-item-avatar>
       <v-list-item-title>{{ username }}</v-list-item-title>
       <v-btn icon @click.stop="toggleDrawer">

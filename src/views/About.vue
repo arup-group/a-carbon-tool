@@ -169,6 +169,11 @@
                             mdi-linkedin
                           </v-icon>
                         </v-btn>
+                        <v-btn icon color='primary' class="ma-2" :disabled="item.twitter===''" :href="item.twitter" target="_blank">
+                          <v-icon>
+                            mdi-twitter
+                          </v-icon>
+                        </v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-sheet>
@@ -192,42 +197,56 @@ export default class About extends Vue {
       img: "/assets/contributors/placeholder-2.png",
       byline: "Product manager @ Arup | environmental sustainability evangalist",
       git: "https://github.com/tomhebunn",
-      linkedin: "https://www.linkedin.com/in/tom-bunn-8251a45a/"
+      linkedin: "https://www.linkedin.com/in/tom-bunn-8251a45a/",
+      twitter: "https://twitter.com/occasional_tb"
     },
     {
       name: "Katharyn Church",
       img: "/assets/contributors/placeholder-1.png",
       byline: "Transport consultant / software developer @ Arup",
       git: "https://github.com/kchurch2",
-      linkedin: ""
+      linkedin: "",
+      twitter: ""
+    },
+    {
+      name: "Rory McCully",
+      img: "/assets/contributors/placeholder-3.png",
+      byline: "Digital leader @ Arup | act original & open-source advocate",
+      git: "https://github.com/rorymccully",
+      linkedin: "https://www.linkedin.com/in/rory-mccully-45271122/",
+      twitter: "https://twitter.com/RoryMccully"
     },
     {
       name: "Daniel O'Dowd",
       img: "/assets/contributors/placeholder-2.png",
       byline: "BIM manager / developer @ Arup",
       git: "https://github.com/ninehundred",
-      linkedin: ""
+      linkedin: "",
+      twitter: ""
     },
     {
       name: "Stam Psarras",
       img: "/assets/contributors/placeholder-3.png",
       byline: "Software developer @ Arup",
       git: "https://github.com/psarras",
-      linkedin: ""
+      linkedin: "",
+      twitter: ""
     },
     {
       name: "Rob Salca",
       img: "/assets/contributors/placeholder-2.png",
       byline: "Software engineer @ Arup | sustainability and salsa enthusiast",
       git: "https://github.com/ro-sa",
-      linkedin: "https://www.linkedin.com/in/robert-salca"
+      linkedin: "https://www.linkedin.com/in/robert-salca",
+      twitter: ""
     },
     {
       name: "Rory Webber",
       img: "/assets/contributors/placeholder-3.png",
       byline: "Front end dev @ Arup",
       git: "https://github.com/exilliar",
-      linkedin: ""
+      linkedin: "",
+      twitter: ""
     },
   ]
 

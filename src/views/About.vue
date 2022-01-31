@@ -1,13 +1,13 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" lg='8'>
+      <v-col cols="12" lg="8">
         <v-card flat outlined class="mt-8 mb-4">
           <v-card-title class="text-h4">Declaration</v-card-title>
           <v-card-text>
             The construction industry currently faces significant challenges in reducing its environmental impact. The built environment is directly responsible for
             nearly 40% of all carbon emissions, with 10% coming from embodied carbon - the emissions associated with the construction, maintenance and deconstruction
-            (<a href='https://worldgbc.org/news-media/commitment-includes-embodied-carbon' target='_blank'>WGBC, 2021</a>).
+            (<a href="https://worldgbc.org/news-media/commitment-includes-embodied-carbon" target="_blank">WGBC, 2021</a>).
             <br /><br />
             As an intitative, we believe that significant action needs to be taken to curb these emissions, with a target of limiting global temperature rise to 1.5C.
             Construction professionals - architects, engineers, designers, consultants and contractors - with the power to enact maningful change require the right tools to do so.
@@ -17,12 +17,12 @@
             would like to contribute. Unlike other lifecycle analysis tools, act is intended to be used by designers as they work to provide quick feedback and enable carbon 
             to be included as a factor in design as it happens.
           </v-card-text>
-          <v-img src='/assets/globe.png' contain height='480'></v-img>
+          <v-img src="/assets/globe.png" contain height="480"></v-img>
         </v-card>
       
         <v-card flat outlined class="my-4">
           <v-card-title class="text-h4">Speckle</v-card-title>
-          <v-card-text class='mb-4'>
+          <v-card-text class="mb-4">
             <strong>act</strong> is built on top of Speckle - a cloud based solution for the AEC industry that provides honest interoperability, real time collaboration, 
             data management, versioning and automation. Speckle allows us to directly plug into BIM projects and store the resulting assessment in an accessible location 
             which could form part of a wider workflow. But don't take it from us. Watch the video and follow the links below for more information.
@@ -40,13 +40,13 @@
           </v-card-actions>
           <v-card-actions class="my-4">
             <v-row dense>
-              <v-col cols='6' align='right'>
-                <v-btn color='primary' outlined href='https://speckle.systems/' target='_blank'>
+              <v-col cols="6" align="right">
+                <v-btn color="primary" outlined href='https://speckle.systems/' target='_blank'>
                   Speckle Home
                 </v-btn>
               </v-col>
-              <v-col cols='6' align='left'>
-                <v-btn color='secondary' outlined href='https://speckle.xyz/' target='_blank'>
+              <v-col cols="6" align="left">
+                <v-btn color="secondary" outlined href='https://speckle.xyz/' target='_blank'>
                   Speckle XYZ
                 </v-btn>
               </v-col>
@@ -59,20 +59,20 @@
           <v-card-text>
             <strong>act</strong> follows the methodology set out in <a href='https://www.rics.org/globalassets/rics-website/media/news/whole-life-carbon-assessment-for-the--built-environment-november-2017.pdf' target='_blank'>
             RICS: Whole life carbon assessment for the build environment (2017)</a> and <a href='https://www.en-standard.eu/bs-en-15978-2011-sustainability-of-construction-works-assessment-of-environmental-performance-of-buildings-calculation-method/'
-            target='_blank'>BS EN 15978 (2011)</a>. 
+            target="_blank">BS EN 15978 (2011)</a>. 
             <br /><br />
             act currently covers stages A1 - A5 of this scope, from cradle to practical completion. This includes the calculation of product stage carbon (A1-A3) - 
             the carbon emissions associated with material extraction and processing, transport to site (A4), and emissions on site (A5). The calculation methods 
             used for each of these stages are detailed below.
           </v-card-text>
-          <v-img src='/assets/carbon-stages.svg' height='600' contain class='mb-8'></v-img>
+          <v-img src="/assets/carbon-stages.svg" height="600" contain class="mb-8"></v-img>
           <v-card-text>
             <div><strong>Product Stage Carbon (A1-A3)</strong></div>
             Product stage carbon is calculated by applying the mass of material by a carbon factor representing the effort and energy expended in it's creation.
             The factors used within <strong>act</strong> are provided below. To estimate the mass of materials from Building Information Models (BIMs) act 
             calculate the volume of each object and applies the density of the selected material.
           </v-card-text>
-          <v-img src='/assets/a1a3-equation.png' height='200' contain></v-img>
+          <v-img src="/assets/a1a3-equation.png" height="200" contain></v-img>
           <v-card-text>
             <div><strong>Transport emissions (A4)</strong></div>
             Calculated by applying a transport factor (kgCO2e/kg/km) against the mass of material in each object and the distance travelled from source location 
@@ -92,8 +92,8 @@
             The amount of waste for each BIM object can be calulated using a waste factor taken from the WRAP database (2018). The emissions of this 
             waste can then be estimated using the A1-A4 equations above.<br /><br />
           </v-card-text>
-          <v-img src='/assets/a5-waste-volume-equation.png' height='120' contain></v-img>
-          <v-img src='/assets/a5-site-equation.png' height='320' contain class="mb-4"></v-img>
+          <v-img src='/assets/a5-waste-volume-equation.png' height="120" contain></v-img>
+          <v-img src='/assets/a5-site-equation.png' height="320" contain class="mb-4"></v-img>
         </v-card>
  
         <v-card flat outlined class="my-4">
@@ -104,10 +104,10 @@
           </v-card-text>
           <v-card-actions class="mx-3 mb-4">
             <v-row>
-              <v-col v-for='geo in dataSources' :key='geo.name' cols='12'>
+              <v-col v-for="geo in dataSources" :key='geo.name' cols='12'>
                 <div><strong>{{ geo.name }}</strong></div>
-                <div v-for='source in geo.sources' :key='source.name'>
-                  <v-btn outlined small :href='source.url' class='my-1' color='secondary' target="_blank">
+                <div v-for="source in geo.sources" :key="source.name">
+                  <v-btn outlined small :href="source.url" class="my-1" color="secondary" target="_blank">
                     {{ source.name }}
                   </v-btn>
                 </div>
@@ -126,7 +126,7 @@
           <v-card-actions class="justify-center">
             <v-btn
               outlined
-              color='primary'
+              color="primary"
               href="https://github.com/arup-group/a-carbon-tool"
               target="_blank"
               class='mx-2'
@@ -135,7 +135,7 @@
             </v-btn>
             <v-btn
               outlined
-              color='secondary'
+              color="secondary"
               href="https://speckle.community/"
               target="_blank"
               class='mx-2'
@@ -149,27 +149,27 @@
                 <v-col cols='12' sm="6" md="4" v-for="item in contributors" :key='item.name'>
                   <v-sheet 
                     outlined
-                    color='primary'
+                    color="primary"
                     rounded
-                    class='my-1'
+                    class="my-1"
                     height="100%"
                   >
-                    <v-card flat height='100%' class='card-outter'>
+                    <v-card flat height="100%" class="card-outter">
                       <v-img :src="item.img" aspect-ratio="1" contain max-height='240px'></v-img>
                       <v-card-title>{{ item.name }}</v-card-title>
                       <v-card-subtitle>{{ item.byline }}</v-card-subtitle>
-                      <v-card-actions fill-height class='card-actions'>
-                        <v-btn icon color='primary' class="ma-2" :disabled="item.git===''" :href="item.git" target="_blank">
+                      <v-card-actions fill-height class="card-actions">
+                        <v-btn icon color="primary" class="ma-2" :disabled="item.git===''" :href="item.git" target="_blank">
                           <v-icon>
                             mdi-github
                           </v-icon>
                         </v-btn>
-                        <v-btn icon color='primary' class="ma-2" :disabled="item.linkedin===''" :href="item.linkedin" target="_blank">
+                        <v-btn icon color="primary" class="ma-2" :disabled="item.linkedin===''" :href="item.linkedin" target="_blank">
                           <v-icon>
                             mdi-linkedin
                           </v-icon>
                         </v-btn>
-                        <v-btn icon color='primary' class="ma-2" :disabled="item.twitter===''" :href="item.twitter" target="_blank">
+                        <v-btn icon color="primary" class="ma-2" :disabled="item.twitter===''" :href="item.twitter" target="_blank">
                           <v-icon>
                             mdi-twitter
                           </v-icon>

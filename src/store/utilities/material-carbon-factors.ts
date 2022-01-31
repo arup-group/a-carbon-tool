@@ -16,23 +16,6 @@ export interface MaterialCarbonFactors {
   UK: any;
 }
 
-const MaterialCategories = [
-  "Aluminium",
-  "Brick",
-  "Blockwork",
-  "Cement",
-  "Concrete",
-  "Fire",
-  "Glass",
-  "Gypsum",
-  "Insulation",
-  "Plasterboard",
-  "Plastic",
-  "Steel",
-  "Stone",
-  "Timber"
-]
-
 export interface AllMaterialCarbonFactors {
   [key: string]: {
     [key: string]: {

@@ -64,6 +64,22 @@ export default new Vuex.Store({
       "Building Envelope",
       "Space Plan",
     ],
+    materialCategories: [
+      "Aluminium",
+      "Brick",
+      "Blockwork",
+      "Cement",
+      "Concrete",
+      "Fire",
+      "Glass",
+      "Gypsum",
+      "Insulation",
+      "Plasterboard",
+      "Plastic",
+      "Steel",
+      "Stone",
+      "Timber"
+    ],
     transportTypes: [
       {
         name: "local",

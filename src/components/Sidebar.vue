@@ -26,7 +26,7 @@
         v-for="item in items"
         :key="item.title"
         link
-        @click="$router.push(item.route)"
+        @click="changeRoute(item.route)"
       >
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
@@ -82,6 +82,13 @@ export default class Sidebar extends Vue {
 
   @Emit("toggleDrawer")
   toggleDrawer() {
+    return;
+  }
+
+  changeRoute(newPath: string) {
+    if (this.$route.path !== newPath) {
+      this.$router.push(newPath);
+    }
     return;
   }
 

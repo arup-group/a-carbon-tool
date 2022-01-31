@@ -12,17 +12,18 @@ export interface Material {
 }
 
 export interface MaterialCarbonFactors {
-  India: any;
-  UK: any;
-}
-
-export interface AllMaterialCarbonFactors {
   [key: string]: {
     [key: string]: {
       [key: string]: Material;
     }
-  };
+  }
 }
+
+export interface AllMaterialCarbonFactors {
+  India: MaterialCarbonFactors;
+  UK: MaterialCarbonFactors;
+}
+
 
 export const materialCarbonFactors: MaterialCarbonFactors = {
   India: {

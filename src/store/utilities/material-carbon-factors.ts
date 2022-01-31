@@ -14,9 +14,6 @@ export interface Material {
 export interface MaterialCarbonFactors {
   India: any;
   UK: any;
-  // Australia: any;
-  // EU: any;
-  // EastAsia: any;
 }
 
 const MaterialCategories = [
@@ -34,12 +31,13 @@ const MaterialCategories = [
   "Steel",
   "Stone",
   "Timber"
-
 ]
 
-export interface UKMaterialCarbonFactors {
+export interface AllMaterialCarbonFactors {
   [key: string]: {
-    [key: string]: Material;
+    [key: string]: {
+      [key: string]: Material;
+    }
   };
 }
 

@@ -18,7 +18,7 @@ import router from "@/router";
 import {
   materialCarbonFactors,
   MaterialFull,
-  UKMaterialCarbonFactors,
+  AllMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
 import { TransportType } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
@@ -48,7 +48,22 @@ export default new Vuex.Store({
     serverInfo: null,
 
     darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
-
+    
+    // Carbon data
+    selectedRegion: "UK",
+    availableregions: [
+      "India",
+      "UK"
+    ],
+    buildingElementCategories: [
+      "Substructure",
+      "Superstructure",
+      "Mechanical Services",
+      "Electrical Services",
+      "Public Health & Hydraulics",
+      "Building Envelope",
+      "Space Plan",
+    ],
     transportTypes: [
       {
         name: "local",
@@ -90,10 +105,13 @@ export default new Vuex.Store({
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
-    materialsArrUK: (state): MaterialFull[] => {
+
+    // needs updating to cover region selection
+    materialsArr: (state): MaterialFull[] => {
+      const region = state.selectedRegion
       const tmparr = (
         Object.keys(materialCarbonFactors.UK) as Array<
-          keyof UKMaterialCarbonFactors
+          keyof AllMaterialCarbonFactors
         >
       ).map((type) => {
         const arr: MaterialFull[] = [];

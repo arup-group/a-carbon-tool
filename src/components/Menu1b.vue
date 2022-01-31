@@ -16,7 +16,7 @@
       ></v-text-field>
       <v-select
         v-model="form.component"
-        :items="items_comp"
+        :items="elementCategories()"
         :rules="selectionRules"
         label="Primary element category"
       ></v-select>
@@ -39,8 +39,10 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import { StreamObject } from "@/models/newAssessment";
+import store from "@/store";
 
 @Component({})
+
 export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject;
   mounted() {
@@ -62,15 +64,7 @@ export default class Menu1b extends Vue {
   loadStream(id: string) {
     return id;
   }
-  items_comp = [
-    "Substructure",
-    "Superstructure",
-    "Mechanical Services",
-    "Electrical Services",
-    "Public Health & Hydraulics",
-    "Building Envelope",
-    "Space Plan",
-  ];
+
   isFormValid = false;
   form = {};
   // textRules = [(v: string) => !!v || "Text is required"];
@@ -78,5 +72,9 @@ export default class Menu1b extends Vue {
   valueRules = [
     (v: number) => Number.isInteger(Number(v)) || "Number is required",
   ];
+
+  elementCategories() {
+    return store.state.buildingElementCategories
+  }
 }
 </script>

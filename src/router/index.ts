@@ -12,7 +12,7 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Login.vue"),
   },
   {
-    path: "/landing",
+    path: "/",
     name: "Landing",
     component: () => import("../views/Landing.vue"),
   },

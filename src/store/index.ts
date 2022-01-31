@@ -9,10 +9,12 @@ import {
   getToken,
   getUserData,
   getUserStreams,
+  getStreamBranches,
+  getBranchData,
   goToSpeckleAuthpage,
   speckleLogOut,
   uploadObjects,
-  uploadObjectWithChildren,
+  getStreamCommit,
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
@@ -196,6 +198,26 @@ export default new Vuex.Store({
       const streams = await getUserStreams(context);
       return streams;
     },
+    async getStreamObjects(context, streamid: string) {
+      const streams = await getStreamObjects(context, streamid);
+      return streams;
+    },
+
+    async getStreamBranches(context, streamid: string) {
+      const streams = await getStreamBranches(context, streamid);
+      return streams;
+    },
+
+    async getStreamCommit(context, streamid: string) {
+      const streams = await getStreamCommit(context, streamid);
+      return streams;
+    },
+
+    async getBranchData(context, [streamid, objId]) {
+      const streams = await getBranchData(context, streamid, objId);
+      return streams;
+    },
+
     async getObjectUrls(context, streamid: string) {
       const objectIds = await getStreamObjects(context, streamid);
 

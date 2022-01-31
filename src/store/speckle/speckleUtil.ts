@@ -1,15 +1,21 @@
 import { AuthError, Server, Token } from "@/models/auth";
-import { StreamReferenceObjects } from "@/models/graphql";
 import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
+import {
+  StreamReferenceObjects,
+  StreamReferenceBranches,
+} from "@/models/graphql";
 
 import {
   streamReferencedObjects,
+  streamsDataQuery,
   userInfoQuery,
   streamsQuery,
   uploadObjectsMutation,
   createBranchMutation,
   uploadObjectWithChildrenMutation,
   createCommitMutation,
+  streamReferencedBranches,
+  streamCommmitObjects
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
@@ -132,6 +138,24 @@ export const createCommit = (
     createCommitMutation(streamid, objectid, totalChildrenCount),
     context
   );
+export const getStreamCommit = (
+  context: any,
+  streamid: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(streamCommmitObjects(streamid), context);
+
+export const getStreamBranches = (
+  context: any,
+  streamid: string
+): Promise<StreamReferenceBranches> =>
+  speckleFetch(streamReferencedBranches(streamid), context);
+
+export const getBranchData = (
+  context: any,
+  streamid: string,
+  objId: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(streamsDataQuery(streamid, objId), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

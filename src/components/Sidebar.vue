@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    v-if="li"
     v-model="drawer"
     :clipped="clipped"
     app
@@ -77,7 +78,6 @@ export default class Sidebar extends Vue {
   logout() {
     console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
   }
-
 
   @Emit("toggleDrawer")
   toggleDrawer() {

@@ -1,8 +1,5 @@
 <template>
-  <!-- <arc-navbar slot="nav" logo="/assets/logo.svg" arup="false">
-    <div slot="name">act | a carbon tool</div>
-  </arc-navbar> -->
-  <v-app-bar fixed app :clipped-left="clipped">
+  <v-app-bar v-if="li" fixed app :clipped-left="clipped">
     <v-app-bar-nav-icon @click.stop="toggleDrawer"></v-app-bar-nav-icon>
     <v-toolbar-title>act | a carbon tool</v-toolbar-title>
   </v-app-bar>

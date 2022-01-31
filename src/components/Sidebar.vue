@@ -29,14 +29,13 @@
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
-
         <v-list-item-content>
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
-    <v-divider></v-divider>
-    <v-list dense>
+    <v-spacer></v-spacer>
+    <v-list dense style="position: absolute; bottom: 0; width: 100%">
       <v-list-item @click="logout">
         <v-list-item-icon>
           <v-icon>mdi-logout-variant </v-icon>
@@ -68,7 +67,6 @@ export default class Sidebar extends Vue {
   @Prop() darkModeState!: boolean;
   @Prop() drawer!: boolean;
   @Prop() clipped!: boolean;
-  // @Prop() mini!: boolean;
 
   @Emit("toggleDarkMode")
   toggleDarkMode() {
@@ -80,10 +78,6 @@ export default class Sidebar extends Vue {
     console.log(""); // method needs something in to avoid prettier rules, doesn't need to do anything, just emits
   }
 
-  // @Emit("toggleMini")
-  // toggleMini() {
-  //   return;
-  // }
 
   @Emit("toggleDrawer")
   toggleDrawer() {

@@ -7,7 +7,6 @@
       :darkModeState="darkModeState"
       :drawer="drawer"
       :clipped="clipped"
-      :mini="mini"
       @toggleDarkMode="toggleDarkMode"
       @logout="logout"
       @toggleDrawer="toggleDrawer"
@@ -73,19 +72,14 @@ export default class App extends Vue {
 
   data() {
     return {
-      drawer: true,
+      drawer: false,
       clipped: false,
-      mini: true,
     };
   }
 
   toggleDrawer() {
     this.$data.drawer = this.$data.drawer ? false : true;
   }
-
-  // toggleMini() {
-  //   this.$data.mini = this.$data.mini ? false : true;
-  // }
 
   toggleClipped() {
     this.$data.clipped = this.$data.clipped ? false : true;

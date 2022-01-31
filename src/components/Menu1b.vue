@@ -15,7 +15,7 @@
         required
       ></v-text-field>
       <v-select
-        v-model="region"
+        v-model="form.region"
         :items="availableRegions()"
         :rules="selectionRules"
         label="Region"
@@ -72,7 +72,6 @@ export default class Menu1b extends Vue {
   loadStream(id: string) {
     return id;
   }
-  region = "";
   isFormValid = false;
   form = {};
   // textRules = [(v: string) => !!v || "Text is required"];
@@ -89,7 +88,7 @@ export default class Menu1b extends Vue {
     return store.state.availableregions
   }
 
-  @Watch('region')
+  @Watch('form.region')
   onPropertyChanged(value: string) {
     store.commit('getRegion', value)
   }

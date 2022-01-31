@@ -156,6 +156,9 @@ export default new Vuex.Store({
     setDarkMode(state) {
       state.darkMode = state.darkMode ? false : true;
     },
+    setRegion(state, region) {
+      state.selectedRegion = region
+    }
   },
   actions: {
     // Auth

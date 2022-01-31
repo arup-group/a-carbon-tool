@@ -2,7 +2,7 @@
   <v-navigation-drawer
     v-if="li"
     v-model="drawer"
-    :clipped="clipped"
+    clipped="clipped"
     app
     height="100vh"
     floating

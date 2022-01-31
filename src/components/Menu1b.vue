@@ -68,7 +68,7 @@ export default class Menu1b extends Vue {
     "Mechanical Services",
     "Electrical Services",
     "Public Health & Hydraulics",
-    "Skin",
+    "Building Envelope",
     "Space Plan",
   ];
   isFormValid = false;

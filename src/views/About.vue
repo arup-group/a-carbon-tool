@@ -233,6 +233,15 @@ export default class About extends Vue {
 
   dataSources = [
     {
+      name: "India",
+      sources: [
+        {
+          name: "IFC India Construction Materials Database Methodology Report 2017",
+          url: "https://edgebuildings.com/wp-content/uploads/2017/12/IFC-India-Construction-Materials-Database-Methodology-Report.pdf"
+        }
+      ]
+    },
+    {
       name: "UK",
       sources: [
         {
@@ -276,15 +285,6 @@ export default class About extends Vue {
         }
       ]
     },
-    {
-      name: "India",
-      sources: [
-        {
-          name: "coming soon",
-          url: ""
-        }
-      ]
-    }
   ]
 }
 </script>

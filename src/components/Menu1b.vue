@@ -15,6 +15,14 @@
         required
       ></v-text-field>
       <v-select
+        v-model="region"
+        :items="availableRegions()"
+        :rules="selectionRules"
+        label="Region"
+        required
+
+      ></v-select>
+      <v-select
         v-model="form.component"
         :items="elementCategories()"
         :rules="selectionRules"
@@ -37,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 import { StreamObject } from "@/models/newAssessment";
 import store from "@/store";
 
@@ -64,7 +72,7 @@ export default class Menu1b extends Vue {
   loadStream(id: string) {
     return id;
   }
-
+  region = "";
   isFormValid = false;
   form = {};
   // textRules = [(v: string) => !!v || "Text is required"];
@@ -75,6 +83,16 @@ export default class Menu1b extends Vue {
 
   elementCategories() {
     return store.state.buildingElementCategories
+  };
+
+  availableRegions() {
+    return store.state.availableregions
   }
+
+  @Watch('region')
+  onPropertyChanged(value: string) {
+    store.commit('getRegion', value)
+  }
+
 }
 </script>

@@ -17,7 +17,6 @@
       :drawer="drawer"
       :clipped="clipped"
       @toggleDrawer="toggleDrawer"
-      @toogleClipped="toggleClipped"
     />
     <v-main>
       <router-view />
@@ -73,16 +72,12 @@ export default class App extends Vue {
   data() {
     return {
       drawer: false,
-      clipped: false,
+      clipped: true,
     };
   }
 
   toggleDrawer() {
     this.$data.drawer = this.$data.drawer ? false : true;
-  }
-
-  toggleClipped() {
-    this.$data.clipped = this.$data.clipped ? false : true;
   }
 
   logout() {

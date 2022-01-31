@@ -19,10 +19,5 @@ export default class Header extends Vue {
   toggleDrawer() {
     return;
   }
-
-  @Emit("toggleClipped")
-  toggleClipped() {
-    return;
-  }
 }
 </script>

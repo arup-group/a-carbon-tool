@@ -2,7 +2,12 @@
   <v-main>
     <v-row class="justify-center">
       <v-col cols="12">
-        <v-card flat :color="this.$store.state.darkMode ? '#1C1C1C' : ''" border class="justify-center">
+        <v-card
+          flat
+          border
+          class="justify-center"
+          :color="this.$store.state.darkMode ? '#121212' : ''"
+        >
           <v-img src="/assets/logo.svg" max-height="160px" contain class="mt-8">
           </v-img>
           <v-card-title class="text-h4 justify-center"
@@ -17,7 +22,7 @@
         <LoginCard :servers="servers" @submit="logIn" />
       </v-col>
       <v-col cols="12">
-        <v-card flat :color="this.$store.state.darkMode ? '#1C1C1C' : ''">
+        <v-card flat :color="this.$store.state.darkMode ? '#121212' : ''">
           <v-card-actions class="justify-center">
             <v-btn
               icon

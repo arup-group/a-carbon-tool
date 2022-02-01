@@ -1,6 +1,9 @@
 <template>
-  <v-container class="d-flex justify-center align-center">
-    <v-card outlined>
+  <v-container
+    class="d-flex justify-center align-center"
+    style="background-color: #121212 !important"
+  >
+    <v-card outlined border>
       <div>
         <v-card-subtitle class="d-flex justify-center">
           Please select your server</v-card-subtitle

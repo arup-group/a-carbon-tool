@@ -98,7 +98,7 @@ export default class Sidebar extends Vue {
       icon: "mdi-molecule-co2",
       route: "/assessment",
     },
-    { title: "Home", icon: "mdi-home", route: "/landing" },
+    { title: "Home", icon: "mdi-home", route: "/" },
     { title: "About", icon: "mdi-information-outline", route: "/about" },
   ];
 }

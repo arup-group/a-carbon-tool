@@ -19,11 +19,15 @@ export default new Vuetify({
       dark: {
         primary: "#BFF7EA",
         secondary: "#F6BEE2",
-        background: "#353535",
+        background: "#1C1C1C",
+        container: "#1C1C1C",
         border: "BEBEBE",
         warning: "#FFE011",
         error: "#F40808",
       },
+    },
+    options: {
+      customProperties: true,
     },
   },
 });

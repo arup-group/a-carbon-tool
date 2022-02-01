@@ -1,26 +1,34 @@
 <template>
   <v-app style="height: 100vh">
-    <arc-container
-      :theme="this.$store.state.darkMode ? 'dark' : 'ACT-light'"
-      style="height: 100%"
-    >
-      <Header
-        :li="isAuthenticated"
-        :darkModeButtonText="darkModeButtonText"
-        :darkModeState="darkModeState"
-        @logout="logout"
-        @toggleDarkMode="toggleDarkMode"
-      />
-      <v-main>
-        <router-view />
-      </v-main>
-    </arc-container>
+    <Sidebar
+      :li="isAuthenticated"
+      :username="name"
+      :darkModeButtonText="darkModeButtonText"
+      :darkModeState="darkModeState"
+      :drawer="drawer"
+      @update:drawer="drawer = $event"
+      :clipped="clipped"
+      @toggleDarkMode="toggleDarkMode"
+      @logout="logout"
+      @toggleDrawer="toggleDrawer"
+    />
+
+    <Header
+      :li="isAuthenticated"
+      :drawer="drawer"
+      :clipped="clipped"
+      @toggleDrawer="toggleDrawer"
+    />
+    <v-main>
+      <router-view />
+    </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 import Header from "./components/Header.vue";
+import Sidebar from "./components/Sidebar.vue";
 
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";
@@ -36,7 +44,7 @@ setBasePath("/");
 import "@/assets/style.css";
 
 @Component({
-  components: { Header },
+  components: { Header, Sidebar },
 })
 export default class App extends Vue {
   get name() {
@@ -60,6 +68,13 @@ export default class App extends Vue {
 
   get darkModeState() {
     return this.$store.state.darkMode;
+  }
+
+  drawer = false;
+  clipped = true;
+
+  toggleDrawer() {
+    this.$data.drawer = this.$data.drawer ? false : true;
   }
 
   logout() {

@@ -1,7 +1,8 @@
 <template>
   <v-navigation-drawer
     v-if="li"
-    v-model="drawer"
+    :value="drawer"
+    @input="$emit('update:drawer', $event)"
     clipped="clipped"
     app
     height="100vh"
@@ -94,6 +95,9 @@ export default class Sidebar extends Vue {
 
   data() {
     return {
+      props: {
+        drawer: {},
+      },
       items: [
         {
           title: "New Assessment",

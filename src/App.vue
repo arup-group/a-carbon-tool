@@ -6,6 +6,7 @@
       :darkModeButtonText="darkModeButtonText"
       :darkModeState="darkModeState"
       :drawer="drawer"
+      @update:drawer="drawer = $event"
       :clipped="clipped"
       @toggleDarkMode="toggleDarkMode"
       @logout="logout"

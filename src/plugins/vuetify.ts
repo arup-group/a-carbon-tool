@@ -17,8 +17,8 @@ export default new Vuetify({
         error: "#F40808",
       },
       dark: {
-        primary: "#4EC0EB",
-        secondary: "#FF79C0",
+        primary: "#BFF7EA",
+        secondary: "#F6BEE2",
         background: "#1C1C1C",
         container: "#1C1C1C",
         border: "BEBEBE",

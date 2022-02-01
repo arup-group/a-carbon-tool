@@ -49,7 +49,6 @@ export default class LoginCard extends Vue {
 
   signIn(serverDestination: string) {
     if (serverDestination === "arup") {
-      //console.log(this.servers.arup);
       this.submit(this.servers.arup);
     } else if (serverDestination === "xyz") this.submit(this.servers.xyz);
   }

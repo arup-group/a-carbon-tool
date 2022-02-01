@@ -57,7 +57,7 @@ export default class Assessment extends Vue {
   token = "";
   types: SpeckleType[] = [];
   objects: SpeckleObject[] = [];
-  materials: MaterialFull[] = this.$store.getters.materialsArrUK;
+  materials: MaterialFull[] = this.$store.getters.materialsArr;
   colors: Color[] = [];
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;

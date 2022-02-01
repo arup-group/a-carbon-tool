@@ -125,17 +125,18 @@ export default new Vuex.Store({
 
     // needs updating to cover region selection
     materialsArr: (state): MaterialFull[] => {
-      // const region = state.selectedRegion
+      const region: keyof AllMaterialCarbonFactors = state.selectedRegion as keyof AllMaterialCarbonFactors
+      console.log("materialsArr")
       const tmparr = (
-        Object.keys(materialCarbonFactors.UK) as Array<
+        Object.keys(materialCarbonFactors[region]) as Array<
           keyof RegionMaterialCarbonFactors
         >
       ).map((type) => {
         const arr: MaterialFull[] = [];
-        Object.keys(materialCarbonFactors.UK[type]).forEach((t) => {
+        Object.keys(materialCarbonFactors[region][type]).forEach((t) => {
           const toPush: MaterialFull = {
             name: `${type} - ${t}`,
-            ...materialCarbonFactors.UK[type][t],
+            ...materialCarbonFactors[region][type][t],
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);

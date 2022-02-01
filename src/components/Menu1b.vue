@@ -73,7 +73,14 @@ export default class Menu1b extends Vue {
     return id;
   }
   isFormValid = false;
-  form = {};
+  
+  form = {
+    project: "",
+    region: "",
+    component: "",
+    projectValue: 0,
+    gia: 1
+  };
   // textRules = [(v: string) => !!v || "Text is required"];
   selectionRules = [(v: string) => !!v || "Input is required"];
   valueRules = [
@@ -90,7 +97,8 @@ export default class Menu1b extends Vue {
 
   @Watch('form.region')
   onPropertyChanged(value: string) {
-    store.commit('getRegion', value)
+    console.log(value)
+    store.commit('setRegion', value)
   }
 
 }

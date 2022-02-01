@@ -14,7 +14,6 @@
     <v-list-item class="px-2">
       <v-list-item-avatar>
         <v-img src="/assets/logo.svg" contain alt="logo"></v-img>
-        <!-- <v-icon>mdi-account</v-icon> -->
       </v-list-item-avatar>
       <v-list-item-title>{{ username }}</v-list-item-title>
       <v-btn icon @click.stop="toggleDrawer">
@@ -93,21 +92,14 @@ export default class Sidebar extends Vue {
     return;
   }
 
-  data() {
-    return {
-      props: {
-        drawer: {},
-      },
-      items: [
-        {
-          title: "New Assessment",
-          icon: "mdi-molecule-co2",
-          route: "/assessment",
-        },
-        { title: "Home", icon: "mdi-home", route: "/landing" },
-        { title: "About", icon: "mdi-information-outline", route: "/about" },
-      ],
-    };
-  }
+  items = [
+    {
+      title: "New Assessment",
+      icon: "mdi-molecule-co2",
+      route: "/assessment",
+    },
+    { title: "Home", icon: "mdi-home", route: "/landing" },
+    { title: "About", icon: "mdi-information-outline", route: "/about" },
+  ];
 }
 </script>

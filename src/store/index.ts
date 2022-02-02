@@ -30,6 +30,7 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
+import { becs } from "./utilities/BECs";
 
 Vue.use(Vuex);
 
@@ -148,6 +149,9 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    getBECs(context) {
+      return becs;
+    },
     // Auth
     logout(context) {
       // wipe the state

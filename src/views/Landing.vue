@@ -23,7 +23,7 @@
               md="6"
               lg="4"
             >
-              <project-card :project="item"></project-card>
+              <project-card :project="item" :becs="becs"></project-card>
             </v-col>
           </v-row>
         </template>
@@ -54,6 +54,7 @@ import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingSearch from "@/components/landing/LandingSearch.vue";
 import { Project } from "@/models/project";
+import { BEC } from "@/store/utilities/BECs";
 
 @Component({
   components: {
@@ -74,6 +75,13 @@ export default class Landing extends Vue {
   displayProjects: Project[] = [];
   projects: Project[] = [];
   loading = true;
+  becs: BEC[] = [];
+
+  async mounted() {
+    this.token = this.$store.state.token.token;
+    this.loadStreams();
+    this.becs = await this.$store.dispatch("getBECs");
+  }
 
   get numberOfPages() {
     const items = this.projects.length;
@@ -86,11 +94,6 @@ export default class Landing extends Vue {
 
   formerPage() {
     if (this.page - 1 >= 1) this.page -= 1;
-  }
-
-  mounted() {
-    this.token = this.$store.state.token.token;
-    this.loadStreams();
   }
 
   projectSearch(project: Project | undefined) {

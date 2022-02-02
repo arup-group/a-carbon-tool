@@ -55,6 +55,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import { Project } from "@/models/project";
 import DoughnutChart from "../charts/DoughnutChart.vue";
 import { BEC } from "@/store/utilities/BECs";
+import { ChartData } from "@/models/chart";
 
 @Component({
   components: { DoughnutChart },
@@ -66,11 +67,14 @@ export default class ProjectCard extends Vue {
   get title() {
     return this.project.title;
   }
-  get co2Values() {
-    return this.project.co2Values;
+  get co2Values(): ChartData[] {
+    return this.project.co2Values.map(c => ({
+      label: c.label,
+      value: this.convertKgToTonnes(c.value)
+    }));
   }
   get co2Total() {
-    return Math.round(this.project.totalCO2e);
+    return this.convertKgToTonnes(this.project.totalCO2e);
   }
   get link() {
     return this.project.link;
@@ -81,6 +85,11 @@ export default class ProjectCard extends Vue {
   get chipColor() {
     const color = this.becs.find((b) => b.name === this.project.category);
     return color ? color.color : "primary";
+  }
+
+  convertKgToTonnes(value: number) {
+    // converts kg to tonnes and rounds to 2 dp
+    return Math.round(value * 0.001 * 100) / 100
   }
 
   open() {

@@ -1,30 +1,6 @@
 <template>
   <v-main class="page">
-    <v-row justify="center">
-      <v-col cols="12">
-        <v-img
-          src="/assets/logo.svg"
-          height="80px"
-          class="ma-4"
-          contain
-        ></v-img>
-      </v-col>
-      <v-col cols="12" md="6">
-        <div class="pa-7">
-          <div class="text-h4">act | a carbon tool</div>
-          <div class="subtitle-2 font-weight-light">
-            An open-source platform for performing embodied carbon emission
-            calculations from Building Information Models through
-            <a
-              href="https://speckle.systems/"
-              target="_blank"
-              class="secondary--text"
-              >Speckle</a
-            >
-          </div>
-        </div>
-      </v-col>
-    </v-row>
+    <landing-header />
     <v-container>
       <v-data-iterator
         :items="projects"
@@ -83,8 +59,9 @@
 import { Vue, Component, Emit } from "vue-property-decorator";
 import ProjectCard from "../components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
+import LandingHeader from "@/components/landing/LandingHeader.vue";
 
-@Component({ components: { ProjectCard, NewAssessmentCard } })
+@Component({ components: { ProjectCard, NewAssessmentCard, LandingHeader } })
 export default class Landing extends Vue {
   carbonBranches: any[] = [];
   availableStreams: string[] = [];

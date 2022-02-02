@@ -1,5 +1,5 @@
 <template>
-  <v-app style="height: 100vh">
+  <v-app>
     <Sidebar
       :li="isAuthenticated"
       :username="name"

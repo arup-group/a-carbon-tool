@@ -2,13 +2,28 @@
   <v-main class="page">
     <v-row justify="center">
       <v-col cols="12">
-        <v-card flat class="mt-8">
-          <v-img src="/assets/logo.svg" height="80px" class="ma-4" contain>
-          </v-img>
-        </v-card>
+        <v-img
+          src="/assets/logo.svg"
+          height="80px"
+          class="ma-4"
+          contain
+        ></v-img>
       </v-col>
       <v-col cols="12" md="6">
-        <v-card flat class="mx-4 justify-center">
+        <div class="pa-7">
+          <div class="text-h4">act | a carbon tool</div>
+          <div class="subtitle-2 font-weight-light">
+            An open-source platform for performing embodied carbon emission
+            calculations from Building Information Models through
+            <a
+              href="https://speckle.systems/"
+              target="_blank"
+              class="secondary--text"
+              >Speckle</a
+            >
+          </div>
+        </div>
+        <!-- <v-card flat class="mx-4 justify-center">
           <v-card-title class="text-h4"> act | a carbon tool </v-card-title>
           <v-card-subtitle>
             An open-source platform for performing embodied carbon emission
@@ -20,7 +35,7 @@
               >Speckle</a
             >
           </v-card-subtitle>
-        </v-card>
+        </v-card> -->
       </v-col>
     </v-row>
     <v-container>
@@ -85,20 +100,10 @@
             <span class="mr-4 grey--text">
               Page {{ page }} of {{ numberOfPages }}
             </span>
-            <v-btn
-              color='primary'
-              outlined
-              class='mr-1'
-              @click="formerPage"
-            >
+            <v-btn color="primary" outlined class="mr-1" @click="formerPage">
               <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
-            <v-btn
-              color='primary'
-              outlined
-              class='ml-1'
-              @click="nextPage"
-            >
+            <v-btn color="primary" outlined class="ml-1" @click="nextPage">
               <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
           </v-row>
@@ -109,7 +114,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Emit } from "vue-property-decorator";
-import ProjectCard from "../components/ProjectCard.vue";
+import ProjectCard from "../components/landing/ProjectCard.vue";
 import { Project } from "@/models/project";
 
 @Component({ components: { ProjectCard } })

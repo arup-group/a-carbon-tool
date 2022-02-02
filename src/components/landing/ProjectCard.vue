@@ -53,7 +53,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 import { Project } from "@/models/project";
-import DoughnutChart from "./charts/DoughnutChart.vue";
+import DoughnutChart from "../charts/DoughnutChart.vue";
 
 @Component({
   components: { DoughnutChart },

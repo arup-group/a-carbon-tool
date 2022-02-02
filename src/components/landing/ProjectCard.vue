@@ -1,5 +1,5 @@
 <template>
-  <v-main>
+  <v-container>
     <v-sheet outlined color='primary' rounded class='my-1'>
       <v-card flat height='600'>
         <v-card-title>
@@ -47,7 +47,7 @@
         </v-card-actions>
       </v-card>
     </v-sheet>
-  </v-main>
+  </v-container>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";

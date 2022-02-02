@@ -23,12 +23,16 @@
         v-model="sea"
         :disabled="!isCustom"
       ></v-text-field>
-      <v-btn :disabled="!isCustom" @click="customSave">Save</v-btn>
+      <v-btn :disabled="saveDisabled" @click="customSave">Save</v-btn>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { SpeckleType, TransportSelected, TransportType } from "@/models/newAssessment";
+import {
+  SpeckleType,
+  TransportSelected,
+  TransportType,
+} from "@/models/newAssessment";
 import { Vue, Prop, Watch, Component, Emit } from "vue-property-decorator";
 
 type Selected = null | TransportType;
@@ -42,6 +46,7 @@ export default class Item extends Vue {
   road = 0;
   rail = 0;
   sea = 0;
+  customSaved = false;
 
   @Watch("selected")
   onSelectedChange(value: Selected) {
@@ -53,6 +58,13 @@ export default class Item extends Vue {
         this.transportSelected(this.selected);
       }
     }
+  }
+
+  @Watch("road")
+  @Watch("rail")
+  @Watch("sea")
+  formChanged() {
+    if (this.isCustom) this.customSaved = false;
   }
 
   customSave() {
@@ -67,6 +79,7 @@ export default class Item extends Vue {
           sea: +this.sea,
         },
       };
+      this.customSaved = true;
       this.transportSelected(transportType);
     }
   }
@@ -90,6 +103,12 @@ export default class Item extends Vue {
   get typeName() {
     const typeArr = this.type.type.split(".");
     return typeArr[typeArr.length - 1];
+  }
+
+  get saveDisabled() {
+    if (this.isCustom) {
+      return this.customSaved;
+    } else return !this.isCustom;
   }
 }
 </script>

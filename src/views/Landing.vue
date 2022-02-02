@@ -23,19 +23,6 @@
             >
           </div>
         </div>
-        <!-- <v-card flat class="mx-4 justify-center">
-          <v-card-title class="text-h4"> act | a carbon tool </v-card-title>
-          <v-card-subtitle>
-            An open-source platform for performing embodied carbon emission
-            calculations from Building Information Models through
-            <a
-              href="https://speckle.systems/"
-              target="_blank"
-              class="secondary--text"
-              >Speckle</a
-            >
-          </v-card-subtitle>
-        </v-card> -->
       </v-col>
     </v-row>
     <v-container>
@@ -61,27 +48,7 @@
         <template v-slot:default="props" class="my-2">
           <v-row>
             <v-col cols="12" md="6" lg="4" v-if="page === 1">
-              <v-container class="ma-0 pa-0" fluid>
-                <v-sheet outlined color="primary" rounded class="my-1">
-                  <v-card
-                    flat
-                    height="600"
-                    class="d-flex align-center justify-center"
-                  >
-                    <v-card-actions class="justify-center">
-                      <v-btn
-                        x-large
-                        outlined
-                        color="primary"
-                        @click="$router.push('/assessment')"
-                      >
-                        <v-icon> mdi-plus </v-icon>
-                        New Assessment
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-sheet>
-              </v-container>
+              <new-assessment-card />
             </v-col>
             <v-col
               v-for="item in props.items"
@@ -115,9 +82,9 @@
 <script lang="ts">
 import { Vue, Component, Emit } from "vue-property-decorator";
 import ProjectCard from "../components/landing/ProjectCard.vue";
-import { Project } from "@/models/project";
+import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 
-@Component({ components: { ProjectCard } })
+@Component({ components: { ProjectCard, NewAssessmentCard } })
 export default class Landing extends Vue {
   carbonBranches: any[] = [];
   availableStreams: string[] = [];

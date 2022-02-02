@@ -1,4 +1,5 @@
 import { AuthError, Server, Token } from "@/models/auth";
+import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 import {
   StreamReferenceObjects,
   StreamReferenceBranches,
@@ -9,6 +10,10 @@ import {
   streamsDataQuery,
   userInfoQuery,
   streamsQuery,
+  uploadObjectsMutation,
+  createBranchMutation,
+  uploadObjectWithChildrenMutation,
+  createCommitMutation,
   streamReferencedBranches,
   streamCommmitObjects
 } from "./graphql/speckleQueries";
@@ -79,6 +84,7 @@ export async function speckleFetch(query: any, context: any) {
           Authorization: "Bearer " + token,
           "Content-Type": "application/json",
         },
+        // body: `{ query: ${query} }`
         body: JSON.stringify({
           query: query,
         }),
@@ -99,14 +105,44 @@ export const getStreamObjects = (
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(streamReferencedObjects(streamid), context);
 
+export const getUserStreams = (context: any) =>
+  speckleFetch(streamsQuery(), context);
+
+export const uploadObjects = (
+  context: any,
+  streamid: string,
+  objects: SpeckleObjectComplete[]
+) => speckleFetch(uploadObjectsMutation(streamid, objects), context);
+
+export const createReportBranch = (context: any, streamid: string) =>
+  speckleFetch(createBranchMutation(streamid), context);
+
+export const uploadObjectWithChildren = (
+  context: any,
+  streamid: string,
+  object: ReportTotals,
+  children: string[]
+) =>
+  speckleFetch(
+    uploadObjectWithChildrenMutation(streamid, object, children),
+    context
+  );
+
+export const createCommit = (
+  context: any,
+  streamid: string,
+  objectid: string,
+  totalChildrenCount: number
+) =>
+  speckleFetch(
+    createCommitMutation(streamid, objectid, totalChildrenCount),
+    context
+  );
 export const getStreamCommit = (
   context: any,
   streamid: string
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(streamCommmitObjects(streamid), context);
-
-export const getUserStreams = (context: any) =>
-  speckleFetch(streamsQuery(), context);
 
 export const getStreamBranches = (
   context: any,

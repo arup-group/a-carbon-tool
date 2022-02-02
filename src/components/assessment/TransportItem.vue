@@ -46,11 +46,10 @@ export default class Item extends Vue {
   @Watch("selected")
   onSelectedChange(value: Selected) {
     if (value !== null) {
-      this.road = value.defaults.road;
-      this.rail = value.defaults.rail;
-      this.sea = value.defaults.sea;
+      this.road = value.values.road;
+      this.rail = value.values.rail;
+      this.sea = value.values.sea;
       if (value.name !== "custom" && this.selected) {
-        console.log("default emit")
         this.transportSelected(this.selected);
       }
     }
@@ -59,14 +58,13 @@ export default class Item extends Vue {
   customSave() {
     // should always be true, but good to check
     if (this.selected) {
-      console.log("[customSave] selected:", this.selected)
       const transportType: TransportType = {
         name: this.selected.name,
         color: this.selected.color,
-        defaults: {
-          road: this.road,
-          rail: this.rail,
-          sea: this.sea,
+        values: {
+          road: +this.road,
+          rail: +this.rail,
+          sea: +this.sea,
         },
       };
       this.transportSelected(transportType);

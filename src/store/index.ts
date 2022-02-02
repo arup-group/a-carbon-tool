@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import {
+  createCommit,
+  createReportBranch,
   exchangeAccessCode,
   getServer,
   getStreamObjects,
@@ -11,6 +13,7 @@ import {
   getBranchData,
   goToSpeckleAuthpage,
   speckleLogOut,
+  uploadObjects,
   getStreamCommit,
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
@@ -21,7 +24,12 @@ import {
   RegionMaterialCarbonFactors,
   AllMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
-import { TransportType } from "@/models/newAssessment";
+import {
+  ProjectDataComplete,
+  ReportTotals,
+  SpeckleObjectComplete,
+  TransportType,
+} from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
@@ -85,7 +93,7 @@ export default new Vuex.Store({
       {
         name: "local",
         color: "#53ac8b",
-        defaults: {
+        values: {
           road: 50,
           rail: 0,
           sea: 0,
@@ -94,7 +102,7 @@ export default new Vuex.Store({
       {
         name: "regional",
         color: "#2d8486",
-        defaults: {
+        values: {
           road: 300,
           rail: 0,
           sea: 0,
@@ -103,7 +111,7 @@ export default new Vuex.Store({
       {
         name: "global",
         color: "#683a78",
-        defaults: {
+        values: {
           road: 200,
           rail: 0,
           sea: 10000,
@@ -112,7 +120,7 @@ export default new Vuex.Store({
       {
         name: "custom",
         color: "#1f9321",
-        defaults: {
+        values: {
           road: 0,
           rail: 0,
           sea: 0,
@@ -253,7 +261,6 @@ export default new Vuex.Store({
       const objectIds = await getStreamObjects(context, streamid);
 
       return objectIds.data.stream.branch.commits.items.map((item) => {
-        console.log(`context.state.selectedServer\n${context.state.selectedServer}`)
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
       });
     },
@@ -266,11 +273,6 @@ export default new Vuex.Store({
       const { streamid, objecturl } = input;
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
-      console.log("inputs:", input);
-      console.log(
-        "url:",
-        `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`
-      );
       const response = await fetch(
         `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`,
         {
@@ -283,12 +285,9 @@ export default new Vuex.Store({
       const rawObj = await response.text();
       const rootObj = JSON.parse(rawObj);
 
-      console.log("[getObjectDetails] rootObj:", rootObj);
-
       const childrenIds = Object.keys(rootObj.__closure).sort(
         (a, b) => rootObj.__closure[a] - rootObj.__closure[b]
       );
-      console.log("[getObjectDetails] childrenIds:", childrenIds);
 
       const childrenObjects = await fetch(
         `${context.state.selectedServer.url}/api/getobjects/${streamid}`,
@@ -303,17 +302,118 @@ export default new Vuex.Store({
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log("[getObjectDetails] data:", data);
           return data;
         });
 
-      console.log("[getObjectDetails] childrenObjects:", childrenObjects);
       return childrenObjects;
+    },
+    async uploadReport(context, input: UploadReportInput) {
+      const { streamid, objects, reportTotals, projectData } = input;
+
+      // TODO: ADD ERROR HANDLING
+      const uploadObjectsRes: UploadObjectsRes = await uploadObjects(
+        context,
+        streamid,
+        objects
+      );
+      const children = uploadObjectsRes.data.objectCreate;
+      const formData = new FormData();
+      // below line means that some objects may be given duplicate strings and the report won't save properly
+      // TODO: FIND SOME BETTER WAY OF SETTING THE OBJECT ID
+      const objectid = Math.floor(Math.random() * 1000000).toString();
+      formData.append(
+        "batch1",
+        new Blob([
+          JSON.stringify([
+            {
+              id: objectid,
+              __closure: Object.fromEntries(children.map((c) => [c, 1])),
+              speckleType: "act-totals",
+              speckle_type: "act-totals",
+              transportCarbonA4: reportTotals.transportCarbonA4,
+              productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
+              constructionCarbonA5: reportTotals.constructionCarbonA5,
+              totalCO2: reportTotals.totalCO2,
+              projectData,
+            },
+          ]),
+        ])
+      );
+      await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${context.state.token.token}`,
+        },
+        body: formData,
+      });
+      // TODO: DELETE BRANCH FIRST TO ENSURE THE BRANCH ONLY CONTAINS OBJECTS FROM MOST RECENT REPORT
+      const createBranch: SpeckleBranchRes = await createReportBranch(
+        context,
+        streamid
+      );
+
+      const totalChildrenCount = uploadObjectsRes.data.objectCreate.length;
+
+      const createCommitRes: CreateCommitRes = await createCommit(
+        context,
+        streamid,
+        objectid,
+        totalChildrenCount
+      );
     },
   },
   modules: {},
   plugins: [createPersistedState()],
 });
+
+interface CreateCommitRes {
+  data: {
+    commitCreate: string;
+  };
+}
+
+interface SpeckleBranchRes {
+  error?: {
+    message: string;
+    locations: {
+      line: number;
+      column: number;
+    }[];
+    path: string[];
+    extensions: {
+      code: string;
+      exception: {
+        length: number;
+        name: string;
+        severity: string;
+        code: string;
+        detail: string;
+        schema: string;
+        table: string;
+        constraint: string;
+        file: string;
+        line: string;
+        routine: string;
+      };
+    };
+  }[];
+  data: {
+    branchCreate: string;
+  };
+}
+
+interface UploadObjectsRes {
+  data: {
+    objectCreate: string[];
+  };
+}
+
+export interface UploadReportInput {
+  streamid: string;
+  objects: SpeckleObjectComplete[];
+  reportTotals: ReportTotals;
+  projectData: ProjectDataComplete;
+}
 
 interface ObjectDetailsInput {
   streamid: string;

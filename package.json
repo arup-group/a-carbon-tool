@@ -9,7 +9,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@arc-web/components": "^1.1.1",
+    "@arc-web/components": "^1.4.2",
     "@speckle/objectloader": "^2.2.0",
     "@speckle/viewer": "^2.0.12",
     "@types/three": "^0.136.1",

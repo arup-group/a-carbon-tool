@@ -10,7 +10,7 @@
         required
       ></v-combobox>
       <v-text-field
-        v-model="form.project"
+        v-model="form.name"
         label="Project name"
         required
       ></v-text-field>
@@ -29,13 +29,13 @@
         label="Primary element category"
       ></v-select>
       <v-text-field
-        v-model="form.projectValue"
+        v-model="form.cost"
         :rules="valueRules"
         label="System cost (£)"
         required
       ></v-text-field>
       <v-text-field
-        v-model="form.gia"
+        v-model="form.floorArea"
         label="System gross floor area (m2)"
         :rules="valueRules"
         required
@@ -46,26 +46,32 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
-import { StreamObject } from "@/models/newAssessment";
+import { ProjectDataComplete, ProjectDataTemp, Step, StreamObject } from "@/models/newAssessment";
 import store from "@/store";
 
 @Component({})
 
 export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject;
-  mounted() {
-    console.log("[menu1b]", this.streams);
-  }
+  @Prop() step!: Step;
+
+  form: ProjectDataTemp = {
+    name: null,
+    component: null,
+    cost: null,
+    floorArea: null,
+    region: "",
+  };
   speckleStream!: StreamObject;
+
   streamSelected() {
     try {
       const id = this.speckleStream.value;
-      console.log(id);
       if (id !== undefined) {
         this.loadStream(id);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
   @Emit("loadStream")
@@ -74,32 +80,38 @@ export default class Menu1b extends Vue {
   }
   isFormValid = false;
   
-  form = {
-    project: "",
-    region: "",
-    component: "",
-    projectValue: 0,
-    gia: 1
-  };
+  availableRegions() {
+    return store.state.availableRegions
+  }
+
+  elementCategories() {
+    return store.state.buildingElementCategories
+  }
+
+
   // textRules = [(v: string) => !!v || "Text is required"];
   selectionRules = [(v: string) => !!v || "Input is required"];
   valueRules = [
     (v: number) => Number.isInteger(Number(v)) || "Number is required",
   ];
 
-  elementCategories() {
-    return store.state.buildingElementCategories
-  };
-
-  availableRegions() {
-    return store.state.availableregions
+  @Watch("step")
+  stepChanged(newVal: Step, oldVal: Step) {
+    if (newVal !== Step.DATA && oldVal === Step.DATA && this.isFormValid) {
+      // if the step moves on from this form and the form is valid
+      this.uploadData();
+    }
   }
 
-  @Watch('form.region')
-  onPropertyChanged(value: string) {
-    console.log(value)
-    store.commit('setRegion', value)
+  @Emit("uploadData")
+  uploadData(): ProjectDataComplete {
+    return {
+      name: this.form.name ? this.form.name : "",
+      component: this.form.component ? this.form.component : "",
+      cost: this.form.cost ? +this.form.cost : 0,
+      floorArea: this.form.floorArea ? +this.form.floorArea : 1,
+      region: this.form.region ? this.form.region: "",
+    };
   }
-
 }
 </script>

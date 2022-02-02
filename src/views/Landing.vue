@@ -3,23 +3,13 @@
     <landing-header />
     <v-container>
       <v-data-iterator
-        :items="projects"
+        :items="displayProjects"
         :items-per-page.sync="itemsPerPage"
         :page.sync="page"
         hide-default-footer
       >
         <template v-slot:header>
-          <v-toolbar flat rounded outlined class="my-4">
-            <v-text-field
-              v-model="search"
-              clearable
-              flat
-              solo
-              hide-details
-              label="Search"
-              prepend-inner-icon="mdi-magnify"
-            ></v-text-field>
-          </v-toolbar>
+          <landing-search :projects="projects" @projectSearch="projectSearch" />
         </template>
         <template v-slot:default="props" class="my-2">
           <v-row>
@@ -55,22 +45,27 @@ import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
+import LandingSearch from "@/components/landing/LandingSearch.vue";
+import { Project } from "@/models/project";
 
 @Component({
-  components: { ProjectCard, NewAssessmentCard, LandingHeader, LandingFooter },
+  components: {
+    ProjectCard,
+    NewAssessmentCard,
+    LandingHeader,
+    LandingFooter,
+    LandingSearch,
+  },
 })
 export default class Landing extends Vue {
   carbonBranches: any[] = [];
-  availableStreams: string[] = [];
   branchData: any[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
-  filter = {};
-  sortdesc = false;
   page = 1;
-  keys = ["title", "category"];
-  projects: any[] = [];
+  displayProjects: Project[] = []
+  projects: Project[] = [];
 
   get numberOfPages() {
     const items = this.projects.length;
@@ -88,6 +83,14 @@ export default class Landing extends Vue {
   mounted() {
     this.token = this.$store.state.token.token;
     this.loadStreams();
+  }
+
+  projectSearch(project: Project | undefined) {
+    if (project) {
+      this.displayProjects = [project];
+    } else {
+      this.displayProjects = this.projects;
+    }
   }
 
   async loadStreams() {
@@ -160,11 +163,13 @@ export default class Landing extends Vue {
         title: `${proj.name}`,
         id: `${proj.id}`,
         co2Values: co2Data,
-        totalCO2e: `${proj.data.data.stream.object.data.totalCO2}`,
+        totalCO2e: proj.data.data.stream.object.data.totalCO2,
         link: "",
         category: `${proj.data.data.stream.object.data.projectData.component}`,
       };
     });
+
+    this.displayProjects = this.projects;
   }
 }
 </script>

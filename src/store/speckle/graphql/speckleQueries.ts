@@ -103,7 +103,8 @@ export const createCommitMutation = (
     message: "upload carbon report",
     sourceApplication: "ACT",
     totalChildrenCount: ${totalChildrenCount},
-  })`;
+  })
+}`;
 export const streamCommmitObjects = (id: string) => `query {
 stream(id: "${id}") {
   branch (name:"actcarbonreport"){

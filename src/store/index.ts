@@ -60,7 +60,7 @@ export default new Vuex.Store({
     
     // Carbon data
     selectedRegion: "UK",
-    availableregions: [
+    availableRegions: [
       "India",
       "UK"
     ],
@@ -187,6 +187,11 @@ export default new Vuex.Store({
     }
   },
   actions: {
+
+    changeRegion(context, region) {
+      context.commit("setRegion", region)
+    },
+
     // Auth
     logout(context) {
       // wipe the state

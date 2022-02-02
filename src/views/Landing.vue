@@ -38,30 +38,27 @@
           </v-row>
         </template>
         <template v-slot:footer>
-          <v-row class="pb-2">
-            <v-spacer></v-spacer>
-            <span class="mr-4 grey--text">
-              Page {{ page }} of {{ numberOfPages }}
-            </span>
-            <v-btn color="primary" outlined class="mr-1" @click="formerPage">
-              <v-icon>mdi-chevron-left</v-icon>
-            </v-btn>
-            <v-btn color="primary" outlined class="ml-1" @click="nextPage">
-              <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
-          </v-row>
+          <landing-footer
+            :numberOfPages="numberOfPages"
+            :page="page"
+            @formerPage="formerPage"
+            @nextPage="nextPage"
+          />
         </template>
       </v-data-iterator>
     </v-container>
   </v-main>
 </template>
 <script lang="ts">
-import { Vue, Component, Emit } from "vue-property-decorator";
-import ProjectCard from "../components/landing/ProjectCard.vue";
+import { Vue, Component } from "vue-property-decorator";
+import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
+import LandingFooter from "@/components/landing/LandingFooter.vue";
 
-@Component({ components: { ProjectCard, NewAssessmentCard, LandingHeader } })
+@Component({
+  components: { ProjectCard, NewAssessmentCard, LandingHeader, LandingFooter },
+})
 export default class Landing extends Vue {
   carbonBranches: any[] = [];
   availableStreams: string[] = [];

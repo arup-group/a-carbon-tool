@@ -1,7 +1,7 @@
 <template>
   <v-main class="page">
     <landing-header />
-    <v-container>
+    <v-container v-if="!loading">
       <v-data-iterator
         :items="displayProjects"
         :items-per-page.sync="itemsPerPage"
@@ -37,6 +37,13 @@
         </template>
       </v-data-iterator>
     </v-container>
+    <div v-else style="width: 100%" class="d-flex justify-center">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        :size="200"
+      ></v-progress-circular>
+    </div>
   </v-main>
 </template>
 <script lang="ts">
@@ -64,8 +71,9 @@ export default class Landing extends Vue {
   itemsPerPage = 8;
   search = "";
   page = 1;
-  displayProjects: Project[] = []
+  displayProjects: Project[] = [];
   projects: Project[] = [];
+  loading = true;
 
   get numberOfPages() {
     const items = this.projects.length;
@@ -170,6 +178,7 @@ export default class Landing extends Vue {
     });
 
     this.displayProjects = this.projects;
+    this.loading = false;
   }
 }
 </script>

@@ -9,17 +9,17 @@
         v-model="selected"
       ></v-select>
       <v-text-field
-        label="road"
+        label="road (km)"
         v-model="road"
         :disabled="!isCustom"
       ></v-text-field>
       <v-text-field
-        label="rail"
+        label="rail (km)"
         v-model="rail"
         :disabled="!isCustom"
       ></v-text-field>
       <v-text-field
-        label="sea"
+        label="sea (km)"
         v-model="sea"
         :disabled="!isCustom"
       ></v-text-field>

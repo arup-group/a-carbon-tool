@@ -21,7 +21,8 @@ import router from "@/router";
 import {
   materialCarbonFactors,
   MaterialFull,
-  UKMaterialCarbonFactors,
+  RegionMaterialCarbonFactors,
+  AllMaterialCarbonFactors,
 } from "./utilities/material-carbon-factors";
 import {
   ProjectDataComplete,
@@ -56,7 +57,38 @@ export default new Vuex.Store({
     serverInfo: null,
 
     darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
-
+    
+    // Carbon data
+    selectedRegion: "UK",
+    availableRegions: [
+      "India",
+      "UK"
+    ],
+    buildingElementCategories: [
+      "Substructure",
+      "Superstructure",
+      "Mechanical Services",
+      "Electrical Services",
+      "Public Health & Hydraulics",
+      "Building Envelope",
+      "Space Plan",
+    ],
+    materialCategories: [
+      "Aluminium",
+      "Brick",
+      "Blockwork",
+      "Cement",
+      "Concrete",
+      "Fire",
+      "Glass",
+      "Gypsum",
+      "Insulation",
+      "Plasterboard",
+      "Plastic",
+      "Steel",
+      "Stone",
+      "Timber"
+    ],
     transportTypes: [
       {
         name: "local",
@@ -98,17 +130,21 @@ export default new Vuex.Store({
   },
   getters: {
     isAuthenticated: (state) => state.user != null,
-    materialsArrUK: (state): MaterialFull[] => {
+
+    // needs updating to cover region selection
+    materialsArr: (state): MaterialFull[] => {
+      const region: keyof AllMaterialCarbonFactors = state.selectedRegion as keyof AllMaterialCarbonFactors
+      console.log("materialsArr")
       const tmparr = (
-        Object.keys(materialCarbonFactors.UK) as Array<
-          keyof UKMaterialCarbonFactors
+        Object.keys(materialCarbonFactors[region]) as Array<
+          keyof RegionMaterialCarbonFactors
         >
       ).map((type) => {
         const arr: MaterialFull[] = [];
-        Object.keys(materialCarbonFactors.UK[type]).forEach((t) => {
+        Object.keys(materialCarbonFactors[region][type]).forEach((t) => {
           const toPush: MaterialFull = {
             name: `${type} - ${t}`,
-            ...materialCarbonFactors.UK[type][t],
+            ...materialCarbonFactors[region][type][t],
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);
@@ -146,8 +182,16 @@ export default new Vuex.Store({
     setDarkMode(state) {
       state.darkMode = state.darkMode ? false : true;
     },
+    setRegion(state, region) {
+      state.selectedRegion = region
+    }
   },
   actions: {
+
+    changeRegion(context, region) {
+      context.commit("setRegion", region)
+    },
+
     // Auth
     logout(context) {
       // wipe the state

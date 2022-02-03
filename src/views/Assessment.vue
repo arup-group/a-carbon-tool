@@ -79,7 +79,7 @@ export default class Assessment extends Vue {
   token = "";
   types: SpeckleType[] = [];
   objects: SpeckleObject[] = [];
-  materials: MaterialFull[] = this.$store.getters.materialsArrUK;
+  materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
   totalVolume = -1;
@@ -433,6 +433,10 @@ export default class Assessment extends Vue {
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
     this.projectData = data;
+    this.$store.dispatch("changeRegion", data.region).then(res=>{
+      this.materials = this.$store.getters.materialsArr
+      console.log(data.region)
+    })
   }
 }
 </script>

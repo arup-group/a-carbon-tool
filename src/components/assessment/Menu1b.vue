@@ -15,8 +15,16 @@
         required
       ></v-text-field>
       <v-select
+        v-model="form.region"
+        :items="availableRegions()"
+        :rules="selectionRules"
+        label="Region"
+        required
+
+      ></v-select>
+      <v-select
         v-model="form.component"
-        :items="items_comp"
+        :items="elementCategories()"
         :rules="selectionRules"
         label="Primary element category"
       ></v-select>
@@ -39,8 +47,10 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 import { ProjectDataComplete, ProjectDataTemp, Step, StreamObject } from "@/models/newAssessment";
+import store from "@/store";
 
 @Component({})
+
 export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject;
   @Prop() step!: Step;
@@ -50,6 +60,7 @@ export default class Menu1b extends Vue {
     component: null,
     cost: null,
     floorArea: null,
+    region: "",
   };
   speckleStream!: StreamObject;
 
@@ -67,16 +78,17 @@ export default class Menu1b extends Vue {
   loadStream(id: string) {
     return id;
   }
-  items_comp = [
-    "Substructure",
-    "Superstructure",
-    "Mechanical Services",
-    "Electrical Services",
-    "Public Health & Hydraulics",
-    "Skin",
-    "Space Plan",
-  ];
   isFormValid = false;
+  
+  availableRegions() {
+    return store.state.availableRegions
+  }
+
+  elementCategories() {
+    return store.state.buildingElementCategories
+  }
+
+
   // textRules = [(v: string) => !!v || "Text is required"];
   selectionRules = [(v: string) => !!v || "Input is required"];
   valueRules = [
@@ -97,7 +109,8 @@ export default class Menu1b extends Vue {
       name: this.form.name ? this.form.name : "",
       component: this.form.component ? this.form.component : "",
       cost: this.form.cost ? +this.form.cost : 0,
-      floorArea: this.form.floorArea ? +this.form.floorArea : 0,
+      floorArea: this.form.floorArea ? +this.form.floorArea : 1,
+      region: this.form.region ? this.form.region: "",
     };
   }
 }

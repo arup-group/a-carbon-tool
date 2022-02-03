@@ -27,6 +27,7 @@ export default class MaterialBreakdownCard extends Vue {
     return this.materials.map((m) => ({
       label: m.name,
       value: m.value,
+      color: ""
     }));
   }
 }

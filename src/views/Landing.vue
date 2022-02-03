@@ -146,7 +146,10 @@ export default class Landing extends Vue {
         });
       }
     }
-    const co2Obj: { [key: string]: number } = {};
+    // const co2Obj: { [key: string]: number } = {};
+    const co2Obj: {
+      [key: string]: { value: number; color: string };
+    } = {};
     this.projects = this.branchData.map((proj) => {
       const children = proj.data.data.stream.object.children.objects;
       children.forEach((material: any) => {
@@ -157,17 +160,22 @@ export default class Landing extends Vue {
           parseFloat(material.data.act.reportData.constructionCarbonA5.value) +
           parseFloat(material.data.act.reportData.constructionCarbonA5.waste);
         const materialKey = material.data.act.formData.material.name;
+        const materialColor = material.data.act.formData.material.color;
         if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
-          co2Obj[materialKey] += materialValue;
+          co2Obj[materialKey] = {
+            value: co2Obj[materialKey].value + materialValue,
+            color: materialColor,
+          };
         } else {
-          co2Obj[materialKey] = materialValue;
+          co2Obj[materialKey] = { value: materialValue, color: materialColor };
         }
       });
       const co2Arr = Object.entries(co2Obj);
       const co2Data = co2Arr.map((obj) => {
         return {
           label: obj[0],
-          value: obj[1],
+          value: obj[1].value,
+          color: obj[1].color,
         };
       });
       return {
@@ -179,6 +187,8 @@ export default class Landing extends Vue {
         category: `${proj.data.data.stream.object.data.projectData.component}`,
       };
     });
+
+    console.log("this.projects:", this.projects);
 
     this.displayProjects = this.projects;
     this.loading = false;

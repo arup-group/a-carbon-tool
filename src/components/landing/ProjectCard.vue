@@ -68,9 +68,11 @@ export default class ProjectCard extends Vue {
     return this.project.title;
   }
   get co2Values(): ChartData[] {
+    console.log("co2Values:", this.project.co2Values)
     return this.project.co2Values.map(c => ({
       label: c.label,
-      value: this.convertKgToTonnes(c.value)
+      value: this.convertKgToTonnes(c.value),
+      color: c.color
     }));
   }
   get co2Total() {

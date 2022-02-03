@@ -41,6 +41,7 @@ export default class ABreakdownCard extends Vue {
     return this.levels.map((l) => ({
       label: l.name,
       value: l.tCO2e,
+      color: ""
     }));
   }
 

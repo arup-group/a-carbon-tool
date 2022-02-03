@@ -188,8 +188,6 @@ export default class Landing extends Vue {
       };
     });
 
-    console.log("this.projects:", this.projects);
-
     this.displayProjects = this.projects;
     this.loading = false;
   }

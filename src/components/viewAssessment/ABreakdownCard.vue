@@ -26,7 +26,7 @@ import { ABreakdown, Level } from "@/models/assessment";
 import { ChartData } from "@/models/chart";
 import { Vue, Component, Prop } from "vue-property-decorator";
 
-import HBarChart from "./charts/HBarChart.vue";
+import HBarChart from "../charts/HBarChart.vue";
 
 @Component({
   components: { HBarChart },

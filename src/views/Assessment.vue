@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, { Color, Gradient, GradientColor } from "@/components/Renderer.vue";
+import Renderer, { Color, Gradient, GradientColor } from "@/components/shared/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 

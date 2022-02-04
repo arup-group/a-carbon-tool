@@ -90,7 +90,7 @@ export default class ProjectCard extends Vue {
 
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp
-    return Math.round(value * 0.001 * 100) / 100
+    return Math.round(value * 0.001)
   }
 
   open() {

@@ -1,7 +1,7 @@
 <template>
   <v-main class="page">
     <landing-header />
-    <v-container v-if="!loading">
+    <v-container v-if="!loading && !error">
       <v-data-iterator
         :items="displayProjects"
         :items-per-page.sync="itemsPerPage"
@@ -37,12 +37,19 @@
         </template>
       </v-data-iterator>
     </v-container>
-    <div v-else style="width: 100%" class="d-flex justify-center">
+    <div
+      v-else-if="loading && !error"
+      style="width: 100%"
+      class="d-flex justify-center"
+    >
       <v-progress-circular
         indeterminate
         color="primary"
         :size="200"
       ></v-progress-circular>
+    </div>
+    <div v-else>
+      <landing-error @retry="loadStreams" />
     </div>
   </v-main>
 </template>
@@ -53,6 +60,7 @@ import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingSearch from "@/components/landing/LandingSearch.vue";
+import LandingError from "@/components/landing/LandingError.vue";
 import { Project } from "@/models/project";
 import { BEC } from "@/store/utilities/BECs";
 
@@ -63,6 +71,7 @@ import { BEC } from "@/store/utilities/BECs";
     LandingHeader,
     LandingFooter,
     LandingSearch,
+    LandingError,
   },
 })
 export default class Landing extends Vue {
@@ -76,6 +85,7 @@ export default class Landing extends Vue {
   projects: Project[] = [];
   loading = true;
   becs: BEC[] = [];
+  error = false;
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -105,91 +115,102 @@ export default class Landing extends Vue {
   }
 
   async loadStreams() {
-    const streams = await this.$store.dispatch("getUserStreams");
-    const streamID = streams.data.user.streams.items.map((stream: any) => {
-      return { name: stream.name, id: stream.id };
-    });
-    const streamBranches: any[] = [];
-    for (let i = 0; i < streamID.length; i++) {
-      const branches = await this.$store.dispatch(
-        "getStreamBranches",
-        streamID[i].id
-      );
-      streamBranches.push([branches, streamID[i]]);
-    }
-    for (let i = 0; i < streamBranches.length; i++) {
-      streamBranches[i][0].data.stream.branches.items.forEach((branch: any) => {
-        if (branch.name === "actcarbonreport") {
-          this.carbonBranches.push(streamBranches[i][1]);
-        }
+    try {
+      const streams = await this.$store.dispatch("getUserStreams");
+      const streamID = streams.data.user.streams.items.map((stream: any) => {
+        return { name: stream.name, id: stream.id };
       });
-    }
-    for (let i = 0; i < this.carbonBranches.length; i++) {
-      const branchCommit = await this.$store.dispatch(
-        "getStreamCommit",
-        streamBranches[i][1].id
-      );
-      var carbonCommit = "";
-      if (branchCommit.data.stream.branch) {
-        carbonCommit =
-          branchCommit.data.stream.branch.commits.items[0].referencedObject;
+      const streamBranches: any[] = [];
+      for (let i = 0; i < streamID.length; i++) {
+        const branches = await this.$store.dispatch(
+          "getStreamBranches",
+          streamID[i].id
+        );
+        streamBranches.push([branches, streamID[i]]);
       }
-      const branch = await this.$store.dispatch("getBranchData", [
-        this.carbonBranches[i].id,
-        carbonCommit,
-      ]);
-      if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
-        this.branchData.push({
-          id: this.carbonBranches[i].id,
-          name: this.carbonBranches[i].name,
-          data: branch,
+      for (let i = 0; i < streamBranches.length; i++) {
+        streamBranches[i][0].data.stream.branches.items.forEach(
+          (branch: any) => {
+            if (branch.name === "actcarbonreport") {
+              this.carbonBranches.push(streamBranches[i][1]);
+            }
+          }
+        );
+      }
+      for (let i = 0; i < this.carbonBranches.length; i++) {
+        const branchCommit = await this.$store.dispatch(
+          "getStreamCommit",
+          streamBranches[i][1].id
+        );
+        var carbonCommit = "";
+        if (branchCommit.data.stream.branch) {
+          carbonCommit =
+            branchCommit.data.stream.branch.commits.items[0].referencedObject;
+        }
+        const branch = await this.$store.dispatch("getBranchData", [
+          this.carbonBranches[i].id,
+          carbonCommit,
+        ]);
+        if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
+          this.branchData.push({
+            id: this.carbonBranches[i].id,
+            name: this.carbonBranches[i].name,
+            data: branch,
+          });
+        }
+      }
+      const co2Obj: {
+        [key: string]: { value: number; color: string };
+      } = {};
+      this.projects = this.branchData.map((proj) => {
+        const children = proj.data.data.stream.object.children.objects;
+        children.forEach((material: any) => {
+          const materialValue =
+            parseFloat(material.data.act.reportData.productStageCarbonA1A3) +
+            parseFloat(material.data.act.reportData.transportCarbonA4) +
+            parseFloat(material.data.act.reportData.constructionCarbonA5.site) +
+            parseFloat(
+              material.data.act.reportData.constructionCarbonA5.value
+            ) +
+            parseFloat(material.data.act.reportData.constructionCarbonA5.waste);
+          const materialKey = material.data.act.formData.material.name;
+          const materialColor = material.data.act.formData.material.color;
+          if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
+            co2Obj[materialKey] = {
+              value: co2Obj[materialKey].value + materialValue,
+              color: materialColor,
+            };
+          } else {
+            co2Obj[materialKey] = {
+              value: materialValue,
+              color: materialColor,
+            };
+          }
         });
-      }
-    }
-    // const co2Obj: { [key: string]: number } = {};
-    const co2Obj: {
-      [key: string]: { value: number; color: string };
-    } = {};
-    this.projects = this.branchData.map((proj) => {
-      const children = proj.data.data.stream.object.children.objects;
-      children.forEach((material: any) => {
-        const materialValue =
-          parseFloat(material.data.act.reportData.productStageCarbonA1A3) +
-          parseFloat(material.data.act.reportData.transportCarbonA4) +
-          parseFloat(material.data.act.reportData.constructionCarbonA5.site) +
-          parseFloat(material.data.act.reportData.constructionCarbonA5.value) +
-          parseFloat(material.data.act.reportData.constructionCarbonA5.waste);
-        const materialKey = material.data.act.formData.material.name;
-        const materialColor = material.data.act.formData.material.color;
-        if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
-          co2Obj[materialKey] = {
-            value: co2Obj[materialKey].value + materialValue,
-            color: materialColor,
+        const co2Arr = Object.entries(co2Obj);
+        const co2Data = co2Arr.map((obj) => {
+          return {
+            label: obj[0],
+            value: obj[1].value,
+            color: obj[1].color,
           };
-        } else {
-          co2Obj[materialKey] = { value: materialValue, color: materialColor };
-        }
-      });
-      const co2Arr = Object.entries(co2Obj);
-      const co2Data = co2Arr.map((obj) => {
+        });
         return {
-          label: obj[0],
-          value: obj[1].value,
-          color: obj[1].color,
+          title: `${proj.name}`,
+          id: `${proj.id}`,
+          co2Values: co2Data,
+          totalCO2e: proj.data.data.stream.object.data.totalCO2,
+          link: "",
+          category: `${proj.data.data.stream.object.data.projectData.component}`,
         };
       });
-      return {
-        title: `${proj.name}`,
-        id: `${proj.id}`,
-        co2Values: co2Data,
-        totalCO2e: proj.data.data.stream.object.data.totalCO2,
-        link: "",
-        category: `${proj.data.data.stream.object.data.projectData.component}`,
-      };
-    });
 
-    this.displayProjects = this.projects;
-    this.loading = false;
+      this.displayProjects = this.projects;
+      this.loading = false;
+    } catch (err) {
+      this.error = true;
+      this.loading = false;
+    }
   }
 }
 </script>

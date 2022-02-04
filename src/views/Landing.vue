@@ -23,7 +23,10 @@
               md="6"
               lg="4"
             >
-              <project-card :project="item"></project-card>
+              <project-card
+                :project="item"
+                @delete="checkDelete"
+              ></project-card>
             </v-col>
           </v-row>
         </template>
@@ -51,17 +54,25 @@
     <div v-else>
       <landing-error @retry="loadStreams" />
     </div>
+    <confirm-dialog
+      :dialog="dialog"
+      @agree="agreeDelete"
+      @cancel="cancelDelete"
+      message="Are you sure you want to delete this report?"
+    />
   </v-main>
 </template>
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
+import { Project } from "@/models/project";
+
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingSearch from "@/components/landing/LandingSearch.vue";
 import LandingError from "@/components/landing/LandingError.vue";
-import { Project } from "@/models/project";
+import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 
 @Component({
   components: {
@@ -71,6 +82,7 @@ import { Project } from "@/models/project";
     LandingFooter,
     LandingSearch,
     LandingError,
+    ConfirmDialog,
   },
 })
 export default class Landing extends Vue {
@@ -84,6 +96,8 @@ export default class Landing extends Vue {
   projects: Project[] = [];
   loading = true;
   error = false;
+  dialog = false;
+  deleteid = "";
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -103,6 +117,20 @@ export default class Landing extends Vue {
     if (this.page - 1 >= 1) this.page -= 1;
   }
 
+  checkDelete(streamid: string) {
+    this.deleteid = streamid;
+    this.dialog = true;
+  }
+  agreeDelete() {
+    this.dialog = false;
+    console.log("agree");
+    return;
+  }
+  cancelDelete() {
+    this.dialog = false;
+    this.deleteid = "";
+  }
+
   projectSearch(project: Project | undefined) {
     if (project) {
       this.displayProjects = [project];
@@ -112,6 +140,8 @@ export default class Landing extends Vue {
   }
 
   async loadStreams() {
+    this.loading = true;
+    this.error = false;
     try {
       const streams = await this.$store.dispatch("getUserStreams");
       const streamID = streams.data.user.streams.items.map((stream: any) => {

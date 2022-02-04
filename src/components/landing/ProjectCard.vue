@@ -32,9 +32,8 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <div>
-            <v-btn icon color="primary">
-              <v-icon>mdi-cog</v-icon>
-            </v-btn>
+            <landing-options @delete="checkDelete" />
+            <v-select :menu-props="{value: options}" v-if="options" :items="['one','two']" />
             <v-btn icon color="primary">
               <v-icon>mdi-share-variant</v-icon>
             </v-btn>
@@ -48,19 +47,23 @@
   </v-container>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import { Project } from "@/models/project";
 import { ChartData } from "@/models/chart";
+
 import DoughnutChart from "../charts/DoughnutChart.vue";
-import BECChip, { BEC } from "../shared/BECChip.vue";
+import BECChip from "../shared/BECChip.vue";
+import LandingOptions from "./LandingOptions.vue";
 
 
 @Component({
-  components: { DoughnutChart, BECChip },
+  components: { DoughnutChart, BECChip, LandingOptions },
 })
 export default class ProjectCard extends Vue {
   @Prop() project!: Project;
+
+  options = false;
 
   get title() {
     return this.project.title;
@@ -80,6 +83,11 @@ export default class ProjectCard extends Vue {
   }
   get category() {
     return this.project.category;
+  }
+
+  @Emit("delete")
+  checkDelete() {
+    return this.project.id;
   }
 
   convertKgToTonnes(value: number) {

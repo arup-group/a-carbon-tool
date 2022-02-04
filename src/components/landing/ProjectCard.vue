@@ -8,9 +8,7 @@
               {{ title }}
             </v-col>
             <v-col cols="5" align="right">
-              <v-chip :color="chipColor" style="color: black">{{
-                category
-              }}</v-chip>
+              <BECChip :category="category" />
             </v-col>
           </v-row>
         </v-card-title>
@@ -53,16 +51,16 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 import { Project } from "@/models/project";
-import DoughnutChart from "../charts/DoughnutChart.vue";
-import { BEC } from "@/store/utilities/BECs";
 import { ChartData } from "@/models/chart";
+import DoughnutChart from "../charts/DoughnutChart.vue";
+import BECChip, { BEC } from "../shared/BECChip.vue";
+
 
 @Component({
-  components: { DoughnutChart },
+  components: { DoughnutChart, BECChip },
 })
 export default class ProjectCard extends Vue {
   @Prop() project!: Project;
-  @Prop() becs!: BEC[];
 
   get title() {
     return this.project.title;
@@ -82,10 +80,6 @@ export default class ProjectCard extends Vue {
   }
   get category() {
     return this.project.category;
-  }
-  get chipColor() {
-    const color = this.becs.find((b) => b.name === this.project.category);
-    return color ? color.color : "primary";
   }
 
   convertKgToTonnes(value: number) {

@@ -262,10 +262,12 @@ export default class About extends Vue {
     },
     {
       name: "Netherlands",
-      sources: {
-        name: "De Nationale Milieudatabase (NMD, 2021)",
-        url: "https://milieudatabase.nl/database/nationalemilieudatabase/",
-      }
+      sources: [
+        {
+          name: "De Nationale Milieudatabase (NMD, 2021)",
+          url: "https://milieudatabase.nl/database/nationalemilieudatabase/",
+        }
+      ]
     },
     {
       name: "UK",
@@ -295,15 +297,6 @@ export default class About extends Vue {
     },
     {
       name: "East Asia",
-      sources: [
-        {
-          name: "coming soon",
-          url: ""
-        }
-      ]
-    },
-    {
-      name: "Europe",
       sources: [
         {
           name: "coming soon",

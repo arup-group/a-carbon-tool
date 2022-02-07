@@ -19,7 +19,9 @@ export interface RegionMaterialCarbonFactors {
 
 export interface AllMaterialCarbonFactors {
   India: RegionMaterialCarbonFactors;
+  Netherlands: RegionMaterialCarbonFactors;
   UK: RegionMaterialCarbonFactors;
+
 }
 
 
@@ -296,6 +298,253 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
       }
+    }
+  },
+  Netherlands: {
+    Aluminium: {
+      "General": {
+        productStageCarbonA1A3: 4.4897202,
+        density: 2755,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)",
+      }
+    },
+    Brick: {
+      "General":   {
+        productStageCarbonA1A3: 0.24430374,
+        density: 1822,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+    },
+    Coating: {
+      "Powdercoat Aluminium": {
+        productStageCarbonA1A3: 16.2,
+        density: 1826,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)",
+      },
+      "Powdercoat steel": {
+        productStageCarbonA1A3: 15.8,
+        density: 1824,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      }
+    },
+    Concrete: {
+      "150mm Kanaalplaatvloer - 268kg/m2":   {
+        productStageCarbonA1A3: 0.1401,
+        density: 1787,
+        wastage: 0.03,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "200mm Kanaalplaatvloer - 308kg/m2":   {
+        productStageCarbonA1A3: 0.1383,
+        density: 1540,
+        wastage: 0.03,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "260mm Kanaalplaatvloer - 383kg/m2":   {
+        productStageCarbonA1A3: 0.1471,
+        density: 1473,
+        wastage: 0.03,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "320mm Kanaalplaatvloer - 429kg/m2":   {
+        productStageCarbonA1A3: 0.1618,
+        density: 1341,
+        wastage: 0.03,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "400mm Kanaalplaatvloer - 490kg/m2":   {
+        productStageCarbonA1A3: 0.1603,
+        density: 1225,
+        wastage: 0.03,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "Breedplaatvloer incl wapening - precast only":   {
+        productStageCarbonA1A3: 0.1917,
+        density: 2400,
+        wastage: 0.03,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C30/37 100% CEM1":   {
+        productStageCarbonA1A3: 0.111,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C30/37 25% CEM1 75% CEMIII/C":   {
+        productStageCarbonA1A3: 0.057,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C30/37 50% CEM1 50% CEMIII/C":   {
+        productStageCarbonA1A3: 0.078,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C30/37 75% CEM1 25% CEMIII/C":   {
+        productStageCarbonA1A3: 0.096,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C40/50 100% CEM1":   {
+        productStageCarbonA1A3: 0.141,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C40/50 25% CEM1 75% CEMIII/C":   {
+        productStageCarbonA1A3: 0.072,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C40/50 50% CEM1 50% CEMIII/C":   {
+        productStageCarbonA1A3: 0.099,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C40/50 75% CEM1 25% CEMIII/C":   {
+        productStageCarbonA1A3: 0.121,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C50/60 100% CEM1":   {
+        productStageCarbonA1A3: 0.177,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C50/60 25% CEM1 75% CEMIII/C":   {
+        productStageCarbonA1A3: 0.089,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C50/60 50% CEM1 50% CEMIII/C":   {
+        productStageCarbonA1A3: 0.125,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "C50/60 75% CEM1 25% CEMIII/C":   {
+        productStageCarbonA1A3: 0.155,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "In-situ with rebar - average NL":   {
+        productStageCarbonA1A3: 0.115,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "Precast concrete with rebar - NL average":   {
+        productStageCarbonA1A3: 0.149,
+        density: 2400,
+        wastage: 0.04,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+    },
+    Glass: {
+      "Double glazing":   {
+        productStageCarbonA1A3: 1.1306612,
+        density: 1823,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+    },
+    Steel: {
+      "Reinforcement - NL average":   {
+        productStageCarbonA1A3: 1.36,
+        density: 7850,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "Rolled section (90% EAF + 10% BF)":   {
+        productStageCarbonA1A3: 0.908,
+        density: 7850,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "Stainless steel":   {
+        productStageCarbonA1A3: 5.0733127,
+        density: 7850,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "Structural hollow sections (TATA)":   {
+        productStageCarbonA1A3: 2.5,
+        density: 7850,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+    },
+    Timber: {
+      "Average Engineered Timber (CLT/Glulam)":   {
+        productStageCarbonA1A3: 0.32,
+        density: 550,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "CLT NL (C24 Spruce)":   {
+        productStageCarbonA1A3: 0.324,
+        density: 500,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "Glulam NL (GL24h, GL28c and CL32c)":   {
+        productStageCarbonA1A3: 0.32,
+        density: 550,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
+      "LVL NL":   {
+        productStageCarbonA1A3: 0.64,
+        density: 550,
+        wastage: 0.05,
+        units:"kgCO2e/kg",
+        source: "De Nationale Milieudatabase (2021)"
+      },
     }
   },
   UK: {

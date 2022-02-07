@@ -62,6 +62,7 @@ export default new Vuex.Store({
     selectedRegion: "UK",
     availableRegions: [
       "India",
+      "Netherlands",
       "UK"
     ],
     buildingElementCategories: [

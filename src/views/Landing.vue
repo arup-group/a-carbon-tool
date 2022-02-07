@@ -1,5 +1,5 @@
 <template>
-  <v-main class="page">
+  <v-main class="mr-7 ml-7">
     <landing-header />
     <v-container v-if="!loading && !error">
       <v-data-iterator
@@ -126,6 +126,7 @@ export default class Landing extends Vue {
 
   get numberOfPages() {
     const items = this.projects.length;
+    if (!items) return 1;
     return Math.ceil(items / this.itemsPerPage);
   }
 
@@ -302,20 +303,3 @@ export default class Landing extends Vue {
   }
 }
 </script>
-<style scoped>
-.titles {
-  width: 70%;
-}
-.page {
-  margin-left: 4rem;
-  margin-right: 4rem;
-}
-
-.grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 33% 33% 33%;
-  column-gap: 1rem;
-  row-gap: 1rem;
-}
-</style>

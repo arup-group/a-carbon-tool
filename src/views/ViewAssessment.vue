@@ -69,7 +69,7 @@ export default class ViewAssessment extends Vue {
 
   assessment: AssessmentComplete = {
     // dummy data
-    streamId: "67899fd79d",
+    streamId: this.$route.params.streamId,
     projectInfo: {
       name: "Super great project",
       type: "Superstructure",

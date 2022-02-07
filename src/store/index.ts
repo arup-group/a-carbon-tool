@@ -31,6 +31,7 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
+import { DeleteStreamData } from "@/models/graphql";
 
 Vue.use(Vuex);
 

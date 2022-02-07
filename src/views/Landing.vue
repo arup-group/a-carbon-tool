@@ -60,11 +60,26 @@
       @cancel="cancelDelete"
       message="Are you sure you want to delete this report?"
     />
+    <SESnackBar
+      @close="deleteSnackClose"
+      :success="deleteSuccess"
+      :model="deleteSnack"
+      textError="Something went wrong, please retry"
+      textSuccess="Report deleted!"
+    />
   </v-main>
 </template>
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
+
 import { Project } from "@/models/project";
+import {
+  StreamData,
+  DeleteStreamData,
+  StreamReferenceBranches,
+} from "@/models/graphql";
+
+import { DeleteBranchInput } from "@/store";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -72,14 +87,9 @@ import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingSearch from "@/components/landing/LandingSearch.vue";
 import LandingError from "@/components/landing/LandingError.vue";
+
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
-import {
-  DeleteStreamData,
-  StreamReferenceBranches,
-  StreamReferenceObjects,
-} from "@/models/graphql";
-import { StreamData } from "@/models/graphql/StreamData.interface";
-import { DeleteBranchInput } from "@/store";
+import SESnackBar from "@/components/shared/SESnackBar.vue";
 
 @Component({
   components: {
@@ -90,6 +100,7 @@ import { DeleteBranchInput } from "@/store";
     LandingSearch,
     LandingError,
     ConfirmDialog,
+    SESnackBar,
   },
 })
 export default class Landing extends Vue {
@@ -105,6 +116,8 @@ export default class Landing extends Vue {
   error = false;
   dialog = false;
   deleteid = "";
+  deleteSuccess = true;
+  deleteSnack = false;
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -130,22 +143,39 @@ export default class Landing extends Vue {
   }
   async agreeDelete() {
     this.dialog = false;
-    const stream = this.carbonBranches.find(c => c.id === this.deleteid);
+    const stream = this.carbonBranches.find((c) => c.id === this.deleteid);
     if (stream) {
       const input: DeleteBranchInput = {
         streamid: stream.id,
-        branchid: stream.branchid
+        branchid: stream.branchid,
+      };
+      try {
+        const deleted: DeleteStreamData = await this.$store.dispatch(
+          "deleteBranch",
+          input
+        );
+        if (deleted.data.branchDelete) {
+          this.deleteSuccess = true;
+          this.deleteSnack = true;
+          this.loadStreams();
+        } else {
+          this.deleteSuccess = false;
+          this.deleteSnack = true;
+        }
+      } catch (err) {
+        this.deleteSuccess = false;
+        this.deleteSnack = true;
       }
-      const deleted: DeleteStreamData = await this.$store.dispatch("deleteBranch", input);
-      if (deleted.data.branchDelete) {
-        this.loadStreams();
-      } // else, TODO: ADD ERROR HANDLING
     }
     return;
   }
   cancelDelete() {
     this.dialog = false;
     this.deleteid = "";
+  }
+  deleteSnackClose() {
+    this.error = false;
+    this.deleteSnack = false;
   }
 
   projectSearch(project: Project | undefined) {
@@ -249,9 +279,9 @@ export default class Landing extends Vue {
         });
         const co2Arr = Object.entries(co2Obj);
         const co2Data = co2Arr.map((obj) => ({
-            label: obj[0],
-            value: obj[1].value,
-            color: obj[1].color,
+          label: obj[0],
+          value: obj[1].value,
+          color: obj[1].color,
         }));
         return {
           title: `${proj.name}`,

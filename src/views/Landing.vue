@@ -3,27 +3,37 @@
     <landing-header />
     <v-container v-if="!loading && !error">
       <v-data-iterator
-        :items="displayProjects"
+        :items="projectData"
         :items-per-page.sync="itemsPerPage"
         :page.sync="page"
+        :search="search"
         hide-default-footer
       >
         <template v-slot:header>
-          <landing-search :projects="projects" @projectSearch="projectSearch" />
+          <v-toolbar flat rounded outlined class="my-4">
+          <v-text-field
+            v-model="search"
+            clearable
+            flat
+            solo
+            hide-details
+            prepend-inner-icon="mdi-magnify"
+            label="Search"
+          ></v-text-field>
+          </v-toolbar>
         </template>
         <template v-slot:default="props" class="my-2">
           <v-row>
-            <v-col cols="12" md="6" lg="4" v-if="page === 1">
-              <new-assessment-card />
-            </v-col>
             <v-col
               v-for="item in props.items"
-              :key="item.id"
+              :key="item.title"
               cols="12"
               md="6"
               lg="4"
             >
+              <new-assessment-card v-if="item.title === 'New Assessment'" />
               <project-card
+                v-else
                 :project="item"
                 @delete="checkDelete"
               ></project-card>
@@ -85,7 +95,6 @@ import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import LandingSearch from "@/components/landing/LandingSearch.vue";
 import LandingError from "@/components/landing/LandingError.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
@@ -97,7 +106,6 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
     NewAssessmentCard,
     LandingHeader,
     LandingFooter,
-    LandingSearch,
     LandingError,
     ConfirmDialog,
     SESnackBar,
@@ -110,7 +118,6 @@ export default class Landing extends Vue {
   itemsPerPage = 8;
   search = "";
   page = 1;
-  displayProjects: Project[] = [];
   projects: Project[] = [];
   loading = true;
   error = false;
@@ -128,6 +135,11 @@ export default class Landing extends Vue {
     const items = this.projects.length;
     if (!items) return 1;
     return Math.ceil(items / this.itemsPerPage);
+  }
+
+  get projectData() {
+    // console.log("data", ["new assessment", ...this.projects])
+    return [{ title: "New Assessment" }, ...this.projects];
   }
 
   nextPage() {
@@ -177,14 +189,6 @@ export default class Landing extends Vue {
   deleteSnackClose() {
     this.error = false;
     this.deleteSnack = false;
-  }
-
-  projectSearch(project: Project | undefined) {
-    if (project) {
-      this.displayProjects = [project];
-    } else {
-      this.displayProjects = this.projects;
-    }
   }
 
   async loadStreams() {
@@ -294,7 +298,6 @@ export default class Landing extends Vue {
         };
       });
 
-      this.displayProjects = this.projects;
       this.loading = false;
     } catch (err) {
       this.error = true;

@@ -51,8 +51,10 @@ export default class ViewAssessment extends Vue {
       });
 
     this.token = this.$store.state.token.token;
+  }
 
-    this.loadStream(this.assessment.streamId);
+  created() {
+    this.loadStream(this.$route.params.streamId);
   }
 
   async loadStream(streamId: string) {
@@ -60,14 +62,38 @@ export default class ViewAssessment extends Vue {
       "getActReportBranchInfo",
       streamId
     );
-    console.log(actReportBranchInfo);
-    return;
+    console.log(actReportBranchInfo.data.stream.branch.commits.items[0]);
+
+    const branchData = await this.$store.dispatch("getBranchData", [
+      streamId,
+      actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject,
+    ]);
+
+    this.assessment.projectInfo = {
+      name: branchData.data.stream.object.data.projectData.name,
+      type: branchData.data.stream.object.data.projectData.component,
+      reportDate: new Date(
+        actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
+      ),
+      author:
+        actReportBranchInfo.data.stream.branch.commits.items[0].authorName,
+      JN: "000001",
+      systemCost: branchData.data.stream.object.data.projectData.cost,
+      floorArea: branchData.data.stream.object.data.projectData.floorArea,
+      notes: "",
+      totalCO2e: Math.floor(branchData.data.stream.object.data.totalCO2 / 1000),
+      totalkgCO2e: Math.floor(branchData.data.stream.object.data.totalCO2),
+    };
+
+    console.log(branchData);
+    branchData.data.stream.object.children.objects.forEach((object) => {
+      console.log("---> object: \n", object.data.act);
+    });
   }
 
   get urlsLoaded() {
     return this.objectUrls.length > 0;
   }
-
   get projectInfo() {
     return this.assessment.projectInfo;
   }
@@ -77,21 +103,24 @@ export default class ViewAssessment extends Vue {
   get materialBreakdown() {
     return this.assessment.materialBreakdown;
   }
+  get streamId() {
+    return this.$route.params.streamId;
+  }
 
   assessment: AssessmentComplete = {
     // dummy data
     streamId: this.$route.params.streamId,
     projectInfo: {
-      name: "Super great project",
-      type: "Superstructure",
-      reportDate: new Date(2021, 11, 2),
-      author: "Tom Bunn",
+      name: "",
+      type: "",
+      reportDate: new Date(1946, 4, 1),
+      author: "",
       JN: "000001",
-      systemCost: 100000,
-      floorArea: 10000,
+      systemCost: 0,
+      floorArea: 0,
       notes: "",
-      totalCO2e: 3400,
-      totalkgCO2e: 340,
+      totalCO2e: 0,
+      totalkgCO2e: 0,
     },
     materialBreakdown: {
       materials: [
@@ -113,8 +142,8 @@ export default class ViewAssessment extends Vue {
       levels: [
         {
           name: "A1-A3",
-          tCO2e: 2800,
-          kgCO2e: 280,
+          tCO2e: 2.8,
+          kgCO2e: 2800,
         },
         {
           name: "A4",

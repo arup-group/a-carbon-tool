@@ -85,10 +85,87 @@ export default class ViewAssessment extends Vue {
       totalkgCO2e: Math.floor(branchData.data.stream.object.data.totalCO2),
     };
 
-    console.log(branchData);
-    branchData.data.stream.object.children.objects.forEach((object) => {
-      console.log("---> object: \n", object.data.act);
+    const levelsUpdated = {
+      levels: [
+        {
+          name: "A1-A3",
+          tCO2e: 0,
+          kgCO2e: 0,
+        },
+        {
+          name: "A4",
+          tCO2e: 0,
+          kgCO2e: 0,
+        },
+        {
+          name: "A5",
+          tCO2e: 0,
+          kgCO2e: 0,
+        },
+      ],
+    };
+
+    const materialBreakdownUpdated = {
+      materials: [
+        {
+          name: branchData.data.stream.object.children.objects[0].data.act
+            .formData.material.name,
+          value: 0,
+        },
+      ],
+    };
+
+    // console.log(branchData);
+    branchData.data.stream.object.children.objects.forEach((object: any) => {
+      console.log(object);
+      levelsUpdated.levels[0].kgCO2e +=
+        object.data.act.reportData.productStageCarbonA1A3;
+      levelsUpdated.levels[0].tCO2e +=
+        object.data.act.reportData.productStageCarbonA1A3 / 1000;
+      levelsUpdated.levels[1].kgCO2e +=
+        object.data.act.reportData.transportCarbonA4;
+      levelsUpdated.levels[1].tCO2e +=
+        object.data.act.reportData.transportCarbonA4 / 1000;
+      levelsUpdated.levels[2].kgCO2e +=
+        object.data.act.reportData.constructionCarbonA5.site;
+      levelsUpdated.levels[2].tCO2e +=
+        object.data.act.reportData.constructionCarbonA5.site / 1000;
+
+      var totalObjectCarbon =
+        object.data.act.reportData.productStageCarbonA1A3 +
+        object.data.act.reportData.transportCarbonA4 +
+        object.data.act.reportData.constructionCarbonA5.site;
+
+      var needToAddMaterial = false;
+
+      materialBreakdownUpdated.materials.forEach((material: any) => {
+        if ("name" in material) {
+          console.log("it found a materialk");
+          if (material.name === object.data.act.formData.material.name) {
+            material.value += totalObjectCarbon;
+          }
+        } else {
+          needToAddMaterial = true;
+        }
+      });
+
+      if (needToAddMaterial)
+        materialBreakdownUpdated.materials.push({
+          name: object.data.act.formData.material.name,
+          value: totalObjectCarbon,
+        });
     });
+
+    levelsUpdated.levels[0].kgCO2e = Math.ceil(levelsUpdated.levels[0].kgCO2e);
+    levelsUpdated.levels[0].tCO2e = Math.ceil(levelsUpdated.levels[0].tCO2e);
+    levelsUpdated.levels[1].kgCO2e = Math.ceil(levelsUpdated.levels[1].kgCO2e);
+    levelsUpdated.levels[1].tCO2e = Math.ceil(levelsUpdated.levels[1].tCO2e);
+    levelsUpdated.levels[2].kgCO2e = Math.ceil(levelsUpdated.levels[2].kgCO2e);
+    levelsUpdated.levels[2].tCO2e = Math.ceil(levelsUpdated.levels[2].tCO2e);
+
+    this.assessment.aBreakdown = levelsUpdated;
+    console.log(materialBreakdownUpdated);
+    this.assessment.materialBreakdown = materialBreakdownUpdated;
   }
 
   get urlsLoaded() {
@@ -142,18 +219,18 @@ export default class ViewAssessment extends Vue {
       levels: [
         {
           name: "A1-A3",
-          tCO2e: 2.8,
-          kgCO2e: 2800,
+          tCO2e: 0,
+          kgCO2e: 0,
         },
         {
           name: "A4",
-          tCO2e: 150,
-          kgCO2e: 15,
+          tCO2e: 0,
+          kgCO2e: 0,
         },
         {
           name: "A5",
-          tCO2e: 250,
-          kgCO2e: 25,
+          tCO2e: 0,
+          kgCO2e: 0,
         },
       ],
     },

@@ -3,6 +3,7 @@ export interface ProjectDataTemp {
   component: string | null;
   cost: number | null;
   floorArea: number | null;
+  region: string | null;
 }
 
 export interface ProjectDataComplete {
@@ -10,4 +11,5 @@ export interface ProjectDataComplete {
   component: string;
   cost: number;
   floorArea: number;
+  region: string;
 }

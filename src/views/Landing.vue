@@ -11,15 +11,15 @@
       >
         <template v-slot:header>
           <v-toolbar flat rounded outlined class="my-4">
-          <v-text-field
-            v-model="search"
-            clearable
-            flat
-            solo
-            hide-details
-            prepend-inner-icon="mdi-magnify"
-            label="Search"
-          ></v-text-field>
+            <v-text-field
+              v-model="search"
+              clearable
+              flat
+              solo
+              hide-details
+              prepend-inner-icon="mdi-magnify"
+              label="Search"
+            ></v-text-field>
           </v-toolbar>
         </template>
         <template v-slot:default="props" class="my-2">
@@ -138,7 +138,6 @@ export default class Landing extends Vue {
   }
 
   get projectData() {
-    // console.log("data", ["new assessment", ...this.projects])
     return [{ title: "New Assessment" }, ...this.projects];
   }
 

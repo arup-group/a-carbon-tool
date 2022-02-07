@@ -1,5 +1,5 @@
 <template>
-  <v-chip :color="color" style="color: black">{{ category }}</v-chip>
+  <v-chip :color="backgroundColor" :style="`color: ${color}`">{{ category }}</v-chip>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
@@ -15,12 +15,16 @@ type BECCategory =
 export interface BEC {
   name: BECCategory;
   color: string;
+  backgroundColor: string;
 }
 
 @Component
 export default class BECChip extends Vue {
   @Prop() category!: BECCategory;
 
+  get backgroundColor() {
+    return this.becs.find((b) => b.name === this.category)?.backgroundColor;
+  }
   get color() {
     return this.becs.find((b) => b.name === this.category)?.color;
   }
@@ -28,31 +32,38 @@ export default class BECChip extends Vue {
   becs: BEC[] = [
     {
       name: "Superstructure",
-      color: "#CD9CE3",
+      color: "white",
+      backgroundColor: "#224a63",
     },
     {
       name: "Substructure",
-      color: "#ED90CB",
+      color: "black",
+      backgroundColor: "#aeebdb",
     },
     {
       name: "Mechanical Services",
-      color: "#52C4BA",
+      color: "black",
+      backgroundColor: "#f0b4b4",
     },
     {
       name: "Electrical Services",
-      color: "#77DCCC",
+      color: "white",
+      backgroundColor: "#754792",
     },
     {
       name: "Public Health & Hydraulics",
-      color: "#BFF7EA",
+      color: "black",
+      backgroundColor: "#dbb5ea",
     },
     {
       name: "Space plan",
-      color: "#6CC9F6",
+      color: "white",
+      backgroundColor: "#4b97d2",
     },
     {
       name: "Building Envelope",
-      color: "#C3EAFE",
+      color: "black",
+      backgroundColor: "#82c7f1",
     },
   ];
 }

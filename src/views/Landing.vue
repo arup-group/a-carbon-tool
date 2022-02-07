@@ -73,6 +73,13 @@ import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingSearch from "@/components/landing/LandingSearch.vue";
 import LandingError from "@/components/landing/LandingError.vue";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
+import {
+  DeleteStreamData,
+  StreamReferenceBranches,
+  StreamReferenceObjects,
+} from "@/models/graphql";
+import { StreamData } from "@/models/graphql/StreamData.interface";
+import { DeleteBranchInput } from "@/store";
 
 @Component({
   components: {
@@ -86,8 +93,8 @@ import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
   },
 })
 export default class Landing extends Vue {
-  carbonBranches: any[] = [];
-  branchData: any[] = [];
+  carbonBranches: { id: string; name: string; branchid: string }[] = [];
+  branchData: { id: string; name: string; data: StreamData }[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
@@ -121,9 +128,19 @@ export default class Landing extends Vue {
     this.deleteid = streamid;
     this.dialog = true;
   }
-  agreeDelete() {
+  async agreeDelete() {
     this.dialog = false;
-    console.log("agree");
+    const stream = this.carbonBranches.find(c => c.id === this.deleteid);
+    if (stream) {
+      const input: DeleteBranchInput = {
+        streamid: stream.id,
+        branchid: stream.branchid
+      }
+      const deleted: DeleteStreamData = await this.$store.dispatch("deleteBranch", input);
+      if (deleted.data.branchDelete) {
+        this.loadStreams();
+      } // else, TODO: ADD ERROR HANDLING
+    }
     return;
   }
   cancelDelete() {
@@ -142,39 +159,54 @@ export default class Landing extends Vue {
   async loadStreams() {
     this.loading = true;
     this.error = false;
+    this.projects = [];
+    this.carbonBranches = [];
+    this.branchData = [];
     try {
+      // get all of the user's streams
       const streams = await this.$store.dispatch("getUserStreams");
-      const streamID = streams.data.user.streams.items.map((stream: any) => {
-        return { name: stream.name, id: stream.id };
-      });
-      const streamBranches: any[] = [];
+      // format the streams into a more usable format
+      const streamID: { name: string; id: string }[] =
+        streams.data.user.streams.items.map((stream: any) => {
+          return { name: stream.name, id: stream.id };
+        });
+      // get all of the branches that are on each stream
+      const streamBranches: {
+        branches: StreamReferenceBranches;
+        stream: { id: string; name: string };
+      }[] = [];
       for (let i = 0; i < streamID.length; i++) {
-        const branches = await this.$store.dispatch(
+        const branches: StreamReferenceBranches = await this.$store.dispatch(
           "getStreamBranches",
           streamID[i].id
         );
-        streamBranches.push([branches, streamID[i]]);
+        streamBranches.push({ branches, stream: streamID[i] });
       }
+      // filter those branches to only the "actcarbonreport" branches
       for (let i = 0; i < streamBranches.length; i++) {
-        streamBranches[i][0].data.stream.branches.items.forEach(
-          (branch: any) => {
+        streamBranches[i].branches.data.stream.branches.items.forEach(
+          (branch) => {
             if (branch.name === "actcarbonreport") {
-              this.carbonBranches.push(streamBranches[i][1]);
+              this.carbonBranches.push({
+                ...streamBranches[i].stream,
+                branchid: branch.id,
+              });
             }
           }
         );
       }
+      // get the most recent commit and the data from that commit
       for (let i = 0; i < this.carbonBranches.length; i++) {
         const branchCommit = await this.$store.dispatch(
           "getStreamCommit",
-          streamBranches[i][1].id
+          this.carbonBranches[i].id
         );
         var carbonCommit = "";
         if (branchCommit.data.stream.branch) {
           carbonCommit =
             branchCommit.data.stream.branch.commits.items[0].referencedObject;
         }
-        const branch = await this.$store.dispatch("getBranchData", [
+        const branch: StreamData = await this.$store.dispatch("getBranchData", [
           this.carbonBranches[i].id,
           carbonCommit,
         ]);
@@ -186,10 +218,11 @@ export default class Landing extends Vue {
           });
         }
       }
-      const co2Obj: {
-        [key: string]: { value: number; color: string };
-      } = {};
+      // convert the data into the format that this page needs it to be in
       this.projects = this.branchData.map((proj) => {
+        const co2Obj: {
+          [key: string]: { value: number; color: string };
+        } = {};
         const children = proj.data.data.stream.object.children.objects;
         children.forEach((material: any) => {
           const materialValue =
@@ -215,13 +248,11 @@ export default class Landing extends Vue {
           }
         });
         const co2Arr = Object.entries(co2Obj);
-        const co2Data = co2Arr.map((obj) => {
-          return {
+        const co2Data = co2Arr.map((obj) => ({
             label: obj[0],
             value: obj[1].value,
             color: obj[1].color,
-          };
-        });
+        }));
         return {
           title: `${proj.name}`,
           id: `${proj.id}`,

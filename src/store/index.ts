@@ -15,6 +15,7 @@ import {
   speckleLogOut,
   uploadObjects,
   getStreamCommit,
+  deleteBranch,
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
@@ -202,7 +203,14 @@ export default new Vuex.Store({
       const streams = await getStreamObjects(context, streamid);
       return streams;
     },
-
+    async deleteBranch(context, input: DeleteBranchInput) {
+      const branch = await deleteBranch(
+        context,
+        input.streamid,
+        input.branchid
+      );
+      return branch;
+    },
     async getStreamBranches(context, streamid: string) {
       const streams = await getStreamBranches(context, streamid);
       return streams;
@@ -326,6 +334,11 @@ export default new Vuex.Store({
   modules: {},
   plugins: [createPersistedState()],
 });
+
+export interface DeleteBranchInput {
+  streamid: string;
+  branchid: string;
+}
 
 interface CreateCommitRes {
   data: {

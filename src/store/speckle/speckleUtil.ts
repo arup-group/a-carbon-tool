@@ -15,7 +15,8 @@ import {
   uploadObjectWithChildrenMutation,
   createCommitMutation,
   streamReferencedBranches,
-  streamCommmitObjects
+  streamCommmitObjects,
+  actReportBranchInfo,
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
@@ -156,6 +157,12 @@ export const getBranchData = (
   objId: string
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(streamsDataQuery(streamid, objId), context);
+
+export const getActReportBranchInfo = (
+  context: any,
+  streamId: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(actReportBranchInfo(streamId), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

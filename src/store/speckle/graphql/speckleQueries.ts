@@ -57,11 +57,13 @@ export const uploadObjectWithChildrenMutation = (
     objects: [{
       __closure: ${JSON.stringify(
         Object.fromEntries(children.map((c) => [c, 1]))
-      ).replace(/"([^"]+)":/g, '$1:')},
+      ).replace(/"([^"]+)":/g, "$1:")},
       speckleType: "act-totals",
       transportCarbonA4: ${object.transportCarbonA4},
       productStageCarbonA1A3: ${object.productStageCarbonA1A3},
-      constructionCarbonA5: ${JSON.stringify(object.constructionCarbonA5).replace(/"([^"]+)":/g, '$1:')},
+      constructionCarbonA5: ${JSON.stringify(
+        object.constructionCarbonA5
+      ).replace(/"([^"]+)":/g, "$1:")},
       totalCO2: ${object.totalCO2}
     }]
   })
@@ -77,8 +79,8 @@ export const uploadObjectsMutation = (
       objects.map((o) => ({
         speckleType: "act-object",
         act: o,
-      }))).replace(/"([^"]+)":/g, '$1:')
-    }
+      }))
+    ).replace(/"([^"]+)":/g, "$1:")}
   })
 }
 `;
@@ -124,5 +126,20 @@ export const streamReferencedBranches = (id: string) => `query {
         name
       }
     }
+  }
+}`;
+
+export const actReportBranchInfo = (id: string) => `query {
+  stream(id: "${id}") {
+    name
+    branch(name: "actcarbonreport") {
+    commits {
+      items {
+        authorName
+        createdAt
+      	referencedObject
+      }
+    }
+  }
   }
 }`;

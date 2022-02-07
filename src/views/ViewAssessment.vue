@@ -51,6 +51,17 @@ export default class ViewAssessment extends Vue {
       });
 
     this.token = this.$store.state.token.token;
+
+    this.loadStream(this.assessment.streamId);
+  }
+
+  async loadStream(streamId: string) {
+    const actReportBranchInfo = await this.$store.dispatch(
+      "getActReportBranchInfo",
+      streamId
+    );
+    console.log(actReportBranchInfo);
+    return;
   }
 
   get urlsLoaded() {

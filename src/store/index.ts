@@ -15,6 +15,7 @@ import {
   speckleLogOut,
   uploadObjects,
   getStreamCommit,
+  getActReportBranchInfo,
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
@@ -216,6 +217,14 @@ export default new Vuex.Store({
     async getBranchData(context, [streamid, objId]) {
       const streams = await getBranchData(context, streamid, objId);
       return streams;
+    },
+
+    async getActReportBranchInfo(context, streamId) {
+      const actReportBranchInfo = await getActReportBranchInfo(
+        context,
+        streamId
+      );
+      return actReportBranchInfo;
     },
 
     async getObjectUrls(context, streamid: string) {

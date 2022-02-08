@@ -5,21 +5,23 @@ export interface StreamData {
   data: {
     stream: {
       object: {
-        data: {
-          constructionCarbonA5: CarbonA5
-          id: string
-          productStageCarbonA1A3: number
-          projectData: ProjectDataComplete
-          speckleType: string
-          speckle_type: string
-          totalCO2: number
-          totalChildrenCount: number
-          transportCarbonA4: number
-        };
+        data: ParentSpeckleObjectData;
         children: {
           objects: { data: any }[];
         };
       };
     };
   };
+}
+
+export interface ParentSpeckleObjectData {
+  constructionCarbonA5: CarbonA5;
+  id: string;
+  productStageCarbonA1A3: number;
+  projectData: ProjectDataComplete;
+  speckleType: string;
+  speckle_type: string;
+  totalCO2: number;
+  totalChildrenCount: number;
+  transportCarbonA4: number;
 }

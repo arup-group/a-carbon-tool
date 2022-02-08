@@ -34,6 +34,7 @@ import {
 import createPersistedState from "vuex-persistedstate";
 
 import { BEC, BECCategory } from "@/models/shared";
+import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 
 Vue.use(Vuex);
 
@@ -63,10 +64,7 @@ export default new Vuex.Store({
 
     // Carbon data
     selectedRegion: "UK",
-    availableRegions: [
-      "India",
-      "UK"
-    ],
+    availableRegions: ["India", "UK"],
     becs: [
       {
         name: "Superstructure" as BECCategory,
@@ -118,7 +116,7 @@ export default new Vuex.Store({
       "Plastic",
       "Steel",
       "Stone",
-      "Timber"
+      "Timber",
     ],
     transportTypes: [
       {
@@ -164,7 +162,8 @@ export default new Vuex.Store({
 
     // needs updating to cover region selection
     materialsArr: (state): MaterialFull[] => {
-      const region: keyof AllMaterialCarbonFactors = state.selectedRegion as keyof AllMaterialCarbonFactors
+      const region: keyof AllMaterialCarbonFactors =
+        state.selectedRegion as keyof AllMaterialCarbonFactors;
       const tmparr = (
         Object.keys(materialCarbonFactors[region]) as Array<
           keyof RegionMaterialCarbonFactors
@@ -213,13 +212,12 @@ export default new Vuex.Store({
       state.darkMode = state.darkMode ? false : true;
     },
     setRegion(state, region) {
-      state.selectedRegion = region
-    }
+      state.selectedRegion = region;
+    },
   },
   actions: {
-
     changeRegion(context, region) {
-      context.commit("setRegion", region)
+      context.commit("setRegion", region);
     },
 
     // Auth
@@ -363,20 +361,24 @@ export default new Vuex.Store({
       // below line means that some objects may be given duplicate strings and the report won't save properly
       // TODO: FIND SOME BETTER WAY OF SETTING THE OBJECT ID
       const objectid = Math.floor(Math.random() * 1000000).toString();
+      const objectData: ParentSpeckleObjectData = {
+        id: objectid,
+        speckleType: "act-totals",
+        speckle_type: "act-totals",
+        transportCarbonA4: reportTotals.transportCarbonA4,
+        productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
+        constructionCarbonA5: reportTotals.constructionCarbonA5,
+        totalCO2: reportTotals.totalCO2,
+        projectData,
+        totalChildrenCount: 0,
+      };
       formData.append(
         "batch1",
         new Blob([
           JSON.stringify([
             {
-              id: objectid,
+              ...objectData,
               __closure: Object.fromEntries(children.map((c) => [c, 1])),
-              speckleType: "act-totals",
-              speckle_type: "act-totals",
-              transportCarbonA4: reportTotals.transportCarbonA4,
-              productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
-              constructionCarbonA5: reportTotals.constructionCarbonA5,
-              totalCO2: reportTotals.totalCO2,
-              projectData,
             },
           ]),
         ])

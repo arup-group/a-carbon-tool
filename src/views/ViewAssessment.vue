@@ -11,8 +11,13 @@
       class="renderer"
     />
     <div class="d-flex flex-column justify-space-between card-container">
-      <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
+      <a-breakdown-card
+        v-if="urlsLoaded"
+        class="card"
+        :aBreakdown="aBreakdown"
+      />
       <material-breakdown-card
+        v-if="urlsLoaded"
         class="card"
         :materialBreakdown="materialBreakdown"
       />
@@ -42,6 +47,7 @@ import ViewAssessmentButtons from "@/components/ViewAssessmentButtons.vue";
 export default class ViewAssessment extends Vue {
   objectUrls: string[] = [];
   token!: string;
+  chartDataReady!: boolean;
 
   mounted() {
     this.$store
@@ -53,8 +59,9 @@ export default class ViewAssessment extends Vue {
     this.token = this.$store.state.token.token;
   }
 
-  created() {
-    this.loadStream(this.$route.params.streamId);
+  async created() {
+    this.chartDataReady = await this.loadStream(this.$route.params.streamId);
+    console.log(this.chartDataReady);
   }
 
   async loadStream(streamId: string) {
@@ -62,7 +69,7 @@ export default class ViewAssessment extends Vue {
       "getActReportBranchInfo",
       streamId
     );
-    console.log(actReportBranchInfo.data.stream.branch.commits.items[0]);
+    // console.log(actReportBranchInfo.data.stream.branch.commits.items[0]);
 
     const branchData = await this.$store.dispatch("getBranchData", [
       streamId,
@@ -117,7 +124,7 @@ export default class ViewAssessment extends Vue {
 
     // console.log(branchData);
     branchData.data.stream.object.children.objects.forEach((object: any) => {
-      console.log(object);
+      // console.log(object);
       levelsUpdated.levels[0].kgCO2e +=
         object.data.act.reportData.productStageCarbonA1A3;
       levelsUpdated.levels[0].tCO2e +=
@@ -140,7 +147,7 @@ export default class ViewAssessment extends Vue {
 
       materialBreakdownUpdated.materials.forEach((material: any) => {
         if ("name" in material) {
-          console.log("it found a materialk");
+          // console.log("it found a material");
           if (material.name === object.data.act.formData.material.name) {
             material.value += totalObjectCarbon;
           }
@@ -163,13 +170,28 @@ export default class ViewAssessment extends Vue {
     levelsUpdated.levels[2].kgCO2e = Math.ceil(levelsUpdated.levels[2].kgCO2e);
     levelsUpdated.levels[2].tCO2e = Math.ceil(levelsUpdated.levels[2].tCO2e);
 
+    console.log("---> levels updated \n", levelsUpdated);
     this.assessment.aBreakdown = levelsUpdated;
-    console.log(materialBreakdownUpdated);
+    console.log("---> material breakdown \n", materialBreakdownUpdated);
     this.assessment.materialBreakdown = materialBreakdownUpdated;
+
+    return true;
   }
 
   get urlsLoaded() {
-    return this.objectUrls.length > 0;
+    console.log("---> Urls: ", this.objectUrls.length > 0);
+    console.log("---> chart data", this.chartDataReady);
+    return this.objectUrls.length > 0 && this.chartDataReady;
+    // return async () => {
+    //   try {
+    //     return (
+    //       this.objectUrls.length > 0 &&
+    //       (await this.loadStream(this.$route.params.streamId))
+    //     );
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // };
   }
   get projectInfo() {
     return this.assessment.projectInfo;
@@ -204,14 +226,6 @@ export default class ViewAssessment extends Vue {
         {
           name: "some value 1",
           value: 50,
-        },
-        {
-          name: "some value 2",
-          value: 20,
-        },
-        {
-          name: "some value 3",
-          value: 10,
         },
       ],
     },

@@ -1,0 +1,1 @@
+export { BECCategory, BEC } from "./BEC.model";

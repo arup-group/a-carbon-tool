@@ -32,7 +32,8 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
-import { DeleteStreamData } from "@/models/graphql";
+
+import { BEC, BECCategory } from "@/models/shared";
 
 Vue.use(Vuex);
 
@@ -59,21 +60,49 @@ export default new Vuex.Store({
     serverInfo: null,
 
     darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
-    
+
     // Carbon data
     selectedRegion: "UK",
     availableRegions: [
       "India",
       "UK"
     ],
-    buildingElementCategories: [
-      "Substructure",
-      "Superstructure",
-      "Mechanical Services",
-      "Electrical Services",
-      "Public Health & Hydraulics",
-      "Building Envelope",
-      "Space Plan",
+    becs: [
+      {
+        name: "Superstructure" as BECCategory,
+        color: "white",
+        backgroundColor: "#224a63",
+      },
+      {
+        name: "Substructure" as BECCategory,
+        color: "black",
+        backgroundColor: "#aeebdb",
+      },
+      {
+        name: "Mechanical Services" as BECCategory,
+        color: "black",
+        backgroundColor: "#f0b4b4",
+      },
+      {
+        name: "Electrical Services" as BECCategory,
+        color: "white",
+        backgroundColor: "#754792",
+      },
+      {
+        name: "Public Health & Hydraulics" as BECCategory,
+        color: "black",
+        backgroundColor: "#dbb5ea",
+      },
+      {
+        name: "Space plan" as BECCategory,
+        color: "white",
+        backgroundColor: "#4b97d2",
+      },
+      {
+        name: "Building Envelope" as BECCategory,
+        color: "black",
+        backgroundColor: "#82c7f1",
+      },
     ],
     materialCategories: [
       "Aluminium",
@@ -136,7 +165,6 @@ export default new Vuex.Store({
     // needs updating to cover region selection
     materialsArr: (state): MaterialFull[] => {
       const region: keyof AllMaterialCarbonFactors = state.selectedRegion as keyof AllMaterialCarbonFactors
-      console.log("materialsArr")
       const tmparr = (
         Object.keys(materialCarbonFactors[region]) as Array<
           keyof RegionMaterialCarbonFactors

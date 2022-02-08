@@ -68,7 +68,7 @@
       :dialog="dialog"
       @agree="agreeDelete"
       @cancel="cancelDelete"
-      message="Are you sure you want to delete this report?"
+      message="Are you sure you want to perminantly delete this report for all users? This action is not reversable"
     />
     <SESnackBar
       @close="deleteSnackClose"

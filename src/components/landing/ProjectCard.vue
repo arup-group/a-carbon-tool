@@ -4,7 +4,7 @@
       <v-card flat height="600">
         <v-card-title>
           <v-row>
-            <v-col cols="7">
+            <v-col cols="7" class="limit-lines">
               {{ title }}
             </v-col>
             <v-col cols="5" align="right">
@@ -33,7 +33,11 @@
           <v-spacer></v-spacer>
           <div>
             <landing-options @delete="checkDelete" />
-            <v-select :menu-props="{value: options}" v-if="options" :items="['one','two']" />
+            <v-select
+              :menu-props="{ value: options }"
+              v-if="options"
+              :items="['one', 'two']"
+            />
             <v-btn icon color="primary">
               <v-icon>mdi-share-variant</v-icon>
             </v-btn>
@@ -56,7 +60,6 @@ import DoughnutChart from "../charts/DoughnutChart.vue";
 import BECChip from "../shared/BECChip.vue";
 import LandingOptions from "./LandingOptions.vue";
 
-
 @Component({
   components: { DoughnutChart, BECChip, LandingOptions },
 })
@@ -69,10 +72,10 @@ export default class ProjectCard extends Vue {
     return this.project.title;
   }
   get co2Values(): ChartData[] {
-    return this.project.co2Values.map(c => ({
+    return this.project.co2Values.map((c) => ({
       label: c.label,
       value: this.convertKgToTonnes(c.value),
-      color: c.color
+      color: c.color,
     }));
   }
   get co2Total() {
@@ -92,7 +95,7 @@ export default class ProjectCard extends Vue {
 
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp
-    return Math.round(value * 0.001)
+    return Math.round(value * 0.001);
   }
 
   open() {
@@ -101,3 +104,12 @@ export default class ProjectCard extends Vue {
   }
 }
 </script>
+<style scoped>
+.limit-lines {
+  display: -webkit-box;/* or inline-block */
+  overflow: hidden;
+  max-height: 4em;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+</style>

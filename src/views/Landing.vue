@@ -287,8 +287,9 @@ export default class Landing extends Vue {
           value: obj[1].value,
           color: obj[1].color,
         }));
+        const projName = proj.data.data.stream.object.data.projectData.name;
         return {
-          title: `${proj.name}`,
+          title: `${projName} - ${proj.name}`,
           id: `${proj.id}`,
           co2Values: co2Data,
           totalCO2e: proj.data.data.stream.object.data.totalCO2,

@@ -31,6 +31,7 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
+import { productStageCarbonA1A3 } from "./utilities/carbonCalculator";
 
 Vue.use(Vuex);
 
@@ -143,8 +144,9 @@ export default new Vuex.Store({
       ).map((type) => {
         const arr: MaterialFull[] = [];
         Object.keys(materialCarbonFactors[region][type]).forEach((t) => {
+          const material = materialCarbonFactors[region][type][t];
           const toPush: MaterialFull = {
-            name: `${type} - ${t}`,
+            name: `${type} - ${t} (${ (Math.round(100*material.productStageCarbonA1A3)/100) } kgCO2e/kg)`,
             ...materialCarbonFactors[region][type][t],
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
           };

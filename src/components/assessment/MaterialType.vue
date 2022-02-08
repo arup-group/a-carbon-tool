@@ -1,13 +1,23 @@
 <template>
-  <div class="d-flex align-center justify-space-between">
-    <div>{{ cleanType(type.type) }}</div>
-    <v-combobox
-      :items="materials"
-      :item-text="(materials) => materials['name']"
-      style="max-width: 50%"
-      @change="checkMaterialUpdated"
-    ></v-combobox>
-  </div>
+  <v-card flat>
+    <v-row dense>
+      <v-col cols='12' md="6">
+        <v-chip>{{ cleanType(type.type) }}</v-chip>
+      </v-col>
+      <v-col coles="12" md="6">
+        <v-combobox
+          :items="materials"
+          :item-text="(materials) => materials['name']"
+          
+          @change="checkMaterialUpdated"
+        ></v-combobox>
+      </v-col>
+    </v-row>
+    <div class="d-flex align-center justify-space-between">
+      
+    </div>
+  </v-card>
+  
 </template>
 <script lang="ts">
 import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";

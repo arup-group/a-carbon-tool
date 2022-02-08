@@ -17,6 +17,7 @@ import {
   getStreamCommit,
   getActReportBranchInfo,
 } from "./speckle/speckleUtil";
+import { loadStream } from "@/views/utils/viewAssessmentUtils";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 import {
@@ -226,7 +227,9 @@ export default new Vuex.Store({
       );
       return actReportBranchInfo;
     },
-
+    async loadActReportData(context, streamId: string) {
+      return await loadStream(context, streamId);
+    },
     async getObjectUrls(context, streamid: string) {
       const objectIds = await getStreamObjects(context, streamid);
 

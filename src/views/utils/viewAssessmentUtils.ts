@@ -1,16 +1,34 @@
+import {
+  getBranchData,
+  getActReportBranchInfo,
+} from "@/store/speckle/speckleUtil";
+
 export async function loadStream(context: any, streamId: string) {
-  const actReportBranchInfo = await this.$store.dispatch(
-    "getActReportBranchInfo",
-    streamId
-  );
-  // console.log(actReportBranchInfo.data.stream.branch.commits.items[0]);
+//   console.log("viewAssessmentUtils: \n", context);
+//   console.log(context.$store);
+  //   const actReportBranchInfo = await context.$store.dispatch(
+  //     "getActReportBranchInfo",
+  //     streamId
+  //   );
 
-  const branchData = await this.$store.dispatch("getBranchData", [
+  //   // console.log(actReportBranchInfo.data.stream.branch.commits.items[0]);
+
+  //   const branchData = await context.$store.dispatch("getBranchData", [
+  //     streamId,
+  //     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject,
+  //   ]);
+
+  const actReportBranchInfo = await getActReportBranchInfo(context, streamId);
+
+  const branchData = await getBranchData(
+    context,
     streamId,
-    actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject,
-  ]);
+    actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject
+  );
 
-  this.assessment.projectInfo = {
+  console.log("---> branchData", branchData);
+
+  const projectInfoUpdated = {
     name: branchData.data.stream.object.data.projectData.name,
     type: branchData.data.stream.object.data.projectData.component,
     reportDate: new Date(
@@ -71,12 +89,12 @@ export async function loadStream(context: any, streamId: string) {
     levelsUpdated.levels[2].tCO2e +=
       object.data.act.reportData.constructionCarbonA5.site / 1000;
 
-    var totalObjectCarbon =
+    const totalObjectCarbon =
       object.data.act.reportData.productStageCarbonA1A3 +
       object.data.act.reportData.transportCarbonA4 +
       object.data.act.reportData.constructionCarbonA5.site;
 
-    var needToAddMaterial = false;
+    let needToAddMaterial = false;
 
     materialBreakdownUpdated.materials.forEach((material: any) => {
       if ("name" in material) {
@@ -102,11 +120,6 @@ export async function loadStream(context: any, streamId: string) {
   levelsUpdated.levels[1].tCO2e = Math.ceil(levelsUpdated.levels[1].tCO2e);
   levelsUpdated.levels[2].kgCO2e = Math.ceil(levelsUpdated.levels[2].kgCO2e);
   levelsUpdated.levels[2].tCO2e = Math.ceil(levelsUpdated.levels[2].tCO2e);
-
-  console.log("---> levels updated \n", levelsUpdated);
-  this.assessment.aBreakdown = levelsUpdated;
-  console.log("---> material breakdown \n", materialBreakdownUpdated);
-  this.assessment.materialBreakdown = materialBreakdownUpdated;
 
   return {
     streamId: streamId,

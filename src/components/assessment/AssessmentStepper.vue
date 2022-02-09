@@ -7,7 +7,7 @@
   >
     <v-card style="width: 100%; overflow-y: scroll; height: 85vh">
       <v-card-title class="">New Assessment</v-card-title>
-      <v-stepper style="height: 100%" v-model="step" vertical>
+      <v-stepper v-model="step" vertical>
         <v-stepper-step :complete="completed" step="1" @click.native="step = 1">
           Data
         </v-stepper-step>

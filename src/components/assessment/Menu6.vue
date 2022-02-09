@@ -8,7 +8,6 @@
 </template>
 <script lang="ts">
 import { ReportPassdown } from "@/models/newAssessment";
-import { AssessmentComplete } from "@/models/assessment";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 
@@ -27,40 +26,44 @@ export default class Menu6 extends Vue {
     }
   }
   get aBreakdown() {
-    return this.assessment.aBreakdown;
+    if (this.report) {
+      return {
+        levels: [
+          {
+            name: "A1-A3",
+            kgCO2e: this.report.totals.productStageCarbonA1A3,
+            tCO2e: Math.round(
+              this.report.totals.productStageCarbonA1A3 * 0.001
+            ),
+          },
+          {
+            name: "A4",
+            kgCO2e: this.report.totals.transportCarbonA4,
+            tCO2e: Math.round(this.report.totals.transportCarbonA4 * 0.001),
+          },
+          {
+            name: "A5",
+            kgCO2e:
+              this.report.totals.constructionCarbonA5.value +
+              this.report.totals.constructionCarbonA5.waste +
+              this.report.totals.constructionCarbonA5.site,
+            tCO2e:
+              Math.round(
+                this.report.totals.constructionCarbonA5.value * 0.001
+              ) +
+              Math.round(
+                this.report.totals.constructionCarbonA5.waste * 0.001
+              ) +
+              Math.round(this.report.totals.constructionCarbonA5.site * 0.001),
+          },
+        ],
+      };
+    } else {
+      return "";
+    }
   }
 
-  assessment: AssessmentComplete = {
-    // dummy data
-    streamId: "67899fd79d",
-    projectInfo: {
-      name: "Super great project",
-      type: "Superstructure",
-      reportDate: new Date(2021, 11, 2),
-      author: "Tom Bunn",
-      JN: "000001",
-      systemCost: 100000,
-      floorArea: 10000,
-      notes: "",
-      totalCO2e: 3400,
-      totalkgCO2e: 340,
-    },
-    materialBreakdown: {
-      materials: [
-        {
-          name: "some value 1",
-          value: 50,
-        },
-        {
-          name: "some value 2",
-          value: 20,
-        },
-        {
-          name: "some value 3",
-          value: 10,
-        },
-      ],
-    },
+  assessment = {
     aBreakdown: {
       levels: [
         {

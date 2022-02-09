@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p>Menu7 working!</p>
     <v-btn :disabled="!canSave" @click="save" color="primary">Save</v-btn>
   </div>
 </template>

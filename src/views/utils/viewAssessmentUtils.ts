@@ -4,8 +4,8 @@ import {
 } from "@/store/speckle/speckleUtil";
 
 export async function loadStream(context: any, streamId: string) {
-//   console.log("viewAssessmentUtils: \n", context);
-//   console.log(context.$store);
+  //   console.log("viewAssessmentUtils: \n", context);
+  //   console.log(context.$store);
   //   const actReportBranchInfo = await context.$store.dispatch(
   //     "getActReportBranchInfo",
   //     streamId
@@ -122,9 +122,12 @@ export async function loadStream(context: any, streamId: string) {
   levelsUpdated.levels[2].tCO2e = Math.ceil(levelsUpdated.levels[2].tCO2e);
 
   return {
-    streamId: streamId,
-    projectInfo: projectInfoUpdated,
-    materialBreakdown: materialBreakdownUpdated,
-    aBreakdown: levelsUpdated,
+    ready: true,
+    data: {
+      streamId: streamId,
+      projectInfo: projectInfoUpdated,
+      materialBreakdown: materialBreakdownUpdated,
+      aBreakdown: levelsUpdated,
+    },
   };
 }

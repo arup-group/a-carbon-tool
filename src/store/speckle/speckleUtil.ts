@@ -3,6 +3,7 @@ import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 import {
   StreamReferenceObjects,
   StreamReferenceBranches,
+  StreamData,
 } from "@/models/graphql";
 
 import {
@@ -155,7 +156,7 @@ export const getBranchData = (
   context: any,
   streamid: string,
   objId: string
-): Promise<StreamReferenceObjects> =>
+): Promise<StreamData> =>
   speckleFetch(streamsDataQuery(streamid, objId), context);
 
 export const getActReportBranchInfo = (

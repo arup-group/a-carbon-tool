@@ -6,8 +6,6 @@ import {
 export async function loadStream(context: any, streamId: string) {
   const actReportBranchInfo = await getActReportBranchInfo(context, streamId);
 
-  console.log(actReportBranchInfo);
-
   const branchData = await getBranchData(
     context,
     streamId,
@@ -49,56 +47,48 @@ export async function loadStream(context: any, streamId: string) {
     ],
   };
 
-  const materialBreakdownUpdated = {
-    materials: [
-      {
-        name: branchData.data.stream.object.children.objects[0].data.act
-          .formData.material.name,
-        value: 0,
-      },
-    ],
-  };
-
-  // console.log(branchData);
+  const co2Obj: { [key: string]: number } = {};
   branchData.data.stream.object.children.objects.forEach((object: any) => {
-    // console.log(object);
-    levelsUpdated.levels[0].kgCO2e +=
-      object.data.act.reportData.productStageCarbonA1A3;
+    levelsUpdated.levels[0].kgCO2e += parseFloat(
+      object.data.act.reportData.productStageCarbonA1A3
+    );
     levelsUpdated.levels[0].tCO2e +=
-      object.data.act.reportData.productStageCarbonA1A3 / 1000;
-    levelsUpdated.levels[1].kgCO2e +=
-      object.data.act.reportData.transportCarbonA4;
+      parseFloat(object.data.act.reportData.productStageCarbonA1A3) / 1000;
+    levelsUpdated.levels[1].kgCO2e += parseFloat(
+      object.data.act.reportData.transportCarbonA4
+    );
     levelsUpdated.levels[1].tCO2e +=
-      object.data.act.reportData.transportCarbonA4 / 1000;
-    levelsUpdated.levels[2].kgCO2e +=
-      object.data.act.reportData.constructionCarbonA5.site;
+      parseFloat(object.data.act.reportData.transportCarbonA4) / 1000;
+    levelsUpdated.levels[2].kgCO2e += parseFloat(
+      object.data.act.reportData.constructionCarbonA5.value
+    );
     levelsUpdated.levels[2].tCO2e +=
-      object.data.act.reportData.constructionCarbonA5.site / 1000;
+      parseFloat(object.data.act.reportData.constructionCarbonA5.value) / 1000;
 
     const totalObjectCarbon =
-      object.data.act.reportData.productStageCarbonA1A3 +
-      object.data.act.reportData.transportCarbonA4 +
-      object.data.act.reportData.constructionCarbonA5.site;
+      parseFloat(object.data.act.reportData.productStageCarbonA1A3) +
+      parseFloat(object.data.act.reportData.transportCarbonA4) +
+      parseFloat(object.data.act.reportData.constructionCarbonA5.value);
 
-    let needToAddMaterial = false;
-
-    materialBreakdownUpdated.materials.forEach((material: any) => {
-      if ("name" in material) {
-        // console.log("it found a material");
-        if (material.name === object.data.act.formData.material.name) {
-          material.value += totalObjectCarbon;
-        }
-      } else {
-        needToAddMaterial = true;
-      }
-    });
-
-    if (needToAddMaterial)
-      materialBreakdownUpdated.materials.push({
-        name: object.data.act.formData.material.name,
-        value: totalObjectCarbon,
-      });
+    const materialKey = object.data.act.formData.material.name;
+    if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
+      co2Obj[materialKey] += totalObjectCarbon;
+    } else {
+      co2Obj[materialKey] = totalObjectCarbon;
+    }
   });
+
+  const co2Arr = Object.entries(co2Obj);
+  const materials = co2Arr.map((obj) => {
+    return {
+      name: obj[0],
+      value: obj[1],
+    };
+  });
+
+  const materialBreakdownUpdated = {
+    materials,
+  };
 
   levelsUpdated.levels[0].kgCO2e = Math.ceil(levelsUpdated.levels[0].kgCO2e);
   levelsUpdated.levels[0].tCO2e = Math.ceil(levelsUpdated.levels[0].tCO2e);

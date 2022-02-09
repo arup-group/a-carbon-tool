@@ -15,6 +15,7 @@ import {
   speckleLogOut,
   uploadObjects,
   getStreamCommit,
+  deleteBranch,
 } from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
@@ -31,6 +32,9 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
+
+import { BECName } from "@/models/shared";
+import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 
 Vue.use(Vuex);
 
@@ -57,21 +61,46 @@ export default new Vuex.Store({
     serverInfo: null,
 
     darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
-    
+
     // Carbon data
     selectedRegion: "UK",
-    availableRegions: [
-      "India",
-      "UK"
-    ],
-    buildingElementCategories: [
-      "Substructure",
-      "Superstructure",
-      "Mechanical Services",
-      "Electrical Services",
-      "Public Health & Hydraulics",
-      "Building Envelope",
-      "Space Plan",
+    availableRegions: ["India", "UK"],
+    becs: [
+      {
+        name: "Superstructure" as BECName,
+        color: "white",
+        backgroundColor: "#224a63",
+      },
+      {
+        name: "Substructure" as BECName,
+        color: "black",
+        backgroundColor: "#aeebdb",
+      },
+      {
+        name: "Mechanical Services" as BECName,
+        color: "black",
+        backgroundColor: "#f0b4b4",
+      },
+      {
+        name: "Electrical Services" as BECName,
+        color: "white",
+        backgroundColor: "#754792",
+      },
+      {
+        name: "Public Health & Hydraulics" as BECName,
+        color: "black",
+        backgroundColor: "#dbb5ea",
+      },
+      {
+        name: "Space plan" as BECName,
+        color: "white",
+        backgroundColor: "#4b97d2",
+      },
+      {
+        name: "Building Envelope" as BECName,
+        color: "black",
+        backgroundColor: "#82c7f1",
+      },
     ],
     materialCategories: [
       "Aluminium",
@@ -87,7 +116,7 @@ export default new Vuex.Store({
       "Plastic",
       "Steel",
       "Stone",
-      "Timber"
+      "Timber",
     ],
     transportTypes: [
       {
@@ -133,8 +162,8 @@ export default new Vuex.Store({
 
     // needs updating to cover region selection
     materialsArr: (state): MaterialFull[] => {
-      const region: keyof AllMaterialCarbonFactors = state.selectedRegion as keyof AllMaterialCarbonFactors
-      console.log("materialsArr")
+      const region: keyof AllMaterialCarbonFactors =
+        state.selectedRegion as keyof AllMaterialCarbonFactors;
       const tmparr = (
         Object.keys(materialCarbonFactors[region]) as Array<
           keyof RegionMaterialCarbonFactors
@@ -183,13 +212,12 @@ export default new Vuex.Store({
       state.darkMode = state.darkMode ? false : true;
     },
     setRegion(state, region) {
-      state.selectedRegion = region
-    }
+      state.selectedRegion = region;
+    },
   },
   actions: {
-
     changeRegion(context, region) {
-      context.commit("setRegion", region)
+      context.commit("setRegion", region);
     },
 
     // Auth
@@ -246,7 +274,14 @@ export default new Vuex.Store({
       const streams = await getStreamObjects(context, streamid);
       return streams;
     },
-
+    async deleteBranch(context, input: DeleteBranchInput) {
+      const branch = await deleteBranch(
+        context,
+        input.streamid,
+        input.branchid
+      );
+      return branch;
+    },
     async getStreamBranches(context, streamid: string) {
       const streams = await getStreamBranches(context, streamid);
       return streams;
@@ -326,20 +361,24 @@ export default new Vuex.Store({
       // below line means that some objects may be given duplicate strings and the report won't save properly
       // TODO: FIND SOME BETTER WAY OF SETTING THE OBJECT ID
       const objectid = Math.floor(Math.random() * 1000000).toString();
+      const objectData: ParentSpeckleObjectData = {
+        id: objectid,
+        speckleType: "act-totals",
+        speckle_type: "act-totals",
+        transportCarbonA4: reportTotals.transportCarbonA4,
+        productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
+        constructionCarbonA5: reportTotals.constructionCarbonA5,
+        totalCO2: reportTotals.totalCO2,
+        projectData,
+        totalChildrenCount: 0,
+      };
       formData.append(
         "batch1",
         new Blob([
           JSON.stringify([
             {
-              id: objectid,
+              ...objectData,
               __closure: Object.fromEntries(children.map((c) => [c, 1])),
-              speckleType: "act-totals",
-              speckle_type: "act-totals",
-              transportCarbonA4: reportTotals.transportCarbonA4,
-              productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
-              constructionCarbonA5: reportTotals.constructionCarbonA5,
-              totalCO2: reportTotals.totalCO2,
-              projectData,
             },
           ]),
         ])
@@ -370,6 +409,11 @@ export default new Vuex.Store({
   modules: {},
   plugins: [createPersistedState()],
 });
+
+export interface DeleteBranchInput {
+  streamid: string;
+  branchid: string;
+}
 
 interface CreateCommitRes {
   data: {

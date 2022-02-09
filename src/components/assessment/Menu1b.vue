@@ -24,7 +24,7 @@
       ></v-select>
       <v-select
         v-model="form.component"
-        :items="elementCategories()"
+        :items="becs"
         :rules="selectionRules"
         label="Primary element category"
       ></v-select>
@@ -54,6 +54,7 @@ import store from "@/store";
 export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject;
   @Prop() step!: Step;
+  @Prop() becs!: string;
 
   form: ProjectDataTemp = {
     name: null,
@@ -79,13 +80,9 @@ export default class Menu1b extends Vue {
     return id;
   }
   isFormValid = false;
-  
+
   availableRegions() {
     return store.state.availableRegions
-  }
-
-  elementCategories() {
-    return store.state.buildingElementCategories
   }
 
 

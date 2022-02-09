@@ -1,5 +1,5 @@
 <template>
-  <v-app style="height: 100vh">
+  <v-app>
     <Sidebar
       :li="isAuthenticated"
       :username="name"
@@ -27,8 +27,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import Header from "./components/Header.vue";
-import Sidebar from "./components/Sidebar.vue";
+import Header from "./components/core/Header.vue";
+import Sidebar from "./components/core/Sidebar.vue";
 
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";

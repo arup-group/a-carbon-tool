@@ -7,7 +7,7 @@
   >
     <v-card style="width: 100%; overflow-y: scroll; height: 85vh">
       <v-card-title class="">New Assessment</v-card-title>
-      <v-stepper v-model="step" vertical>
+      <v-stepper style="height: 100%" v-model="step" vertical>
         <v-stepper-step :complete="completed" step="1" @click.native="step = 1">
           Data
         </v-stepper-step>
@@ -60,7 +60,7 @@
           <menu-6 :report="report" />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="7" @click.native="step = 7">
-          Report
+          Save
         </v-stepper-step>
         <v-stepper-content step="7">
           <menu-7 :canSave="canSave" @save="save" />

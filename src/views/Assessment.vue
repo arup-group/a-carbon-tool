@@ -9,7 +9,7 @@
         :colors="colors"
         :gradientColorProperty="volumeGradientPassdown"
       />
-      <div style="width: 40%">
+      <div style="width: 45%">
         <AssessmentStepper
           style="z-index: 1"
           v-if="availableStreams.length !== 0"
@@ -156,7 +156,7 @@ export default class Assessment extends Vue {
         this.carbonCalc();
         this.resetColors();
         break;
-      case Step.REPORT:
+      case Step.SAVE:
         this.resetColors();
         break;
       default:

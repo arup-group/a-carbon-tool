@@ -11,7 +11,7 @@ import { MaterialBreakdown } from "@/models/assessment";
 import { ChartData } from "@/models/chart";
 import { Vue, Component, Prop } from "vue-property-decorator";
 
-import DoughtnutChart from "./charts/DoughnutChart.vue";
+import DoughtnutChart from "../charts/DoughnutChart.vue";
 
 @Component({
   components: { DoughtnutChart },
@@ -27,6 +27,7 @@ export default class MaterialBreakdownCard extends Vue {
     return this.materials.map((m) => ({
       label: m.name,
       value: m.value,
+      color: ""
     }));
   }
 }

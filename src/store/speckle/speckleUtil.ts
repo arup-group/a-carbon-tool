@@ -4,6 +4,7 @@ import {
   StreamReferenceObjects,
   StreamReferenceBranches,
   StreamData,
+  ActReportData,
 } from "@/models/graphql";
 
 import {
@@ -162,7 +163,7 @@ export const getBranchData = (
 export const getActReportBranchInfo = (
   context: any,
   streamId: string
-): Promise<StreamReferenceObjects> =>
+): Promise<ActReportData> =>
   speckleFetch(actReportBranchInfo(streamId), context);
 
 export const getToken = (): Token => ({

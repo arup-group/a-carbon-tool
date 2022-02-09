@@ -4,29 +4,15 @@ import {
 } from "@/store/speckle/speckleUtil";
 
 export async function loadStream(context: any, streamId: string) {
-  //   console.log("viewAssessmentUtils: \n", context);
-  //   console.log(context.$store);
-  //   const actReportBranchInfo = await context.$store.dispatch(
-  //     "getActReportBranchInfo",
-  //     streamId
-  //   );
-
-  //   // console.log(actReportBranchInfo.data.stream.branch.commits.items[0]);
-
-  //   const branchData = await context.$store.dispatch("getBranchData", [
-  //     streamId,
-  //     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject,
-  //   ]);
-
   const actReportBranchInfo = await getActReportBranchInfo(context, streamId);
+
+  console.log(actReportBranchInfo);
 
   const branchData = await getBranchData(
     context,
     streamId,
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject
   );
-
-  console.log("---> branchData", branchData);
 
   const projectInfoUpdated = {
     name: branchData.data.stream.object.data.projectData.name,

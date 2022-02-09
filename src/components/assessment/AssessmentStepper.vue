@@ -18,6 +18,7 @@
             @uploadData="uploadData"
             :streams="streams"
             :step="step"
+            :becs="becs"
           />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="2" @click.native="step = 2">
@@ -100,6 +101,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() totalVolume!: number;
   @Prop() emptyProps!: EmptyPropsPassdown;
   @Prop() report!: ReportPassdown;
+  @Prop() becs!: string;
 
   completed = false;
   step: Step = 1;

@@ -26,6 +26,7 @@
           :totalVolume="totalVolume"
           :emptyProps="emptyProps"
           :report="report"
+          :becs="becs"
         />
       </div>
     </v-container>
@@ -34,11 +35,7 @@
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, {
-  Color,
-  Gradient,
-  GradientColor,
-} from "@/components/Renderer.vue";
+import Renderer, { Color, Gradient, GradientColor } from "@/components/shared/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -110,6 +107,10 @@ export default class Assessment extends Vue {
       });
     });
     this.transportTypes = this.$store.state.transportTypes;
+  }
+
+  get becs(): string[] {
+    return this.$store.state.becs.map((b: { name: string }) => b.name);
   }
 
   async save() {
@@ -436,10 +437,9 @@ export default class Assessment extends Vue {
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
     this.projectData = data;
-    this.$store.dispatch("changeRegion", data.region).then((res) => {
-      this.materials = this.$store.getters.materialsArr;
-      console.log(data.region);
-    });
+    this.$store.dispatch("changeRegion", data.region).then(res=>{
+      this.materials = this.$store.getters.materialsArr
+    })
   }
 }
 </script>

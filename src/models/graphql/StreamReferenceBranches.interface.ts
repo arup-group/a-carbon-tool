@@ -3,7 +3,8 @@ export interface StreamReferenceBranches {
     stream: {
       branches: {
         items: {
-          referencedObject: string;
+          id: string;
+          name: string;
         }[];
       };
     };

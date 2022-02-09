@@ -3,6 +3,7 @@ import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 import {
   StreamReferenceObjects,
   StreamReferenceBranches,
+  DeleteStreamData,
 } from "@/models/graphql";
 
 import {
@@ -15,8 +16,10 @@ import {
   uploadObjectWithChildrenMutation,
   createCommitMutation,
   streamReferencedBranches,
-  streamCommmitObjects
+  streamCommmitObjects,
+  deleteBranchMutation,
 } from "./graphql/speckleQueries";
+import { StreamData } from "@/models/graphql/StreamData.interface";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -154,10 +157,16 @@ export const getBranchData = (
   context: any,
   streamid: string,
   objId: string
-): Promise<StreamReferenceObjects> =>
+): Promise<StreamData> =>
   speckleFetch(streamsDataQuery(streamid, objId), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,
   refreshToken: localStorage.getItem(REFRESH_TOKEN) as string,
 });
+
+export const deleteBranch = (
+  context: any,
+  streamid: string,
+  branchid: string
+): Promise<DeleteStreamData> => speckleFetch(deleteBranchMutation(streamid, branchid), context);

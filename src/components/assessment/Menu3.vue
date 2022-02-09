@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Objects grouped by speckle_type</p>
+    <p>Objects grouped by material</p>
     <transport-item
       v-for="material in groupedMaterials"
       :key="material.name"

@@ -357,6 +357,7 @@ export default class Assessment extends Vue {
   }
 
   async loadStream(id: string) {
+    console.log("id:", id)
     this.streamid = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];

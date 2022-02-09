@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { GroupedMaterial, SpeckleType, TransportSelected, TransportType } from "@/models/newAssessment";
+import { GroupedMaterial, TransportSelected, TransportType } from "@/models/newAssessment";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import TransportItem from "./TransportItem.vue";
 

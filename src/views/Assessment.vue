@@ -405,19 +405,20 @@ export default class Assessment extends Vue {
   transportSelected(selected: TransportSelected) {
     // TURN THIS INTO IT'S OWN FUNCTION
     // let added = false;
-    selected.material.speckle_types.forEach(st => {
+    selected.material.speckle_types.forEach((st) => {
       let added = false;
-      this.colors = this.colors.map(c => {
+      this.colors = this.colors.map((c) => {
         if (c.id === st) {
           added = true;
           return {
-          id: st,
-          color: selected.transportType.color
-        }}
-        else return c;
+            id: st,
+            color: selected.transportType.color,
+          };
+        } else return c;
       });
-      if (!added) this.colors.push({ id: st, color: selected.transportType.color })
-    })
+      if (!added)
+        this.colors.push({ id: st, color: selected.transportType.color });
+    });
     this.transportColors = this.colors;
 
     selected.material.objects.forEach((i) => {

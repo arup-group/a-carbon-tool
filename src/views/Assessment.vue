@@ -19,6 +19,7 @@
           :emptyProps="emptyProps"
           :report="report"
           :becs="becs"
+          :groupedMaterials="groupedMaterials"
         />
       </v-col>
       <v-col cols="8">
@@ -37,7 +38,11 @@
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, { Color, Gradient, GradientColor } from "@/components/shared/Renderer.vue";
+import Renderer, {
+  Color,
+  Gradient,
+  GradientColor,
+} from "@/components/shared/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -58,6 +63,7 @@ import {
   ReportPassdown,
   ObjectDetails,
   ObjectDetailsComplete,
+  GroupedMaterial,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -100,6 +106,8 @@ export default class Assessment extends Vue {
   // two separate values so that the colors can be found at the same time as the volume is calculated, rather than whenever the user goes onto the volume step
   volumeGradient!: Gradient;
   volumeGradientPassdown: GradientColor = null;
+
+  groupedMaterials: GroupedMaterial[] = [];
 
   mounted() {
     this.token = this.$store.state.token.token;
@@ -144,11 +152,13 @@ export default class Assessment extends Vue {
       case Step.TRANSPORT:
         this.resetColors();
         this.colors = this.transportColors;
+        this.groupMaterials();
         break;
-       case Step.QUANTITIES:
-         this.resetColors();
-         if (this.volumeGradient) this.volumeGradientPassdown = this.volumeGradient;
-         break;
+      case Step.QUANTITIES:
+        this.resetColors();
+        if (this.volumeGradient)
+          this.volumeGradientPassdown = this.volumeGradient;
+        break;
       case Step.REVIEW:
         this.resetColors();
         this.review();
@@ -164,6 +174,48 @@ export default class Assessment extends Vue {
         this.resetColors();
         break;
     }
+  }
+
+  groupMaterials() {
+    // const materials: { ids: string[]; material: MaterialFull }[] = [];
+    let materialsObj: {
+      [material: string]: {
+        [speckle_type: string]: string[] /* array should be object id's */;
+      };
+    } = {};
+
+    // assuming that the materials section has been filled out already
+    this.objects.forEach((o) => {
+      const material = o.formData?.material?.name;
+      const speckle_type = o.speckle_type;
+      if (material) {
+        if (materialsObj[material] && materialsObj[material][speckle_type]) {
+          materialsObj[material][speckle_type].push(o.id);
+        } else if (materialsObj[material]) {
+          materialsObj[material][speckle_type] = [o.id];
+        } else {
+          materialsObj[material] = {};
+          materialsObj[material][speckle_type] = [o.id];
+        }
+      }
+    });
+
+    const materialsArr: GroupedMaterial[] = Object.keys(materialsObj).map(
+      (m) => {
+        const ids: string[] = [];
+        const speckle_types = Object.keys(materialsObj[m]).map((s) => {
+          ids.push(...materialsObj[m][s]);
+          return s;
+        });
+        return {
+          material: m,
+          objects: ids,
+          speckle_types,
+        };
+      }
+    );
+
+    this.groupedMaterials = materialsArr;
   }
 
   resetColors() {
@@ -193,8 +245,8 @@ export default class Assessment extends Vue {
       property: "parameters.HOST_VOLUME_COMPUTED.value",
       minValue: minVol,
       maxValue: maxVol,
-      colors: ["#4f7bff", "#ff4f84"]
-    }
+      colors: ["#4f7bff", "#ff4f84"],
+    };
   }
 
   // for now we're just assuming that all data is filled in if the user reaches this step TODO: ONLY ALLOW USER ON THIS PAGE IF REVIEW IS SUCCESSFUL
@@ -352,25 +404,23 @@ export default class Assessment extends Vue {
 
   transportSelected(selected: TransportSelected) {
     // TURN THIS INTO IT'S OWN FUNCTION
-    let added = false;
-    this.colors = this.colors.map((c) => {
-      if (c.id === selected.speckleType.type) {
-        added = true;
-        return {
-          id: selected.speckleType.type,
-          color: selected.transportType.color,
-        };
-      } else return c;
-    });
-
-    if (!added)
-      this.colors.push({
-        id: selected.speckleType.type,
-        color: selected.transportType.color,
+    // let added = false;
+    selected.material.speckle_types.forEach(st => {
+      let added = false;
+      this.colors = this.colors.map(c => {
+        if (c.id === st) {
+          added = true;
+          return {
+          id: st,
+          color: selected.transportType.color
+        }}
+        else return c;
       });
+      if (!added) this.colors.push({ id: st, color: selected.transportType.color })
+    })
     this.transportColors = this.colors;
 
-    selected.speckleType.ids.forEach((i) => {
+    selected.material.objects.forEach((i) => {
       this.objects = this.objects.map((o) => ({
         ...o,
         formData: {
@@ -438,9 +488,9 @@ export default class Assessment extends Vue {
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
     this.projectData = data;
-    this.$store.dispatch("changeRegion", data.region).then(res=>{
-      this.materials = this.$store.getters.materialsArr
-    })
+    this.$store.dispatch("changeRegion", data.region).then((res) => {
+      this.materials = this.$store.getters.materialsArr;
+    });
   }
 }
 </script>

@@ -2,17 +2,17 @@
   <div>
     <p>Objects grouped by speckle_type</p>
     <transport-item
-      v-for="type in types"
-      :key="type.type"
+      v-for="material in groupedMaterials"
+      :key="material.name"
       @transportSelected="transportSelected"
       :transportTypes="transportTypes"
-      :type="type"
+      :groupedMaterial="material"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { SpeckleType, TransportSelected, TransportType } from "@/models/newAssessment";
+import { GroupedMaterial, SpeckleType, TransportSelected, TransportType } from "@/models/newAssessment";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import TransportItem from "./TransportItem.vue";
 
@@ -21,7 +21,7 @@ import TransportItem from "./TransportItem.vue";
 })
 export default class Menu3 extends Vue {
   @Prop() transportTypes!: TransportType[];
-  @Prop() types!: SpeckleType[];
+  @Prop() groupedMaterials!: GroupedMaterial[];
 
   @Emit("transportSelected")
   transportSelected(selected: TransportSelected) {

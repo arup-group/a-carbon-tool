@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12" lg="8">
+      <v-col>
         <v-card flat outlined class="mt-8 mb-4">
           <v-card-title class="text-h4">Declaration</v-card-title>
           <v-card-text>
@@ -12,9 +12,9 @@
             As an intitative, we believe that significant action needs to be taken to curb these emissions, with a target of limiting global temperature rise to 1.5C.
             Construction professionals - architects, engineers, designers, consultants and contractors - with the power to enact maningful change require the right tools to do so.
             <br /><br />
-            A carbon tool, or 'act', is an open-source intitiative to create appropriate tools for the rapid assessment of embodied 
+            A carbon tool, or '<strong>act</strong> ', is an open-source intitiative to create appropriate tools for the rapid assessment of embodied 
             carbon emissions within built-environment assets. It is a work in progress intended to evolve over time. It is free to all to use and it is open to anyone who 
-            would like to contribute. Unlike other lifecycle analysis tools, act is intended to be used by designers as they work to provide quick feedback and enable carbon 
+            would like to contribute. Unlike other lifecycle analysis tools, <strong>act</strong>  is intended to be used by designers as they work to provide quick feedback and enable carbon 
             to be included as a factor in design as it happens.
           </v-card-text>
           <v-img src="/assets/globe.png" contain height="480"></v-img>
@@ -61,7 +61,7 @@
             RICS: Whole life carbon assessment for the build environment (2017)</a> and <a href='https://www.en-standard.eu/bs-en-15978-2011-sustainability-of-construction-works-assessment-of-environmental-performance-of-buildings-calculation-method/'
             target="_blank">BS EN 15978 (2011)</a>. 
             <br /><br />
-            act currently covers stages A1 - A5 of this scope, from cradle to practical completion. This includes the calculation of product stage carbon (A1-A3) - 
+            <strong>act</strong> currently covers stages A1 - A5 of this scope, from cradle to practical completion. This includes the calculation of product stage carbon (A1-A3) - 
             the carbon emissions associated with material extraction and processing, transport to site (A4), and emissions on site (A5). The calculation methods 
             used for each of these stages are detailed below.
           </v-card-text>
@@ -69,8 +69,8 @@
           <v-card-text>
             <div><strong>Product Stage Carbon (A1-A3)</strong></div>
             Product stage carbon is calculated by applying the mass of material by a carbon factor representing the effort and energy expended in it's creation.
-            The factors used within <strong>act</strong> are provided below. To estimate the mass of materials from Building Information Models (BIMs) act 
-            calculate the volume of each object and applies the density of the selected material.
+            The factors used within <strong>act</strong> are provided below. To estimate the mass of materials from Building Information Models (BIMs) <strong>act</strong> 
+            calculates the volume of each object and applies the density of the selected material.
           </v-card-text>
           <v-img src="/assets/a1a3-equation.png" height="200" contain></v-img>
           <v-card-text>

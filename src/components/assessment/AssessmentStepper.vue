@@ -1,5 +1,10 @@
 <template>
-  <v-container class="d-flex justify-center align-center">
+  <v-sheet
+    outlined
+    rounded
+    color="primary"
+    class="d-flex justify-center align-center"
+  >
     <v-card style="width: 100%; overflow-y: scroll; height: 85vh">
       <v-card-title class="">New Assessment</v-card-title>
       <v-stepper v-model="step" vertical>
@@ -61,7 +66,7 @@
         </v-stepper-content>
       </v-stepper>
     </v-card>
-  </v-container>
+  </v-sheet>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";

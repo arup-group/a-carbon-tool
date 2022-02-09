@@ -1,7 +1,15 @@
 <template>
   <v-main>
-    <v-row>
-      <v-col cols="4">
+    <v-container class="d-flex justify-flex-start flex-row ml-5">
+      <Renderer
+        v-if="objectURLs.length !== 0"
+        @loaded="rendererLoaded"
+        :objecturls="objectURLs"
+        :token="token"
+        :colors="colors"
+        :gradientColorProperty="volumeGradientPassdown"
+      />
+      <div style="width: 40%">
         <AssessmentStepper
           style="z-index: 1"
           v-if="availableStreams.length !== 0"
@@ -19,24 +27,18 @@
           :emptyProps="emptyProps"
           :report="report"
         />
-      </v-col>
-      <v-col cols="8">
-        <Renderer
-          v-if="objectURLs.length !== 0"
-          @loaded="rendererLoaded"
-          :objecturls="objectURLs"
-          :token="token"
-          :colors="colors"
-          :gradientColorProperty="volumeGradientPassdown"
-        />
-      </v-col>
-    </v-row>
+      </div>
+    </v-container>
   </v-main>
 </template>
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, { Color, Gradient, GradientColor } from "@/components/Renderer.vue";
+import Renderer, {
+  Color,
+  Gradient,
+  GradientColor,
+} from "@/components/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -140,10 +142,11 @@ export default class Assessment extends Vue {
         this.resetColors();
         this.colors = this.transportColors;
         break;
-       case Step.QUANTITIES:
-         this.resetColors();
-         if (this.volumeGradient) this.volumeGradientPassdown = this.volumeGradient;
-         break;
+      case Step.QUANTITIES:
+        this.resetColors();
+        if (this.volumeGradient)
+          this.volumeGradientPassdown = this.volumeGradient;
+        break;
       case Step.REVIEW:
         this.resetColors();
         this.review();
@@ -188,8 +191,8 @@ export default class Assessment extends Vue {
       property: "parameters.HOST_VOLUME_COMPUTED.value",
       minValue: minVol,
       maxValue: maxVol,
-      colors: ["#4f7bff", "#ff4f84"]
-    }
+      colors: ["#4f7bff", "#ff4f84"],
+    };
   }
 
   // for now we're just assuming that all data is filled in if the user reaches this step TODO: ONLY ALLOW USER ON THIS PAGE IF REVIEW IS SUCCESSFUL
@@ -433,10 +436,10 @@ export default class Assessment extends Vue {
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
     this.projectData = data;
-    this.$store.dispatch("changeRegion", data.region).then(res=>{
-      this.materials = this.$store.getters.materialsArr
-      console.log(data.region)
-    })
+    this.$store.dispatch("changeRegion", data.region).then((res) => {
+      this.materials = this.$store.getters.materialsArr;
+      console.log(data.region);
+    });
   }
 }
 </script>

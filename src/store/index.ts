@@ -174,7 +174,7 @@ export default new Vuex.Store({
           const toPush: MaterialFull = {
             name: `${type} - ${t}`,
             ...materialCarbonFactors[region][type][t],
-            color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
+            color: '#' + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);
         });

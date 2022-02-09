@@ -9,11 +9,11 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 
-import { BEC, BECCategory } from "@/models/shared";
+import { BEC, BECName } from "@/models/shared";
 
 @Component
 export default class BECChip extends Vue {
-  @Prop() category!: BECCategory;
+  @Prop() category!: BECName;
 
   get backgroundColor() {
     return this.becs.find((b) => b.name === this.category)?.backgroundColor;

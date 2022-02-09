@@ -1,4 +1,4 @@
-export type BECCategory =
+export type BECName =
   | "Superstructure"
   | "Substructure"
   | "Mechanical Services"
@@ -7,7 +7,7 @@ export type BECCategory =
   | "Space plan"
   | "Building Envelope";
 export interface BEC {
-  name: BECCategory;
+  name: BECName;
   color: string;
   backgroundColor: string;
 }

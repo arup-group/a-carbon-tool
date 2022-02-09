@@ -1,1 +1,1 @@
-export { BECCategory, BEC } from "./BEC.model";
+export { BECName, BEC } from "./BEC.model";

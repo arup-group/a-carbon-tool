@@ -33,7 +33,7 @@ import {
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
 
-import { BEC, BECCategory } from "@/models/shared";
+import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 
 Vue.use(Vuex);
@@ -67,37 +67,37 @@ export default new Vuex.Store({
     availableRegions: ["India", "UK"],
     becs: [
       {
-        name: "Superstructure" as BECCategory,
+        name: "Superstructure" as BECName,
         color: "white",
         backgroundColor: "#224a63",
       },
       {
-        name: "Substructure" as BECCategory,
+        name: "Substructure" as BECName,
         color: "black",
         backgroundColor: "#aeebdb",
       },
       {
-        name: "Mechanical Services" as BECCategory,
+        name: "Mechanical Services" as BECName,
         color: "black",
         backgroundColor: "#f0b4b4",
       },
       {
-        name: "Electrical Services" as BECCategory,
+        name: "Electrical Services" as BECName,
         color: "white",
         backgroundColor: "#754792",
       },
       {
-        name: "Public Health & Hydraulics" as BECCategory,
+        name: "Public Health & Hydraulics" as BECName,
         color: "black",
         backgroundColor: "#dbb5ea",
       },
       {
-        name: "Space plan" as BECCategory,
+        name: "Space plan" as BECName,
         color: "white",
         backgroundColor: "#4b97d2",
       },
       {
-        name: "Building Envelope" as BECCategory,
+        name: "Building Envelope" as BECName,
         color: "black",
         backgroundColor: "#82c7f1",
       },

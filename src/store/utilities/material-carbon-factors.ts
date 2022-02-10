@@ -455,7 +455,7 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
           source: "IFC India Construction Materials Database Methodology Report 2017"
       }
     },
-    NaturalProducts: {
+    NaturalMaterials: {
         "Straw bale": {
             productStageCarbonA1A3: 0.19,
             density: 140,

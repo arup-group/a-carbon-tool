@@ -1,14 +1,15 @@
 <template>
-  <v-card flat>
-    <v-row dense>
-      <v-col cols='12' md="6">
-        <v-chip>{{ cleanType(type.type) }}</v-chip>
+  <v-card flat color=''>
+    <v-row dense align="center">
+      <v-col cols='12' md="4" class="pl-2">
+        <v-chip>
+          {{ cleanType(type.type) }}
+        </v-chip>
       </v-col>
-      <v-col coles="12" md="6">
+      <v-col coles="12" md="8" class="pr-2">
         <v-combobox
           :items="materials"
           :item-text="(materials) => materials['name']"
-          
           @change="checkMaterialUpdated"
         ></v-combobox>
       </v-col>

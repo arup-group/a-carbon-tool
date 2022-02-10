@@ -1,5 +1,11 @@
 <template>
-  <v-card flat color=''>
+  <v-card flat color=''
+    :style="[
+      this.$store.state.darkMode
+        ? { 'background-color': '#1C1C1C !important' }
+        : { 'background-color': '#FFFFFF !important' },
+    ]"
+  >
     <v-row dense align="center">
       <v-col cols='12' md="4" class="pl-2">
         <v-chip>

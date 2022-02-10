@@ -213,11 +213,7 @@ export default new Vuex.Store({
     },
     setRegion(state, region) {
       state.selectedRegion = region;
-<<<<<<< HEAD
-    }
-=======
     },
->>>>>>> 8ba87676742ee8d948ce36f536619828a33a31d6
   },
   actions: {
     changeRegion(context, region) {

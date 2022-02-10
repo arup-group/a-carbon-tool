@@ -75,3 +75,11 @@ arc-sidebar[theme="ACT-dark"] {
 ul {
   list-style-type: none;
 }
+
+.row {
+   justify-content: center;
+}
+
+.about-col {
+  border: pink;
+}

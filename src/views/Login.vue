@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import LoginCard from "@/components/LoginCard.vue";
+import LoginCard from "@/components/login/LoginCard.vue";
 import { Vue, Component } from "vue-property-decorator";
 import { Server } from "@/models/auth/";
 

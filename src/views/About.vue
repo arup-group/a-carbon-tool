@@ -46,7 +46,7 @@
                 </v-btn>
               </v-col>
               <v-col cols="6" align="left">
-                <v-btn color="secondary" outlined href='https://speckle.xyz/' target='_blank'>
+                <v-btn color="secondary" outlined href='https://speckle.xyz' target='_blank'>
                   Speckle XYZ
                 </v-btn>
               </v-col>

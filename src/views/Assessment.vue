@@ -86,6 +86,7 @@ export default class Assessment extends Vue {
   token = "";
   types: SpeckleType[] = [];
   objects: SpeckleObject[] = [];
+  objectsObj: { [id: string]: SpeckleObject } = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
@@ -387,6 +388,17 @@ export default class Assessment extends Vue {
         totalVol += r.parameters.HOST_VOLUME_COMPUTED.value;
       }
     });
+
+    filteredRes.forEach((r) => {
+      this.objectsObj[r.id] = {
+        id: r.id,
+        speckle_type: r.speckle_type,
+        formData: {
+          volume: r.paramters.HOST_VOLUME_COMPUTED.value
+        }
+      }
+    });
+    console.log("objectsObj:", this.objectsObj);
 
     this.objects = filteredRes.map((r) => ({
       id: r.id,

@@ -28,7 +28,6 @@ const REFRESH_TOKEN = `${APP_NAME}.RefreshToken`;
 const SERVER = `${APP_NAME}.Server`;
 
 export function goToSpeckleAuthpage(server: Server) {
-  console.log(`server arg coming into goToSpeckleAuthpage\n`, server)
   const challenge =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
@@ -48,7 +47,7 @@ export function speckleLogOut() {
 
 // Exchanges the provided access code with a token/refreshToken pair, and saves them to local storage.
 export async function exchangeAccessCode(accessCode: string, server: Server) {
-  const res = await fetch(`${server.url}/steve/auth/token/`, {
+  const res = await fetch(`${server.url}/auth/token/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

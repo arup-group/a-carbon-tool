@@ -38,6 +38,14 @@
     </v-list>
     <v-spacer></v-spacer>
     <v-list dense style="position: absolute; bottom: 0; width: 100%">
+      <v-list-item>
+        <v-list-item-icon>
+          <v-icon>mdi-information-outline</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title>
+          <i> version: {{ version() }}</i>
+        </v-list-item-title>
+      </v-list-item>
       <v-list-item @click="logout">
         <v-list-item-icon>
           <v-icon>mdi-logout-variant </v-icon>
@@ -59,6 +67,7 @@
 </template>
 
 <script lang="ts">
+import store from "@/store";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component
@@ -92,14 +101,18 @@ export default class Sidebar extends Vue {
     return;
   }
 
+  version() {
+    return store.state.version
+  }
+
   items = [
     {
       title: "New Assessment",
       icon: "mdi-molecule-co2",
       route: "/assessment",
     },
-    { title: "Home", icon: "mdi-home", route: "/" },
-    { title: "About", icon: "mdi-information-outline", route: "/about" },
+    { title: "Dashboard", icon: "mdi-view-dashboard-outline", route: "/" },
+    { title: "About", icon: "mdi-help-circle-outline", route: "/about" },
   ];
 }
 </script>

@@ -2,7 +2,7 @@
   <div>
     <strong> {{ getReport(report) }} </strong>
     <v-card flat width="100%">
-      <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
+      <a-breakdown-card :aBreakdown="aBreakdown" />
     </v-card>
   </div>
 </template>
@@ -59,30 +59,8 @@ export default class Menu6 extends Vue {
         ],
       };
     } else {
-      return "";
+      return " ";
     }
   }
-
-  assessment = {
-    aBreakdown: {
-      levels: [
-        {
-          name: "A1-A3",
-          tCO2e: 2800,
-          kgCO2e: 280,
-        },
-        {
-          name: "A4",
-          tCO2e: 150,
-          kgCO2e: 15,
-        },
-        {
-          name: "A5",
-          tCO2e: 250,
-          kgCO2e: 25,
-        },
-      ],
-    },
-  };
 }
 </script>

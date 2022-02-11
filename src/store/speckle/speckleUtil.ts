@@ -5,6 +5,7 @@ import {
   StreamReferenceBranches,
   StreamData,
   ActReportData,
+  DeleteStreamData,
 } from "@/models/graphql";
 
 import {
@@ -19,6 +20,7 @@ import {
   streamReferencedBranches,
   streamCommmitObjects,
   actReportBranchInfo,
+  deleteBranchMutation,
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
@@ -170,3 +172,10 @@ export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,
   refreshToken: localStorage.getItem(REFRESH_TOKEN) as string,
 });
+
+export const deleteBranch = (
+  context: any,
+  streamid: string,
+  branchid: string
+): Promise<DeleteStreamData> =>
+  speckleFetch(deleteBranchMutation(streamid, branchid), context);

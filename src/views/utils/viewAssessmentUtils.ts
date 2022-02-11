@@ -47,7 +47,7 @@ export async function loadStream(context: any, streamId: string) {
     ],
   };
 
-  const co2Obj: { [key: string]: number } = {};
+  const co2Obj: { [key: string]: { value: number; color: string } } = {};
   branchData.data.stream.object.children.objects.forEach((object: any) => {
     levelsUpdated.levels[0].kgCO2e += parseFloat(
       object.data.act.reportData.productStageCarbonA1A3
@@ -71,10 +71,17 @@ export async function loadStream(context: any, streamId: string) {
       parseFloat(object.data.act.reportData.constructionCarbonA5.value);
 
     const materialKey = object.data.act.formData.material.name;
+    const materialColor = object.data.act.formData.material.color;
     if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
-      co2Obj[materialKey] += totalObjectCarbon;
+      co2Obj[materialKey] = {
+        value: co2Obj[materialKey].value + totalObjectCarbon,
+        color: materialColor,
+      };
     } else {
-      co2Obj[materialKey] = totalObjectCarbon;
+      co2Obj[materialKey] = {
+        value: totalObjectCarbon,
+        color: materialColor,
+      };
     }
   });
 
@@ -82,7 +89,8 @@ export async function loadStream(context: any, streamId: string) {
   const materials = co2Arr.map((obj) => {
     return {
       name: obj[0],
-      value: obj[1],
+      value: obj[1].value,
+      color: obj[1].color,
     };
   });
 

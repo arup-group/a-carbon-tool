@@ -29,11 +29,11 @@
 import { Component, Vue } from "vue-property-decorator";
 import { AssessmentComplete } from "@/models/assessment";
 
-import Renderer from "@/components/Renderer.vue";
-import ProjectInfoCard from "@/components/ProjectInfoCard.vue";
-import ABreakdownCard from "@/components/ABreakdownCard.vue";
-import MaterialBreakdownCard from "@/components/MaterialBreakdownCard.vue";
-import ViewAssessmentButtons from "@/components/ViewAssessmentButtons.vue";
+import Renderer from "@/components/shared/Renderer.vue";
+import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
+import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
+import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
+import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
 
 @Component({
   components: {
@@ -60,12 +60,12 @@ export default class ViewAssessment extends Vue {
   }
 
   async created() {
-    const testData = await this.$store.dispatch(
+    const assessmentViewData = await this.$store.dispatch(
       "loadActReportData",
       this.$route.params.streamId
     );
-    this.assessment = testData.data;
-    this.chartDataReady = testData.ready;
+    this.assessment = assessmentViewData.data;
+    this.chartDataReady = assessmentViewData.ready;
   }
 
   get urlsLoaded() {
@@ -104,6 +104,7 @@ export default class ViewAssessment extends Vue {
         {
           name: "some value 1",
           value: 50,
+          color: "",
         },
       ],
     },

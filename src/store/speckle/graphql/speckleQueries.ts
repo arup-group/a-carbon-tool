@@ -34,7 +34,6 @@ export const streamsDataQuery = (streamId: string, objId: string) => `query {
       }
     }
   }`;
-
 export const streamReferencedObjects = (id: string) => `query {
   stream(id: "${id}") {
     branch {
@@ -123,13 +122,15 @@ export const streamReferencedBranches = (id: string) => `query {
   stream(id: "${id}") {
     branches {
       items {
+        id,
         name
       }
     }
   }
 }`;
 
-export const actReportBranchInfo = (id: string) => `query {
+export const actReportBranchInfo = (id: string) => {
+  return `query {
   stream(id: "${id}") {
     name
     branch(name: "actcarbonreport") {
@@ -142,4 +143,12 @@ export const actReportBranchInfo = (id: string) => `query {
     }
   }
   }
+}`;
+};
+
+export const deleteBranchMutation = (
+  streamId: string,
+  id: string
+) => `mutation {
+  branchDelete( branch: {streamId: "${streamId}", id: "${id}"})
 }`;

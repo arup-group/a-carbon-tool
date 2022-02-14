@@ -10,14 +10,12 @@
       :token="token"
       class="renderer"
     />
-    <div class="d-flex flex-column justify-space-between card-container">
-      <a-breakdown-card
-        v-if="urlsLoaded && chartDataReady"
-        class="card"
-        :aBreakdown="aBreakdown"
-      />
+    <div
+      class="d-flex flex-column justify-space-between card-container"
+      v-if="urlsLoaded && chartDataReady"
+    >
+      <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
       <material-breakdown-card
-        v-if="urlsLoaded && chartDataReady"
         class="card"
         :materialBreakdown="materialBreakdown"
       />

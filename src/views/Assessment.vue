@@ -18,7 +18,7 @@
           @stepperUpdate="stepperUpdate"
           @transportSelected="transportSelected"
           @uploadData="uploadData"
-          @save="save"
+          @checkSave="checkSave"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -30,12 +30,29 @@
         />
       </div>
     </v-container>
+    <confirm-dialog
+      :dialog="dialog"
+      @agree="agreeSave"
+      @cancel="cancelSave"
+      message="Do you want to save this report and return to home?"
+    />
+    <SESnackBar
+      @close="saveSnackClose"
+      :success="saveSuccess"
+      :model="saveSnack"
+      textError="Something went wrong, please retry"
+      textSuccess="Report saved!"
+    />
   </v-main>
 </template>
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, { Color, Gradient, GradientColor } from "@/components/shared/Renderer.vue";
+import Renderer, {
+  Color,
+  Gradient,
+  GradientColor,
+} from "@/components/shared/Renderer.vue";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -68,11 +85,16 @@ import {
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
 import { UploadReportInput } from "@/store";
+import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
+import SESnackBar from "@/components/shared/SESnackBar.vue";
 
 @Component({
-  components: { AssessmentStepper, Renderer },
+  components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar,},
 })
 export default class Assessment extends Vue {
+  saveSuccess = true;
+  saveSnack = false;
+  dialog = false;
   availableStreams = [];
   objectURLs: string[] = [];
   token = "";
@@ -112,8 +134,7 @@ export default class Assessment extends Vue {
   get becs(): string[] {
     return this.$store.state.becs.map((b: { name: string }) => b.name);
   }
-
-  async save() {
+  async agreeSave() {
     if (this.report) {
       const uploadReportInput: UploadReportInput = {
         streamid: this.streamid,
@@ -121,9 +142,19 @@ export default class Assessment extends Vue {
         reportTotals: this.report.totals,
         projectData: this.projectData,
       };
-
       await this.$store.dispatch("uploadReport", uploadReportInput);
+      this.saveSnack = true;
+      this.$router.push("/")
     }
+  }
+  saveSnackClose() {
+    this.saveSnack = false;
+  }
+  cancelSave() {
+    this.dialog = false;
+  }
+  checkSave() {
+    this.dialog = true;
   }
 
   rendererLoaded(allMesh: THREE.Mesh[]) {
@@ -437,9 +468,9 @@ export default class Assessment extends Vue {
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
     this.projectData = data;
-    this.$store.dispatch("changeRegion", data.region).then(res=>{
-      this.materials = this.$store.getters.materialsArr
-    })
+    this.$store.dispatch("changeRegion", data.region).then((res) => {
+      this.materials = this.$store.getters.materialsArr;
+    });
   }
 }
 </script>

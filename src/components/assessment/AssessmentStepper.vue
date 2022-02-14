@@ -63,7 +63,7 @@
           Save
         </v-stepper-step>
         <v-stepper-content step="7">
-          <menu-7 :canSave="canSave" @save="save" />
+          <menu-7 :canSave="canSave" @checkSave="checkSave" />
         </v-stepper-content>
       </v-stepper>
     </v-card>
@@ -136,8 +136,8 @@ export default class AssessmentStepper extends Vue {
     return step;
   }
 
-  @Emit("save")
-  save() {
+  @Emit("checkSave")
+  checkSave() {
     return;
   }
 }

@@ -1,8 +1,8 @@
 <template>
   <div>
     <strong> {{ getReport(report) }} </strong>
-    <v-card flat width="100%">
-      <a-breakdown-card :aBreakdown="aBreakdown" />
+    <v-card v-if="report" flat width="100%">
+      <a-breakdown-card :aBreakdown="getaBreakdownData()" />
     </v-card>
   </div>
 </template>
@@ -25,7 +25,8 @@ export default class Menu6 extends Vue {
       return `Total CO2: ${tonnesCO2} tonnes`;
     }
   }
-  get aBreakdown() {
+
+  getaBreakdownData() {
     if (this.report) {
       return {
         levels: [
@@ -59,7 +60,7 @@ export default class Menu6 extends Vue {
         ],
       };
     } else {
-      return " ";
+      return "";
     }
   }
 }

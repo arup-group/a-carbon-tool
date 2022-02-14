@@ -2,11 +2,7 @@
   <div>
     <v-form>
       <strong>Objects by speckle type</strong>
-      <div
-        v-for="type in loadedTypes"
-        :key="type.type"
-        style="width: 100%"
-      >
+      <div v-for="type in loadedTypes" :key="type.type" style="width: 100%">
         <material-type
           :materials="materials"
           :type="type"
@@ -30,7 +26,6 @@ import MaterialType from "./MaterialType.vue";
 export default class Menu2 extends Vue {
   @Prop() types!: SpeckleType[];
   @Prop() materials!: MaterialFull[];
-
 
   get loadedTypes() {
     return this.types ? this.types : [];

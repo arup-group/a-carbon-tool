@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-form>
-      <p>Grouping objects by speckle type</p>
+      <strong>Objects by speckle type</strong>
       <div
         v-for="type in loadedTypes"
         :key="type.type"
@@ -30,6 +30,7 @@ import MaterialType from "./MaterialType.vue";
 export default class Menu2 extends Vue {
   @Prop() types!: SpeckleType[];
   @Prop() materials!: MaterialFull[];
+
 
   get loadedTypes() {
     return this.types ? this.types : [];

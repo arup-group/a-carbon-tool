@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Objects grouped by speckle_type</p>
+    <p>Objects by speckle_type</p>
     <transport-item
       v-for="type in types"
       :key="type.type"

@@ -6,7 +6,11 @@
       :item-text="(materials) => materials['name']"
       style="max-width: 50%"
       @change="checkMaterialUpdated"
-    ></v-combobox>
+    >
+      <template #selection="{ item }">
+        <v-chip :color="item.color">{{ item.name }}</v-chip>
+      </template>
+    </v-combobox>
   </div>
 </template>
 <script lang="ts">

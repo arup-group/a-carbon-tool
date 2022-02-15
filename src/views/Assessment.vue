@@ -47,7 +47,6 @@ import Renderer, {
 import { Component, Vue } from "vue-property-decorator";
 
 import {
-  CalcModes,
   ProjectDataComplete,
   MaterialUpdateOut,
   SpeckleObject,
@@ -90,7 +89,6 @@ export default class Assessment extends Vue {
   objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
-  volumeCalcMode: CalcModes = CalcModes.PROPERTY;
   totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
 
@@ -394,9 +392,9 @@ export default class Assessment extends Vue {
         id: r.id,
         speckle_type: r.speckle_type,
         formData: {
-          volume: r.paramters.HOST_VOLUME_COMPUTED.value
-        }
-      }
+          volume: r.paramters.HOST_VOLUME_COMPUTED.value,
+        },
+      };
     });
 
     this.types = this.findTypes(this.objectsObj);
@@ -428,9 +426,9 @@ export default class Assessment extends Vue {
         ...oldObj,
         formData: {
           ...oldObj.formData,
-          transport: selected.transportType
-        }
-      }
+          transport: selected.transportType,
+        },
+      };
     });
   }
 
@@ -461,9 +459,9 @@ export default class Assessment extends Vue {
         ...oldObj,
         formData: {
           ...oldObj.formData,
-          material: material.material
-        }
-      }
+          material: material.material,
+        },
+      };
     });
   }
 
@@ -495,5 +493,3 @@ export default class Assessment extends Vue {
   }
 }
 </script>
-
-<style scoped></style>

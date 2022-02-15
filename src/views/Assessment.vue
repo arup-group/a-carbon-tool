@@ -77,6 +77,8 @@ import {
 } from "@/store/utilities/carbonCalculator";
 import { UploadReportInput } from "@/store";
 
+type ObjectsObj = { [id: string]: SpeckleObject };
+
 @Component({
   components: { AssessmentStepper, Renderer },
 })
@@ -86,7 +88,7 @@ export default class Assessment extends Vue {
   token = "";
   types: SpeckleType[] = [];
   objects: SpeckleObject[] = [];
-  objectsObj: { [id: string]: SpeckleObject } = {};
+  objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
@@ -178,7 +180,6 @@ export default class Assessment extends Vue {
   }
 
   groupMaterials() {
-    // const materials: { ids: string[]; material: MaterialFull }[] = [];
     let materialsObj: {
       [material: string]: {
         [speckle_type: string]: string[] /* array should be object id's */;
@@ -186,7 +187,7 @@ export default class Assessment extends Vue {
     } = {};
 
     // assuming that the materials section has been filled out already
-    this.objects.forEach((o) => {
+    Object.values(this.objectsObj).forEach((o) => {
       const material = o.formData?.material?.name;
       const speckle_type = o.speckle_type;
       if (material) {
@@ -228,7 +229,7 @@ export default class Assessment extends Vue {
     let minVol = -1;
     let maxVol = -1;
 
-    this.objects.forEach((o, i) => {
+    Object.values(this.objectsObj).forEach((o, i) => {
       if (o.formData?.volume) {
         let volume = o.formData.volume;
         if (i === 0) {
@@ -316,7 +317,7 @@ export default class Assessment extends Vue {
 
   convertToFormComplete() {
     const objs: SpeckleObjectFormComplete[] = [];
-    this.objects.forEach((o) => {
+    Object.values(this.objectsObj).forEach((o) => {
       if (
         o.formData &&
         o.formData.transport &&
@@ -344,7 +345,7 @@ export default class Assessment extends Vue {
       volumesEmpty: [] as string[],
     };
 
-    this.objects.forEach((o) => {
+    Object.values(this.objectsObj).forEach((o) => {
       const formData = o.formData;
 
       if (formData?.material === undefined)
@@ -398,17 +399,8 @@ export default class Assessment extends Vue {
         }
       }
     });
-    console.log("objectsObj:", this.objectsObj);
 
-    this.objects = filteredRes.map((r) => ({
-      id: r.id,
-      speckle_type: r.speckle_type,
-      formData: {
-        volume: r.paramters.HOST_VOLUME_COMPUTED.value,
-      },
-    }));
-
-    this.types = this.findTypes(this.objects);
+    this.types = this.findTypes(this.objectsObj);
     this.totalVolume = totalVol;
 
     this.updateVolumeGradient();
@@ -432,15 +424,14 @@ export default class Assessment extends Vue {
     this.transportColors = this.colors;
 
     selected.material.objects.forEach((i) => {
-      this.objects = this.objects.map((o) => ({
-        ...o,
+      const oldObj = this.objectsObj[i];
+      this.objectsObj[i] = {
+        ...oldObj,
         formData: {
-          transport:
-            o.id === i ? selected.transportType : o.formData?.transport,
-          material: o.formData?.material,
-          volume: o.formData?.volume,
-        },
-      }));
+          ...oldObj.formData,
+          transport: selected.transportType
+        }
+      }
     });
   }
 
@@ -466,21 +457,21 @@ export default class Assessment extends Vue {
 
     // update the objects to include this new material
     material.type.ids.forEach((i) => {
-      this.objects = this.objects.map((o) => ({
-        ...o,
+      const oldObj = this.objectsObj[i];
+      this.objectsObj[i] = {
+        ...oldObj,
         formData: {
-          transport: o.formData?.transport,
-          material: o.id === i ? material.material : o.formData?.material,
-          volume: o.formData?.volume,
-        },
-      }));
+          ...oldObj.formData,
+          material: material.material
+        }
+      }
     });
   }
 
-  findTypes(objects: SpeckleObject[]): SpeckleType[] {
+  findTypes(objects: ObjectsObj): SpeckleType[] {
     let types: SpeckleType[] = [];
 
-    objects.forEach((o) => {
+    Object.values(objects).forEach((o) => {
       let typeIndex = -1;
       types.forEach((t, i) => {
         if (t.type === o.speckle_type) typeIndex = i;

@@ -178,7 +178,7 @@ export default new Vuex.Store({
           const material = materialCarbonFactors[region][type][t];
           const toPush: MaterialFull = {
             name: `${type} - ${t} (${ (Math.round(100*material.productStageCarbonA1A3)/100) } kgCO2e/kg)`,
-            ...materialCarbonFactors[region][type][t],
+            ...material,
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);

@@ -248,6 +248,14 @@ export default class About extends Vue {
       linkedin: "",
       twitter: ""
     },
+    {
+      name: "Raj Patel (P)",
+      img: "/assets/contributors/placeholder-2.png",
+      byline: "Graduate engineer @ Arup",
+      git: "https://github.com/Raj-P-Patel",
+      linkedin: "https://www.linkedin.com/in/raj-p-patel-aa25b09a",
+      twitter: ""
+    },
   ]
 
   dataSources = [
@@ -257,6 +265,39 @@ export default class About extends Vue {
         {
           name: "IFC India Construction Materials Database Methodology Report 2017",
           url: "https://edgebuildings.com/wp-content/uploads/2017/12/IFC-India-Construction-Materials-Database-Methodology-Report.pdf"
+        }
+      ]
+    },
+    {
+      name: "Netherlands",
+      sources: [
+        {
+          name: "De Nationale Milieudatabase (NMD, 2021)",
+          url: "https://milieudatabase.nl/database/nationalemilieudatabase/",
+        },
+        {
+          name: "Derix X-LAM CLT EPD (2019)",
+          url: ""
+        },
+        {
+          name: "Kerto LVL EPD (2015)",
+          url: ""
+        },
+        {
+          name: "MRPI Cement Data",
+          url: "",
+        },
+        {
+          name: "Studiengemeinschaft Holzleimbau EPD",
+          url: ""
+        },
+        {
+          name: "TATA Steel EPDs",
+          url: "",
+        },
+        {
+          name: "VBI Consolis EPDs",
+          url: "",
         }
       ]
     },
@@ -288,15 +329,6 @@ export default class About extends Vue {
     },
     {
       name: "East Asia",
-      sources: [
-        {
-          name: "coming soon",
-          url: ""
-        }
-      ]
-    },
-    {
-      name: "Europe",
       sources: [
         {
           name: "coming soon",

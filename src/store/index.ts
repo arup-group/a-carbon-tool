@@ -32,6 +32,7 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
+import { productStageCarbonA1A3 } from "./utilities/carbonCalculator";
 
 import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
@@ -40,7 +41,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    servers: {// servers object can becomes cached, if changing object check
+    version: "0.0.1",
+    servers: {
       arup: {
         region: "UKIMEA",
         url: "https://v2.speckle.arup.com",
@@ -64,7 +66,7 @@ export default new Vuex.Store({
 
     // Carbon data
     selectedRegion: "UK",
-    availableRegions: ["India", "UK"],
+    availableRegions: ["India", "Netherlands", "UK",],
     becs: [
       {
         name: "Superstructure" as BECName,
@@ -107,13 +109,18 @@ export default new Vuex.Store({
       "Brick",
       "Blockwork",
       "Cement",
+      "Coating",
       "Concrete",
+      "Copper",
       "Fire",
+      "Fill Materials",
       "Glass",
       "Gypsum",
       "Insulation",
+      "Natural materials",
       "Plasterboard",
       "Plastic",
+      "Soil",
       "Steel",
       "Stone",
       "Timber",
@@ -171,9 +178,10 @@ export default new Vuex.Store({
       ).map((type) => {
         const arr: MaterialFull[] = [];
         Object.keys(materialCarbonFactors[region][type]).forEach((t) => {
+          const material = materialCarbonFactors[region][type][t];
           const toPush: MaterialFull = {
-            name: `${type} - ${t}`,
-            ...materialCarbonFactors[region][type][t],
+            name: `${type} - ${t} (${ (Math.round(100*material.productStageCarbonA1A3)/100) } kgCO2e/kg)`,
+            ...material,
             color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);

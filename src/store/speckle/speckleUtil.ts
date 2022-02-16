@@ -35,7 +35,7 @@ export function goToSpeckleAuthpage(server: Server) {
   localStorage.setItem(CHALLENGE, challenge);
   localStorage.setItem(SERVER, JSON.stringify(server));
 
-  // Send user to auth page
+  // Send user to auth page 
   window.location.href = `${server.url}/authn/verify/${server.speckleId}/${challenge}`;
 }
 

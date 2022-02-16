@@ -248,6 +248,14 @@ export default class About extends Vue {
       linkedin: "",
       twitter: ""
     },
+    {
+      name: "Raj Patel (P)",
+      img: "/assets/contributors/placeholder-2.png",
+      byline: "Graduate engineer @ Arup",
+      git: "https://github.com/Raj-P-Patel",
+      linkedin: "https://www.linkedin.com/in/raj-p-patel-aa25b09a",
+      twitter: ""
+    },
   ]
 
   dataSources = [

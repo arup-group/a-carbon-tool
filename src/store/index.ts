@@ -258,7 +258,7 @@ export default new Vuex.Store({
         ) {
           const server = getServer(context);
           const token = getToken();
-          context.commit("login", {
+          context.commit("login", { 
             token,
             server,
           });

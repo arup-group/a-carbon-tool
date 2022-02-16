@@ -21,7 +21,6 @@ export interface AllMaterialCarbonFactors {
   India: RegionMaterialCarbonFactors;
   Netherlands: RegionMaterialCarbonFactors;
   UK: RegionMaterialCarbonFactors;
-
 }
 
 
@@ -147,11 +146,11 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Dense concrete block": {
-          productStageCarbonA1A3: 0.16,
-          density: 2200,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.16,
+        density: 2200,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Precast concrete panels": {
         productStageCarbonA1A3: 0.27,
@@ -161,63 +160,63 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Autocalved aerated concrete": {
-          productStageCarbonA1A3: 0.5,
-          density: 500,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.5,
+        density: 500,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Cement based plaster": {
-          productStageCarbonA1A3: 0.44,
-          density: 2200,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.44,
+        density: 2200,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Cement floor screed": {
-          productStageCarbonA1A3: 0.18,
-          density: 2200,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.18,
+        density: 2200,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Cement mortar": {
-          productStageCarbonA1A3: 0.14,
-          density: 2200,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.14,
+        density: 2200,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Cement/lime render for external wall finishes": {
-          productStageCarbonA1A3: 0.27,
-          density: 2200,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.27,
+        density: 2200,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Glass reinforced concrete": {
-          productStageCarbonA1A3: 0.16,
-          density: 2550,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.16,
+        density: 2550,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Lime mortar": {
-          productStageCarbonA1A3: 0.43,
-          density: 2200,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.43,
+        density: 2200,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       }
     },
     Copper: {
-        "Coppper sheet": {
-            productStageCarbonA1A3: 7.4,
-            density: 8940,
-            wastage: 0.05,
-            units: "kgCO2e/kg",
-            source: "IFC India Construction Materials Database Methodology Report 2017"
-        }
+      "Coppper sheet": {
+        productStageCarbonA1A3: 7.4,
+        density: 8940,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
+      }
     },
     Glass: {
       "Float glass": {
@@ -237,32 +236,32 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Calcined gypsum": {
-          productStageCarbonA1A3: 0.13,
-          density: 3.65,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.13,
+        density: 3.65,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Phosphogypsum": {
-          productStageCarbonA1A3: 0.056,
-          density: 2960,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.056,
+        density: 2960,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Plasterboard": {
-          productStageCarbonA1A3: 0.49,
-          density: 700,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.49,
+        density: 700,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Fly ash/lime/gypsum block": {
-          productStageCarbonA1A3: 0.2,
-          density: 1760,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.2,
+        density: 1760,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       }
     },
     Insulation: {
@@ -302,56 +301,56 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Cellulose insulation": {
-          productStageCarbonA1A3: 0.37,
-          density: 50,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.37,
+        density: 50,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Cork insulation": {
-          productStageCarbonA1A3: 0.71,
-          density: 80,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.71,
+        density: 80,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       }
     },
     Soil: {
-        "Mud plaster": {
-            productStageCarbonA1A3: 0.051,
-            density: 1000,
-            wastage: 0.05,
-            units: "kgCO2e/kg",
-            source: "IFC India Construction Materials Database Methodology Report 2017"
-        },
-        "OPC stabilised soil block": {
-            productStageCarbonA1A3: 0.096,
-            density: 2000,
-            wastage: 0.05,
-            units: "kgCO2e/kg",
-            source: "IFC India Construction Materials Database Methodology Report 2017"
-        },
-        "PFA stabilised soil block": {
-            productStageCarbonA1A3: 0.01,
-            density: 2000,
-            wastage: 0.05,
-            units: "kgCO2e/kg",
-            source: "IFC India Construction Materials Database Methodology Report 2017"
-        },
-        "Portland slag cement stabilised soil block": {
-            productStageCarbonA1A3: 0.073,
-            density: 2000,
-            wastage: 0.05,
-            units: "kgCO2e/kg",
-            source: "IFC India Construction Materials Database Methodology Report 2017"
-        },
-        "Rammed earth": {
-            productStageCarbonA1A3: 0.1116,
-            density: 1900,
-            wastage: 0.05,
-            units: "kgCO2e/kg",
-            source: "IFC India Construction Materials Database Methodology Report 2017"
-        }
+      "Mud plaster": {
+        productStageCarbonA1A3: 0.051,
+        density: 1000,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
+      },
+      "OPC stabilised soil block": {
+        productStageCarbonA1A3: 0.096,
+        density: 2000,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
+      },
+      "PFA stabilised soil block": {
+        productStageCarbonA1A3: 0.01,
+        density: 2000,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
+      },
+      "Portland slag cement stabilised soil block": {
+        productStageCarbonA1A3: 0.073,
+        density: 2000,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
+      },
+      "Rammed earth": {
+        productStageCarbonA1A3: 0.1116,
+        density: 1900,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
+      }
     },
     Plastic: {
       "Carpet (nylon) tile": {
@@ -413,18 +412,18 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Electrogalvanised steel sheet (corrugated zinc)": {
-          productStageCarbonA1A3: 3,
-          density: 7850,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 3,
+        density: 7850,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Galvanised steel stud": {
-          productStageCarbonA1A3: 3.1,
-          density: 7850,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 3.1,
+        density: 7850,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       }
     },
     Timber: {
@@ -443,28 +442,28 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Particle board/chipboard": {
-          productStageCarbonA1A3: 0.2,
-          density: 710,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 0.2,
+        density: 710,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Plywood": {
-          productStageCarbonA1A3: 1.02,
-          density: 600,
-          wastage: 0.05,
-          units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+        productStageCarbonA1A3: 1.02,
+        density: 600,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
       }
     },
     NaturalMaterials: {
-        "Straw bale": {
-            productStageCarbonA1A3: 0.19,
-            density: 140,
-            wastage: 0.05,
-            units: "kgCO2e/kg",
-            source: "IFC India Construction Materials Database Methodology Report 2017"
-        }
+      "Straw bale": {
+        productStageCarbonA1A3: 0.19,
+        density: 140,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "IFC India Construction Materials Database Methodology Report 2017"
+      }
     }
   },
   Netherlands: {

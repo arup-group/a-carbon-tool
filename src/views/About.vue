@@ -274,6 +274,30 @@ export default class About extends Vue {
         {
           name: "De Nationale Milieudatabase (NMD, 2021)",
           url: "https://milieudatabase.nl/database/nationalemilieudatabase/",
+        },
+        {
+          name: "Derix X-LAM CLT EPD (2019)",
+          url: ""
+        },
+        {
+          name: "Kerto LVL EPD (2015)",
+          url: ""
+        },
+        {
+          name: "MRPI Cement Data",
+          url: "",
+        },
+        {
+          name: "Studiengemeinschaft Holzleimbau EPD",
+          url: ""
+        },
+        {
+          name: "TATA Steel EPDs",
+          url: "",
+        },
+        {
+          name: "VBI Consolis EPDs",
+          url: "",
         }
       ]
     },

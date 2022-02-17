@@ -267,7 +267,6 @@ export default new Vuex.Store({
         const data = json.data;
         context.commit("setUser", data.user);
         context.commit("setServerInfo", data.serverInfo);
-        console.log(data.user)
       } catch (err) {
         console.error(err);
         if (err === AuthError.NOT_SIGNED_IN)

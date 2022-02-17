@@ -95,7 +95,7 @@
           @click.native="step = 7"
           color="secondary darken-2"
         >
-          Report
+          Save
         </v-stepper-step>
         <v-stepper-content step="7">
           <menu-7 :canSave="canSave" @checkSave="checkSave" />

@@ -8,7 +8,12 @@
     <v-card style="width: 100%; overflow-y: scroll; height: 85vh">
       <v-card-title class="">New Assessment</v-card-title>
       <v-stepper v-model="step" vertical>
-        <v-stepper-step :complete="completed" step="1" @click.native="step = 1">
+        <v-stepper-step
+          :complete="completed"
+          step="1"
+          @click.native="step = 1"
+          color="secondary darken-2"
+        >
           Data
         </v-stepper-step>
         <v-stepper-content step="1">
@@ -21,7 +26,12 @@
             :becs="becs"
           />
         </v-stepper-content>
-        <v-stepper-step :complete="completed" step="2" @click.native="step = 2">
+        <v-stepper-step
+          :complete="completed"
+          step="2"
+          @click.native="step = 2"
+          color="secondary darken-2"
+        >
           Materials
         </v-stepper-step>
         <v-stepper-content step="2">
@@ -31,7 +41,12 @@
             @materialUpdated="materialUpdated"
           />
         </v-stepper-content>
-        <v-stepper-step :complete="completed" step="3" @click.native="step = 3">
+        <v-stepper-step
+          :complete="completed"
+          step="3"
+          @click.native="step = 3"
+          color="secondary darken-2"
+        >
           Transport
         </v-stepper-step>
         <v-stepper-content step="3">
@@ -41,26 +56,46 @@
             :types="types"
           />
         </v-stepper-content>
-        <v-stepper-step :complete="completed" step="4" @click.native="step = 4">
+        <v-stepper-step
+          :complete="completed"
+          step="4"
+          @click.native="step = 4"
+          color="secondary darken-2"
+        >
           Quantities
         </v-stepper-step>
         <v-stepper-content step="4">
           <menu-4 :totalVolume="totalVolume" />
         </v-stepper-content>
-        <v-stepper-step :complete="completed" step="5" @click.native="step = 5">
+        <v-stepper-step
+          :complete="completed"
+          step="5"
+          @click.native="step = 5"
+          color="secondary darken-2"
+        >
           Review
         </v-stepper-step>
         <v-stepper-content step="5">
           <menu-5 :emptyProps="emptyProps" />
         </v-stepper-content>
-        <v-stepper-step :complete="completed" step="6" @click.native="step = 6">
+        <v-stepper-step
+          :complete="completed"
+          step="6"
+          @click.native="step = 6"
+          color="secondary darken-2"
+        >
           Preview
         </v-stepper-step>
         <v-stepper-content step="6">
           <menu-6 :report="report" />
         </v-stepper-content>
-        <v-stepper-step :complete="completed" step="7" @click.native="step = 7">
-          Save
+        <v-stepper-step
+          :complete="completed"
+          step="7"
+          @click.native="step = 7"
+          color="secondary darken-2"
+        >
+          Report
         </v-stepper-step>
         <v-stepper-content step="7">
           <menu-7 :canSave="canSave" @checkSave="checkSave" />

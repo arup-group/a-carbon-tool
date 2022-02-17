@@ -100,7 +100,7 @@ export default class ViewAssessment extends Vue {
     materialBreakdown: {
       materials: [
         {
-          name: "some value 1",
+          label: "some value 1",
           value: 50,
           color: "",
         },

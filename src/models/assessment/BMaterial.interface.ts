@@ -1,5 +1,5 @@
 export interface BMaterial {
-  name: string;
+  label: string;
   value: number;
   color: string;
 }

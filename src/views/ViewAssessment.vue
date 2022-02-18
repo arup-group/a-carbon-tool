@@ -1,5 +1,5 @@
 <template>
-  <v-container class="d-flex justify-space-between pt-5 container">
+  <v-container class="d-flex justify-space-between pt-5 container" fluid>
     <div class="d-flex flex-column justify-space-between card-container">
       <project-info-card class="card" :projectInfo="projectInfo" />
       <view-assessment-buttons class="card" />

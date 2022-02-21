@@ -7,9 +7,7 @@
         class="d-flex justify-space-between"
       >
         <div>
-          <v-btn icon color="primary">
-            <v-icon>{{ getIcon(poss) }}</v-icon>
-          </v-btn>
+          <v-icon icon :color="getCol(poss)">{{ getIcon(poss) }}</v-icon>
           <strong> {{ poss }}: </strong>
           {{ getFilleds(poss) }}
         </div>
@@ -29,7 +27,7 @@ export default class Menu5 extends Vue {
   @Prop() emptyProps!: EmptyPropsPassdown;
 
   possibleEmpty: PossibleEmpty[] = ["Data", "Materials", "Transport", "Volume"];
-
+  colorCheck = "primary";
   getFilleds(val: PossibleEmpty) {
     switch (val) {
       case "Data":
@@ -46,30 +44,68 @@ export default class Menu5 extends Vue {
     }
   }
 
+  getCol(val: PossibleEmpty) {
+    switch (val) {
+      case "Data":
+        if (this.projectFilled === "Data step is complete") {
+          return "primary";
+        } else {
+          return "red";
+        }
+      case "Materials":
+        if (this.materialsFilled === "All objects have materials") {
+          return "primary";
+        } else {
+          return "red";
+        }
+      case "Transport":
+        if (this.transportsFilled === "All objects have a transport type") {
+          return "primary";
+        } else {
+          return "red";
+        }
+      case "Volume":
+        if (this.volumesFilled === "All objects have a volume") {
+          return "primary";
+        } else {
+          return "red";
+        }
+      default:
+          return "red";
+        }
+    }
   getIcon(val: PossibleEmpty) {
     switch (val) {
       case "Data":
         if (this.projectFilled === "Data step is complete") {
+          this.colorCheck = "primary";
           return "mdi-check-circle";
         } else {
+          this.colorCheck = "red";
           return "mdi-alert-circle";
         }
       case "Materials":
         if (this.materialsFilled === "All objects have materials") {
+          this.colorCheck = "primary";
           return "mdi-check-circle";
         } else {
+          this.colorCheck = "red";
           return "mdi-alert-circle";
         }
       case "Transport":
         if (this.transportsFilled === "All objects have a transport type") {
+          this.colorCheck = "primary";
           return "mdi-check-circle";
         } else {
+          this.colorCheck = "red";
           return "mdi-alert-circle";
         }
       case "Volume":
         if (this.volumesFilled === "All objects have a volume") {
+          this.colorCheck = "primary";
           return "mdi-check-circle";
         } else {
+          this.colorCheck = "Red";
           return "mdi-alert-circle";
         }
       default:

@@ -14,7 +14,7 @@
         :colors="colors"
         :gradientColorProperty="volumeGradientPassdown"
       />
-      <div style="width: 40%">
+      <div style="width: 35%">
         <AssessmentStepper
           style="z-index: 1"
           v-if="availableStreams.length !== 0"

@@ -22,7 +22,7 @@
           chips
         >
           <template #selection="{ item }">
-            <v-chip :text-color="item.color">{{ item.name }}</v-chip>
+            <v-chip :text-color="item.color"><strong>{{ item.name }}</strong></v-chip>
           </template>
         </v-combobox>
       </v-col>

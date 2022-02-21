@@ -1,7 +1,12 @@
 <template>
   <v-main>
-    <v-container class="d-flex justify-flex-start flex-row ml-5">
+    <v-container
+      fluid
+      class="d-flex justify-flex-start flex-row"
+      style="margin: 10px; padding: 10px; width: 100%"
+    >
       <Renderer
+        class="justify-flex-end"
         v-if="objectURLs.length !== 0"
         @loaded="rendererLoaded"
         :objecturls="objectURLs"
@@ -9,7 +14,7 @@
         :colors="colors"
         :gradientColorProperty="volumeGradientPassdown"
       />
-      <div style="width: 45%">
+      <div style="width: 40%">
         <AssessmentStepper
           style="z-index: 1"
           v-if="availableStreams.length !== 0"
@@ -89,7 +94,7 @@ import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 
 @Component({
-  components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar,},
+  components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar },
 })
 export default class Assessment extends Vue {
   saveSuccess = true;
@@ -144,7 +149,7 @@ export default class Assessment extends Vue {
       };
       await this.$store.dispatch("uploadReport", uploadReportInput);
       this.saveSnack = true;
-      this.$router.push("/")
+      this.$router.push("/");
     }
   }
   saveSnackClose() {

@@ -8,6 +8,7 @@
       v-if="urlsLoaded && chartDataReady"
       :objecturls="objectUrls"
       :token="token"
+      :colors="colors"
       class="renderer"
     />
     <div
@@ -32,6 +33,7 @@ import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
 import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
+import { Color } from "../components/shared/Renderer.vue";
 
 @Component({
   components: {
@@ -53,7 +55,7 @@ export default class ViewAssessment extends Vue {
       .then((res: string[]) => {
         this.objectUrls = res;
       });
-
+    console.log("------> viewAssessment this: \n", this);
     this.token = this.$store.state.token.token;
   }
 
@@ -80,6 +82,17 @@ export default class ViewAssessment extends Vue {
   }
   get streamId() {
     return this.$route.params.streamId;
+  }
+
+  get colors() {
+    return this.assessment.materialBreakdown.materials.map(
+      (mat: { label: string; value: number; color: string }) => {
+        return {
+          color: mat.color,
+          id: mat.label,
+        };
+      }
+    );
   }
 
   assessment: AssessmentComplete = {

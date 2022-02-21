@@ -39,6 +39,7 @@ export default class extends Vue {
 
   @Watch("colors")
   onObjectColorChanged(value: Color[]) {
+    console.log("---> value.length: \n", value.length);
     if (value.length === 0 || this.gradientColorProperty) this.resetColors();
     else this.setColors(value);
   }
@@ -80,6 +81,7 @@ export default class extends Vue {
 
     this.viewer = new Viewer({ contained: renderDomElement });
     this.objecturls.forEach((url) => {
+      console.log("---> url: \n", url);
       this.viewer.loadObject(url, this.token);
     });
 
@@ -90,17 +92,22 @@ export default class extends Vue {
         const allObjects = this.viewer.sceneManager.sceneObjects
           .allObjects as THREE.Group;
         const allObjectsChildren = allObjects.children;
+        console.log("---> allObjects.childre: \n", allObjects.children);
         const allMesh: THREE.Mesh[] = [];
         allObjectsChildren.forEach((oc) => {
           const meshChildren = oc.children.filter(
             (c) => c.type === "Mesh"
           ) as THREE.Mesh[];
+          // console.log("---> meshChildren: \n ", meshChildren);
           allMesh.push(...meshChildren);
         });
         // set initial colors if needed
+        console.log("---> this.viewer: \n", this.viewer);
+        console.log("---> this.colors: \n", this.colors);
         if (this.colors) {
           this.setColors(this.colors);
         }
+
         this.loaded(allMesh);
       }
     });
@@ -124,7 +131,7 @@ export default class extends Vue {
         (obj, item) => Object.assign(obj, { [item.key]: item.value }),
         {}
       );
-
+      console.log("---> changeListObj: \n", changeListObj);
       const res = await this.viewer.applyFilter({
         colorBy: {
           type: "category",

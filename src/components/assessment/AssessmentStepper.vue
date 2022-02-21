@@ -20,7 +20,9 @@
             :step="step"
             :becs="becs"
           />
-          <v-btn @click="step = 2" color="primary"> Next </v-btn>
+          <v-btn :style="colStyle" @click="step = 2" color="primary">
+            Next
+          </v-btn>
         </v-stepper-content>
         <v-stepper-step step="2" color="secondary darken-2">
           Materials
@@ -31,8 +33,12 @@
             :materials="materials"
             @materialUpdated="materialUpdated"
           />
-          <v-btn @click="step = 1" color="primary"> Previous </v-btn>
-          <v-btn @click="step = 3" color="primary"> Next </v-btn>
+          <v-btn :style="colStyle" @click="step = 1" color="primary">
+            Previous
+          </v-btn>
+          <v-btn :style="colStyle" @click="step = 3" color="primary">
+            Next
+          </v-btn>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -47,8 +53,12 @@
             :transportTypes="transportTypes"
             :types="types"
           />
-          <v-btn @click="step = 2" color="primary"> Previous </v-btn>
-          <v-btn @click="step = 4" color="primary"> Next </v-btn>
+          <v-btn :style="colStyle" @click="step = 2" color="primary">
+            Previous
+          </v-btn>
+          <v-btn :style="colStyle" @click="step = 4" color="primary">
+            Next
+          </v-btn>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -59,8 +69,12 @@
         </v-stepper-step>
         <v-stepper-content step="4">
           <menu-4 :totalVolume="totalVolume" />
-          <v-btn @click="step = 3" color="primary"> Previous </v-btn>
-          <v-btn @click="step = 5" color="primary"> Next </v-btn>
+          <v-btn :style="colStyle" @click="step = 3" color="primary">
+            Previous
+          </v-btn>
+          <v-btn :style="colStyle" @click="step = 5" color="primary">
+            Next
+          </v-btn>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -71,8 +85,12 @@
         </v-stepper-step>
         <v-stepper-content step="5">
           <menu-5 :emptyProps="emptyProps" />
-          <v-btn @click="step = 4" color="primary"> Previous </v-btn>
-          <v-btn @click="step = 6" color="primary"> Next </v-btn>
+          <v-btn :style="colStyle" @click="step = 4" color="primary">
+            Previous
+          </v-btn>
+          <v-btn :style="colStyle" @click="step = 6" color="primary">
+            Next
+          </v-btn>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -83,8 +101,12 @@
         </v-stepper-step>
         <v-stepper-content step="6">
           <menu-6 :report="report" />
-          <v-btn @click="step = 5" color="primary"> Previous </v-btn>
-          <v-btn @click="step = 7" color="primary"> Next </v-btn>
+          <v-btn :style="colStyle" @click="step = 5" color="primary">
+            Previous
+          </v-btn>
+          <v-btn :style="colStyle" @click="step = 7" color="primary">
+            Next
+          </v-btn>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -94,8 +116,10 @@
           Save
         </v-stepper-step>
         <v-stepper-content step="7">
-          <v-btn @click="step = 6" color="primary"> Previous </v-btn>
-          <menu-7 :canSave="canSave" @checkSave="checkSave" />
+          <v-btn :style="colStyle" @click="step = 6" color="primary">
+            Previous
+          </v-btn>
+          <menu-7 :style="colStyle" :canSave="canSave" @checkSave="checkSave" />
         </v-stepper-content>
       </v-stepper>
     </v-card>
@@ -136,6 +160,17 @@ export default class AssessmentStepper extends Vue {
   @Prop() becs!: string;
 
   step: Step = 1;
+
+  get colStyle() {
+    if (this.$store.state.darkMode)
+      return { "background-color": "#1C1C1C !important" };
+    else {
+      return {
+        "background-color": "#FFFFFF !important",
+        color: "#1C1C1C !important",
+      };
+    }
+  }
 
   get canSave() {
     return this.report ? true : false;

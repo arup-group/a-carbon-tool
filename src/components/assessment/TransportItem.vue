@@ -7,6 +7,7 @@
         :item-text="(types) => types['name']"
         :item-value="(types) => types"
         v-model="selected"
+        chips
       >
         <template #selection="{ item }">
         <v-chip :color="item.color">{{ item.name }}</v-chip>

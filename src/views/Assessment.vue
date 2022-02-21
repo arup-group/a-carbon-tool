@@ -107,6 +107,7 @@ export default class Assessment extends Vue {
   objects: SpeckleObject[] = [];
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
+  becs: TransportType[] = [];
   volumeCalcMode: CalcModes = CalcModes.PROPERTY;
   totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
@@ -134,11 +135,13 @@ export default class Assessment extends Vue {
       });
     });
     this.transportTypes = this.$store.state.transportTypes;
+    this.becs = this.$store.state.becs;
   }
 
-  get becs(): string[] {
-    return this.$store.state.becs.map((b: { name: string }) => b.name);
-  }
+  //get becs(): string[] {
+  //  return this.$store.state.becs.map((b: { name: string }) => b.name);
+  //}
+
   async agreeSave() {
     if (this.report) {
       const uploadReportInput: UploadReportInput = {

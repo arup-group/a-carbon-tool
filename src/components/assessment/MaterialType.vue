@@ -19,9 +19,10 @@
           :items="materials"
           :item-text="(materials) => materials['name']"
           @change="checkMaterialUpdated"
+          chips
         >
           <template #selection="{ item }">
-            <v-chip :color="item.color">{{ item.name }}</v-chip>
+            <v-chip :text-color="item.color">{{ item.name }}</v-chip>
           </template>
         </v-combobox>
       </v-col>

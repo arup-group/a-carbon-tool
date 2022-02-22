@@ -106,7 +106,7 @@ export default class ProjectCard extends Vue {
 </script>
 <style scoped>
 .limit-lines {
-  display: -webkit-box;/* or inline-block */
+  display: -webkit-box; /* or inline-block */
   overflow: hidden;
   max-height: 4em;
   -webkit-line-clamp: 2;

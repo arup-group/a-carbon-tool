@@ -34,7 +34,6 @@ export const streamsDataQuery = (streamId: string, objId: string) => `query {
       }
     }
   }`;
-
 export const streamReferencedObjects = (id: string) => `query {
   stream(id: "${id}") {
     branch {
@@ -129,6 +128,23 @@ export const streamReferencedBranches = (id: string) => `query {
     }
   }
 }`;
+
+export const actReportBranchInfo = (id: string) => {
+  return `query {
+  stream(id: "${id}") {
+    name
+    branch(name: "actcarbonreport") {
+    commits {
+      items {
+        authorName
+        createdAt
+      	referencedObject
+      }
+    }
+  }
+  }
+}`;
+};
 
 export const deleteBranchMutation = (
   streamId: string,

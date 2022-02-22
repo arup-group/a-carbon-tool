@@ -27,6 +27,7 @@
         :items="becs"
         :rules="selectionRules"
         label="Primary element category"
+        chips
       ></v-select>
       <v-text-field
         v-model="form.cost"

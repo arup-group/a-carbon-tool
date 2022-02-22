@@ -7,9 +7,7 @@
       </v-btn>
     </v-card-title>
     <v-card-subtitle>
-      <v-chip outlined>
-        {{ type }}
-      </v-chip>
+      <BECChip :category="type" />
     </v-card-subtitle>
     <v-card-text>
       <v-divider class="mb-4 mt-3"></v-divider>
@@ -57,8 +55,11 @@
 <script lang="ts">
 import { ProjectInfo } from "@/models/assessment";
 import { Vue, Component, Prop } from "vue-property-decorator";
+import BECChip from "../shared/BECChip.vue";
 
-@Component
+@Component({
+  components: { BECChip },
+})
 export default class ProjectInfoCard extends Vue {
   @Prop() projectInfo!: ProjectInfo;
   show = false;

@@ -209,6 +209,7 @@ export default class Landing extends Vue {
         branches: StreamReferenceBranches;
         stream: { id: string; name: string };
       }[] = [];
+      console.log('here are all the streams\n', streams)
       for (let i = 0; i < streamID.length; i++) {
         const branches: StreamReferenceBranches = await this.$store.dispatch(
           "getStreamBranches",
@@ -223,7 +224,7 @@ export default class Landing extends Vue {
             if (branch.name === "actcarbonreport") {
               this.carbonBranches.push({
                 ...streamBranches[i].stream,
-                branchid: branch.id,
+                branchid: branch.id
               });
             }
           }
@@ -240,10 +241,13 @@ export default class Landing extends Vue {
           carbonCommit =
             branchCommit.data.stream.branch.commits.items[0].referencedObject;
         }
+        // gets data from the most recent stream branch commit that we've just got from speckle.
+        // put a console log here to see what data we got from all the above request params
         const branch: StreamData = await this.$store.dispatch("getBranchData", [
           this.carbonBranches[i].id,
           carbonCommit,
         ]);
+        console.log('here is a branch', branch)
         if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
           this.branchData.push({
             id: this.carbonBranches[i].id,

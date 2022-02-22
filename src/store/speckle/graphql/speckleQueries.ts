@@ -10,6 +10,8 @@ export const userInfoQuery = () => `query {
     }
   }`;
 
+// REMOVE COMMENT WHEN COMPLETE
+// added createdAt to check when each main stream was created
 export const streamsQuery = () => `query {
   user {
     name,
@@ -17,6 +19,7 @@ export const streamsQuery = () => `query {
         items {
           name,
           id,
+          createdAt,
         }
       }
     }
@@ -118,12 +121,13 @@ stream(id: "${id}") {
   }
 }`;
 
+// TODO: get more info on branch such as date - need to make sure date is ahead of main
 export const streamReferencedBranches = (id: string) => `query {
   stream(id: "${id}") {
     branches {
       items {
         id,
-        name
+        name,
       }
     }
   }

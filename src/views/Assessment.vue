@@ -144,15 +144,21 @@ export default class Assessment extends Vue {
 
   async agreeSave() {
     if (this.report) {
-      const uploadReportInput: UploadReportInput = {
-        streamid: this.streamid,
-        objects: this.report.reportObjs,
-        reportTotals: this.report.totals,
-        projectData: this.projectData,
-      };
-      await this.$store.dispatch("uploadReport", uploadReportInput);
-      this.saveSnack = true;
-      this.$router.push("/");
+      if (this.report.reportObjs.length > 0) {
+        const uploadReportInput: UploadReportInput = {
+          streamid: this.streamid,
+          objects: this.report.reportObjs,
+          reportTotals: this.report.totals,
+          projectData: this.projectData,
+        };
+        await this.$store.dispatch("uploadReport", uploadReportInput);
+        this.saveSnack = true;
+        this.$router.push("/");
+      } else {
+        this.saveSnack = true;
+        this.saveSuccess = false;
+        this.dialog = false;
+      }
     }
   }
   saveSnackClose() {

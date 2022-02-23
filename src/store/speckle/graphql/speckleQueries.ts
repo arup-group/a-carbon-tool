@@ -121,13 +121,16 @@ stream(id: "${id}") {
   }
 }`;
 
-// TODO: get more info on branch such as date - need to make sure date is ahead of main
+// Gets all branches for a particular stream id including date
 export const streamReferencedBranches = (id: string) => `query {
   stream(id: "${id}") {
     branches {
       items {
         id,
         name,
+        commits {
+          cursor
+        }
       }
     }
   }

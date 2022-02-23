@@ -200,16 +200,20 @@ export default class Landing extends Vue {
       // get all of the user's streams
       const streams = await this.$store.dispatch("getUserStreams");
       // format the streams into a more usable format
-      const streamID: { name: string; id: string }[] =
+      const streamID: { name: string; id: string; createdAt: string }[] =
         streams.data.user.streams.items.map((stream: any) => {
-          return { name: stream.name, id: stream.id };
+          return { name: stream.name, id: stream.id, createdAt: stream.createdAt };
         });
+
+      // Logging the formatted streams (with createdAt)
+      //console.log(streamID);
+
       // get all of the branches that are on each stream
       const streamBranches: {
         branches: StreamReferenceBranches;
-        stream: { id: string; name: string };
+        stream: { id: string; name: string; createdAt: string };
       }[] = [];
-      console.log('here are all the streams\n', streams)
+
       for (let i = 0; i < streamID.length; i++) {
         const branches: StreamReferenceBranches = await this.$store.dispatch(
           "getStreamBranches",
@@ -217,19 +221,35 @@ export default class Landing extends Vue {
         );
         streamBranches.push({ branches, stream: streamID[i] });
       }
+
       // filter those branches to only the "actcarbonreport" branches
       for (let i = 0; i < streamBranches.length; i++) {
+        console.log(streamBranches[i])
         streamBranches[i].branches.data.stream.branches.items.forEach(
           (branch) => {
             if (branch.name === "actcarbonreport") {
               this.carbonBranches.push({
                 ...streamBranches[i].stream,
-                branchid: branch.id
+                branchid: branch.id,
               });
             }
           }
         );
       }
+      
+      console.log("here are the carbon branches\n", this.carbonBranches)
+
+      // for (const streamBranch in streamBranches) {
+      //   const filter_test_result = streamBranches[
+      //     streamBranch
+      //   ].branches.data.stream.branches.items.filter(
+      //     (branch) => branch.name === "actcarbonreport"
+      //   );
+      //   console.log("filter test\n", {...filter_test_result[0]});
+      //   //this.carbonBranches.push(filter_test_result[0].id)
+      // }
+      // //console.log("here is the filter stuff\n", test_array)
+
       // get the most recent commit and the data from that commit
       for (let i = 0; i < this.carbonBranches.length; i++) {
         const branchCommit = await this.$store.dispatch(
@@ -241,13 +261,14 @@ export default class Landing extends Vue {
           carbonCommit =
             branchCommit.data.stream.branch.commits.items[0].referencedObject;
         }
+
         // gets data from the most recent stream branch commit that we've just got from speckle.
-        // put a console log here to see what data we got from all the above request params
         const branch: StreamData = await this.$store.dispatch("getBranchData", [
           this.carbonBranches[i].id,
           carbonCommit,
         ]);
-        console.log('here is a branch', branch)
+        console.log(branch);
+
         if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
           this.branchData.push({
             id: this.carbonBranches[i].id,

@@ -83,6 +83,8 @@ export async function loadStream(context: any, streamId: string) {
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject
   );
 
+  console.log("---> branchData: \n", branchData);
+
   const projectInfoUpdated = {
     name: branchData.data.stream.object.data.projectData.name,
     type: branchData.data.stream.object.data.projectData.component,

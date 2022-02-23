@@ -55,7 +55,7 @@ export default class ViewAssessment extends Vue {
       .then((res: string[]) => {
         this.objectUrls = res;
       });
-    console.log("------> viewAssessment this: \n", this);
+
     this.token = this.$store.state.token.token;
   }
 

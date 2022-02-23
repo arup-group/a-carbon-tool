@@ -1,6 +1,6 @@
-import { SpeckleType, TransportType } from ".";
+import { GroupedMaterial, SpeckleType, TransportType } from ".";
 
 export interface TransportSelected {
-  speckleType: SpeckleType;
+  material: GroupedMaterial;
   transportType: TransportType;
 }

@@ -67,6 +67,15 @@ export default class extends Vue {
   loading = 0;
   failed = false;
   mounted() {
+    this.renderStream(this.objecturls);
+  }
+  @Watch("objecturls")
+  urlsChanged(newVal: string[]) {
+    document.getElementById("renderer")?.remove();
+    this.renderStream(newVal);
+  }
+
+  renderStream(objecturls: string[]) {
     let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
@@ -79,7 +88,7 @@ export default class extends Vue {
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
     this.viewer = new Viewer({ contained: renderDomElement });
-    this.objecturls.forEach((url) => {
+    objecturls.forEach((url) => {
       this.viewer.loadObject(url, this.token);
     });
 

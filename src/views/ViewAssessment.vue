@@ -48,12 +48,13 @@ export default class ViewAssessment extends Vue {
   objectUrls: string[] = [];
   token!: string;
   chartDataReady = false;
+  colors!: Color;
 
   mounted() {
     this.$store
       .dispatch("getObjectUrls", this.assessment.streamId)
       .then((res: string[]) => {
-        this.objectUrls = res;
+        this.objectUrls = [res[0]];
       });
 
     this.token = this.$store.state.token.token;
@@ -65,6 +66,7 @@ export default class ViewAssessment extends Vue {
       this.$route.params.streamId
     );
     this.assessment = assessmentViewData.data;
+    this.colors = assessmentViewData.colors;
     this.chartDataReady = assessmentViewData.ready;
   }
 
@@ -82,17 +84,6 @@ export default class ViewAssessment extends Vue {
   }
   get streamId() {
     return this.$route.params.streamId;
-  }
-
-  get colors() {
-    return this.assessment.materialBreakdown.materials.map(
-      (mat: { label: string; value: number; color: string }) => {
-        return {
-          color: mat.color,
-          id: mat.label,
-        };
-      }
-    );
   }
 
   assessment: AssessmentComplete = {

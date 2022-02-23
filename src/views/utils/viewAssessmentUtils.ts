@@ -24,7 +24,9 @@ export function extractCo2Data(branchData: any) {
     ],
   };
 
-  const co2Obj: { [key: string]: { value: number; color: string } } = {};
+  const co2Obj: {
+    [key: string]: { value: number; color: string; id: string };
+  } = {};
   branchData.data.stream.object.children.objects.forEach((object: any) => {
     levels.levels[0].kgCO2e += parseFloat(
       object.data.act.reportData.productStageCarbonA1A3
@@ -53,15 +55,16 @@ export function extractCo2Data(branchData: any) {
       co2Obj[materialKey] = {
         value: co2Obj[materialKey].value + totalObjectCarbon,
         color: materialColor,
+        id: object.data.act.speckle_type,
       };
     } else {
       co2Obj[materialKey] = {
         value: totalObjectCarbon,
         color: materialColor,
+        id: object.data.act.speckle_type,
       };
     }
   });
-
   const co2Arr = Object.entries(co2Obj);
   const materials = co2Arr.map((obj) => {
     return {
@@ -71,7 +74,13 @@ export function extractCo2Data(branchData: any) {
     };
   });
 
-  return { levels, materials };
+  const colors = co2Arr.map((obj) => {
+    return {
+      id: obj[1].id,
+      color: obj[1].color,
+    };
+  });
+  return { levels, materials, colors };
 }
 
 export async function loadStream(context: any, streamId: string) {
@@ -82,8 +91,6 @@ export async function loadStream(context: any, streamId: string) {
     streamId,
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject
   );
-
-  console.log("---> branchData: \n", branchData);
 
   const projectInfoUpdated = {
     name: branchData.data.stream.object.data.projectData.name,
@@ -117,6 +124,7 @@ export async function loadStream(context: any, streamId: string) {
 
   return {
     ready: true,
+    colors: co2Data.colors,
     data: {
       streamId: streamId,
       projectInfo: projectInfoUpdated,

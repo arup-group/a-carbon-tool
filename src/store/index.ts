@@ -51,9 +51,9 @@ export default new Vuex.Store({
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
-      xyz: {
+      xyz_server: {
         region: "PUBLIC",
-        url: "https://speckle.xyz/",
+        url: "https://speckle.xyz",
         speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
       },
@@ -260,12 +260,11 @@ export default new Vuex.Store({
         ) {
           const server = getServer(context);
           const token = getToken();
-          context.commit("login", {
+          context.commit("login", { 
             token,
             server,
           });
         }
-
         const json = await getUserData(context);
         const data = json.data;
         context.commit("setUser", data.user);

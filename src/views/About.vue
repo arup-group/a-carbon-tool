@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-row>
+  <v-container class="d-flex justify-center mb-6 pa-2">
+    <v-row class="d-flex justify-center mb-6">
       <v-col cols="12" lg="8">
         <v-card flat outlined class="mt-8 mb-4">
           <v-card-title class="text-h4">Declaration</v-card-title>
@@ -46,7 +46,7 @@
                 </v-btn>
               </v-col>
               <v-col cols="6" align="left">
-                <v-btn color="secondary" outlined href='https://speckle.xyz/' target='_blank'>
+                <v-btn color="secondary" outlined href='https://speckle.xyz' target='_blank'>
                   Speckle XYZ
                 </v-btn>
               </v-col>

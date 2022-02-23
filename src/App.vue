@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component } from "vue-property-decorator";
 import Header from "./components/core/Header.vue";
 import Sidebar from "./components/core/Sidebar.vue";
 
@@ -47,18 +47,18 @@ import "@/assets/style.css";
   components: { Header, Sidebar },
 })
 export default class App extends Vue {
-  get name() {
+  get name(): string {
     if (this.isAuthenticated) return this.$store.state.user.name;
     return "";
   }
-  get company() {
+  get company(): string {
     return this.$store.state.serverInfo.company;
   }
-  get serverName() {
+  get serverName(): string {
     return this.$store.state.serverInfo.name;
   }
 
-  get isAuthenticated() {
+  get isAuthenticated(): boolean {
     return this.$store.getters.isAuthenticated;
   }
 
@@ -66,7 +66,7 @@ export default class App extends Vue {
     return this.darkModeState ? "🌞" : "🌚";
   }
 
-  get darkModeState() {
+  get darkModeState(): boolean {
     return this.$store.state.darkMode;
   }
 

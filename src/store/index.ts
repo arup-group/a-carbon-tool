@@ -34,7 +34,6 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
-import { productStageCarbonA1A3 } from "./utilities/carbonCalculator";
 
 import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
@@ -184,7 +183,7 @@ export default new Vuex.Store({
           const toPush: MaterialFull = {
             name: `${type} - ${t} (${ (Math.round(100*material.productStageCarbonA1A3)/100) } kgCO2e/kg)`,
             ...material,
-            color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
+            color: "#" + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);
         });

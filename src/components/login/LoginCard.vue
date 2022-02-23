@@ -17,7 +17,7 @@
               outlined
               color="secondary"
               class="mb-2"
-              @click="signIn('xyz')"
+              @click="signIn('xyz_server')"
             >
               Speckle XYZ
             </v-btn>
@@ -45,12 +45,14 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class LoginCard extends Vue {
-  @Prop() servers!: { arup: Server; xyz: Server };
+  @Prop() servers!: { arup: Server; xyz_server: Server };
 
   signIn(serverDestination: string) {
     if (serverDestination === "arup") {
       this.submit(this.servers.arup);
-    } else if (serverDestination === "xyz") this.submit(this.servers.xyz);
+    } else if (serverDestination === "xyz_server") {
+      this.submit(this.servers.xyz_server);
+    }
   }
 
   @Emit("submit")

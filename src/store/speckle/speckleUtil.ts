@@ -3,6 +3,8 @@ import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 import {
   StreamReferenceObjects,
   StreamReferenceBranches,
+  StreamData,
+  ActReportData,
   DeleteStreamData,
 } from "@/models/graphql";
 
@@ -17,9 +19,9 @@ import {
   createCommitMutation,
   streamReferencedBranches,
   streamCommmitObjects,
+  actReportBranchInfo,
   deleteBranchMutation,
 } from "./graphql/speckleQueries";
-import { StreamData } from "@/models/graphql/StreamData.interface";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -35,7 +37,7 @@ export function goToSpeckleAuthpage(server: Server) {
   localStorage.setItem(CHALLENGE, challenge);
   localStorage.setItem(SERVER, JSON.stringify(server));
 
-  // Send user to auth page
+  // Send user to auth page 
   window.location.href = `${server.url}/authn/verify/${server.speckleId}/${challenge}`;
 }
 
@@ -160,6 +162,12 @@ export const getBranchData = (
 ): Promise<StreamData> =>
   speckleFetch(streamsDataQuery(streamid, objId), context);
 
+export const getActReportBranchInfo = (
+  context: any,
+  streamId: string
+): Promise<ActReportData> =>
+  speckleFetch(actReportBranchInfo(streamId), context);
+
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,
   refreshToken: localStorage.getItem(REFRESH_TOKEN) as string,
@@ -169,4 +177,5 @@ export const deleteBranch = (
   context: any,
   streamid: string,
   branchid: string
-): Promise<DeleteStreamData> => speckleFetch(deleteBranchMutation(streamid, branchid), context);
+): Promise<DeleteStreamData> =>
+  speckleFetch(deleteBranchMutation(streamid, branchid), context);

@@ -15,8 +15,10 @@ import {
   speckleLogOut,
   uploadObjects,
   getStreamCommit,
+  getActReportBranchInfo,
   deleteBranch,
 } from "./speckle/speckleUtil";
+import { loadStream } from "@/views/utils/viewAssessmentUtils";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 import {
@@ -48,9 +50,9 @@ export default new Vuex.Store({
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
-      xyz: {
+      xyz_server: {
         region: "PUBLIC",
-        url: "https://speckle.xyz/",
+        url: "https://speckle.xyz",
         speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
       },
@@ -257,12 +259,11 @@ export default new Vuex.Store({
         ) {
           const server = getServer(context);
           const token = getToken();
-          context.commit("login", {
+          context.commit("login", { 
             token,
             server,
           });
         }
-
         const json = await getUserData(context);
         const data = json.data;
         context.commit("setUser", data.user);
@@ -304,6 +305,16 @@ export default new Vuex.Store({
       return streams;
     },
 
+    async getActReportBranchInfo(context, streamId) {
+      const actReportBranchInfo = await getActReportBranchInfo(
+        context,
+        streamId
+      );
+      return actReportBranchInfo;
+    },
+    async loadActReportData(context, streamId: string) {
+      return await loadStream(context, streamId);
+    },
     async getObjectUrls(context, streamid: string) {
       const objectIds = await getStreamObjects(context, streamid);
 

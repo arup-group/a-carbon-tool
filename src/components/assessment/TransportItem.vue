@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>{{ typeName }}</p>
+    <p>{{ materialName }}</p>
     <div class="d-flex align-center justify-space-between">
       <v-select
         :items="transportTypes"
@@ -29,6 +29,7 @@
 </template>
 <script lang="ts">
 import {
+  GroupedMaterial,
   SpeckleType,
   TransportSelected,
   TransportType,
@@ -40,7 +41,7 @@ type Selected = null | TransportType;
 @Component
 export default class Item extends Vue {
   @Prop() transportTypes!: TransportType[];
-  @Prop() type!: SpeckleType;
+  @Prop() groupedMaterial!: GroupedMaterial;
 
   selected: Selected = null;
   road = 0;
@@ -87,7 +88,7 @@ export default class Item extends Vue {
   @Emit("transportSelected")
   transportSelected(transportType: TransportType): TransportSelected {
     return {
-      speckleType: this.type,
+      material: this.groupedMaterial,
       transportType: transportType,
     };
   }
@@ -100,9 +101,8 @@ export default class Item extends Vue {
     return this.selected ? this.selected.name === "custom" : false;
   }
 
-  get typeName() {
-    const typeArr = this.type.type.split(".");
-    return typeArr[typeArr.length - 1];
+  get materialName() {
+    return this.groupedMaterial.material;
   }
 
   get saveDisabled() {

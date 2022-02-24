@@ -91,7 +91,7 @@ export default class ViewAssessment extends Vue {
     streamId: this.$route.params.streamId,
     projectInfo: {
       name: "",
-      type: "",
+      type: [""],
       reportDate: new Date(1946, 4, 1),
       author: "",
       JN: "000001",

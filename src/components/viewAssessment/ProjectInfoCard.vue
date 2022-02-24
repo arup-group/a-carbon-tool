@@ -7,7 +7,9 @@
       </v-btn>
     </v-card-title>
     <v-card-subtitle>
-      <BECChip :category="type" />
+      <v-flex v-for="t in type" :key="t">
+        <BECChip :category="t" />
+      </v-flex>
     </v-card-subtitle>
     <v-card-text>
       <v-divider class="mb-4 mt-3"></v-divider>

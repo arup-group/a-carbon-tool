@@ -20,13 +20,13 @@
         :rules="selectionRules"
         label="Region"
         required
-
       ></v-select>
       <v-select
-        v-model="form.component"
+        v-model="form.components"
         :items="becs"
         :rules="selectionRules"
         label="Primary element category"
+        multiple
         chips
       ></v-select>
       <v-text-field
@@ -47,19 +47,23 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
-import { ProjectDataComplete, ProjectDataTemp, Step, StreamObject } from "@/models/newAssessment";
+import {
+  ProjectDataComplete,
+  ProjectDataTemp,
+  Step,
+  StreamObject,
+} from "@/models/newAssessment";
 import store from "@/store";
 
 @Component({})
-
 export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject;
   @Prop() step!: Step;
-  @Prop() becs!: string;
+  @Prop() becs!: string[];
 
   form: ProjectDataTemp = {
     name: null,
-    component: null,
+    components: null,
     cost: null,
     floorArea: null,
     region: "",
@@ -85,11 +89,11 @@ export default class Menu1b extends Vue {
   isFormValid = false;
 
   availableRegions() {
-    return store.state.availableRegions
+    return store.state.availableRegions;
   }
 
-
   // textRules = [(v: string) => !!v || "Text is required"];
+  multipleSelectionRules = [(v: string[]) => !!v.length || "Input is required"];
   selectionRules = [(v: string) => !!v || "Input is required"];
   valueRules = [
     (v: number) => Number.isInteger(Number(v)) || "Number is required",
@@ -107,10 +111,10 @@ export default class Menu1b extends Vue {
   uploadData(): ProjectDataComplete {
     return {
       name: this.form.name ? this.form.name : "",
-      component: this.form.component ? this.form.component : "",
+      components: this.form.components ? this.form.components : [""],
       cost: this.form.cost ? +this.form.cost : 0,
       floorArea: this.form.floorArea ? +this.form.floorArea : 1,
-      region: this.form.region ? this.form.region: "",
+      region: this.form.region ? this.form.region : "",
     };
   }
 }

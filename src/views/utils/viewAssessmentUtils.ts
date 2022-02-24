@@ -94,7 +94,7 @@ export async function loadStream(context: any, streamId: string) {
 
   const projectInfoUpdated = {
     name: branchData.data.stream.object.data.projectData.name,
-    type: branchData.data.stream.object.data.projectData.component,
+    type: branchData.data.stream.object.data.projectData.components,
     reportDate: new Date(
       actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
     ),

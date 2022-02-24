@@ -1,6 +1,6 @@
 export interface ProjectInfo {
   name: string;
-  type: string;
+  type: string[];
   reportDate: Date;
   author: string;
   JN: string;

@@ -47,7 +47,7 @@
       :dialog="dialog"
       @agree="agreeSave"
       @cancel="cancelSave"
-      message="Do you want to save this report and return to home?"
+      message="Do you want to save and view this report?"
     />
     <SESnackBar
       @close="saveSnackClose"
@@ -164,9 +164,9 @@ export default class Assessment extends Vue {
         this.dialog = false;
         this.loading = true;
         await this.$store.dispatch("uploadReport", uploadReportInput);
-        this.saveSnack = true;
-        this.$router.push("/");
         this.loading = false;
+        this.saveSnack = true;
+        this.$router.push(`/assessment/view/${this.streamid}`);
       } else {
         this.saveSnack = true;
         this.saveSuccess = false;

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="d-flex justify-space-between pt-5 container">
+  <v-container class="d-flex justify-space-between pt-5 container" fluid>
     <div class="d-flex flex-column justify-space-between card-container">
       <project-info-card class="card" :projectInfo="projectInfo" />
       <view-assessment-buttons class="card" />
@@ -8,6 +8,7 @@
       v-if="urlsLoaded && chartDataReady"
       :objecturls="objectUrls"
       :token="token"
+      :colors="colors"
       class="renderer"
     />
     <div
@@ -32,6 +33,7 @@ import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
 import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
+import { Color } from "../components/shared/Renderer.vue";
 
 @Component({
   components: {
@@ -46,12 +48,13 @@ export default class ViewAssessment extends Vue {
   objectUrls: string[] = [];
   token!: string;
   chartDataReady = false;
+  colors!: Color;
 
   mounted() {
     this.$store
       .dispatch("getObjectUrls", this.assessment.streamId)
       .then((res: string[]) => {
-        this.objectUrls = res;
+        this.objectUrls = [res[0]];
       });
 
     this.token = this.$store.state.token.token;
@@ -63,6 +66,7 @@ export default class ViewAssessment extends Vue {
       this.$route.params.streamId
     );
     this.assessment = assessmentViewData.data;
+    this.colors = assessmentViewData.colors;
     this.chartDataReady = assessmentViewData.ready;
   }
 
@@ -100,7 +104,7 @@ export default class ViewAssessment extends Vue {
     materialBreakdown: {
       materials: [
         {
-          name: "some value 1",
+          label: "some value 1",
           value: 50,
           color: "",
         },

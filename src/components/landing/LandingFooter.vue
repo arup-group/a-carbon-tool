@@ -1,5 +1,5 @@
 <template>
-  <v-row class="pb-2 d-flex align-center">
+  <v-row class="pb-2 pr-4 d-flex align-center">
     <v-spacer></v-spacer>
     <span class="mr-4 grey--text">
       Page {{ page }} of {{ numberOfPages }}

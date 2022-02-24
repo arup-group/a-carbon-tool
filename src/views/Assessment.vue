@@ -1,6 +1,14 @@
 <template>
   <v-main>
+    <div v-if="loading" style="width: 100%" class="d-flex justify-center">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        :size="200"
+      ></v-progress-circular>
+    </div>
     <v-container
+      v-else
       fluid
       class="d-flex justify-flex-start flex-row"
       style="margin: 10px; padding: 10px; width: 100%"
@@ -97,6 +105,7 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
   components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar },
 })
 export default class Assessment extends Vue {
+  loading = false;
   saveSuccess = true;
   saveSnack = false;
   dialog = false;
@@ -143,6 +152,7 @@ export default class Assessment extends Vue {
   //}
 
   async agreeSave() {
+    this.loading=true;
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
         const uploadReportInput: UploadReportInput = {
@@ -151,13 +161,17 @@ export default class Assessment extends Vue {
           reportTotals: this.report.totals,
           projectData: this.projectData,
         };
+        this.dialog = false;
+        this.loading = true;
         await this.$store.dispatch("uploadReport", uploadReportInput);
         this.saveSnack = true;
         this.$router.push("/");
+        this.loading = false;
       } else {
         this.saveSnack = true;
         this.saveSuccess = false;
         this.dialog = false;
+        this.loading = false;
       }
     }
   }

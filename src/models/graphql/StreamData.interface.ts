@@ -6,6 +6,7 @@ export interface StreamData {
     stream: {
       object: {
         data: ParentSpeckleObjectData;
+        createdAt: string;
         children: {
           objects: { data: any }[];
         };

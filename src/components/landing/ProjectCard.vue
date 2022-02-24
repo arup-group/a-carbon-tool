@@ -15,7 +15,9 @@
         <v-card-text>
           <v-row justify="start" class="text--primary" fill-height dense>
             <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
+            <v-col cols="6"> {{ branchDate }}</v-col>
           </v-row>
+
         </v-card-text>
         <v-divider class="mx-4"></v-divider>
         <v-card-actions>
@@ -29,22 +31,33 @@
           <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
         </v-card-actions>
         <v-divider class="mx-4"></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <div>
-            <landing-options @delete="checkDelete" />
-            <v-select
-              :menu-props="{ value: options }"
-              v-if="options"
-              :items="['one', 'two']"
-            />
-            <v-btn icon color="primary">
-              <v-icon>mdi-share-variant</v-icon>
-            </v-btn>
-            <v-btn icon color="primary" @click="open">
-              <v-icon>mdi-open-in-new</v-icon>
-            </v-btn>
-          </div>
+        <!-- conditionally render a warning symbol and tool tip if new main available on stream
+        for reporting -->
+        <v-card-actions class="d-flex justify-space-between mb-6 pa-2">
+          <span>
+          <v-tooltip right max-width="200px">
+            <template v-slot:activator="{ on, attrs }">
+              <span icon color="red" v-bind="attrs" v-on="on">
+                <v-icon color="red">mdi-alert</v-icon>
+              </span>
+            </template>
+            <span>Theres an update on main branch, you can use edit to update your report</span>
+          </v-tooltip>
+          </span>
+          <span>
+          <landing-options @delete="checkDelete"/>
+          <v-select
+            :menu-props="{ value: options }"
+            v-if="options"
+            :items="['one', 'two']"
+          />
+          <v-btn icon color="primary">
+            <v-icon>mdi-share-variant</v-icon>
+          </v-btn>
+          <v-btn icon color="primary" @click="open">
+            <v-icon>mdi-open-in-new</v-icon>
+          </v-btn>
+          </span>
         </v-card-actions>
       </v-card>
     </v-sheet>
@@ -80,6 +93,10 @@ export default class ProjectCard extends Vue {
   }
   get co2Total() {
     return this.convertKgToTonnes(this.project.totalCO2e);
+  }
+
+  get branchDate() {
+    return this.project.projectDate;
   }
   get link() {
     return this.project.link;

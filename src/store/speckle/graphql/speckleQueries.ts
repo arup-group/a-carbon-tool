@@ -11,7 +11,6 @@ export const userInfoQuery = () => `query {
   }`;
 
 // REMOVE COMMENT WHEN COMPLETE
-// added createdAt to check when each main stream was created
 export const streamsQuery = () => `query {
   user {
     name,
@@ -19,7 +18,6 @@ export const streamsQuery = () => `query {
         items {
           name,
           id,
-          createdAt,
         }
       }
     }
@@ -29,6 +27,7 @@ export const streamsDataQuery = (streamId: string, objId: string) => `query {
   stream(id: "${streamId}") {
     object(id: "${objId}") {
       data,
+      createdAt,
         children {
           objects {
             data
@@ -37,6 +36,7 @@ export const streamsDataQuery = (streamId: string, objId: string) => `query {
       }
     }
   }`;
+
 export const streamReferencedObjects = (id: string) => `query {
   stream(id: "${id}") {
     branch {

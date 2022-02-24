@@ -112,7 +112,7 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
   },
 })
 export default class Landing extends Vue {
-  carbonBranches: { id: string; name: string; branchid: string }[] = [];
+  carbonBranches: { id: string; name: string; branchid: string, branchCommitDate: any }[] = [];
   branchData: { id: string; name: string; data: StreamData }[] = [];
   token = "";
   itemsPerPage = 8;
@@ -202,7 +202,7 @@ export default class Landing extends Vue {
       // format the streams into a more usable format
       const streamID: { name: string; id: string; createdAt: string }[] =
         streams.data.user.streams.items.map((stream: any) => {
-          return { name: stream.name, id: stream.id, createdAt: stream.createdAt };
+          return { name: stream.name, id: stream.id};
         });
 
       // Logging the formatted streams (with createdAt)
@@ -224,31 +224,21 @@ export default class Landing extends Vue {
 
       // filter those branches to only the "actcarbonreport" branches
       for (let i = 0; i < streamBranches.length; i++) {
-        console.log(streamBranches[i])
+        console.log("original branch\n",streamBranches[i])
         streamBranches[i].branches.data.stream.branches.items.forEach(
           (branch) => {
             if (branch.name === "actcarbonreport") {
+              const branchCommitDate = branch.commits.cursor;
               this.carbonBranches.push({
                 ...streamBranches[i].stream,
                 branchid: branch.id,
+                branchCommitDate: branchCommitDate,
               });
             }
           }
         );
       }
-      
-      console.log("here are the carbon branches\n", this.carbonBranches)
-
-      // for (const streamBranch in streamBranches) {
-      //   const filter_test_result = streamBranches[
-      //     streamBranch
-      //   ].branches.data.stream.branches.items.filter(
-      //     (branch) => branch.name === "actcarbonreport"
-      //   );
-      //   console.log("filter test\n", {...filter_test_result[0]});
-      //   //this.carbonBranches.push(filter_test_result[0].id)
-      // }
-      // //console.log("here is the filter stuff\n", test_array)
+      //console.log("here are the filtered carbon branches\n", this.carbonBranches);
 
       // get the most recent commit and the data from that commit
       for (let i = 0; i < this.carbonBranches.length; i++) {
@@ -267,8 +257,8 @@ export default class Landing extends Vue {
           this.carbonBranches[i].id,
           carbonCommit,
         ]);
-        console.log(branch);
-
+        //console.log(branch);
+        // if there are no errors - push branch data to branchData
         if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
           this.branchData.push({
             id: this.carbonBranches[i].id,
@@ -277,8 +267,15 @@ export default class Landing extends Vue {
           });
         }
       }
+
+      console.log('all branch data\n', this.branchData)
+
       // convert the data into the format that this page needs it to be in
       this.projects = this.branchData.map((proj) => {
+        // add if statement here to check if date on main of the stream is more recent
+        // if it is then make a var true
+        // if not then make a var false
+        // then we can use this to conditionally render the hazard sign.
         const co2Obj: {
           [key: string]: { value: number; color: string };
         } = {};
@@ -320,8 +317,11 @@ export default class Landing extends Vue {
           totalCO2e: proj.data.data.stream.object.data.totalCO2,
           link: "",
           category: `${proj.data.data.stream.object.data.projectData.component}`,
+          projectDate: proj.data.data.stream.object.createdAt,
         };
       });
+
+      console.log('these are the carbon projects we got along with the data\n', this.projects)
 
       this.loading = false;
     } catch (err) {

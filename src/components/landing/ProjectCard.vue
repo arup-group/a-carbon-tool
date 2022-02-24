@@ -7,8 +7,8 @@
             <v-col cols="7" class="limit-lines">
               {{ title }}
             </v-col>
-            <v-col cols="5" align="right">
-              <BECChip :category="category" />
+            <v-col class="d-flex flex-row mb-6">
+              <BECChip v-for="cat in category" :key="cat" :category="cat" />
             </v-col>
           </v-row>
         </v-card-title>
@@ -85,6 +85,7 @@ export default class ProjectCard extends Vue {
     return this.project.link;
   }
   get category() {
+    console.log("--->category: ", this.project.category);
     return this.project.category;
   }
 

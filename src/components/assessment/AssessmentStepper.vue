@@ -5,9 +5,13 @@
     color="primary"
     class="d-flex justify-center align-center"
   >
-    <v-card style="width: 100%; overflow-y: scroll; height: 85vh">
+    <v-card style="width: 100%; height: 85%">
       <v-card-title class="">New Assessment</v-card-title>
-      <v-stepper v-model="step" vertical>
+      <v-stepper
+        style="overflow-y: scroll; height: 100vh"
+        v-model="step"
+        vertical
+      >
         <v-stepper-step step="1" color="secondary darken-2">
           Data
         </v-stepper-step>
@@ -20,9 +24,12 @@
             :step="step"
             :becs="becs"
           />
-          <v-btn :style="colStyle" @click="step = 2" color="primary">
-            Next
-          </v-btn>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn :style="colStyle" @click="step = 2" color="primary">
+              Next
+            </v-btn>
+          </v-card-actions>
         </v-stepper-content>
         <v-stepper-step step="2" color="secondary darken-2">
           Materials
@@ -33,12 +40,15 @@
             :materials="materials"
             @materialUpdated="materialUpdated"
           />
-          <v-btn :style="colStyle" @click="step = 1" color="primary">
-            Previous
-          </v-btn>
-          <v-btn :style="colStyle" @click="step = 3" color="primary">
-            Next
-          </v-btn>
+          <v-card-actions>
+            <v-btn :style="colStyle" @click="step = 1" color="primary">
+              Previous
+            </v-btn>
+            <v-spacer />
+            <v-btn :style="colStyle" @click="step = 3" color="primary">
+              Next
+            </v-btn>
+          </v-card-actions>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -53,12 +63,15 @@
             :transportTypes="transportTypes"
             :types="types"
           />
-          <v-btn :style="colStyle" @click="step = 2" color="primary">
-            Previous
-          </v-btn>
-          <v-btn :style="colStyle" @click="step = 4" color="primary">
-            Next
-          </v-btn>
+          <v-card-actions>
+            <v-btn :style="colStyle" @click="step = 2" color="primary">
+              Previous
+            </v-btn>
+            <v-spacer />
+            <v-btn :style="colStyle" @click="step = 4" color="primary">
+              Next
+            </v-btn>
+          </v-card-actions>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -69,12 +82,15 @@
         </v-stepper-step>
         <v-stepper-content step="4">
           <menu-4 :totalVolume="totalVolume" />
-          <v-btn :style="colStyle" @click="step = 3" color="primary">
-            Previous
-          </v-btn>
-          <v-btn :style="colStyle" @click="step = 5" color="primary">
-            Next
-          </v-btn>
+          <v-card-actions>
+            <v-btn :style="colStyle" @click="step = 3" color="primary">
+              Previous
+            </v-btn>
+            <v-spacer />
+            <v-btn :style="colStyle" @click="step = 5" color="primary">
+              Next
+            </v-btn>
+          </v-card-actions>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -85,12 +101,15 @@
         </v-stepper-step>
         <v-stepper-content step="5">
           <menu-5 :emptyProps="emptyProps" />
-          <v-btn :style="colStyle" @click="step = 4" color="primary">
-            Previous
-          </v-btn>
-          <v-btn :style="colStyle" @click="step = 6" color="primary">
-            Next
-          </v-btn>
+          <v-card-actions>
+            <v-btn :style="colStyle" @click="step = 4" color="primary">
+              Previous
+            </v-btn>
+            <v-spacer />
+            <v-btn :style="colStyle" @click="step = 6" color="primary">
+              Next
+            </v-btn>
+          </v-card-actions>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -101,12 +120,15 @@
         </v-stepper-step>
         <v-stepper-content step="6">
           <menu-6 :report="report" />
-          <v-btn :style="colStyle" @click="step = 5" color="primary">
-            Previous
-          </v-btn>
-          <v-btn :style="colStyle" @click="step = 7" color="primary">
-            Next
-          </v-btn>
+          <v-card-actions>
+            <v-btn :style="colStyle" @click="step = 5" color="primary">
+              Previous
+            </v-btn>
+            <v-spacer />
+            <v-btn :style="colStyle" @click="step = 7" color="primary">
+              Next
+            </v-btn>
+          </v-card-actions>
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -116,10 +138,17 @@
           Save
         </v-stepper-step>
         <v-stepper-content step="7">
-          <v-btn :style="colStyle" @click="step = 6" color="primary">
-            Previous
-          </v-btn>
-          <menu-7 :style="colStyle" :canSave="canSave" @checkSave="checkSave" />
+          <v-card-actions>
+            <v-btn :style="colStyle" @click="step = 6" color="primary">
+              Previous
+            </v-btn>
+            <v-spacer />
+            <menu-7
+              :style="colStyle"
+              :canSave="canSave"
+              @checkSave="checkSave"
+            />
+          </v-card-actions>
         </v-stepper-content>
       </v-stepper>
     </v-card>
@@ -163,11 +192,16 @@ export default class AssessmentStepper extends Vue {
 
   get colStyle() {
     if (this.$store.state.darkMode)
-      return { "background-color": "#1C1C1C !important" };
+      return {
+        "background-color": "#1C1C1C !important",
+        color: "#FFFFFF !important",
+        border: "thin solid",
+      };
     else {
       return {
         "background-color": "#FFFFFF !important",
         color: "#1C1C1C !important",
+        border: "thin solid",
       };
     }
   }

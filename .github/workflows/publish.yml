@@ -18,12 +18,10 @@ jobs:
             accessKey: AWS_ACCESS_KEY_ID
             secretAccessKey: AWS_SECRET_ACCESS_KEY
             domain: act.staging-speckle.arup.com
-            distributionId: E371NR2EWLBGAU
           - environment: prod
             accessKey: PROD_AWS_ACCESS_KEY_ID
             secretAccessKey: PROD_AWS_SECRET_ACCESS_KEY
             domain: act.speckle.arup.com
-            distributionId: E2NXBFTPT5D0EV
 
     steps:
     - uses: actions/checkout@v2
@@ -53,8 +51,8 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: |
         aws s3 sync --delete dist/ s3://${{ matrix.domain }}-${{ matrix.environment }}
-
     - name: Invalidate Cache
       if: github.ref == 'refs/heads/main'
       run: |
-        aws cloudfront create-invalidation --distribution-id ${{ matrix.distributionId }} --paths /index.html
+        distribution_id=$(aws cloudfront list-distributions | jq -r 'select(.DistributionList.Items[1].Aliases.Items[0] == "${{ matrix.domain }}") | .DistributionList.Items[0].Id')
+        aws cloudfront create-invalidation --distribution-id $distribution_id --paths /index.html

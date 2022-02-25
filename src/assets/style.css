@@ -27,6 +27,7 @@ arc-container[theme="ACT-dark"] {
   /* Base */
   --arc-font-color: var(--arc-grey-000);
   --arc-input-color: var(--arc-grey-000);
+  --arc-background-color: var(--arc-grey-090);
   --arc-container-color: var(--arc-grey-100);
 
   /* Palette */
@@ -61,6 +62,14 @@ arc-sidebar[theme="ACT-dark"] {
   /* Size */
   --sidebar-width: clamp(15rem, 10%, var(--arc-sidebar-width));
   --gap-distance: 0;
+}
+
+.primary-text {
+  color: rgba(var(--arc-color-primary));
+}
+
+.secondary-text {
+  color: rgba(var(--arc-color-secondary));
 }
 
 ul {

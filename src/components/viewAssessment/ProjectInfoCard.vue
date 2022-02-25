@@ -7,9 +7,7 @@
       </v-btn>
     </v-card-title>
     <v-card-subtitle>
-      <v-flex v-for="t in type" :key="t">
-        <BECChip :category="t" />
-      </v-flex>
+      <BECChipGroup :categories="type" />
     </v-card-subtitle>
     <v-card-text>
       <v-divider class="mb-4 mt-3"></v-divider>
@@ -57,10 +55,10 @@
 <script lang="ts">
 import { ProjectInfo } from "@/models/assessment";
 import { Vue, Component, Prop } from "vue-property-decorator";
-import BECChip from "../shared/BECChip.vue";
+import BECChipGroup from "../shared/BECChipGroup.vue";
 
 @Component({
-  components: { BECChip },
+  components: { BECChipGroup },
 })
 export default class ProjectInfoCard extends Vue {
   @Prop() projectInfo!: ProjectInfo;

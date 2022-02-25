@@ -1,15 +1,13 @@
 <template>
   <v-container>
     <v-sheet outlined color="primary" rounded class="my-1">
-      <v-card flat height="600">
+      <v-card flat height="650">
         <v-card-title>
           <v-row>
             <v-col cols="7" class="limit-lines">
               {{ title }}
             </v-col>
-            <v-col class="d-flex flex-row mb-6">
-              <BECChip v-for="cat in category" :key="cat" :category="cat" />
-            </v-col>
+            <BECChipGroup :categories="category" />
           </v-row>
         </v-card-title>
         <v-card-text>
@@ -57,11 +55,11 @@ import { Project } from "@/models/project";
 import { ChartData } from "@/models/chart";
 
 import DoughnutChart from "../charts/DoughnutChart.vue";
-import BECChip from "../shared/BECChip.vue";
 import LandingOptions from "./LandingOptions.vue";
+import BECChipGroup from "../shared/BECChipGroup.vue";
 
 @Component({
-  components: { DoughnutChart, BECChip, LandingOptions },
+  components: { DoughnutChart, BECChipGroup, LandingOptions },
 })
 export default class ProjectCard extends Vue {
   @Prop() project!: Project;
@@ -85,7 +83,6 @@ export default class ProjectCard extends Vue {
     return this.project.link;
   }
   get category() {
-    console.log("--->category: ", this.project.category);
     return this.project.category;
   }
 

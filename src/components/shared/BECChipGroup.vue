@@ -1,5 +1,5 @@
 <template>
-  <v-col class="d-flex justify-start">
+  <v-col class="d-flex flex-wrap">
     <BECChip v-for="cat in categories" :key="cat" :category="cat" />
   </v-col>
 </template>

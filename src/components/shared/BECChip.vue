@@ -1,7 +1,7 @@
 <template>
   <v-chip
     :color="backgroundColor"
-    :style="`color: ${color}; text-overflow: ellipsis; overflow: hidden;`"
+    :style="`color: ${color}; text-overflow: ellipsis; overflow: hidden; margin: 2px;`"
   >
     <span class="text-truncate">{{ category }}</span>
   </v-chip>

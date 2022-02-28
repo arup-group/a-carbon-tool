@@ -108,12 +108,26 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         units: "kgCO2e/kg",
         source: "EPD of Average PPC and Compocem Cement, Ambuja Cements Limited 2018"
       },
-      "Fiber cement board": {
-          productStageCarbonA1A3: 0.47,
-          density: 1700,
+      "Fiber cement board (Greencor roofing - 6mm thick)": {
+          productStageCarbonA1A3: 1.152,
+          density: 1350,
           wastage: 0.03,
           units: "kgCO2e/kg",
-          source: "IFC India Construction Materials Database Methodology Report 2017"
+          source: "EPD of Greencor sheet, Hicem & Hilux board, RAMCO INDUSTRIES LTD.(RIL) 2019"
+      },
+      "Fiber cement board (Hicem - 4-18mm thick)": {
+          productStageCarbonA1A3: 0.731,
+          density: 1200,
+          wastage: 0.03,
+          units: "kgCO2e/kg",
+          source: "EPD of Greencor sheet, Hicem & Hilux board, RAMCO INDUSTRIES LTD.(RIL) 2019"
+      },
+      "Fiber cement board (Hilux - 6-12mm thick)": {
+          productStageCarbonA1A3: 0.943,
+          density: 900,
+          wastage: 0.03,
+          units: "kgCO2e/kg",
+          source: "EPD of Greencor sheet, Hicem & Hilux board, RAMCO INDUSTRIES LTD.(RIL) 2019"
       }
     },
     Concrete: {
@@ -361,12 +375,19 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
-      "Plasterboard": {
-        productStageCarbonA1A3: 0.49,
-        density: 700,
+      "Plasterboard (12.5mm thick)": {
+        productStageCarbonA1A3: 0.443,
+        density: 573,
         wastage: 0.23,
         units: "kgCO2e/kg",
-        source: "IFC India Construction Materials Database Methodology Report 2017"
+        source: "EPD 12.5mm and 15mm Gypboard Plain, Gyproc, Saint Gobain 2018"
+      },
+      "Plasterboard (15mm thick)": {
+        productStageCarbonA1A3: 0.362,
+        density: 734,
+        wastage: 0.23,
+        units: "kgCO2e/kg",
+        source: "EPD 12.5mm and 15mm Gypboard Plain, Gyproc, Saint Gobain 2018"
       },
       "Fly ash/lime/gypsum block": {
         productStageCarbonA1A3: 0.2,
@@ -425,6 +446,27 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         wastage: 0.15,
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
+      },
+      "ETICS with EPS board (50-120mm thick)": {
+        productStageCarbonA1A3: 6.77,
+        density: 24,
+        wastage: 0.15,
+        units: "kgCO2e/kg",
+        source: "Berger External Thermal Insulation & Composite Systems (ETICS) EPD, Berger 2020"
+      },
+      "ETICS with XPS board (50-120mm thick)": {
+        productStageCarbonA1A3: 5.76,
+        density: 37.5,
+        wastage: 0.15,
+        units: "kgCO2e/kg",
+        source: "Berger External Thermal Insulation & Composite Systems (ETICS) EPD, Berger 2020"
+      },
+      "ETICS with mineral wool board (50-120mm thick)": {
+        productStageCarbonA1A3: 2.129,
+        density: 132,
+        wastage: 0.15,
+        units: "kgCO2e/kg",
+        source: "Berger External Thermal Insulation & Composite Systems (ETICS) EPD, Berger 2020"
       }
     },
     Soil: {

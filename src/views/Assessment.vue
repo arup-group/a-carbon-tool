@@ -47,7 +47,7 @@
       :dialog="dialog"
       @agree="agreeSave"
       @cancel="cancelSave"
-      message="Do you want to save and view this report?"
+      message="Do you want to save and view this report? This will overwrite any existing reports for this stream"
     />
     <SESnackBar
       @close="saveSnackClose"

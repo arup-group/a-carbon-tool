@@ -579,13 +579,6 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
-      "Cold-rolled closed annealed coil": {
-        productStageCarbonA1A3: 2.93,
-        density: 7850,
-        wastage: 0.0,
-        units: "kgCO2e/kg",
-        source: "Cold Rolled Closed Annealed Coil (STEEL) EPD, JSW 2020"
-      },
       "Cold-rolled coated GA and GI coil and sheet": {
         productStageCarbonA1A3: 2.76,
         density: 7850,
@@ -606,27 +599,6 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         wastage: 0.0,
         units: "kgCO2e/kg",
         source: "EPD Average of Finished Flat Products (Steel), JSW 2022"
-      },
-      "Hot-rolled wire rod coil": {
-        productStageCarbonA1A3: 2.87,
-        density: 7850,
-        wastage: 0.0,
-        units: "kgCO2e/kg",
-        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
-      },
-      "Heat treated wire rod coil": {
-        productStageCarbonA1A3: 3.07,
-        density: 7850,
-        wastage: 0.0,
-        units: "kgCO2e/kg",
-        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
-      },
-      "Wire rod": {
-        productStageCarbonA1A3: 2.59,
-        density: 7850,
-        wastage: 0.01,
-        units: "kgCO2e/kg",
-        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
       },
       "Hot-rolled bar": {
         productStageCarbonA1A3: 2.87,

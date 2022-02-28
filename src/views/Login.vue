@@ -27,7 +27,7 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="9" class="d-flex justify-center align-center">
-        <LoginCard :servers="servers" @submit="logIn" />
+        <LoginCard :servers="servers" @submit="logIn"/>
       </v-col>
       <v-col cols="12">
         <v-card flat :color="this.$store.state.darkMode ? '#121212' : ''">
@@ -72,7 +72,7 @@
         <v-img src='/assets/globe.png' contain height='200'></v-img>
         <v-card-title>Getting started</v-card-title>
         <v-card-text>
-          Create an account on <a href='https://speckle.xyz/' target='_blank'>Speckle XYZ</a> to use act. Or, if you're a member of Arup staff, follow the login links to use 
+          Create an account on <a href='https://speckle.xyz' target='_blank'>Speckle XYZ</a> to use act. Or, if you're a member of Arup staff, follow the login links to use 
           your work credentials.
         </v-card-text>
         <v-card-actions class="justify-end">
@@ -96,9 +96,9 @@ import { Server } from "@/models/auth/";
   components: { LoginCard },
 })
 export default class Login extends Vue {
-  dialog = true
-  
-  servers: { arup: Server; xyz: Server } = this.$store.state.servers;
+  dialog = true;
+
+  servers: { arup: Server; xyz_server: Server } = this.$store.state.servers;
 
   logIn(server: Server) {
     this.$store.dispatch("redirectToAuth", server);

@@ -75,13 +75,15 @@ export default class Menu1b extends Vue {
     floorArea: null,
     region: "",
   };
-  speckleStream!: StreamObject;
+  speckleStream: StreamObject | null = null;
 
   streamSelected() {
     try {
-      const id = this.speckleStream.value;
-      if (id !== undefined) {
-        this.loadStream(id);
+      if (this.speckleStream) {
+        const id = this.speckleStream.value;
+        if (id !== undefined) {
+          this.loadStream(id);
+        }
       }
     } catch (error) {
       console.error(error);

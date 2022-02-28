@@ -61,7 +61,7 @@
           <Menu3
             @transportSelected="transportSelected"
             :transportTypes="transportTypes"
-            :types="types"
+            :groupedMaterials="groupedMaterials"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 2" color="primary">
@@ -172,6 +172,7 @@ import {
   TransportType,
   EmptyPropsPassdown,
   ReportPassdown,
+  GroupedMaterial,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -187,6 +188,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() emptyProps!: EmptyPropsPassdown;
   @Prop() report!: ReportPassdown;
   @Prop() becs!: string;
+  @Prop() groupedMaterials!: GroupedMaterial[];
 
   step: Step = 1;
 

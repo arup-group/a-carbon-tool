@@ -52,7 +52,7 @@ export default class extends Vue {
           property: value.property,
           minValue: value.minValue,
           maxValue: value.maxValue,
-          gradientColors: value.colors
+          gradientColors: value.colors,
         },
       });
     }
@@ -67,6 +67,15 @@ export default class extends Vue {
   loading = 0;
   failed = false;
   mounted() {
+    this.renderStream(this.objecturls);
+  }
+  @Watch("objecturls")
+  urlsChanged(newVal: string[]) {
+    document.getElementById("renderer")?.remove();
+    this.renderStream(newVal);
+  }
+
+  renderStream(objecturls: string[]) {
     let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
@@ -79,25 +88,30 @@ export default class extends Vue {
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
     this.viewer = new Viewer({ contained: renderDomElement });
-    this.objecturls.forEach((url) => {
+    objecturls.forEach((url) => {
       this.viewer.loadObject(url, this.token);
     });
 
     this.viewer.on("load-progress", (args: any) => {
-      this.loading = args.progress * 100;
+      this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
       if (this.loading === 100) {
-        const allObjects = this.viewer.sceneManager.sceneObjects.allObjects as THREE.Group;
+        const allObjects = this.viewer.sceneManager.sceneObjects
+          .allObjects as THREE.Group;
         const allObjectsChildren = allObjects.children;
         const allMesh: THREE.Mesh[] = [];
-        allObjectsChildren.forEach(oc => {
-          const meshChildren = oc.children.filter(c => c.type === "Mesh") as THREE.Mesh[];
+        allObjectsChildren.forEach((oc) => {
+          const meshChildren = oc.children.filter(
+            (c) => c.type === "Mesh"
+          ) as THREE.Mesh[];
+
           allMesh.push(...meshChildren);
         });
         // set initial colors if needed
         if (this.colors) {
           this.setColors(this.colors);
         }
+
         this.loaded(allMesh);
       }
     });
@@ -113,18 +127,20 @@ export default class extends Vue {
       const changeList = colors.map((c) => {
         return {
           key: c.id,
-          value: c.color
-        }
+          value: c.color,
+        };
       });
 
-      const changeListObj = changeList.reduce((obj, item) => Object.assign(obj, { [item.key]: item.value }), {});
-
+      const changeListObj = changeList.reduce(
+        (obj, item) => Object.assign(obj, { [item.key]: item.value }),
+        {}
+      );
       const res = await this.viewer.applyFilter({
         colorBy: {
           type: "category",
           property: "speckle_type",
           values: changeListObj,
-          default: '#636363'
+          default: "#636363",
         },
       });
     }

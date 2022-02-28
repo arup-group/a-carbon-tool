@@ -34,7 +34,6 @@ import {
   TransportType,
 } from "@/models/newAssessment";
 import createPersistedState from "vuex-persistedstate";
-import { productStageCarbonA1A3 } from "./utilities/carbonCalculator";
 
 import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
@@ -43,7 +42,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.0.1",
+    version: "0.0.1 BETA",
     servers: {
       arup: {
         region: "UKIMEA",
@@ -51,9 +50,9 @@ export default new Vuex.Store({
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
-      xyz: {
+      xyz_server: {
         region: "PUBLIC",
-        url: "https://speckle.xyz/",
+        url: "https://speckle.xyz",
         speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
       },
@@ -184,7 +183,7 @@ export default new Vuex.Store({
           const toPush: MaterialFull = {
             name: `${type} - ${t} (${ (Math.round(100*material.productStageCarbonA1A3)/100) } kgCO2e/kg)`,
             ...material,
-            color: "#" + Math.floor(Math.random() * 16777215).toString(16), // generates random hex code for color, should be replaced at some point
+            color: "#" + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);
         });
@@ -260,12 +259,11 @@ export default new Vuex.Store({
         ) {
           const server = getServer(context);
           const token = getToken();
-          context.commit("login", {
+          context.commit("login", { 
             token,
             server,
           });
         }
-
         const json = await getUserData(context);
         const data = json.data;
         context.commit("setUser", data.user);

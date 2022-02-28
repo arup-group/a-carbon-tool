@@ -82,24 +82,31 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
     Cement: {
       "Ordinary Portland cement (OPC)": {
         productStageCarbonA1A3: 0.91,
-        density: 2200,
+        density: 1440,
         wastage: 0.04,
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Portland slag cement (25% GGBS)": {
         productStageCarbonA1A3: 0.69,
-        density: 2200,
+        density: 1440,
         wastage: 0.04,
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
-      "Fly ash cement (30% pozzolana)": {
-        productStageCarbonA1A3: 0.64,
-        density: 2200,
+      "Portland slag cement (40-50% GGBS)": {
+        productStageCarbonA1A3: 0.532,
+        density: 1440,
         wastage: 0.04,
         units: "kgCO2e/kg",
-        source: "IFC India Construction Materials Database Methodology Report 2017"
+        source: "EPD of Average PPC and PSC Cement, ACC Limited 2018"
+      },
+      "Fly ash cement (26-32% fly ash)": {
+        productStageCarbonA1A3: 0.76,
+        density: 1440,
+        wastage: 0.04,
+        units: "kgCO2e/kg",
+        source: "EPD of Average PPC and Compocem Cement, Ambuja Cements Limited 2018"
       },
       "Fiber cement board": {
           productStageCarbonA1A3: 0.47,
@@ -110,6 +117,111 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
       }
     },
     Concrete: {
+      "Ready mix concrete (M5)": {
+        productStageCarbonA1A3: 0.058,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M7.5)": {
+        productStageCarbonA1A3: 0.061,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M10)": {
+        productStageCarbonA1A3: 0.078,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M15)": {
+        productStageCarbonA1A3: 0.088,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M20)": {
+        productStageCarbonA1A3: 0.104,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M25)": {
+        productStageCarbonA1A3: 0.121,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M30)": {
+        productStageCarbonA1A3: 0.138,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M35)": {
+        productStageCarbonA1A3: 0.165,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M40)": {
+        productStageCarbonA1A3: 0.167,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M45)": {
+        productStageCarbonA1A3: 0.18,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M50)": {
+        productStageCarbonA1A3: 0.182,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M55)": {
+        productStageCarbonA1A3: 0.188,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M60)": {
+        productStageCarbonA1A3: 0.186,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M70)": {
+        productStageCarbonA1A3: 0.195,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
+      "Ready mix concrete (M80)": {
+        productStageCarbonA1A3: 0.198,
+        density: 2400,
+        wastage: 0.05,
+        units: "kgCO2e/kg",
+        source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
+      },
       "Ready mix concrete with OPC": {
         productStageCarbonA1A3: 0.11,
         density: 2200,
@@ -397,12 +509,12 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
-      "Steel reinforcement bar": {
-        productStageCarbonA1A3: 2.6,
+      "Steel reinforcement bar (TMT)": {
+        productStageCarbonA1A3: 2.835,
         density: 7850,
         wastage: 0.05,
         units: "kgCO2e/kg",
-        source: "IFC India Construction Materials Database Methodology Report 2017"
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
       },
       "Steel section": {
         productStageCarbonA1A3: 2.5,
@@ -412,7 +524,7 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Electrogalvanised steel sheet (corrugated zinc)": {
-        productStageCarbonA1A3: 3,
+        productStageCarbonA1A3: 3.0,
         density: 7850,
         wastage: 0.01,
         units: "kgCO2e/kg",
@@ -424,6 +536,83 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         wastage: 0.01,
         units: "kgCO2e/kg",
         source: "IFC India Construction Materials Database Methodology Report 2017"
+      },
+      "Cold-rolled closed annealed coil": {
+        productStageCarbonA1A3: 2.93,
+        density: 7850,
+        wastage: 0.0,
+        units: "kgCO2e/kg",
+        source: "Cold Rolled Closed Annealed Coil (STEEL) EPD, JSW 2020"
+      },
+      "Cold-rolled coated GA and GI coil and sheet": {
+        productStageCarbonA1A3: 2.76,
+        density: 7850,
+        wastage: 0.0,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Flat Products (Steel), JSW 2022"
+      },
+      "Hot-rolled flat": {
+        productStageCarbonA1A3: 3.0,
+        density: 7850,
+        wastage: 0.0,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Flat Products (Steel), JSW 2022"
+      },
+      "Hot-rolled coil": {
+        productStageCarbonA1A3: 2.96,
+        density: 7850,
+        wastage: 0.0,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Flat Products (Steel), JSW 2022"
+      },
+      "Hot-rolled wire rod coil": {
+        productStageCarbonA1A3: 2.87,
+        density: 7850,
+        wastage: 0.0,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
+      },
+      "Heat treated wire rod coil": {
+        productStageCarbonA1A3: 3.07,
+        density: 7850,
+        wastage: 0.0,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
+      },
+      "Wire rod": {
+        productStageCarbonA1A3: 2.59,
+        density: 7850,
+        wastage: 0.01,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
+      },
+      "Hot-rolled bar": {
+        productStageCarbonA1A3: 2.87,
+        density: 7850,
+        wastage: 0.01,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
+      },
+      "Hot-rolled hexagon bar": {
+        productStageCarbonA1A3: 2.87,
+        density: 7850,
+        wastage: 0.01,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
+      },
+      "Hot-rolled round cornered square": {
+        productStageCarbonA1A3: 3.0,
+        density: 7850,
+        wastage: 0.01,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
+      },
+      "Heat treated bar": {
+        productStageCarbonA1A3: 3.07,
+        density: 7850,
+        wastage: 0.01,
+        units: "kgCO2e/kg",
+        source: "EPD Average of Finished Long Products (Steel), JSW 2021"
       }
     },
     Timber: {

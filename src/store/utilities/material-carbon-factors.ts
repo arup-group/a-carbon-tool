@@ -236,13 +236,6 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         units: "kgCO2e/kg",
         source: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018"
       },
-      "Ready mix concrete with OPC": {
-        productStageCarbonA1A3: 0.11,
-        density: 2200,
-        wastage: 0.05,
-        units: "kgCO2e/kg",
-        source: "IFC India Construction Materials Database Methodology Report 2017"
-      },
       "Ready mix concrete with Portland slag cement (25% GGBS)": {
         productStageCarbonA1A3: 0.089,
         density: 2200,

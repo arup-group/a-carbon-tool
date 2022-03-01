@@ -369,11 +369,11 @@ export const materialCarbonFactors: AllMaterialCarbonFactors = {
         source: "IFC India Construction Materials Database Methodology Report 2017"
       },
       "Plasterboard (12.5mm thick)": {
-        productStageCarbonA1A3: 0.443,
-        density: 573,
+        productStageCarbonA1A3: 0.516,
+        density: 612.5,
         wastage: 0.23,
         units: "kgCO2e/kg",
-        source: "EPD 12.5mm and 15mm Gypboard Plain, Gyproc, Saint Gobain 2018"
+        source: "EPD Gypboard Plain (Standard board), Gyproc, Saint Gobain 2020"
       },
       "Plasterboard (15mm thick)": {
         productStageCarbonA1A3: 0.362,

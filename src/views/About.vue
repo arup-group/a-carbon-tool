@@ -283,6 +283,10 @@ export default class About extends Vue {
           url: "https://www.environdec.com/library/epd1116"
         },
         {
+          name: "EPD Gypboard Plain (Standard board), Gyproc, Saint Gobain 2020",
+          url: "https://www.gyproc.in/pdf/Verified-EPD-Gyproc-Gypboard-Plain-2020.pdf"
+        },
+        {
           name: "EPD 12.5mm and 15mm Gypboard Plain, Gyproc, Saint Gobain 2018",
           url: "https://www.environdec.com/library/epd945"
         },

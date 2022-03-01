@@ -33,8 +33,9 @@
         <v-divider class="mx-4"></v-divider>
         <!-- conditionally render a warning symbol and tool tip if new main available on stream
         for reporting -->
+
         <v-card-actions class="d-flex justify-space-between mb-6 pa-2">
-          <span>
+          <span v-if="newMainAvailable">
           <v-tooltip right max-width="200px">
             <template v-slot:activator="{ on, attrs }">
               <span icon color="red" v-bind="attrs" v-on="on">
@@ -44,6 +45,8 @@
             <span>Theres an update on main branch, you can use edit to update your report</span>
           </v-tooltip>
           </span>
+          <span v-else></span>
+
           <span>
           <landing-options @delete="checkDelete"/>
           <v-select
@@ -97,6 +100,10 @@ export default class ProjectCard extends Vue {
 
   get branchDate() {
     return this.project.projectDate;
+  }
+
+  get newMainAvailable() {
+    return this.project.newMainAvailable;
   }
   get link() {
     return this.project.link;

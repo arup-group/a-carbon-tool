@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-sheet outlined color="primary" rounded class="my-1">
-      <v-card flat height="600">
+      <v-card flat height="600" @mouseleave="cardOverlay = false">
         <v-card-title>
           <v-row>
             <v-col cols="7" class="limit-lines">
@@ -15,9 +15,8 @@
         <v-card-text>
           <v-row justify="start" class="text--primary" fill-height dense>
             <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
-            <v-col cols="6"> {{ branchDate }}</v-col>
+            <v-col align="right" cols="6"> last update:{{ branchDate }}</v-col>
           </v-row>
-
         </v-card-text>
         <v-divider class="mx-4"></v-divider>
         <v-card-actions>
@@ -31,37 +30,45 @@
           <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
         </v-card-actions>
         <v-divider class="mx-4"></v-divider>
-        <!-- conditionally render a warning symbol and tool tip if new main available on stream
-        for reporting -->
-
         <v-card-actions class="d-flex justify-space-between mb-6 pa-2">
-          <span v-if="newMainAvailable">
-          <v-tooltip right max-width="200px">
-            <template v-slot:activator="{ on, attrs }">
-              <span icon color="red" v-bind="attrs" v-on="on">
-                <v-icon color="red">mdi-alert</v-icon>
+          <!-- <span v-if="newMainAvailable"> -->
+          <span v-if="true">
+            <template>
+              <span>
+                <v-btn icon color="red darken-1" @click="cardOverlay = true">
+                  <v-icon>mdi-alert</v-icon>
+                </v-btn>
               </span>
             </template>
-            <span>Theres an update on main branch, you can use edit to update your report</span>
-          </v-tooltip>
           </span>
           <span v-else></span>
-
           <span>
-          <landing-options @delete="checkDelete"/>
-          <v-select
-            :menu-props="{ value: options }"
-            v-if="options"
-            :items="['one', 'two']"
-          />
-          <v-btn icon color="primary">
-            <v-icon>mdi-share-variant</v-icon>
-          </v-btn>
-          <v-btn icon color="primary" @click="open">
-            <v-icon>mdi-open-in-new</v-icon>
-          </v-btn>
+            <landing-options @delete="checkDelete" />
+            <v-select
+              :menu-props="{ value: options }"
+              v-if="options"
+              :items="['one', 'two']"
+            />
+            <v-btn icon color="primary">
+              <v-icon>mdi-share-variant</v-icon>
+            </v-btn>
+            <v-btn icon color="primary" @click="open">
+              <v-icon>mdi-open-in-new</v-icon>
+            </v-btn>
           </span>
         </v-card-actions>
+        <v-overlay class="d-inline-flex pa-2" :absolute="true" :opacity="0.98" :value="cardOverlay">
+          <v-col>
+            <v-card-text>
+              Theres an update on main branch, use edit to update your report.
+            </v-card-text>
+          </v-col>
+          <v-col class="d-flex flex-column mb-6">
+            <v-btn icon color="red darken-1" @click="cardOverlay = false">
+              <v-icon>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-col>
+        </v-overlay>
       </v-card>
     </v-sheet>
   </v-container>
@@ -83,6 +90,7 @@ export default class ProjectCard extends Vue {
   @Prop() project!: Project;
 
   options = false;
+  cardOverlay = false;
 
   get title() {
     return this.project.title;
@@ -99,7 +107,10 @@ export default class ProjectCard extends Vue {
   }
 
   get branchDate() {
-    return this.project.projectDate;
+    const branchDate = new Date(Date.parse(this.project.projectDate));
+    const enGBFormatter = new Intl.DateTimeFormat("en-GB");
+    const branchDateFormatted = enGBFormatter.format(branchDate);
+    return branchDateFormatted;
   }
 
   get newMainAvailable() {

@@ -206,7 +206,6 @@ export default class Landing extends Vue {
         });
 
       // Logging the formatted streams (with createdAt)
-      //console.log(streamID);
 
       // get all of the branches that are on each stream
       const streamBranches: {
@@ -223,10 +222,7 @@ export default class Landing extends Vue {
       }
 
       // filter those branches to only the "actcarbonreport" branches
-
       for (let i = 0; i < streamBranches.length; i++) {
-        //console.log("original branch\n",streamBranches[i])
-
         streamBranches[i].branches.data.stream.branches.items.forEach(
           (branch) => {
             if (branch.name === "actcarbonreport") {
@@ -242,7 +238,6 @@ export default class Landing extends Vue {
           }
         );
       }
-      //console.log("here are the filtered carbon branches\n", this.carbonBranches);
 
       // get the most recent commit and the data from that commit
       for (let i = 0; i < this.carbonBranches.length; i++) {

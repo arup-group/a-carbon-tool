@@ -23,13 +23,14 @@
           </v-toolbar>
         </template>
         <template v-slot:default="props" class="my-2">
-          <v-row>
+          <v-row class="d-flex align-stretch">
             <v-col
               v-for="item in props.items"
               :key="item.title"
               cols="12"
               md="6"
               lg="4"
+              style="display: flex"
             >
               <new-assessment-card v-if="item.title === 'New Assessment'" />
               <project-card

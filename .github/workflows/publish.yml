@@ -56,5 +56,4 @@ jobs:
     - name: Invalidate Cache
       if: github.ref == 'refs/heads/main'
       run: |
-        distribution_id=$(aws cloudfront list-distributions | jq -r 'select(.DistributionList.Items[1].Aliases.Items[0] == "${{ matrix.domain }}") | .DistributionList.Items[0].Id')
-        aws cloudfront create-invalidation --distribution-id $distribution_id --paths /index.html
+        aws cloudfront create-invalidation --distribution-id ${{ matrix.distributionId }} --paths /index.html

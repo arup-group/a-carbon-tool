@@ -92,7 +92,6 @@ export default class Menu1b extends Vue {
     return store.state.availableRegions;
   }
 
-  // textRules = [(v: string) => !!v || "Text is required"];
   multipleSelectionRules = [(v: string[]) => !!v.length || "Input is required"];
   selectionRules = [(v: string) => !!v || "Input is required"];
   valueRules = [

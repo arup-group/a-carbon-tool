@@ -102,6 +102,8 @@ export default class ProjectCard extends Vue {
     // MAY NEED TO UPDATE DEPENDING ON HOW ASSESSMENT/VIEW ENDS UP WORKING
     this.$router.push(`/assessment/view/${this.project.id}`);
   }
+
+  
 }
 </script>
 <style scoped>

@@ -25,7 +25,7 @@ export default class MaterialBreakdownCard extends Vue {
 
   get chartData(): ChartData[] {
     return this.materials.map((m) => ({
-      label: m.name,
+      label: m.label,
       value: m.value,
       color: m.color,
     }));

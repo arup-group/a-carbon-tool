@@ -90,6 +90,7 @@ import {
 } from "@/models/graphql";
 
 import { DeleteBranchInput } from "@/store";
+import { extractCo2Data } from "../views/utils/viewAssessmentUtils";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -99,7 +100,6 @@ import LandingError from "@/components/landing/LandingError.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
-
 @Component({
   components: {
     ProjectCard,
@@ -270,39 +270,8 @@ export default class Landing extends Vue {
 
       // convert the data into the format that this page needs it to be in
       this.projects = this.branchData.map((proj) => {
-        const co2Obj: {
-          [key: string]: { value: number; color: string };
-        } = {};
-        const children = proj.data.data.stream.object.children.objects;
-        children.forEach((material: any) => {
-          const materialValue =
-            parseFloat(material.data.act.reportData.productStageCarbonA1A3) +
-            parseFloat(material.data.act.reportData.transportCarbonA4) +
-            parseFloat(material.data.act.reportData.constructionCarbonA5.site) +
-            parseFloat(
-              material.data.act.reportData.constructionCarbonA5.value
-            ) +
-            parseFloat(material.data.act.reportData.constructionCarbonA5.waste);
-          const materialKey = material.data.act.formData.material.name;
-          const materialColor = material.data.act.formData.material.color;
-          if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
-            co2Obj[materialKey] = {
-              value: co2Obj[materialKey].value + materialValue,
-              color: materialColor,
-            };
-          } else {
-            co2Obj[materialKey] = {
-              value: materialValue,
-              color: materialColor,
-            };
-          }
-        });
-        const co2Arr = Object.entries(co2Obj);
-        const co2Data = co2Arr.map((obj) => ({
-          label: obj[0],
-          value: obj[1].value,
-          color: obj[1].color,
-        }));
+        const co2Data = extractCo2Data(proj.data).materials;
+
         const projName = proj.data.data.stream.object.data.projectData.name;
         return {
           title: `${projName} - ${proj.name}`,

@@ -33,7 +33,7 @@
           <Menu3
             @transportSelected="transportSelected"
             :transportTypes="transportTypes"
-            :types="types"
+            :groupedMaterials="groupedMaterials"
           />
         </v-stepper-content>
         <v-stepper-step :complete="completed" step="4" @click.native="step = 4" color="secondary darken-2">
@@ -82,6 +82,7 @@ import {
   TransportType,
   EmptyPropsPassdown,
   ReportPassdown,
+  GroupedMaterial,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -97,6 +98,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() emptyProps!: EmptyPropsPassdown;
   @Prop() report!: ReportPassdown;
   @Prop() becs!: string;
+  @Prop() groupedMaterials!: GroupedMaterial[];
 
   completed = false;
   step: Step = 1;

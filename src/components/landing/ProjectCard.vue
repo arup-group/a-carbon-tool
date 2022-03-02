@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <v-sheet outlined color="primary" rounded class="my-1" height="100%">
-      <v-card flat height="100%" style="display: flex; flex-direction: column">
+    <v-sheet outlined color="primary" rounded height="100%">
+      <v-card flat height="100%" class="d-flex flex-column">
         <v-card-title>
           <v-row>
             <v-col cols="12" class="limit-lines">

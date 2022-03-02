@@ -29,16 +29,14 @@
 import { Vue, Component } from "vue-property-decorator";
 import Header from "./components/core/Header.vue";
 import Sidebar from "./components/core/Sidebar.vue";
-
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";
 import "@arc-web/components/dist/themes/light.css";
 import "@arc-web/components/dist/themes/dark.css";
-
 import "@arc-web/components/dist/components/container/arc-container.js";
 import "@arc-web/components/dist/components/navbar/arc-navbar.js";
-
 import { setBasePath } from "@arc-web/components/dist/utilities/base-path";
+
 setBasePath("/");
 
 import "@/assets/style.css";
@@ -57,30 +55,23 @@ export default class App extends Vue {
   get serverName(): string {
     return this.$store.state.serverInfo.name;
   }
-
   get isAuthenticated(): boolean {
     return this.$store.getters.isAuthenticated;
   }
-
   get darkModeButtonText() {
     return this.darkModeState ? "🌞" : "🌚";
   }
-
   get darkModeState(): boolean {
     return this.$store.state.darkMode;
   }
-
   drawer = false;
   clipped = true;
-
   toggleDrawer() {
     this.$data.drawer = this.$data.drawer ? false : true;
   }
-
   logout() {
     this.$store.dispatch("logout");
   }
-
   toggleDarkMode() {
     this.$store.dispatch("setDarkMode");
     this.$vuetify.theme.dark = this.$store.state.darkMode ? true : false;

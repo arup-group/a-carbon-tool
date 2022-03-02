@@ -1,16 +1,20 @@
 <template>
-  <v-container class="d-flex justify-space-between pt-5 container">
+  <v-container class="d-flex justify-space-between pt-5 container" fluid>
     <div class="d-flex flex-column justify-space-between card-container">
       <project-info-card class="card" :projectInfo="projectInfo" />
       <view-assessment-buttons class="card" />
     </div>
     <Renderer
-      v-if="urlsLoaded"
+      v-if="urlsLoaded && chartDataReady"
       :objecturls="objectUrls"
       :token="token"
+      :colors="colors"
       class="renderer"
     />
-    <div class="d-flex flex-column justify-space-between card-container">
+    <div
+      class="d-flex flex-column justify-space-between card-container"
+      v-if="urlsLoaded && chartDataReady"
+    >
       <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
       <material-breakdown-card
         class="card"
@@ -24,11 +28,12 @@
 import { Component, Vue } from "vue-property-decorator";
 import { AssessmentComplete } from "@/models/assessment";
 
-import Renderer from "@/components/Renderer.vue";
-import ProjectInfoCard from "@/components/ProjectInfoCard.vue";
-import ABreakdownCard from "@/components/ABreakdownCard.vue";
-import MaterialBreakdownCard from "@/components/MaterialBreakdownCard.vue";
-import ViewAssessmentButtons from "@/components/ViewAssessmentButtons.vue";
+import Renderer from "@/components/shared/Renderer.vue";
+import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
+import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
+import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
+import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
+import { Color } from "../components/shared/Renderer.vue";
 
 @Component({
   components: {
@@ -42,21 +47,32 @@ import ViewAssessmentButtons from "@/components/ViewAssessmentButtons.vue";
 export default class ViewAssessment extends Vue {
   objectUrls: string[] = [];
   token!: string;
+  chartDataReady = false;
+  colors!: Color;
 
   mounted() {
     this.$store
       .dispatch("getObjectUrls", this.assessment.streamId)
       .then((res: string[]) => {
-        this.objectUrls = res;
+        this.objectUrls = [res[0]];
       });
 
     this.token = this.$store.state.token.token;
   }
 
-  get urlsLoaded() {
-    return this.objectUrls.length > 0;
+  async created() {
+    const assessmentViewData = await this.$store.dispatch(
+      "loadActReportData",
+      this.$route.params.streamId
+    );
+    this.assessment = assessmentViewData.data;
+    this.colors = assessmentViewData.colors;
+    this.chartDataReady = assessmentViewData.ready;
   }
 
+  get urlsLoaded() {
+    return this.objectUrls.length > 0 && this.chartDataReady;
+  }
   get projectInfo() {
     return this.assessment.projectInfo;
   }
@@ -66,35 +82,31 @@ export default class ViewAssessment extends Vue {
   get materialBreakdown() {
     return this.assessment.materialBreakdown;
   }
+  get streamId() {
+    return this.$route.params.streamId;
+  }
 
   assessment: AssessmentComplete = {
     // dummy data
-    streamId: "67899fd79d",
+    streamId: this.$route.params.streamId,
     projectInfo: {
-      name: "Super great project",
-      type: "Superstructure",
-      reportDate: new Date(2021, 11, 2),
-      author: "Tom Bunn",
+      name: "",
+      type: "",
+      reportDate: new Date(1946, 4, 1),
+      author: "",
       JN: "000001",
-      systemCost: 100000,
-      floorArea: 10000,
+      systemCost: 0,
+      floorArea: 0,
       notes: "",
-      totalCO2e: 3400,
-      totalkgCO2e: 340,
+      totalCO2e: 0,
+      totalkgCO2e: 0,
     },
     materialBreakdown: {
       materials: [
         {
-          name: "some value 1",
+          label: "some value 1",
           value: 50,
-        },
-        {
-          name: "some value 2",
-          value: 20,
-        },
-        {
-          name: "some value 3",
-          value: 10,
+          color: "",
         },
       ],
     },
@@ -102,18 +114,18 @@ export default class ViewAssessment extends Vue {
       levels: [
         {
           name: "A1-A3",
-          tCO2e: 2800,
-          kgCO2e: 280,
+          tCO2e: 0,
+          kgCO2e: 0,
         },
         {
           name: "A4",
-          tCO2e: 150,
-          kgCO2e: 15,
+          tCO2e: 0,
+          kgCO2e: 0,
         },
         {
           name: "A5",
-          tCO2e: 250,
-          kgCO2e: 25,
+          tCO2e: 0,
+          kgCO2e: 0,
         },
       ],
     },

@@ -12,26 +12,24 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Login.vue"),
   },
   {
-    path: "/landing",
+    path: "/",
     name: "Landing",
     component: () => import("../views/Landing.vue"),
   },
   {
-    path: "/assessment/view",
+    path: "/assessment/view/:streamId",
     name: "ViewAssessment",
     component: () => import("../views/ViewAssessment.vue"),
   },
   {
-    path: "/about",
-    name: "About",
-    component: () =>
-      import("../views/About.vue"),
+    path: "/assessment",
+    name: "NewAssessment",
+    component: () => import("../views/Assessment.vue"),
   },
   {
-    path: "/help",
-    name: "Help",
-    component: () =>
-      import("../views/Help.vue"),
+    path: "/about",
+    name: "About",
+    component: () => import("../views/About.vue"),
   },
 ];
 

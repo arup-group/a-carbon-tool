@@ -1,7 +1,27 @@
 import { AuthError, Server, Token } from "@/models/auth";
-import { StreamReferenceObjects } from "@/models/graphql";
+import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
+import {
+  StreamReferenceObjects,
+  StreamReferenceBranches,
+  StreamData,
+  ActReportData,
+  DeleteStreamData,
+} from "@/models/graphql";
 
-import { streamReferencedObjects, userInfoQuery } from "./graphql/speckleQueries";
+import {
+  streamReferencedObjects,
+  streamsDataQuery,
+  userInfoQuery,
+  streamsQuery,
+  uploadObjectsMutation,
+  createBranchMutation,
+  uploadObjectWithChildrenMutation,
+  createCommitMutation,
+  streamReferencedBranches,
+  streamCommmitObjects,
+  actReportBranchInfo,
+  deleteBranchMutation,
+} from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -13,11 +33,11 @@ export function goToSpeckleAuthpage(server: Server) {
   const challenge =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
-  // Save challenge and server url in localStorage
+  // Save challenge and server JSON string in localStorage for later use
   localStorage.setItem(CHALLENGE, challenge);
-  localStorage.setItem(SERVER, server.url);
+  localStorage.setItem(SERVER, JSON.stringify(server));
 
-  // Send user to auth page
+  // Send user to auth page 
   window.location.href = `${server.url}/authn/verify/${server.speckleId}/${challenge}`;
 }
 
@@ -52,18 +72,10 @@ export async function exchangeAccessCode(accessCode: string, server: Server) {
 }
 
 export function getServer(context: any): Server {
-  const url = localStorage.getItem(SERVER) as string;
-  const tmpServer = context.state.servers.find((s: Server) => s.url === url);
-  let server: Server;
-  if (tmpServer) server = tmpServer;
-  else
-    server = {
-      region: "",
-      url: url,
-      speckleId: "",
-      speckleSecret: "",
-    };
-  return server;
+  //gets server info stored as a JSON string in local storage
+  const server = localStorage.getItem(SERVER) as string;
+  const serverJson = JSON.parse(server);
+  return serverJson;
 }
 
 export async function speckleFetch(query: any, context: any) {
@@ -75,23 +87,95 @@ export async function speckleFetch(query: any, context: any) {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
+        // body: `{ query: ${query} }`
         body: JSON.stringify({
-          query: query
-        })
+          query: query,
+        }),
       });
       return await res.json();
-    } catch(err) {
+    } catch (err) {
       console.error("API cal failed", err);
     }
   } else return Promise.reject(AuthError.NOT_SIGNED_IN);
 }
 
-export const getUserData = (context: any) => speckleFetch(userInfoQuery(), context);
-export const getStreamObjects = (context: any, streamid: string): Promise<StreamReferenceObjects> => speckleFetch(streamReferencedObjects(streamid), context)
+export const getUserData = (context: any) =>
+  speckleFetch(userInfoQuery(), context);
+
+export const getStreamObjects = (
+  context: any,
+  streamid: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(streamReferencedObjects(streamid), context);
+
+export const getUserStreams = (context: any) =>
+  speckleFetch(streamsQuery(), context);
+
+export const uploadObjects = (
+  context: any,
+  streamid: string,
+  objects: SpeckleObjectComplete[]
+) => speckleFetch(uploadObjectsMutation(streamid, objects), context);
+
+export const createReportBranch = (context: any, streamid: string) =>
+  speckleFetch(createBranchMutation(streamid), context);
+
+export const uploadObjectWithChildren = (
+  context: any,
+  streamid: string,
+  object: ReportTotals,
+  children: string[]
+) =>
+  speckleFetch(
+    uploadObjectWithChildrenMutation(streamid, object, children),
+    context
+  );
+
+export const createCommit = (
+  context: any,
+  streamid: string,
+  objectid: string,
+  totalChildrenCount: number
+) =>
+  speckleFetch(
+    createCommitMutation(streamid, objectid, totalChildrenCount),
+    context
+  );
+export const getStreamCommit = (
+  context: any,
+  streamid: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(streamCommmitObjects(streamid), context);
+
+export const getStreamBranches = (
+  context: any,
+  streamid: string
+): Promise<StreamReferenceBranches> =>
+  speckleFetch(streamReferencedBranches(streamid), context);
+
+export const getBranchData = (
+  context: any,
+  streamid: string,
+  objId: string
+): Promise<StreamData> =>
+  speckleFetch(streamsDataQuery(streamid, objId), context);
+
+export const getActReportBranchInfo = (
+  context: any,
+  streamId: string
+): Promise<ActReportData> =>
+  speckleFetch(actReportBranchInfo(streamId), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,
-  refreshToken: localStorage.getItem(REFRESH_TOKEN) as string
-})
+  refreshToken: localStorage.getItem(REFRESH_TOKEN) as string,
+});
+
+export const deleteBranch = (
+  context: any,
+  streamid: string,
+  branchid: string
+): Promise<DeleteStreamData> =>
+  speckleFetch(deleteBranchMutation(streamid, branchid), context);

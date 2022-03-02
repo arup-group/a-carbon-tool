@@ -17,7 +17,7 @@ export default class DoughnutChart extends Mixins(
         datasets: [
           {
             label: "Data One",
-            backgroundColor: ["#2962B2", "#2092D3", "#20acd3"],
+            backgroundColor: this.data.map((d) => d.color),
             data: this.data.map((d) => d.value),
           },
         ],

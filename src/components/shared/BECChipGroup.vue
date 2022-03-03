@@ -1,24 +1,13 @@
 <template>
-  <div v-if="moreThanThreeCats">
-    <v-col class="d-flex flex-wrap">
-      <div v-if="showDots">
-        <BECChip
-          v-for="cat in firstThreeCategories"
-          :key="cat"
-          :category="cat"
-        />
-        <BECChip :category="dotCat" @switchShowDots="switchShowDots" />
-      </div>
-      <div v-else>
-        <BECChip v-for="cat in categories" :key="cat" :category="cat" />
-      </div>
-    </v-col>
-  </div>
-  <div v-else>
-    <v-col class="d-flex flex-wrap">
+  <v-col class="d-flex flex-wrap" :key="showDots">
+    <div v-if="showDots">
+      <BECChip v-for="cat in firstTwoCategories" :key="cat" :category="cat" />
+      <BECChip :category="dotCat" @switchShowDots="switchShowDots" />
+    </div>
+    <div v-else>
       <BECChip v-for="cat in categories" :key="cat" :category="cat" />
-    </v-col>
-  </div>
+    </div>
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -30,30 +19,32 @@ import BECChip from "./BECChip.vue";
 })
 export default class BECChipGroup extends Vue {
   @Prop() categories!: string[];
+  @Prop() showDots: boolean = this.moreThanTwoCats ? true : false;
 
-  get moreThanThreeCats() {
-    return this.categories.length > 3;
+  get moreThanTwoCats() {
+    return [...this.categories].length > 2;
   }
 
-  get firstThreeCategories() {
-    if (this.categories.length > 2) {
-      return [...this.categories.slice(0, 3)];
+  get firstTwoCategories() {
+    if ([...this.categories].length > 1) {
+      return [...this.categories.slice(0, 2)];
     } else {
       return [...this.categories];
     }
   }
 
   get dotCat() {
-    return "...";
+    return "+" + ([...this.categories].length - 2) + " more...";
   }
 
-  get showDots() {
-    return this.moreThanThreeCats ? true : false;
-  }
+  // get showDots() {
+  //   return this.moreThanTwoCats ? true : false;
+  // }
 
   switchShowDots() {
     console.log(this.showDots);
-    return this.showDots ? false : true;
+    this.showDots = this.showDots ? false : true;
+    return;
   }
 }
 </script>

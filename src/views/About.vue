@@ -374,9 +374,45 @@ export default class About extends Vue {
       sources: [
         {
           name: "IFC India Construction Materials Database Methodology Report 2017",
-          url: "https://edgebuildings.com/wp-content/uploads/2017/12/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+          url: "https://edgebuildings.com/wp-content/uploads/2017/12/IFC-India-Construction-Materials-Database-Methodology-Report.pdf"
         },
-      ],
+        {
+          name: "EPD of Average PPC and PSC Cement, ACC Limited 2018",
+          url: "https://www.environdec.com/library/epd1112"
+        },
+        {
+          name: "EPD of Average PPC and Compocem Cement, Ambuja Cements Limited 2018",
+          url: "https://www.environdec.com/library/epd1113"
+        },
+        {
+          name: "EPD of Greencor sheet, Hicem & Hilux board, RAMCO INDUSTRIES LTD.(RIL) 2019",
+          url: "https://www.environdec.com/library/epd1410"
+        },
+        {
+          name: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018",
+          url: "https://www.environdec.com/library/epd1116"
+        },
+        {
+          name: "EPD Gypboard Plain (Standard board), Gyproc, Saint Gobain 2020",
+          url: "https://www.gyproc.in/pdf/Verified-EPD-Gyproc-Gypboard-Plain-2020.pdf"
+        },
+        {
+          name: "EPD 12.5mm and 15mm Gypboard Plain, Gyproc, Saint Gobain 2018",
+          url: "https://www.environdec.com/library/epd945"
+        },
+        {
+          name: "Berger External Thermal Insulation & Composite Systems (ETICS) EPD, Berger 2020",
+          url: "https://www.environdec.com/library/epd1418"
+        },
+        {
+          name: "EPD Average of Finished Long Products (Steel), JSW 2021",
+          url: "https://www.environdec.com/library/epd4326"
+        },
+        {
+          name: "EPD Average of Finished Flat Products (Steel), JSW 2022",
+          url: "https://www.environdec.com/library/epd5017"
+        }
+      ]
     },
     {
       name: "Netherlands",

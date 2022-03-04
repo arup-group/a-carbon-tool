@@ -140,7 +140,7 @@
             </v-btn>
             <v-spacer />
             <menu-7
-              :style="colStyle"
+              :colStyle="colStyle"
               :canSave="canSave"
               @checkSave="checkSave"
             />

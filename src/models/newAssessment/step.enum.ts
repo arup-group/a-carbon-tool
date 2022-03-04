@@ -5,5 +5,5 @@ export enum Step {
   QUANTITIES = 4,
   REVIEW = 5,
   PREVIEW = 6,
-  REPORT = 7,
+  SAVE = 7,
 }

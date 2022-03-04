@@ -1,8 +1,17 @@
 <template>
   <div>
-    <p>Volume automatically calculated as:</p>
-    <p v-if="volCalculated" class="text-center">{{ displayVolume }}m3</p>
-    <p v-else>Volume being calculated</p> <!-- ADD LOADING SPINNER/COMPONENT -->
+    <div v-if="volCalculated">
+      <strong>Volume automatically calculated as:</strong><br />
+      <v-chip class="text-center">{{ displayVolume }}m3</v-chip>
+    </div>
+    <div v-else>
+      <strong>Volume being calculated</strong><br />
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        :size="100"
+      ></v-progress-circular>
+    </div>
   </div>
 </template>
 <script lang="ts">

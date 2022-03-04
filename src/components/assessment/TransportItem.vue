@@ -7,7 +7,12 @@
         :item-text="(types) => types['name']"
         :item-value="(types) => types"
         v-model="selected"
-      ></v-select>
+        chips
+      >
+        <template #selection="{ item }">
+          <v-chip :color="item.color"><strong>{{ item.name }}</strong></v-chip>
+        </template>
+      </v-select>
       <v-text-field
         label="road (km)"
         v-model="road"

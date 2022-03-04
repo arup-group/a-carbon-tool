@@ -101,7 +101,6 @@ import LandingError from "@/components/landing/LandingError.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
-
 @Component({
   components: {
     ProjectCard,

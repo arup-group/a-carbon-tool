@@ -2,7 +2,7 @@
   <v-app-bar v-if="li" fixed app :clipped-left="clipped">
     <v-app-bar-nav-icon @click.stop="toggleDrawer"></v-app-bar-nav-icon>
     <v-toolbar-title @click="changeRoute()"
-      ><a>act | a carbon tool</a></v-toolbar-title
+      ><a>act | a carbon tool | BETA</a></v-toolbar-title
     >
   </v-app-bar>
 </template>

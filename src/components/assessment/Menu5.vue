@@ -12,22 +12,38 @@
           {{ getFilleds(poss) }}
         </div>
       </div>
+      <v-card-actions>
+        <v-btn :style="colStyle" @click="stepMinus" color="primary">
+          Previous
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          :disabled="this.incomplete"
+          :style="colStyle"
+          @click="stepPlus"
+          color="primary"
+        >
+          Next
+        </v-btn>
+      </v-card-actions>
     </div>
     <div v-else>Empty props loading</div>
   </div>
 </template>
 <script lang="ts">
 import { EmptyPropsPassdown } from "@/models/newAssessment";
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 type PossibleEmpty = "Data" | "Materials" | "Transport" | "Volume";
 
 @Component
 export default class Menu5 extends Vue {
   @Prop() emptyProps!: EmptyPropsPassdown;
+  @Prop() colStyle!: any;
 
   possibleEmpty: PossibleEmpty[] = ["Data", "Materials", "Transport", "Volume"];
   colorCheck = "primary";
+
   getFilleds(val: PossibleEmpty) {
     switch (val) {
       case "Data":
@@ -71,9 +87,9 @@ export default class Menu5 extends Vue {
           return "red";
         }
       default:
-          return "red";
-        }
+        return "red";
     }
+  }
   getIcon(val: PossibleEmpty) {
     switch (val) {
       case "Data":
@@ -114,6 +130,19 @@ export default class Menu5 extends Vue {
     }
   }
 
+  get incomplete() {
+    if (
+      this.projectFilled === "Data step is complete" &&
+      this.transportsFilled === "All objects have a transport type" &&
+      this.materialsFilled === "All objects have materials" &&
+      this.volumesFilled === "All objects have a volume"
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   get projectFilled() {
     if (this.emptyProps)
       return this.emptyProps.projectEmpty
@@ -141,6 +170,14 @@ export default class Menu5 extends Vue {
         ? `${this.emptyProps.volumesEmpty.length} Objects without a volume`
         : "All objects have a volume";
     else return "";
+  }
+  @Emit("stepPlus")
+  stepPlus() {
+    return;
+  }
+  @Emit("stepMinus")
+  stepMinus() {
+    return;
   }
 }
 </script>

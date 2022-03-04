@@ -6,9 +6,9 @@
     class="d-flex justify-center align-center"
   >
     <v-card style="width: 100%; height: 85vh">
-      <v-card-title style="height:10vh" class="">New Assessment</v-card-title>
+      <v-card-title style="height: 10vh" class="">New Assessment</v-card-title>
       <v-stepper
-        style="overflow-y: scroll; height: 75vh "
+        style="overflow-y: scroll; height: 75vh"
         v-model="step"
         vertical
       >
@@ -100,16 +100,12 @@
           Review
         </v-stepper-step>
         <v-stepper-content step="5">
-          <menu-5 :emptyProps="emptyProps" />
-          <v-card-actions>
-            <v-btn :style="colStyle" @click="step = 4" color="primary">
-              Previous
-            </v-btn>
-            <v-spacer />
-            <v-btn :style="colStyle" @click="step = 6" color="primary">
-              Next
-            </v-btn>
-          </v-card-actions>
+          <menu-5
+            :colStyle="colStyle"
+            @stepPlus="stepPlus"
+            @stepMinus="stepMinus"
+            :emptyProps="emptyProps"
+          />
         </v-stepper-content>
         <v-stepper-step
           :complete="completed"
@@ -191,6 +187,16 @@ export default class AssessmentStepper extends Vue {
   @Prop() groupedMaterials!: GroupedMaterial[];
 
   step: Step = 1;
+
+  stepPlus() {
+    this.step += 1;
+    return this.step;
+  }
+
+  stepMinus() {
+    this.step -= 1;
+    return this.step;
+  }
 
   get colStyle() {
     if (this.$store.state.darkMode)

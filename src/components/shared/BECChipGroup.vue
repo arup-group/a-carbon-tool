@@ -19,7 +19,7 @@ import BECChip from "./BECChip.vue";
 })
 export default class BECChipGroup extends Vue {
   @Prop() categories!: string[];
-  showDots: boolean = this.moreThanTwoCats ? true : false;
+  showDots = this.moreThanTwoCats ? true : false;
 
   get moreThanTwoCats() {
     return [...this.categories].length > 2;

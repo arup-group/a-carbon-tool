@@ -10,7 +10,7 @@
         chips
       >
         <template #selection="{ item }">
-          <v-chip :text-color="item.color"><strong>{{ item.name }}</strong></v-chip>
+          <v-chip :color="item.color"><strong>{{ item.name }}</strong></v-chip>
         </template>
       </v-select>
       <v-text-field

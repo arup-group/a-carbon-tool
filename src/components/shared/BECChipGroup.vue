@@ -22,7 +22,6 @@ export default class BECChipGroup extends Vue {
   showDots: boolean = this.moreThanTwoCats ? true : false;
 
   get moreThanTwoCats() {
-    console.log(this.categories);
     return [...this.categories].length > 2;
   }
 

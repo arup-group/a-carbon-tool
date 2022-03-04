@@ -27,6 +27,7 @@
         :rules="selectionRules"
         label="Primary element category"
         multiple
+        required
         chips
       ></v-select>
       <v-text-field

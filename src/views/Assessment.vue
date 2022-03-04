@@ -1,7 +1,28 @@
 <template>
   <v-main>
-    <v-row>
-      <v-col cols="4">
+    <div v-if="loading" style="width: 100%" class="d-flex justify-center">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        :size="200"
+      ></v-progress-circular>
+    </div>
+    <v-container
+      v-else
+      fluid
+      class="d-flex justify-flex-start flex-row"
+      style="margin: 10px; padding: 10px; width: 100%"
+    >
+      <Renderer
+        class="justify-flex-end"
+        v-if="objectURLs.length !== 0"
+        @loaded="rendererLoaded"
+        :objecturls="objectURLs"
+        :token="token"
+        :colors="colors"
+        :gradientColorProperty="volumeGradientPassdown"
+      />
+      <div style="width: 35%">
         <AssessmentStepper
           style="z-index: 1"
           v-if="availableStreams.length !== 0"
@@ -10,7 +31,7 @@
           @stepperUpdate="stepperUpdate"
           @transportSelected="transportSelected"
           @uploadData="uploadData"
-          @save="save"
+          @checkSave="checkSave"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -21,18 +42,21 @@
           :becs="becs"
           :groupedMaterials="groupedMaterials"
         />
-      </v-col>
-      <v-col cols="8">
-        <Renderer
-          v-if="objectURLs.length !== 0"
-          @loaded="rendererLoaded"
-          :objecturls="objectURLs"
-          :token="token"
-          :colors="colors"
-          :gradientColorProperty="volumeGradientPassdown"
-        />
-      </v-col>
-    </v-row>
+      </div>
+    </v-container>
+    <confirm-dialog
+      :dialog="dialog"
+      @agree="agreeSave"
+      @cancel="cancelSave"
+      message="Do you want to save and view this report? This will overwrite any existing reports for this stream"
+    />
+    <SESnackBar
+      @close="saveSnackClose"
+      :success="saveSuccess"
+      :model="saveSnack"
+      textError="Something went wrong, please retry"
+      textSuccess="Report saved!"
+    />
   </v-main>
 </template>
 
@@ -75,13 +99,19 @@ import {
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
 import { UploadReportInput } from "@/store";
+import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
+import SESnackBar from "@/components/shared/SESnackBar.vue";
 
 type ObjectsObj = { [id: string]: SpeckleObject };
 
 @Component({
-  components: { AssessmentStepper, Renderer },
+  components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar },
 })
 export default class Assessment extends Vue {
+  loading = false;
+  saveSuccess = true;
+  saveSnack = false;
+  dialog = false;
   availableStreams = [];
   objectURLs: string[] = [];
   token = "";
@@ -89,6 +119,7 @@ export default class Assessment extends Vue {
   objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
+  becs: TransportType[] = [];
   totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
 
@@ -117,23 +148,41 @@ export default class Assessment extends Vue {
       });
     });
     this.transportTypes = this.$store.state.transportTypes;
+    this.becs = this.$store.state.becs;
   }
 
-  get becs(): string[] {
-    return this.$store.state.becs.map((b: { name: string }) => b.name);
-  }
-
-  async save() {
+  async agreeSave() {
+    this.loading=true;
     if (this.report) {
-      const uploadReportInput: UploadReportInput = {
-        streamid: this.streamid,
-        objects: this.report.reportObjs,
-        reportTotals: this.report.totals,
-        projectData: this.projectData,
-      };
-
-      await this.$store.dispatch("uploadReport", uploadReportInput);
+      if (this.report.reportObjs.length > 0) {
+        const uploadReportInput: UploadReportInput = {
+          streamid: this.streamid,
+          objects: this.report.reportObjs,
+          reportTotals: this.report.totals,
+          projectData: this.projectData,
+        };
+        this.dialog = false;
+        this.loading = true;
+        await this.$store.dispatch("uploadReport", uploadReportInput);
+        this.loading = false;
+        this.saveSnack = true;
+        this.$router.push(`/assessment/view/${this.streamid}`);
+      } else {
+        this.saveSnack = true;
+        this.saveSuccess = false;
+        this.dialog = false;
+        this.loading = false;
+      }
     }
+  }
+  saveSnackClose() {
+    this.saveSnack = false;
+  }
+  cancelSave() {
+    this.dialog = false;
+  }
+  checkSave() {
+    this.dialog = true;
   }
 
   rendererLoaded(allMesh: THREE.Mesh[]) {
@@ -167,7 +216,7 @@ export default class Assessment extends Vue {
         this.carbonCalc();
         this.resetColors();
         break;
-      case Step.REPORT:
+      case Step.SAVE:
         this.resetColors();
         break;
       default:

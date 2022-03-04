@@ -24,12 +24,20 @@
       <v-select
         v-model="form.components"
         :items="becs"
+        :item-text="(types) => types['name']"
+        :item-value="(types) => types"
         :rules="selectionRules"
         label="Primary element category"
         multiple
         required
         chips
-      ></v-select>
+      >
+        <template #selection="{ item }">
+          <v-chip :color="item.backgroundColor" :text-color="item.color">{{
+            item.name
+          }}</v-chip>
+        </template>
+      </v-select>
       <v-text-field
         v-model="form.cost"
         :rules="valueRules"

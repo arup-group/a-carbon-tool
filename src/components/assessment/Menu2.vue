@@ -1,12 +1,8 @@
 <template>
   <div>
     <v-form>
-      <p>Grouping objects by speckle type</p>
-      <div
-        v-for="type in loadedTypes"
-        :key="type.type"
-        style="width: 100%"
-      >
+      <strong>Objects by speckle type</strong>
+      <div v-for="type in loadedTypes" :key="type.type" style="width: 100%">
         <material-type
           :materials="materials"
           :type="type"

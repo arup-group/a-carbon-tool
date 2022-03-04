@@ -6,9 +6,9 @@
     class="d-flex justify-center align-center"
   >
     <v-card style="width: 100%; height: 85vh">
-      <v-card-title style="height: 5vh" class="">New Assessment</v-card-title>
+      <v-card-title style="height:10vh" class="">New Assessment</v-card-title>
       <v-stepper
-        style="overflow-y: scroll; height: 80vh"
+        style="overflow-y: scroll; height: 75vh "
         v-model="step"
         vertical
       >

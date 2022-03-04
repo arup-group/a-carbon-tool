@@ -1,5 +1,5 @@
 <template>
-  <v-col class="d-flex flex-wrap" :key="showDots">
+  <v-col class="d-flex flex-wrap">
     <div v-if="showDots">
       <BECChip v-for="cat in firstTwoCategories" :key="cat" :category="cat" />
       <BECChip :category="dotCat" @switchShowDots="switchShowDots" />
@@ -19,9 +19,10 @@ import BECChip from "./BECChip.vue";
 })
 export default class BECChipGroup extends Vue {
   @Prop() categories!: string[];
-  @Prop() showDots: boolean = this.moreThanTwoCats ? true : false;
+  showDots: boolean = this.moreThanTwoCats ? true : false;
 
   get moreThanTwoCats() {
+    console.log(this.categories);
     return [...this.categories].length > 2;
   }
 
@@ -37,12 +38,7 @@ export default class BECChipGroup extends Vue {
     return "+" + ([...this.categories].length - 2) + " more...";
   }
 
-  // get showDots() {
-  //   return this.moreThanTwoCats ? true : false;
-  // }
-
   switchShowDots() {
-    console.log(this.showDots);
     this.showDots = this.showDots ? false : true;
     return;
   }

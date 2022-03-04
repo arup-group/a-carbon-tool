@@ -7,7 +7,7 @@
       </v-btn>
     </v-card-title>
     <v-card-subtitle>
-      <BECChipGroup :categories="type" />
+      <BECChipGroup v-if="type.length !== 0" :categories="type" />
     </v-card-subtitle>
     <v-card-text>
       <v-divider class="mb-4 mt-3"></v-divider>
@@ -62,7 +62,7 @@ import BECChipGroup from "../shared/BECChipGroup.vue";
 })
 export default class ProjectInfoCard extends Vue {
   @Prop() projectInfo!: ProjectInfo;
-  show = false;
+  show = true;
 
   get name() {
     return this.projectInfo.name;

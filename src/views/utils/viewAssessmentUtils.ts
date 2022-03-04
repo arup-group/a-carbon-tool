@@ -94,7 +94,7 @@ export async function loadStream(context: any, streamId: string) {
 
   const projectInfoUpdated = {
     name: branchData.data.stream.object.data.projectData.name,
-    type: branchData.data.stream.object.data.projectData.component,
+    type: branchData.data.stream.object.data.projectData.components,
     reportDate: new Date(
       actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
     ),
@@ -116,11 +116,14 @@ export async function loadStream(context: any, streamId: string) {
   };
 
   levelsUpdated.levels[0].kgCO2e = Math.ceil(levelsUpdated.levels[0].kgCO2e);
-  levelsUpdated.levels[0].tCO2e = Math.ceil(levelsUpdated.levels[0].tCO2e);
+  levelsUpdated.levels[0].tCO2e =
+    Math.ceil(levelsUpdated.levels[0].tCO2e * 100) / 100;
   levelsUpdated.levels[1].kgCO2e = Math.ceil(levelsUpdated.levels[1].kgCO2e);
-  levelsUpdated.levels[1].tCO2e = Math.ceil(levelsUpdated.levels[1].tCO2e);
+  levelsUpdated.levels[1].tCO2e =
+    Math.ceil(levelsUpdated.levels[1].tCO2e * 100) / 100;
   levelsUpdated.levels[2].kgCO2e = Math.ceil(levelsUpdated.levels[2].kgCO2e);
-  levelsUpdated.levels[2].tCO2e = Math.ceil(levelsUpdated.levels[2].tCO2e);
+  levelsUpdated.levels[2].tCO2e =
+    Math.ceil(levelsUpdated.levels[2].tCO2e * 100) / 100;
 
   return {
     ready: true,

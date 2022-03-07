@@ -18,7 +18,7 @@
             {{ getTCO2e(level) }} tCO<sub>2</sub>e
           </div>
           <div class="font-weight-light">
-            {{ getKgCO2e(level) }} kgCO<sub>2</sub>e/m<sup>2</sup>
+            {{ getKgCO2ePerSqm(level) }} kgCO<sub>2</sub>e/m<sup>2</sup>
           </div>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default class ABreakdownCard extends Vue {
   getTCO2e(level: Level) {
     return level.tCO2e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
-  getKgCO2e(level: Level) {
+  getKgCO2ePerSqm(level: Level) {
     return level.kgCO2eperm2.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 }

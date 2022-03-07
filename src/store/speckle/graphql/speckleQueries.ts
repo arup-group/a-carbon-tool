@@ -152,3 +152,9 @@ export const deleteBranchMutation = (
 ) => `mutation {
   branchDelete( branch: {streamId: "${streamId}", id: "${id}"})
 }`;
+
+export const streamNameQuery = (streamId: string) => `query {
+  stream(id: "${streamId}") {
+    name
+  }
+}`

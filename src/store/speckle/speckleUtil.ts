@@ -6,6 +6,7 @@ import {
   StreamData,
   ActReportData,
   DeleteStreamData,
+  StreamName,
 } from "@/models/graphql";
 
 import {
@@ -21,6 +22,7 @@ import {
   streamCommmitObjects,
   actReportBranchInfo,
   deleteBranchMutation,
+  streamNameQuery,
 } from "./graphql/speckleQueries";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
@@ -37,7 +39,7 @@ export function goToSpeckleAuthpage(server: Server) {
   localStorage.setItem(CHALLENGE, challenge);
   localStorage.setItem(SERVER, JSON.stringify(server));
 
-  // Send user to auth page 
+  // Send user to auth page
   window.location.href = `${server.url}/authn/verify/${server.speckleId}/${challenge}`;
 }
 
@@ -180,4 +182,7 @@ export const deleteBranch = (
 ): Promise<DeleteStreamData> =>
   speckleFetch(deleteBranchMutation(streamid, branchid), context);
 
-// export const getAllStreamCommits = (context: any, streamid: string)
+export const getStreamName = (
+  context: any,
+  streamid: string
+): Promise<StreamName> => speckleFetch(streamNameQuery(streamid), context);

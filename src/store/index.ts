@@ -17,6 +17,7 @@ import {
   getStreamCommit,
   getActReportBranchInfo,
   deleteBranch,
+  getStreamName,
 } from "./speckle/speckleUtil";
 import { loadStream } from "@/views/utils/viewAssessmentUtils";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
@@ -298,6 +299,10 @@ export default new Vuex.Store({
     async getStreamCommit(context, streamid: string) {
       const streams = await getStreamCommit(context, streamid);
       return streams;
+    },
+
+    async getStreamName(context, streamid: string) {
+      return await getStreamName(context, streamid);
     },
 
     async getBranchData(context, { streamid, objId }: GetBranchDataInputs) {

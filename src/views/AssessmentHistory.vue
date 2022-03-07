@@ -7,6 +7,11 @@
         :page.sync="page"
         hide-default-footer
       >
+        <template v-slot:header>
+          <v-toolbar class="mb-2" dark flat>
+            <v-toolbar-title>{{ streamName }}</v-toolbar-title>
+          </v-toolbar>
+        </template>
         <template v-slot:default="props">
           <div v-for="report in props.items" :key="report.id">
             <history-project-card :project="report" />
@@ -21,6 +26,7 @@
 <script lang="ts">
 import {
   StreamData,
+  StreamName,
   StreamReferenceBranches,
   StreamReferenceObjects,
 } from "@/models/graphql";
@@ -40,6 +46,7 @@ import { ProjectAVals } from "@/models/assessmentHistory";
 })
 export default class AssessmentHistory extends Vue {
   streamId = "";
+  streamName = "";
   loading = true;
   error = false;
   reports: ReportObj[] = [];
@@ -48,14 +55,24 @@ export default class AssessmentHistory extends Vue {
   page = 1;
 
   mounted() {
+    this.streamId = this.$route.params.streamId;
     this.loadReports();
+    this.getName();
+  }
+
+  async getName() {
+    const rawStreamName: StreamName = await this.$store.dispatch(
+      "getStreamName",
+      this.streamId
+    );
+
+    this.streamName = rawStreamName.data.stream.name;
   }
 
   async loadReports() {
     this.loading = true;
     this.error = false;
     try {
-      this.streamId = this.$route.params.streamId;
       const branches: StreamReferenceBranches = await this.getBranches(
         this.streamId
       );
@@ -128,19 +145,23 @@ export default class AssessmentHistory extends Vue {
         a5Tot += reportData.constructionCarbonA5.value;
       });
 
-      const aValues: ChartData[] = [{
+      const aValues: ChartData[] = [
+        {
           label: "A1-A3",
           value: a1A3Tot,
           color: "",
-      },{
+        },
+        {
           label: "A4",
           value: a4Tot,
           color: "",
-      },{
+        },
+        {
           label: "A5",
           value: a5Tot,
           color: "",
-      },]
+        },
+      ];
       const co2Data = Object.values(materials);
       return {
         title: `${r.data.projectData.name}`,

@@ -25,9 +25,7 @@ export default class HistoryFilters extends Vue {
 
   mounted() {
     if (this.defaultFilters) {
-        console.log("setting default filters", this.defaultFilters)
       this.filters = { ...this.defaultFilters }; // spread used to force copying of values rather than copying reference
-      console.log("this.filters:", this.filters);
     }
   }
 
@@ -50,22 +48,22 @@ export default class HistoryFilters extends Vue {
   }
 
   get materials() {
-      return this.filters.materials;
+    return this.filters.materials;
   }
   set materials(val) {
-      this.filters.materials = val;
+    this.filters.materials = val;
   }
   get a15() {
-      return this.filters.a15;
+    return this.filters.a15;
   }
   set a15(val) {
-      this.filters.a15 = val;
+    this.filters.a15 = val;
   }
   get categories() {
-      return this.filters.categories;
+    return this.filters.categories;
   }
   set categories(val) {
-      this.filters.categories = val;
+    this.filters.categories = val;
   }
 }
 </script>

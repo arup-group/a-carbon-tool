@@ -7,28 +7,32 @@
             <v-col cols="12" class="limit-lines">
               {{ title }}
             </v-col>
-            <BECChipGroup :categories="category" />
+            <BECChipGroup v-if="categories" :categories="category" />
           </v-row>
         </v-card-title>
         <v-card-text>
           <v-row justify="start" class="text--primary" fill-height dense>
             <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
           </v-row>
-        <v-divider class="mb-4 mt-2"></v-divider>
+          <v-divider class="mb-4 mt-2"></v-divider>
           <v-row>
-            <v-col cols="12" lg="6" align="center">
+            <v-col cols="12" :lg="materialGraphLgCols" align="center">
               <v-card flat width="80%">
-                <DoughnutChart :data="co2Values" :chartData="{}" />
+                <DoughnutChart
+                  v-if="materials"
+                  :data="co2Values"
+                  :chartData="{}"
+                />
               </v-card>
             </v-col>
-            <v-col cols="12" lg="6" align="center">
-                  <v-card flat width="80%">
-                      <h-bar-chart :data="aVals" />
-                  </v-card>
-              </v-col>
+            <v-col cols="12" :lg="a15GraphLgCols" align="center">
+              <v-card flat width="80%">
+                <h-bar-chart v-if="a15" :data="aVals" />
+              </v-card>
+            </v-col>
           </v-row>
-          </v-card-text>
-          <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
+        </v-card-text>
+        <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
       </v-card>
     </v-sheet>
   </v-container>
@@ -42,16 +46,18 @@ import DoughnutChart from "../charts/DoughnutChart.vue";
 import HBarChart from "../charts/HBarChart.vue";
 import LandingOptions from "../landing/LandingOptions.vue";
 import BECChipGroup from "../shared/BECChipGroup.vue";
-import { ProjectAVals } from "@/models/assessmentHistory";
+import { HistoryFilterOptions, ProjectAVals } from "@/models/assessmentHistory";
 
 @Component({
   components: { DoughnutChart, BECChipGroup, LandingOptions, HBarChart },
 })
 export default class HistoryProjectCard extends Vue {
   @Prop() project!: ProjectAVals;
+  @Prop() filters!: HistoryFilterOptions;
 
   options = false;
 
+  // project getters
   get title() {
     return this.project.title;
   }
@@ -66,13 +72,32 @@ export default class HistoryProjectCard extends Vue {
     return this.convertKgToTonnes(this.project.totalCO2e);
   }
   get aVals() {
-      return this.project.aValues;
+    return this.project.aValues;
   }
   get link() {
     return this.project.link;
   }
   get category() {
     return this.project.category;
+  }
+
+  // filters getters
+  get materials() {
+    return this.filters.materials;
+  }
+  get a15() {
+    return this.filters.a15;
+  }
+  get categories() {
+    return this.filters.categories;
+  }
+
+  // different getters
+  get materialGraphLgCols() {
+      return this.a15 ? "6" : "12";
+  }
+  get a15GraphLgCols() {
+      return this.materials ? "6" : "12";
   }
 
   @Emit("delete")

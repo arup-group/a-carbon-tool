@@ -19,9 +19,12 @@
           />
         </template>
         <template v-slot:default="props">
-          <div v-for="report in props.items" :key="report.id">
-            <history-project-card :project="report" />
-          </div>
+          <history-project-card
+            v-for="report in props.items"
+            :key="report.id"
+            :project="report"
+            :filters="filters"
+          />
         </template>
       </v-data-iterator>
     </v-container>
@@ -78,15 +81,12 @@ export default class AssessmentHistory extends Vue {
   }
 
   materialsFilterUpdate(material: boolean) {
-    console.log("material:", material);
     this.filters.materials = material;
   }
   a15FilterUpdate(a15: boolean) {
-    console.log("a15:", a15);
     this.filters.a15 = a15;
   }
   categoriesFilterUpdate(categories: boolean) {
-    console.log("categories:", categories);
     this.filters.categories = categories;
   }
 
@@ -114,7 +114,6 @@ export default class AssessmentHistory extends Vue {
         );
         this.reports = await this.getReports(branchData, this.streamId);
         this.cleanedReports = this.convReports(this.reports);
-        console.log("cleanedReports:", this.cleanedReports);
         this.loading = false;
       }
     } catch (err) {

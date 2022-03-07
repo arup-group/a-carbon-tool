@@ -15,7 +15,7 @@
         <v-card-text>
           <v-row justify="start" class="text--primary" fill-height dense>
             <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
-            <v-col align="right" cols="6"> last update:{{ branchDate }}</v-col>
+            <v-col align="right" cols="6"> updated: {{ branchDate }}</v-col>
           </v-row>
         </v-card-text>
         <v-divider class="mx-4"></v-divider>

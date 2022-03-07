@@ -11,6 +11,12 @@
           <v-toolbar class="mb-2" dark flat>
             <v-toolbar-title>{{ streamName }}</v-toolbar-title>
           </v-toolbar>
+          <history-filters
+            @materials="materialsFilterUpdate"
+            @a15="a15FilterUpdate"
+            @categories="categoriesFilterUpdate"
+            :defaultFilters="filters"
+          />
         </template>
         <template v-slot:default="props">
           <div v-for="report in props.items" :key="report.id">
@@ -39,10 +45,16 @@ import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import { Project } from "@/models/project";
 import HistoryProjectCard from "@/components/assessmentHistory/HistoryProjectCard.vue";
 import { ChartData } from "@/models/chart";
-import { ProjectAVals } from "@/models/assessmentHistory";
+import { HistoryFilterOptions, ProjectAVals } from "@/models/assessmentHistory";
+import HistoryFilters from "@/components/assessmentHistory/HistoryFilters.vue";
 
 @Component({
-  components: { LoadingSpinner, ErrorRetry, HistoryProjectCard },
+  components: {
+    LoadingSpinner,
+    ErrorRetry,
+    HistoryProjectCard,
+    HistoryFilters,
+  },
 })
 export default class AssessmentHistory extends Vue {
   streamId = "";
@@ -53,11 +65,29 @@ export default class AssessmentHistory extends Vue {
   cleanedReports: Project[] = [];
   itemsPerPage = 10;
   page = 1;
+  filters: HistoryFilterOptions = {
+    materials: true,
+    a15: true,
+    categories: true,
+  };
 
   mounted() {
     this.streamId = this.$route.params.streamId;
     this.loadReports();
     this.getName();
+  }
+
+  materialsFilterUpdate(material: boolean) {
+    console.log("material:", material);
+    this.filters.materials = material;
+  }
+  a15FilterUpdate(a15: boolean) {
+    console.log("a15:", a15);
+    this.filters.a15 = a15;
+  }
+  categoriesFilterUpdate(categories: boolean) {
+    console.log("categories:", categories);
+    this.filters.categories = categories;
   }
 
   async getName() {

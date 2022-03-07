@@ -15,16 +15,27 @@
             @materials="materialsFilterUpdate"
             @a15="a15FilterUpdate"
             @categories="categoriesFilterUpdate"
+            @direction="directionUpdate"
             :defaultFilters="filters"
           />
         </template>
         <template v-slot:default="props">
-          <history-project-card
-            v-for="report in props.items"
-            :key="report.id"
-            :project="report"
-            :filters="filters"
-          />
+          <div v-if="direction">
+            <history-project-card
+              v-for="report in props.items"
+              :key="report.id"
+              :project="report"
+              :filters="filters"
+            />
+          </div>
+          <div v-else class="d-flex">
+              <history-project-card
+              v-for="report in props.items"
+              :key="report.id"
+              :project="report"
+              :filters="filters"
+            />
+          </div>
         </template>
       </v-data-iterator>
     </v-container>
@@ -48,7 +59,11 @@ import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import { Project } from "@/models/project";
 import HistoryProjectCard from "@/components/assessmentHistory/HistoryProjectCard.vue";
 import { ChartData } from "@/models/chart";
-import { HistoryFilterOptions, ProjectAVals } from "@/models/assessmentHistory";
+import {
+  HistoryFilterOptions,
+  HistoryProjectCardDirection,
+  ProjectAVals,
+} from "@/models/assessmentHistory";
 import HistoryFilters from "@/components/assessmentHistory/HistoryFilters.vue";
 
 @Component({
@@ -72,12 +87,17 @@ export default class AssessmentHistory extends Vue {
     materials: true,
     a15: true,
     categories: true,
+    direction: HistoryProjectCardDirection.COL,
   };
 
   mounted() {
     this.streamId = this.$route.params.streamId;
     this.loadReports();
     this.getName();
+  }
+
+  get direction() {
+    return this.filters.direction === HistoryProjectCardDirection.COL;
   }
 
   materialsFilterUpdate(material: boolean) {
@@ -88,6 +108,10 @@ export default class AssessmentHistory extends Vue {
   }
   categoriesFilterUpdate(categories: boolean) {
     this.filters.categories = categories;
+  }
+  directionUpdate(direction: HistoryProjectCardDirection) {
+    console.log("direction:", direction);
+    this.filters.direction = direction;
   }
 
   async getName() {

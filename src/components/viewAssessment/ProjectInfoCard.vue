@@ -17,7 +17,7 @@
           ><span class="font-weight-light">tCO2e</span>
         </div>
         <div class="font-weight-bold">TOTAL A-5 CARBON</div>
-        <div class="font-weight-light">{{ totalkgCO2e }} kgCO2e/m2</div>
+        <div class="font-weight-light">{{ totalkgCO2e }} kgCO2e</div>
       </div>
       <v-expand-transition>
         <div v-show="show">

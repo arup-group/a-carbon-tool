@@ -4,13 +4,15 @@ import { CarbonA5 } from "../newAssessment/speckleObject.interface";
 export interface StreamData {
   data: {
     stream: {
-      object: {
-        data: ParentSpeckleObjectData;
-        children: {
-          objects: { data: any }[];
-        };
-      };
+      object: ReportObj;
     };
+  };
+}
+
+export interface ReportObj {
+  data: ParentSpeckleObjectData;
+  children: {
+    objects: { data: any }[];
   };
 }
 

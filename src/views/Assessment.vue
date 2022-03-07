@@ -1,12 +1,6 @@
 <template>
   <v-main>
-    <div v-if="loading" style="width: 100%" class="d-flex justify-center">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        :size="200"
-      ></v-progress-circular>
-    </div>
+    <loading-spinner v-if="loading" />
     <v-container
       v-else
       fluid
@@ -101,11 +95,18 @@ import {
 import { UploadReportInput } from "@/store";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 
 type ObjectsObj = { [id: string]: SpeckleObject };
 
 @Component({
-  components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar },
+  components: {
+    AssessmentStepper,
+    Renderer,
+    ConfirmDialog,
+    SESnackBar,
+    LoadingSpinner,
+  },
 })
 export default class Assessment extends Vue {
   loading = false;
@@ -152,7 +153,7 @@ export default class Assessment extends Vue {
   }
 
   async agreeSave() {
-    this.loading=true;
+    this.loading = true;
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
         const uploadReportInput: UploadReportInput = {

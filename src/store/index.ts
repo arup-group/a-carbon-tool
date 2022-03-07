@@ -300,7 +300,7 @@ export default new Vuex.Store({
       return streams;
     },
 
-    async getBranchData(context, [streamid, objId]) {
+    async getBranchData(context, { streamid, objId }: GetBranchDataInputs) {
       const streams = await getBranchData(context, streamid, objId);
       return streams;
     },
@@ -427,6 +427,11 @@ export default new Vuex.Store({
   modules: {},
   plugins: [createPersistedState()],
 });
+
+export interface GetBranchDataInputs {
+  streamid: string;
+  objId: string;
+}
 
 export interface DeleteBranchInput {
   streamid: string;

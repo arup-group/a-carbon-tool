@@ -179,3 +179,5 @@ export const deleteBranch = (
   branchid: string
 ): Promise<DeleteStreamData> =>
   speckleFetch(deleteBranchMutation(streamid, branchid), context);
+
+// export const getAllStreamCommits = (context: any, streamid: string)

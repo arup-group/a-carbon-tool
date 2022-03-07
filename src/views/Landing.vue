@@ -51,20 +51,8 @@
         </template>
       </v-data-iterator>
     </v-container>
-    <div
-      v-else-if="loading && !error"
-      style="width: 100%"
-      class="d-flex justify-center"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        :size="200"
-      ></v-progress-circular>
-    </div>
-    <div v-else>
-      <landing-error @retry="loadStreams" />
-    </div>
+    <loading-spinner v-else-if="loading && !error" />
+    <error-retry v-else @retry="loadStreams" />
     <confirm-dialog
       :dialog="dialog"
       @agree="agreeDelete"
@@ -90,26 +78,29 @@ import {
   StreamReferenceBranches,
 } from "@/models/graphql";
 
-import { DeleteBranchInput } from "@/store";
+import { DeleteBranchInput, GetBranchDataInputs } from "@/store";
 import { extractCo2Data } from "../views/utils/viewAssessmentUtils";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import LandingError from "@/components/landing/LandingError.vue";
 
+import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
+
 @Component({
   components: {
     ProjectCard,
     NewAssessmentCard,
     LandingHeader,
     LandingFooter,
-    LandingError,
+    ErrorRetry,
     ConfirmDialog,
     SESnackBar,
+    LoadingSpinner,
   },
 })
 export default class Landing extends Vue {
@@ -241,10 +232,11 @@ export default class Landing extends Vue {
           carbonCommit =
             branchCommit.data.stream.branch.commits.items[0].referencedObject;
         }
-        const branch: StreamData = await this.$store.dispatch("getBranchData", [
-          this.carbonBranches[i].id,
-          carbonCommit,
-        ]);
+        const getBranchDataInputs: GetBranchDataInputs = {
+          streamid: this.carbonBranches[i].id,
+          objId: carbonCommit
+        }
+        const branch: StreamData = await this.$store.dispatch("getBranchData", getBranchDataInputs);
         if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
           this.branchData.push({
             id: this.carbonBranches[i].id,

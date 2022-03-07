@@ -9,38 +9,39 @@ export function extractCo2Data(branchData: any) {
       {
         name: "A1-A3",
         tCO2e: 0,
-        kgCO2e: 0,
+        kgCO2eperm2: 0,
       },
       {
         name: "A4",
         tCO2e: 0,
-        kgCO2e: 0,
+        kgCO2eperm2: 0,
       },
       {
         name: "A5",
         tCO2e: 0,
-        kgCO2e: 0,
+        kgCO2eperm2: 0,
       },
     ],
   };
+
+  const floorArea = branchData.data.stream.object.data.projectData.floorArea;
 
   const co2Obj: {
     [key: string]: { value: number; color: string; id: string };
   } = {};
   branchData.data.stream.object.children.objects.forEach((object: any) => {
-    levels.levels[0].kgCO2e += parseFloat(
-      object.data.act.reportData.productStageCarbonA1A3
-    );
+    console.log(branchData.data.stream.object.data.projectData.floorArea);
+    levels.levels[0].kgCO2eperm2 +=
+      parseFloat(object.data.act.reportData.productStageCarbonA1A3) / floorArea;
     levels.levels[0].tCO2e +=
       parseFloat(object.data.act.reportData.productStageCarbonA1A3) / 1000;
-    levels.levels[1].kgCO2e += parseFloat(
-      object.data.act.reportData.transportCarbonA4
-    );
+    levels.levels[1].kgCO2eperm2 +=
+      parseFloat(object.data.act.reportData.transportCarbonA4) / floorArea;
     levels.levels[1].tCO2e +=
       parseFloat(object.data.act.reportData.transportCarbonA4) / 1000;
-    levels.levels[2].kgCO2e += parseFloat(
-      object.data.act.reportData.constructionCarbonA5.value
-    );
+    levels.levels[2].kgCO2eperm2 +=
+      parseFloat(object.data.act.reportData.constructionCarbonA5.value) /
+      floorArea;
     levels.levels[2].tCO2e +=
       parseFloat(object.data.act.reportData.constructionCarbonA5.value) / 1000;
 
@@ -115,13 +116,19 @@ export async function loadStream(context: any, streamId: string) {
     materials: co2Data.materials,
   };
 
-  levelsUpdated.levels[0].kgCO2e = Math.ceil(levelsUpdated.levels[0].kgCO2e);
+  levelsUpdated.levels[0].kgCO2eperm2 = Math.ceil(
+    levelsUpdated.levels[0].kgCO2eperm2
+  );
   levelsUpdated.levels[0].tCO2e =
     Math.ceil(levelsUpdated.levels[0].tCO2e * 100) / 100;
-  levelsUpdated.levels[1].kgCO2e = Math.ceil(levelsUpdated.levels[1].kgCO2e);
+  levelsUpdated.levels[1].kgCO2eperm2 = Math.ceil(
+    levelsUpdated.levels[1].kgCO2eperm2
+  );
   levelsUpdated.levels[1].tCO2e =
     Math.ceil(levelsUpdated.levels[1].tCO2e * 100) / 100;
-  levelsUpdated.levels[2].kgCO2e = Math.ceil(levelsUpdated.levels[2].kgCO2e);
+  levelsUpdated.levels[2].kgCO2eperm2 = Math.ceil(
+    levelsUpdated.levels[2].kgCO2eperm2
+  );
   levelsUpdated.levels[2].tCO2e =
     Math.ceil(levelsUpdated.levels[2].tCO2e * 100) / 100;
 

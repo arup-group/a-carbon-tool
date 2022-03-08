@@ -15,6 +15,7 @@ import {
   speckleLogOut,
   uploadObjects,
   getStreamCommit,
+  getMainStreamCommit,
   getActReportBranchInfo,
   deleteBranch,
 } from "./speckle/speckleUtil";
@@ -297,6 +298,12 @@ export default new Vuex.Store({
 
     async getStreamCommit(context, streamid: string) {
       const streams = await getStreamCommit(context, streamid);
+      return streams;
+    },
+
+
+    async getMainStreamCommit(context, streamid: string) {
+      const streams = await getMainStreamCommit(context, streamid);
       return streams;
     },
 

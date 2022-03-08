@@ -31,8 +31,7 @@
         </v-card-actions>
         <v-divider class="mx-4"></v-divider>
         <v-card-actions class="d-flex justify-space-between mb-6 pa-2">
-          <!-- <span v-if="newMainAvailable"> -->
-          <span v-if="true">
+          <span v-if="newMainAvailable">
             <template>
               <span>
                 <v-btn icon color="red darken-1" @click="cardOverlay = true">

@@ -109,6 +109,7 @@ export const createCommitMutation = (
     totalChildrenCount: ${totalChildrenCount},
   })
 }`;
+
 export const streamCommmitObjects = (id: string) => `query {
 stream(id: "${id}") {
   branch (name:"actcarbonreport"){
@@ -121,7 +122,19 @@ stream(id: "${id}") {
   }
 }`;
 
-// Gets all branches for a particular stream id including date
+export const mainStreamCommmitObjects = (id: string) => `query {
+  stream(id: "${id}") {
+    branch (name:"main"){
+      commits {
+         items {
+           referencedObject
+          }
+        }
+      }
+    }
+  }`;
+
+// Gets all branches for a particular stream id including first commit date
 export const streamReferencedBranches = (id: string) => `query {
   stream(id: "${id}") {
     branches {

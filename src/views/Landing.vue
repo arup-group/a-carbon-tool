@@ -112,7 +112,7 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
   },
 })
 export default class Landing extends Vue {
-  carbonBranches: { id: string; name: string; branchid: string, newMainAvailable: boolean }[] = [];
+  carbonBranches: { id: string; name: string; branchid: string, mainBranchID: string | undefined;}[] = [];
   branchData: { id: string; name: string; newMainAvailable: boolean; data: StreamData }[] = [];
   token = "";
   itemsPerPage = 8;
@@ -205,8 +205,6 @@ export default class Landing extends Vue {
           return { name: stream.name, id: stream.id};
         });
 
-      // Logging the formatted streams (with createdAt)
-
       // get all of the branches that are on each stream
       const streamBranches: {
         branches: StreamReferenceBranches;
@@ -222,17 +220,17 @@ export default class Landing extends Vue {
       }
 
       // filter those branches to only the "actcarbonreport" branches
+      // add any stream in its entiry if it contains a branch called 'actcarbonreport'
       for (let i = 0; i < streamBranches.length; i++) {
+        // go through all items on streamBranches
         streamBranches[i].branches.data.stream.branches.items.forEach(
           (branch) => {
             if (branch.name === "actcarbonreport") {
-              const mainBranchCommitDate = streamBranches[i].branches.data.stream.branches.items.find(element => element.name === 'main');
-              const carbonBranchDate = Date.parse(branch.commits.cursor);
-              const mainBranchDate = Date.parse(mainBranchCommitDate?.commits.cursor);
+              const mainBranch = streamBranches[i].branches.data.stream.branches.items.find(element => element.name === 'main');
               this.carbonBranches.push({
                 ...streamBranches[i].stream,
                 branchid: branch.id,
-                newMainAvailable: carbonBranchDate < mainBranchDate,
+                mainBranchID: mainBranch?.id,
               });
             }
           }
@@ -240,30 +238,53 @@ export default class Landing extends Vue {
       }
 
       // get the most recent commit and the data from that commit
+      // for each stream that has a carbon branch in it (carbonBranches)
       for (let i = 0; i < this.carbonBranches.length; i++) {
-        const branchCommit = await this.$store.dispatch(
+        // get all of the commits to this stream with the name actcarbonreport
+        const carbonBranchCommit = await this.$store.dispatch(
           "getStreamCommit",
           this.carbonBranches[i].id
         );
-        var carbonCommit = "";
-        if (branchCommit.data.stream.branch) {
-          carbonCommit =
-            branchCommit.data.stream.branch.commits.items[0].referencedObject;
+
+        const mainBranchCommits = await this.$store.dispatch(
+          "getMainStreamCommit",
+          this.carbonBranches[i].id
+        );
+        
+        var latestCarbonCommitObj = "";
+        if (carbonBranchCommit.data.stream.branch) {
+          latestCarbonCommitObj =
+            carbonBranchCommit.data.stream.branch.commits.items[0].referencedObject;
         }
 
-        // gets data from the most recent stream branch commit that we've just got from speckle.
-        const branch: StreamData = await this.$store.dispatch("getBranchData", [
+        // Get the most recent commit object id on the main branch
+        var latestMainCommitObj = "";
+        if (carbonBranchCommit.data.stream.branch) {
+          latestMainCommitObj =
+            mainBranchCommits.data.stream.branch.commits.items[0].referencedObject;
+        }
+
+        // Get data from the most recent arupcarbon branch
+        const latestCarbonBranchData: StreamData = await this.$store.dispatch("getBranchData", [
           this.carbonBranches[i].id,
-          carbonCommit,
-          // 
+          latestCarbonCommitObj, 
         ]);
+
+        const latestMainBranchData: StreamData = await this.$store.dispatch("getBranchData", [
+          this.carbonBranches[i].id,
+          latestMainCommitObj,
+        ]);
+        
+        const latestCarbonBranchCommit = new Date(latestCarbonBranchData.data.stream.object.createdAt).getTime();
+        const latestMainBranchCommit = new Date(latestMainBranchData.data.stream.object.createdAt).getTime();
+
         // if there are no errors - push branch data to branchData
-        if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
+        if (!Object.prototype.hasOwnProperty.call(latestCarbonBranchData, "errors")) {
           this.branchData.push({
             id: this.carbonBranches[i].id,
             name: this.carbonBranches[i].name,
-            newMainAvailable: this.carbonBranches[i].newMainAvailable,
-            data: branch,
+            newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit, //TODO: fix this with a proper
+            data: latestCarbonBranchData,
           });
         }
       }

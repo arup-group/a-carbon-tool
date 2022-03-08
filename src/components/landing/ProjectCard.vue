@@ -57,15 +57,15 @@
           </span>
         </v-card-actions>
         <v-overlay class="d-inline-flex pa-2" :absolute="true" :opacity="0.98" :value="cardOverlay">
+          <v-col class="d-flex flex-column align-end mb-6">
+            <v-btn icon color="red darken-1" @click="cardOverlay = false">
+              <v-icon>mdi-close-circle</v-icon>
+            </v-btn>
+          </v-col>
           <v-col>
             <v-card-text>
               Theres an update on main branch, use edit to update your report.
             </v-card-text>
-          </v-col>
-          <v-col class="d-flex flex-column mb-6">
-            <v-btn icon color="red darken-1" @click="cardOverlay = false">
-              <v-icon>mdi-close-circle</v-icon>
-            </v-btn>
           </v-col>
         </v-overlay>
       </v-card>

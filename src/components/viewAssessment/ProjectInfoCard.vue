@@ -7,17 +7,23 @@
       </v-btn>
     </v-card-title>
     <v-card-subtitle>
-      <BECChip :category="type" />
+      <BECChipGroup v-if="type.length !== 0" :categories="type" />
     </v-card-subtitle>
     <v-card-text>
       <v-divider class="mb-4 mt-3"></v-divider>
       <div class="text-center">
         <div>
-          <span class="text-h5 mr-2">{{ totalCO2e }}</span
-          ><span class="font-weight-light">tCO2e</span>
+          <span class="text-h5 mr-2">{{
+            totalCO2e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          }}</span
+          ><span class="font-weight-light">tCO<sub>2</sub>e</span>
         </div>
         <div class="font-weight-bold">TOTAL A-5 CARBON</div>
-        <div class="font-weight-light">{{ totalkgCO2e }} kgCO2e/m2</div>
+        <div class="font-weight-light">
+          {{ Math.ceil(totalkgCO2e / floorArea) }} kgCO<sub>2</sub>e/m<sup
+            >2</sup
+          >
+        </div>
       </div>
       <v-expand-transition>
         <div v-show="show">
@@ -41,7 +47,12 @@
           </div>
           <div class="d-flex justify-space-between">
             <div>Gross Floor Area:</div>
-            <div>{{ floorArea }}</div>
+            <div>
+              {{
+                `${floorArea.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
+              }}
+              m<sup>2</sup>
+            </div>
           </div>
           <div class="d-flex justify-space between">
             <div>Notes:</div>
@@ -55,14 +66,14 @@
 <script lang="ts">
 import { ProjectInfo } from "@/models/assessment";
 import { Vue, Component, Prop } from "vue-property-decorator";
-import BECChip from "../shared/BECChip.vue";
+import BECChipGroup from "../shared/BECChipGroup.vue";
 
 @Component({
-  components: { BECChip },
+  components: { BECChipGroup },
 })
 export default class ProjectInfoCard extends Vue {
   @Prop() projectInfo!: ProjectInfo;
-  show = false;
+  show = true;
 
   get name() {
     return this.projectInfo.name;
@@ -76,9 +87,7 @@ export default class ProjectInfoCard extends Vue {
       .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
   get totalkgCO2e() {
-    return this.projectInfo.totalkgCO2e
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return this.projectInfo.totalkgCO2e;
   }
   get reportDate() {
     return this.projectInfo.reportDate.toLocaleString("en-UK", {
@@ -99,9 +108,7 @@ export default class ProjectInfoCard extends Vue {
       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
   }
   get floorArea() {
-    return `${this.projectInfo.floorArea
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")} m2`;
+    return this.projectInfo.floorArea;
   }
   get notes() {
     return this.projectInfo.notes;

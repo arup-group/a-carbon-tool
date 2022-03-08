@@ -3,7 +3,6 @@
     v-if="li"
     :value="drawer"
     @input="$emit('update:drawer', $event)"
-    clipped="clipped"
     app
     height="100vh"
     floating
@@ -77,7 +76,6 @@ export default class Sidebar extends Vue {
   @Prop() darkModeButtonText!: string;
   @Prop() darkModeState!: boolean;
   @Prop() drawer!: boolean;
-  @Prop() clipped!: boolean;
 
   @Emit("toggleDarkMode")
   toggleDarkMode() {
@@ -102,7 +100,7 @@ export default class Sidebar extends Vue {
   }
 
   version() {
-    return store.state.version
+    return store.state.version;
   }
 
   items = [

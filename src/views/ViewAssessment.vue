@@ -91,7 +91,7 @@ export default class ViewAssessment extends Vue {
     streamId: this.$route.params.streamId,
     projectInfo: {
       name: "",
-      type: "",
+      type: [],
       reportDate: new Date(1946, 4, 1),
       author: "",
       JN: "000001",
@@ -115,17 +115,17 @@ export default class ViewAssessment extends Vue {
         {
           name: "A1-A3",
           tCO2e: 0,
-          kgCO2e: 0,
+          kgCO2eperm2: 0,
         },
         {
           name: "A4",
           tCO2e: 0,
-          kgCO2e: 0,
+          kgCO2eperm2: 0,
         },
         {
           name: "A5",
           tCO2e: 0,
-          kgCO2e: 0,
+          kgCO2eperm2: 0,
         },
       ],
     },

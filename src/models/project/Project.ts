@@ -5,6 +5,6 @@ export interface Project {
   id: string;
   co2Values: ChartData[];
   link: string;
-  category: string; // maybe this will eventually be limited to a set number of categories?
-  totalCO2e : number;
+  category: string[]; // maybe this will eventually be limited to a set number of categories?
+  totalCO2e: number;
 }

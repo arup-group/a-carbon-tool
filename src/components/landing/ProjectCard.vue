@@ -1,15 +1,13 @@
 <template>
   <v-container>
-    <v-sheet outlined color="primary" rounded class="my-1">
-      <v-card flat height="600">
+    <v-sheet outlined color="primary" rounded height="100%">
+      <v-card flat height="100%" class="d-flex flex-column">
         <v-card-title>
           <v-row>
-            <v-col cols="7" class="limit-lines">
+            <v-col cols="12" class="limit-lines">
               {{ title }}
             </v-col>
-            <v-col cols="5" align="right">
-              <BECChip :category="category" />
-            </v-col>
+            <BECChipGroup :categories="category" />
           </v-row>
         </v-card-title>
         <v-card-text>
@@ -18,7 +16,7 @@
           </v-row>
         </v-card-text>
         <v-divider class="mx-4"></v-divider>
-        <v-card-actions>
+        <v-card-actions style="margin-bottom: auto">
           <v-row class="mx-auto">
             <v-col cols="12" align="center">
               <v-card flat width="80%">
@@ -28,24 +26,26 @@
           </v-row>
           <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
         </v-card-actions>
-        <v-divider class="mx-4"></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <div>
-            <landing-options @delete="checkDelete" />
-            <v-select
-              :menu-props="{ value: options }"
-              v-if="options"
-              :items="['one', 'two']"
-            />
-            <v-btn icon color="primary">
-              <v-icon>mdi-share-variant</v-icon>
-            </v-btn>
-            <v-btn icon color="primary" @click="open">
-              <v-icon>mdi-open-in-new</v-icon>
-            </v-btn>
-          </div>
-        </v-card-actions>
+        <v-container style="margin-top: auto">
+          <v-divider class="mx-4"></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <div>
+              <landing-options @delete="checkDelete" />
+              <v-select
+                :menu-props="{ value: options }"
+                v-if="options"
+                :items="['one', 'two']"
+              />
+              <v-btn icon color="primary">
+                <v-icon>mdi-share-variant</v-icon>
+              </v-btn>
+              <v-btn icon color="primary" @click="open">
+                <v-icon>mdi-open-in-new</v-icon>
+              </v-btn>
+            </div>
+          </v-card-actions>
+        </v-container>
       </v-card>
     </v-sheet>
   </v-container>
@@ -57,11 +57,11 @@ import { Project } from "@/models/project";
 import { ChartData } from "@/models/chart";
 
 import DoughnutChart from "../charts/DoughnutChart.vue";
-import BECChip from "../shared/BECChip.vue";
 import LandingOptions from "./LandingOptions.vue";
+import BECChipGroup from "../shared/BECChipGroup.vue";
 
 @Component({
-  components: { DoughnutChart, BECChip, LandingOptions },
+  components: { DoughnutChart, BECChipGroup, LandingOptions },
 })
 export default class ProjectCard extends Vue {
   @Prop() project!: Project;

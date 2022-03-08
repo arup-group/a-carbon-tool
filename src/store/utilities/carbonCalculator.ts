@@ -1,4 +1,3 @@
-import { Material } from "./material-carbon-factors";
 import { SpeckleObjectFormComplete } from "@/models/newAssessment";
 
 // TODO: MOVE THESE INTO A MIXIN?
@@ -26,9 +25,10 @@ export function transportCarbonA4(obj: SpeckleObjectFormComplete) {
   const trans = obj.formData.transport.values;
 
   const transCarb =
-    obj.formData.material.density *
-    obj.formData.volume *
-    (trans.road * factors.road + (trans.sea * factors.sea) / 1000);
+    (obj.formData.material.density *
+      obj.formData.volume *
+      (trans.road * factors.road + trans.sea * factors.sea)) /
+    1000;
   return transCarb;
 }
 
@@ -39,10 +39,9 @@ export function constructionCarbonA5Site(sysCost: number) {
 }
 
 // calculate the carbon associated with material wastage
-export function constructionCarbonA5Waste(
-  obj: SpeckleObjectFormComplete
-) {
-  const wasteVolume = obj.formData.volume * (1 / (1 - obj.formData.material.wastage) - 1);
+export function constructionCarbonA5Waste(obj: SpeckleObjectFormComplete) {
+  const wasteVolume =
+    obj.formData.volume * (1 / (1 - obj.formData.material.wastage) - 1);
 
   // create new object with waste volume
   const wasteObj = obj;

@@ -1,4 +1,3 @@
-import { Material } from "./material-carbon-factors";
 import { SpeckleObjectFormComplete } from "@/models/newAssessment";
 
 // TODO: MOVE THESE INTO A MIXIN?

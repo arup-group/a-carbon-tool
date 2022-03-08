@@ -5,6 +5,7 @@
         <v-checkbox v-model="materials" label="Materials graph" />
         <v-checkbox v-model="a15" label="A1-5 graph" />
         <v-checkbox v-model="categories" label="Categories" />
+        <v-checkbox v-model="renderer" label="Renderer" />
         <v-switch v-model="direction" :label="directionLabel" />
       </v-card-text>
     </v-card>
@@ -22,6 +23,7 @@ export default class HistoryFilters extends Vue {
     materials: true,
     a15: true,
     categories: true,
+    renderer: true,
     direction: HistoryProjectCardDirection.COL,
   };
 
@@ -55,6 +57,12 @@ export default class HistoryFilters extends Vue {
     return this.filters.direction;
   }
 
+  @Watch("renderer")
+  @Emit("renderer")
+  emitRenderer() {
+    return this.filters.renderer;
+  }
+
   get materials() {
     return this.filters.materials;
   }
@@ -78,6 +86,12 @@ export default class HistoryFilters extends Vue {
   }
   set direction(val) {
       this.filters.direction = val ? HistoryProjectCardDirection.COL : HistoryProjectCardDirection.ROW;
+  }
+  get renderer() {
+    return this.filters.renderer;
+  }
+  set renderer(val) {
+    this.filters.renderer = val;
   }
 
   get directionLabel() {

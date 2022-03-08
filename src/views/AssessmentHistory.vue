@@ -15,22 +15,16 @@
             @materials="materialsFilterUpdate"
             @a15="a15FilterUpdate"
             @categories="categoriesFilterUpdate"
+            @renderer="rendererFilterUpdate"
             @direction="directionUpdate"
             :defaultFilters="filters"
           />
         </template>
         <template v-slot:default="props">
-          <div v-if="direction">
+          <div :style="historyProjectCardsContainerStyle">
             <history-project-card
               v-for="report in props.items"
-              :key="report.id"
-              :project="report"
-              :filters="filters"
-            />
-          </div>
-          <div v-else class="d-flex">
-              <history-project-card
-              v-for="report in props.items"
+              :style="historyProjectCardStyle"
               :key="report.id"
               :project="report"
               :filters="filters"
@@ -85,8 +79,9 @@ export default class AssessmentHistory extends Vue {
   page = 1;
   filters: HistoryFilterOptions = {
     materials: true,
-    a15: true,
+    a15: false,
     categories: true,
+    renderer: false,
     direction: HistoryProjectCardDirection.COL,
   };
 
@@ -99,6 +94,12 @@ export default class AssessmentHistory extends Vue {
   get direction() {
     return this.filters.direction === HistoryProjectCardDirection.COL;
   }
+  get historyProjectCardsContainerStyle() {
+    return this.direction ? "" : "display: flex; overflow-x: scroll;";
+  }
+  get historyProjectCardStyle() {
+    return this.direction ? "" : "min-width: 33%;"
+  }
 
   materialsFilterUpdate(material: boolean) {
     this.filters.materials = material;
@@ -108,6 +109,9 @@ export default class AssessmentHistory extends Vue {
   }
   categoriesFilterUpdate(categories: boolean) {
     this.filters.categories = categories;
+  }
+  rendererFilterUpdate(renderer: boolean) {
+    this.filters.renderer = renderer;
   }
   directionUpdate(direction: HistoryProjectCardDirection) {
     console.log("direction:", direction);

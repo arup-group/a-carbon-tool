@@ -1,10 +1,12 @@
 <template>
   <v-app-bar v-if="li" fixed app :clipped-left="clipped">
     <v-app-bar-nav-icon @click.stop="toggleDrawer"></v-app-bar-nav-icon>
-    <v-app-bar-title @click="changeRoute()">
-      act (beta)
+    <v-app-bar-title>
+      act <span><i>(&beta;)</i></span>
     </v-app-bar-title>
-    <v-img src="/assets/logo.svg" height="48px" width='48px' class="ma-4" contain></v-img>
+    <v-btn icon @click="changeRoute()" class='mx-2'>
+      <v-img height='24px' src="/assets/logo.svg" contain></v-img>
+    </v-btn>
   </v-app-bar>
 </template>
 

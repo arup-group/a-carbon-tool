@@ -79,21 +79,33 @@ export function extractCo2Data(branchData: any, children: any[]) {
   return { levels, materials, colors };
 }
 
+export async function loadParent(
+  url: string,
+  streamId: string,
+  parentId: string,
+  token: string
+) {
+  return await fetch(`${url}/objects/${streamId}/${parentId}/single`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((d) => d.json());
+}
+
 export async function loadStream(context: any, streamId: string) {
   const actReportBranchInfo = await getActReportBranchInfo(context, streamId);
   const parentId =
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
 
-  const branchData = await fetch(
-    `${context.state.selectedServer.url}/objects/${streamId}/${parentId}/single`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${context.state.token.token}`,
-      },
-    }
-  ).then((d) => d.json());
+  const branchData = await loadParent(
+    context.state.selectedServer.url,
+    streamId,
+    parentId,
+    context.state.token.token
+  );
+  console.log("branchData:", branchData);
 
   const projectInfoUpdated = {
     name: branchData.projectData.name,
@@ -110,7 +122,12 @@ export async function loadStream(context: any, streamId: string) {
     totalkgCO2e: Math.floor(branchData.totalCO2),
   };
 
-  const childrenData = await getChildren(context, streamId, branchData);
+  const childrenData = await getChildren(
+    context.state.selectedServer.url,
+    context.state.token.token,
+    streamId,
+    branchData
+  );
 
   const co2Data = extractCo2Data(branchData, childrenData);
 
@@ -148,8 +165,9 @@ export async function loadStream(context: any, streamId: string) {
   };
 }
 
-async function getChildren(
-  context: any,
+export async function getChildren(
+  url: string,
+  token: string,
   streamId: string,
   parent: any
 ): Promise<any[]> {
@@ -165,17 +183,14 @@ async function getChildren(
   // get the data from the children objects, running one request per 1000 objects
   return await Promise.all(
     childrenSplit.map((cs) => {
-      return fetch(
-        `${context.state.selectedServer.url}/api/getobjects/${streamId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${context.state.token.token}`,
-          },
-          body: JSON.stringify({ objects: JSON.stringify(cs) }),
-        }
-      ).then((res) => res.json());
+      return fetch(`${url}/api/getobjects/${streamId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ objects: JSON.stringify(cs) }),
+      }).then((res) => res.json());
     })
   ).then((data) => {
     const arr: any[] = [];

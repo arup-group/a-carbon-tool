@@ -14,6 +14,10 @@ export interface StreamData {
   };
 }
 
+export interface HTTPStreamData extends ParentSpeckleObjectData {
+  __closure: { [childId: string]: 1 };
+}
+
 export interface ParentSpeckleObjectData {
   constructionCarbonA5: CarbonA5;
   id: string;

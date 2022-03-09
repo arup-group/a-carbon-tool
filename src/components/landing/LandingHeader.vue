@@ -1,8 +1,5 @@
 <template>
   <v-row justify="center">
-    <v-col cols="12">
-      <v-img src="/assets/logo.svg" height="80px" class="ma-4" contain></v-img>
-    </v-col>
     <v-col cols="12" md="6">
       <div class="pa-7">
         <div class="text-h4">act | a carbon tool</div>

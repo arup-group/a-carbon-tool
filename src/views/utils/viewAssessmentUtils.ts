@@ -1,9 +1,6 @@
-import {
-  getBranchData,
-  getActReportBranchInfo,
-} from "@/store/speckle/speckleUtil";
+import { getActReportBranchInfo } from "@/store/speckle/speckleUtil";
 
-export function extractCo2Data(branchData: any) {
+export function extractCo2Data(branchData: any, children: any[]) {
   const levels = {
     levels: [
       {
@@ -24,45 +21,43 @@ export function extractCo2Data(branchData: any) {
     ],
   };
 
-  const floorArea = branchData.data.stream.object.data.projectData.floorArea;
+  const floorArea = branchData.projectData.floorArea;
 
   const co2Obj: {
     [key: string]: { value: number; color: string; id: string };
   } = {};
-  branchData.data.stream.object.children.objects.forEach((object: any) => {
-    console.log(branchData.data.stream.object.data.projectData.floorArea);
+  children.forEach((object: any) => {
     levels.levels[0].kgCO2eperm2 +=
-      parseFloat(object.data.act.reportData.productStageCarbonA1A3) / floorArea;
+      parseFloat(object.act.reportData.productStageCarbonA1A3) / floorArea;
     levels.levels[0].tCO2e +=
-      parseFloat(object.data.act.reportData.productStageCarbonA1A3) / 1000;
+      parseFloat(object.act.reportData.productStageCarbonA1A3) / 1000;
     levels.levels[1].kgCO2eperm2 +=
-      parseFloat(object.data.act.reportData.transportCarbonA4) / floorArea;
+      parseFloat(object.act.reportData.transportCarbonA4) / floorArea;
     levels.levels[1].tCO2e +=
-      parseFloat(object.data.act.reportData.transportCarbonA4) / 1000;
+      parseFloat(object.act.reportData.transportCarbonA4) / 1000;
     levels.levels[2].kgCO2eperm2 +=
-      parseFloat(object.data.act.reportData.constructionCarbonA5.value) /
-      floorArea;
+      parseFloat(object.act.reportData.constructionCarbonA5.value) / floorArea;
     levels.levels[2].tCO2e +=
-      parseFloat(object.data.act.reportData.constructionCarbonA5.value) / 1000;
+      parseFloat(object.act.reportData.constructionCarbonA5.value) / 1000;
 
     const totalObjectCarbon =
-      parseFloat(object.data.act.reportData.productStageCarbonA1A3) +
-      parseFloat(object.data.act.reportData.transportCarbonA4) +
-      parseFloat(object.data.act.reportData.constructionCarbonA5.value);
+      parseFloat(object.act.reportData.productStageCarbonA1A3) +
+      parseFloat(object.act.reportData.transportCarbonA4) +
+      parseFloat(object.act.reportData.constructionCarbonA5.value);
 
-    const materialKey = object.data.act.formData.material.name;
-    const materialColor = object.data.act.formData.material.color;
+    const materialKey = object.act.formData.material.name;
+    const materialColor = object.act.formData.material.color;
     if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
       co2Obj[materialKey] = {
         value: co2Obj[materialKey].value + totalObjectCarbon,
         color: materialColor,
-        id: object.data.act.speckle_type,
+        id: object.act.speckle_type,
       };
     } else {
       co2Obj[materialKey] = {
         value: totalObjectCarbon,
         color: materialColor,
-        id: object.data.act.speckle_type,
+        id: object.act.speckle_type,
       };
     }
   });
@@ -86,29 +81,38 @@ export function extractCo2Data(branchData: any) {
 
 export async function loadStream(context: any, streamId: string) {
   const actReportBranchInfo = await getActReportBranchInfo(context, streamId);
+  const parentId =
+    actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
 
-  const branchData = await getBranchData(
-    context,
-    streamId,
-    actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject
-  );
+  const branchData = await fetch(
+    `${context.state.selectedServer.url}/objects/${streamId}/${parentId}/single`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${context.state.token.token}`,
+      },
+    }
+  ).then((d) => d.json());
 
   const projectInfoUpdated = {
-    name: branchData.data.stream.object.data.projectData.name,
-    type: branchData.data.stream.object.data.projectData.components,
+    name: branchData.projectData.name,
+    type: branchData.projectData.components,
     reportDate: new Date(
       actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
     ),
     author: actReportBranchInfo.data.stream.branch.commits.items[0].authorName,
     JN: "000001",
-    systemCost: branchData.data.stream.object.data.projectData.cost,
-    floorArea: branchData.data.stream.object.data.projectData.floorArea,
+    systemCost: branchData.projectData.cost,
+    floorArea: branchData.projectData.floorArea,
     notes: "",
-    totalCO2e: Math.floor(branchData.data.stream.object.data.totalCO2 / 1000),
-    totalkgCO2e: Math.floor(branchData.data.stream.object.data.totalCO2),
+    totalCO2e: Math.round((branchData.totalCO2 / 1000) * 100) / 100,
+    totalkgCO2e: Math.floor(branchData.totalCO2),
   };
 
-  const co2Data = extractCo2Data(branchData);
+  const childrenData = await getChildren(context, streamId, branchData);
+
+  const co2Data = extractCo2Data(branchData, childrenData);
 
   const levelsUpdated = co2Data.levels;
 
@@ -142,4 +146,42 @@ export async function loadStream(context: any, streamId: string) {
       aBreakdown: levelsUpdated,
     },
   };
+}
+
+async function getChildren(
+  context: any,
+  streamId: string,
+  parent: any
+): Promise<any[]> {
+  // get the id's of the children objects
+  const children: string[] = Object.keys(parent.__closure);
+
+  // split down the children array into multiple arrays of max length 1000
+  const childrenSplit: string[][] = [];
+  for (let i = 0; i < children.length; i += 1000) {
+    childrenSplit.push(children.slice(i, Math.min(i + 1000, children.length)));
+  }
+
+  // get the data from the children objects, running one request per 1000 objects
+  return await Promise.all(
+    childrenSplit.map((cs) => {
+      return fetch(
+        `${context.state.selectedServer.url}/api/getobjects/${streamId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${context.state.token.token}`,
+          },
+          body: JSON.stringify({ objects: JSON.stringify(cs) }),
+        }
+      ).then((res) => res.json());
+    })
+  ).then((data) => {
+    const arr: any[] = [];
+    data.forEach((d) => {
+      arr.push(...d);
+    });
+    return arr;
+  });
 }

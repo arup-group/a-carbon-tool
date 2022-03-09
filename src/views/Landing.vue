@@ -105,7 +105,7 @@ import LandingError from "@/components/landing/LandingError.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
-import { HTTPStreamData } from "@/models/graphql/StreamData.interface";
+import { HTTPStreamDataParent } from "@/models/graphql/";
 @Component({
   components: {
     ProjectCard,
@@ -119,7 +119,7 @@ import { HTTPStreamData } from "@/models/graphql/StreamData.interface";
 })
 export default class Landing extends Vue {
   carbonBranches: { id: string; name: string; branchid: string }[] = [];
-  branchData: { id: string; name: string; data: HTTPStreamData }[] = [];
+  branchData: { id: string; name: string; data: HTTPStreamDataParent }[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";

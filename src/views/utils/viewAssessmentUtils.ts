@@ -100,7 +100,7 @@ export async function loadStream(context: any, streamId: string) {
       actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
     ),
     author: actReportBranchInfo.data.stream.branch.commits.items[0].authorName,
-    JN: "000001",
+    JN: branchData.data.stream.object.data.projectData.jobNumber,
     systemCost: branchData.data.stream.object.data.projectData.cost,
     floorArea: branchData.data.stream.object.data.projectData.floorArea,
     notes: "",

@@ -1,27 +1,29 @@
 <template>
-  <v-container class="d-flex justify-space-between pt-5 container" fluid>
-    <div class="d-flex flex-column justify-space-between card-container">
-      <project-info-card class="card" :projectInfo="projectInfo" />
-      <view-assessment-buttons class="card" />
-    </div>
-    <Renderer
-      v-if="urlsLoaded && chartDataReady"
-      :objecturls="objectUrls"
-      :token="token"
-      :colors="colors"
-      class="renderer"
-    />
-    <div
-      class="d-flex flex-column justify-space-between card-container"
-      v-if="urlsLoaded && chartDataReady"
-    >
-      <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
-      <material-breakdown-card
-        class="card"
-        :materialBreakdown="materialBreakdown"
+  <v-main>
+    <v-container class="d-flex justify-space-between container" fluid>
+      <div class="d-flex flex-column justify-space-between card-container">
+        <project-info-card class="card" :projectInfo="projectInfo" />
+        <view-assessment-buttons class="card" />
+      </div>
+      <Renderer
+        v-if="urlsLoaded && chartDataReady"
+        :objecturls="objectUrls"
+        :token="token"
+        :colors="colors"
+        class="renderer"
       />
-    </div>
-  </v-container>
+      <div
+        class="d-flex flex-column justify-space-between card-container"
+        v-if="urlsLoaded && chartDataReady"
+      >
+        <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
+        <material-breakdown-card
+          class="card"
+          :materialBreakdown="materialBreakdown"
+        />
+      </div>
+    </v-container>
+  </v-main>
 </template>
 
 <script lang="ts">
@@ -115,17 +117,17 @@ export default class ViewAssessment extends Vue {
         {
           name: "A1-A3",
           tCO2e: 0,
-          kgCO2e: 0,
+          kgCO2eperm2: 0,
         },
         {
           name: "A4",
           tCO2e: 0,
-          kgCO2e: 0,
+          kgCO2eperm2: 0,
         },
         {
           name: "A5",
           tCO2e: 0,
-          kgCO2e: 0,
+          kgCO2eperm2: 0,
         },
       ],
     },

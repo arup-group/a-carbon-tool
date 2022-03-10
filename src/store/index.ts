@@ -43,7 +43,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.0.1 BETA",
+    version: "0.0.2 \u00DF",
     servers: {
       arup: {
         region: "UKIMEA",

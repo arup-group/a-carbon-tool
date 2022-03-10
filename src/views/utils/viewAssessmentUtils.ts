@@ -1,67 +1,65 @@
-import {
-  getBranchData,
-  getActReportBranchInfo,
-} from "@/store/speckle/speckleUtil";
+import { HTTPStreamDataParent } from "@/models/graphql/";
+import { ChildSpeckleObjectData } from "@/models/graphql/StreamData.interface";
+import { getActReportBranchInfo } from "@/store/speckle/speckleUtil";
 
-export function extractCo2Data(branchData: any) {
+export function extractCo2Data(branchData: HTTPStreamDataParent, children: ChildSpeckleObjectData[]) {
   const levels = {
     levels: [
       {
         name: "A1-A3",
         tCO2e: 0,
-        kgCO2e: 0,
+        kgCO2eperm2: 0,
       },
       {
         name: "A4",
         tCO2e: 0,
-        kgCO2e: 0,
+        kgCO2eperm2: 0,
       },
       {
         name: "A5",
         tCO2e: 0,
-        kgCO2e: 0,
+        kgCO2eperm2: 0,
       },
     ],
   };
 
+  const floorArea = branchData.projectData.floorArea;
+
   const co2Obj: {
     [key: string]: { value: number; color: string; id: string };
   } = {};
-  branchData.data.stream.object.children.objects.forEach((object: any) => {
-    levels.levels[0].kgCO2e += parseFloat(
-      object.data.act.reportData.productStageCarbonA1A3
-    );
+  children.forEach((object) => {
+    levels.levels[0].kgCO2eperm2 +=
+      object.act.reportData.productStageCarbonA1A3 / floorArea;
     levels.levels[0].tCO2e +=
-      parseFloat(object.data.act.reportData.productStageCarbonA1A3) / 1000;
-    levels.levels[1].kgCO2e += parseFloat(
-      object.data.act.reportData.transportCarbonA4
-    );
+      object.act.reportData.productStageCarbonA1A3 / 1000;
+    levels.levels[1].kgCO2eperm2 +=
+      object.act.reportData.transportCarbonA4 / floorArea;
     levels.levels[1].tCO2e +=
-      parseFloat(object.data.act.reportData.transportCarbonA4) / 1000;
-    levels.levels[2].kgCO2e += parseFloat(
-      object.data.act.reportData.constructionCarbonA5.value
-    );
+      object.act.reportData.transportCarbonA4 / 1000;
+    levels.levels[2].kgCO2eperm2 +=
+      object.act.reportData.constructionCarbonA5.value / floorArea;
     levels.levels[2].tCO2e +=
-      parseFloat(object.data.act.reportData.constructionCarbonA5.value) / 1000;
+      object.act.reportData.constructionCarbonA5.value / 1000;
 
     const totalObjectCarbon =
-      parseFloat(object.data.act.reportData.productStageCarbonA1A3) +
-      parseFloat(object.data.act.reportData.transportCarbonA4) +
-      parseFloat(object.data.act.reportData.constructionCarbonA5.value);
+      object.act.reportData.productStageCarbonA1A3 +
+      object.act.reportData.transportCarbonA4 +
+      object.act.reportData.constructionCarbonA5.value;
 
-    const materialKey = object.data.act.formData.material.name;
-    const materialColor = object.data.act.formData.material.color;
+    const materialKey = object.act.formData.material.name;
+    const materialColor = object.act.formData.material.color;
     if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
       co2Obj[materialKey] = {
         value: co2Obj[materialKey].value + totalObjectCarbon,
         color: materialColor,
-        id: object.data.act.speckle_type,
+        id: object.act.speckle_type,
       };
     } else {
       co2Obj[materialKey] = {
         value: totalObjectCarbon,
         color: materialColor,
-        id: object.data.act.speckle_type,
+        id: object.act.speckle_type,
       };
     }
   });
@@ -83,31 +81,56 @@ export function extractCo2Data(branchData: any) {
   return { levels, materials, colors };
 }
 
+export async function loadParent(
+  url: string,
+  streamId: string,
+  parentId: string,
+  token: string
+): Promise<HTTPStreamDataParent> {
+  return await fetch(`${url}/objects/${streamId}/${parentId}/single`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((d) => d.json());
+}
+
 export async function loadStream(context: any, streamId: string) {
   const actReportBranchInfo = await getActReportBranchInfo(context, streamId);
+  const parentId =
+    actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
 
-  const branchData = await getBranchData(
-    context,
+  const branchData = await loadParent(
+    context.state.selectedServer.url,
     streamId,
-    actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject
+    parentId,
+    context.state.token.token
   );
 
   const projectInfoUpdated = {
-    name: branchData.data.stream.object.data.projectData.name,
-    type: branchData.data.stream.object.data.projectData.components,
+    name: branchData.projectData.name,
+    type: branchData.projectData.components,
     reportDate: new Date(
       actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
     ),
     author: actReportBranchInfo.data.stream.branch.commits.items[0].authorName,
     JN: "000001",
-    systemCost: branchData.data.stream.object.data.projectData.cost,
-    floorArea: branchData.data.stream.object.data.projectData.floorArea,
+    systemCost: branchData.projectData.cost,
+    floorArea: branchData.projectData.floorArea,
     notes: "",
-    totalCO2e: Math.floor(branchData.data.stream.object.data.totalCO2 / 1000),
-    totalkgCO2e: Math.floor(branchData.data.stream.object.data.totalCO2),
+    totalCO2e: Math.round((branchData.totalCO2 / 1000) * 100) / 100,
+    totalkgCO2e: Math.floor(branchData.totalCO2),
   };
 
-  const co2Data = extractCo2Data(branchData);
+  const childrenData = await getChildren(
+    context.state.selectedServer.url,
+    context.state.token.token,
+    streamId,
+    branchData
+  );
+
+  const co2Data = extractCo2Data(branchData, childrenData);
 
   const levelsUpdated = co2Data.levels;
 
@@ -115,13 +138,19 @@ export async function loadStream(context: any, streamId: string) {
     materials: co2Data.materials,
   };
 
-  levelsUpdated.levels[0].kgCO2e = Math.ceil(levelsUpdated.levels[0].kgCO2e);
+  levelsUpdated.levels[0].kgCO2eperm2 = Math.ceil(
+    levelsUpdated.levels[0].kgCO2eperm2
+  );
   levelsUpdated.levels[0].tCO2e =
     Math.ceil(levelsUpdated.levels[0].tCO2e * 100) / 100;
-  levelsUpdated.levels[1].kgCO2e = Math.ceil(levelsUpdated.levels[1].kgCO2e);
+  levelsUpdated.levels[1].kgCO2eperm2 = Math.ceil(
+    levelsUpdated.levels[1].kgCO2eperm2
+  );
   levelsUpdated.levels[1].tCO2e =
     Math.ceil(levelsUpdated.levels[1].tCO2e * 100) / 100;
-  levelsUpdated.levels[2].kgCO2e = Math.ceil(levelsUpdated.levels[2].kgCO2e);
+  levelsUpdated.levels[2].kgCO2eperm2 = Math.ceil(
+    levelsUpdated.levels[2].kgCO2eperm2
+  );
   levelsUpdated.levels[2].tCO2e =
     Math.ceil(levelsUpdated.levels[2].tCO2e * 100) / 100;
 
@@ -135,4 +164,40 @@ export async function loadStream(context: any, streamId: string) {
       aBreakdown: levelsUpdated,
     },
   };
+}
+
+export async function getChildren(
+  url: string,
+  token: string,
+  streamId: string,
+  parent: HTTPStreamDataParent
+): Promise<ChildSpeckleObjectData[]> {
+  // get the id's of the children objects
+  const children: string[] = Object.keys(parent.__closure);
+
+  // split down the children array into multiple arrays of max length 1000
+  const childrenSplit: string[][] = [];
+  for (let i = 0; i < children.length; i += 1000) {
+    childrenSplit.push(children.slice(i, Math.min(i + 1000, children.length)));
+  }
+
+  // get the data from the children objects, running one request per 1000 objects
+  return await Promise.all(
+    childrenSplit.map(async (cs) => {
+      return fetch(`${url}/api/getobjects/${streamId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ objects: JSON.stringify(cs) }),
+      }).then((res) => res.json());
+    })
+  ).then((data) => {
+    const arr: ChildSpeckleObjectData[] = [];
+    data.forEach((d) => {
+      arr.push(...d);
+    });
+    return arr;
+  });
 }

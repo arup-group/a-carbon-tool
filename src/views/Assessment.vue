@@ -420,6 +420,8 @@ export default class Assessment extends Vue {
 
     let totalVol = 0;
 
+    console.log("res:", res);
+
     const filteredRes: ObjectDetailsComplete[] = [];
     res.forEach((r) => {
       if (r.parameters && r.parameters.HOST_VOLUME_COMPUTED) {

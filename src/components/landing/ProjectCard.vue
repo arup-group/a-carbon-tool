@@ -17,14 +17,10 @@
           </v-row>
         </v-card-text>
         <v-divider class="mx-4"></v-divider>
-        <v-card-actions style="margin-bottom: auto">
-          <v-row class="mx-auto">
-            <v-col cols="12" align="center">
-              <v-card flat width="80%">
-                <DoughnutChart :data="co2Values" :chartData="{}" />
-              </v-card>
-            </v-col>
-          </v-row>
+        <v-card-actions style="margin-bottom: auto" class="justify-center py-0">
+          <v-card flat width="80%" class="ma-0 pa-0">
+            <DoughnutChart :data="co2Values" :chartData="{}" />
+          </v-card>
           <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
         </v-card-actions>
         <v-divider class="mx-4"></v-divider>
@@ -100,7 +96,7 @@ export default class ProjectCard extends Vue {
     }));
   }
   get co2Total() {
-    return this.convertKgToTonnes(this.project.totalCO2e);
+    return this.convertKgToTonnes(this.project.totalCO2e).toLocaleString('en');
   }
 
   get branchDate() {

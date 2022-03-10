@@ -1,5 +1,5 @@
 <template>
-  <v-main class="mr-7 ml-7">
+  <v-main class="mr-7 ml-7 pb-4">
     <landing-header />
     <v-container v-if="!loading && !error">
       <v-data-iterator
@@ -91,7 +91,11 @@ import {
 } from "@/models/graphql";
 
 import { DeleteBranchInput } from "@/store";
-import { extractCo2Data } from "../views/utils/viewAssessmentUtils";
+import {
+  extractCo2Data,
+  loadParent,
+  getChildren,
+} from "../views/utils/viewAssessmentUtils";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -101,6 +105,7 @@ import LandingError from "@/components/landing/LandingError.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import { HTTPStreamDataParent } from "@/models/graphql/";
 @Component({
   components: {
     ProjectCard,
@@ -114,7 +119,7 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
 })
 export default class Landing extends Vue {
   carbonBranches: { id: string; name: string; branchid: string, mainBranchID: string | undefined;}[] = [];
-  branchData: { id: string; name: string; newMainAvailable: boolean; data: StreamData }[] = [];
+  branchData: { id: string; name: string;  projectDate: string;  newMainAvailable: boolean; data: HTTPStreamDataParent }[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
@@ -239,73 +244,85 @@ export default class Landing extends Vue {
       }
 
       // get the most recent commit and the data from that commit
-      // for each stream that has a carbon branch in it (carbonBranches)
-      for (let i = 0; i < this.carbonBranches.length; i++) {
-        // get all of the commits to this stream with the name actcarbonreport
-        const carbonBranchCommit = await this.$store.dispatch(
-          "getStreamCommit",
-          this.carbonBranches[i].id
-        );
+      this.branchData = await Promise.all(
+        this.carbonBranches.map(async (cb) => {
 
-        const mainBranchCommits = await this.$store.dispatch(
-          "getMainStreamCommit",
-          this.carbonBranches[i].id
-        );
-        
-        var latestCarbonCommitObj = "";
-        if (carbonBranchCommit.data.stream.branch) {
-          latestCarbonCommitObj =
-            carbonBranchCommit.data.stream.branch.commits.items[0].referencedObject;
-        }
+          const branchCommit = await this.$store.dispatch(
+            "getStreamCommit",
+            cb.id
+          );
 
-        // Get the most recent commit object id on the main branch
-        var latestMainCommitObj = "";
-        if (carbonBranchCommit.data.stream.branch) {
-          latestMainCommitObj =
-            mainBranchCommits.data.stream.branch.commits.items[0].referencedObject;
-        }
+          const mainBranchCommits = await this.$store.dispatch(
+            "getMainStreamCommit",
+            cb.id
+          );
 
-        // Get data from the most recent arupcarbon branch
-        const latestCarbonBranchData: StreamData = await this.$store.dispatch("getBranchData", [
-          this.carbonBranches[i].id,
-          latestCarbonCommitObj, 
-        ]);
+          let carbonCommit = "";
+          if (branchCommit.data.stream.branch) {
+            carbonCommit =
+              branchCommit.data.stream.branch.commits.items[0].referencedObject;
+          }
+          let latestMainCommitObj = "";
+          if (mainBranchCommits.data.stream.branch) {
+            latestMainCommitObj =
+              mainBranchCommits.data.stream.branch.commits.items[0].referencedObject;
+          }
 
-        const latestMainBranchData: StreamData = await this.$store.dispatch("getBranchData", [
-          this.carbonBranches[i].id,
-          latestMainCommitObj,
-        ]);
-        
-        const latestCarbonBranchCommit = new Date(latestCarbonBranchData.data.stream.object.createdAt).getTime();
-        const latestMainBranchCommit = new Date(latestMainBranchData.data.stream.object.createdAt).getTime();
+          // Get data from the most recent arupcarbon branch
+          const latestCarbonBranchData: StreamData = await this.$store.dispatch("getBranchData", [
+            cb.id,
+            carbonCommit, 
+          ]);
 
-        // if there are no errors - push branch data to branchData
-        if (!Object.prototype.hasOwnProperty.call(latestCarbonBranchData, "errors")) {
-          this.branchData.push({
-            id: this.carbonBranches[i].id,
-            name: this.carbonBranches[i].name,
-            newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit, //TODO: fix this with a proper
-            data: latestCarbonBranchData,
-          });
-        }
-      }
+          const latestMainBranchData: StreamData = await this.$store.dispatch("getBranchData", [
+            cb.id,
+            latestMainCommitObj,
+          ]);
 
+          const latestCarbonBranchCommit = new Date(latestCarbonBranchData.data.stream.object.createdAt).getTime();
+          const latestMainBranchCommit = new Date(latestMainBranchData.data.stream.object.createdAt).getTime();
+          
+
+          const parent = await loadParent(
+            this.$store.state.selectedServer.url,
+            cb.id,
+            carbonCommit,
+            this.$store.state.token.token
+          );
+
+
+          return {
+            id: cb.id,
+            name: cb.name,
+            data: parent,
+            projectDate: latestCarbonBranchData.data.stream.object.createdAt,
+            newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit,
+          };
+        })
+      );
       // convert the data into the format that this page needs it to be in
-      this.projects = this.branchData.map((proj) => {
-        const co2Data = extractCo2Data(proj.data).materials;
+      this.projects = await Promise.all(
+        this.branchData.map(async (proj) => {
+          const childrenData = await getChildren(
+            this.$store.state.selectedServer.url,
+            this.$store.state.token.token,
+            proj.id,
+            proj.data
+          );
+          const co2Data = extractCo2Data(proj.data, childrenData).materials;
 
-        const projName = proj.data.data.stream.object.data.projectData.name;
+        const projName = proj.data.projectData.name;
         return {
           title: `${projName} - ${proj.name}`,
           id: `${proj.id}`,
           co2Values: co2Data,
-          totalCO2e: proj.data.data.stream.object.data.totalCO2,
+          totalCO2e: proj.data.totalCO2,
           link: "",
-          category: `${proj.data.data.stream.object.data.projectData.components}`,
-          projectDate: proj.data.data.stream.object.createdAt,
+          category: proj.data.projectData.components,
+          projectDate: proj.projectDate,
           newMainAvailable: proj.newMainAvailable,
         };
-      });
+      }));
 
       this.loading = false;
     } catch (err) {

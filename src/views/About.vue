@@ -1,5 +1,5 @@
 <template>
-  <v-container class="d-flex justify-center mb-6 pa-2">
+  <v-container class="d-flex justify-center mb-6 pt-8">
     <v-row class="d-flex justify-center mb-6">
       <v-col cols="12" lg="8">
         <v-card flat outlined class="mt-8 mb-4">

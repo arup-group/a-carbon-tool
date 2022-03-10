@@ -19,7 +19,7 @@
       :clipped="clipped"
       @toggleDrawer="toggleDrawer"
     />
-    <v-main class="pt-0">
+    <v-main class="pt-4">
       <router-view />
     </v-main>
   </v-app>

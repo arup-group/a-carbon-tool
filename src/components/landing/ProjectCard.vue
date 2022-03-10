@@ -11,41 +11,33 @@
           </v-row>
         </v-card-title>
         <v-card-text>
-          <v-row justify="start" class="text--primary" fill-height dense>
-            <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
-          </v-row>
+          {{ co2Total }} tCO2e
         </v-card-text>
         <v-divider class="mx-4"></v-divider>
-        <v-card-actions style="margin-bottom: auto">
-          <v-row class="mx-auto">
-            <v-col cols="12" align="center">
-              <v-card flat width="80%">
-                <DoughnutChart :data="co2Values" :chartData="{}" />
-              </v-card>
-            </v-col>
-          </v-row>
+        <v-card-actions style="margin-bottom: auto" class="justify-center py-0">
+          <v-card flat width="80%" class="ma-0 pa-0">
+            <DoughnutChart :data="co2Values" :chartData="{}" />
+          </v-card>
           <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
         </v-card-actions>
-        <v-container style="margin-top: auto">
-          <v-divider class="mx-4"></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <div>
-              <landing-options @delete="checkDelete" />
-              <v-select
-                :menu-props="{ value: options }"
-                v-if="options"
-                :items="['one', 'two']"
-              />
-              <v-btn icon color="primary">
-                <v-icon>mdi-share-variant</v-icon>
-              </v-btn>
-              <v-btn icon color="primary" @click="open">
-                <v-icon>mdi-open-in-new</v-icon>
-              </v-btn>
-            </div>
-          </v-card-actions>
-        </v-container>
+        <v-divider class="mx-4"></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <div>
+            <landing-options @delete="checkDelete" />
+            <v-select
+              :menu-props="{ value: options }"
+              v-if="options"
+              :items="['one', 'two']"
+            />
+            <v-btn icon color="primary">
+              <v-icon>mdi-share-variant</v-icon>
+            </v-btn>
+            <v-btn icon color="primary" @click="open">
+              <v-icon>mdi-open-in-new</v-icon>
+            </v-btn>
+          </div>
+        </v-card-actions>
       </v-card>
     </v-sheet>
   </v-container>

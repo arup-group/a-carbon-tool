@@ -1,7 +1,7 @@
 <template>
   <v-card flat outlined>
     <v-card-title class="card">
-      <span class="text-h7">Product Stage Carbon (A1-A5)</span>
+      <span class="text-h7">Product & Site Carbon (A1-A5)</span>
     </v-card-title>
     <v-card-text style="height: 100%">
       <h-bar-chart

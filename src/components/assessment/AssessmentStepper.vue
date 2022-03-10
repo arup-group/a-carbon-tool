@@ -186,6 +186,8 @@ export default class AssessmentStepper extends Vue {
   @Prop() becs!: string;
   @Prop() groupedMaterials!: GroupedMaterial[];
 
+  completed = false;
+
   step: Step = 1;
 
   stepPlus() {

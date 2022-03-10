@@ -91,7 +91,11 @@ import {
 } from "@/models/graphql";
 
 import { DeleteBranchInput } from "@/store";
-import { extractCo2Data } from "../views/utils/viewAssessmentUtils";
+import {
+  extractCo2Data,
+  loadParent,
+  getChildren,
+} from "../views/utils/viewAssessmentUtils";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -101,6 +105,7 @@ import LandingError from "@/components/landing/LandingError.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import { HTTPStreamDataParent } from "@/models/graphql/";
 @Component({
   components: {
     ProjectCard,
@@ -114,7 +119,7 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
 })
 export default class Landing extends Vue {
   carbonBranches: { id: string; name: string; branchid: string }[] = [];
-  branchData: { id: string; name: string; data: StreamData }[] = [];
+  branchData: { id: string; name: string; data: HTTPStreamDataParent }[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
@@ -231,42 +236,52 @@ export default class Landing extends Vue {
         );
       }
       // get the most recent commit and the data from that commit
-      for (let i = 0; i < this.carbonBranches.length; i++) {
-        const branchCommit = await this.$store.dispatch(
-          "getStreamCommit",
-          this.carbonBranches[i].id
-        );
-        var carbonCommit = "";
-        if (branchCommit.data.stream.branch) {
-          carbonCommit =
-            branchCommit.data.stream.branch.commits.items[0].referencedObject;
-        }
-        const branch: StreamData = await this.$store.dispatch("getBranchData", [
-          this.carbonBranches[i].id,
-          carbonCommit,
-        ]);
-        if (!Object.prototype.hasOwnProperty.call(branch, "errors")) {
-          this.branchData.push({
-            id: this.carbonBranches[i].id,
-            name: this.carbonBranches[i].name,
-            data: branch,
-          });
-        }
-      }
+      this.branchData = await Promise.all(
+        this.carbonBranches.map(async (cb) => {
+          const branchCommit = await this.$store.dispatch(
+            "getStreamCommit",
+            cb.id
+          );
+          let carbonCommit = "";
+          if (branchCommit.data.stream.branch) {
+            carbonCommit =
+              branchCommit.data.stream.branch.commits.items[0].referencedObject;
+          }
+          const parent = await loadParent(
+            this.$store.state.selectedServer.url,
+            cb.id,
+            carbonCommit,
+            this.$store.state.token.token
+          );
+          return {
+            id: cb.id,
+            name: cb.name,
+            data: parent,
+          };
+        })
+      );
       // convert the data into the format that this page needs it to be in
-      this.projects = this.branchData.map((proj) => {
-        const co2Data = extractCo2Data(proj.data).materials;
+      this.projects = await Promise.all(
+        this.branchData.map(async (proj) => {
+          const childrenData = await getChildren(
+            this.$store.state.selectedServer.url,
+            this.$store.state.token.token,
+            proj.id,
+            proj.data
+          );
+          const co2Data = extractCo2Data(proj.data, childrenData).materials;
 
-        const projName = proj.data.data.stream.object.data.projectData.name;
-        return {
-          title: `${projName} - ${proj.name}`,
-          id: `${proj.id}`,
-          co2Values: co2Data,
-          totalCO2e: proj.data.data.stream.object.data.totalCO2,
-          link: "",
-          category: proj.data.data.stream.object.data.projectData.components,
-        };
-      });
+          const projName = proj.data.projectData.name;
+          return {
+            title: `${projName} - ${proj.name}`,
+            id: `${proj.id}`,
+            co2Values: co2Data,
+            totalCO2e: proj.data.totalCO2,
+            link: "",
+            category: proj.data.projectData.components,
+          };
+        })
+      );
 
       this.loading = false;
     } catch (err) {

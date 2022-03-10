@@ -5,6 +5,7 @@ export interface ProjectDataTemp {
   floorArea: number | null;
   region: string | null;
   jobNumber: string | null;
+  notes: string | null;
 }
 
 export interface ProjectDataComplete {
@@ -14,4 +15,5 @@ export interface ProjectDataComplete {
   floorArea: number;
   region: string;
   jobNumber: string;
+  notes: string;
 }

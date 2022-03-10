@@ -82,6 +82,7 @@ export default class Menu1b extends Vue {
     floorArea: null,
     region: "",
     jobNumber: null,
+    notes: null,
   };
   speckleStream: StreamObject | null = null;
 
@@ -130,6 +131,7 @@ export default class Menu1b extends Vue {
       floorArea: this.form.floorArea ? +this.form.floorArea : 1,
       region: this.form.region ? this.form.region : "",
       jobNumber: this.form.jobNumber ? this.form.jobNumber : "",
+      notes: this.form.notes ? this.form.notes : "",
     };
   }
 }

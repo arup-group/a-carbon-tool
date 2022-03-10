@@ -135,15 +135,24 @@
         </v-stepper-step>
         <v-stepper-content step="7">
           <v-card-actions>
-            <v-btn :style="colStyle" @click="step = 6" color="primary">
-              Previous
-            </v-btn>
-            <v-spacer />
+            <v-row>
+              <v-col cols="12">
+                <v-form>
+                  <v-textarea v-model="form.notes" label="Notes"></v-textarea>
+                </v-form>
+              </v-col>
+              <v-col cols="12">
+                <v-btn :style="colStyle" @click="step = 6" color="primary">
+                  Previous
+                </v-btn>
             <menu-7
               :colStyle="colStyle"
               :canSave="canSave"
               @checkSave="checkSave"
             />
+              </v-col>
+            </v-row>
+            <v-spacer />
           </v-card-actions>
         </v-stepper-content>
       </v-stepper>
@@ -187,6 +196,10 @@ export default class AssessmentStepper extends Vue {
   @Prop() groupedMaterials!: GroupedMaterial[];
 
   step: Step = 1;
+
+  form = {
+    notes: null,
+  };
 
   stepPlus() {
     this.step += 1;

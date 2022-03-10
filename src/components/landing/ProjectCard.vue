@@ -79,7 +79,7 @@ export default class ProjectCard extends Vue {
     }));
   }
   get co2Total() {
-    return this.convertKgToTonnes(this.project.totalCO2e);
+    return this.convertKgToTonnes(this.project.totalCO2e).toLocaleString('en');
   }
   get link() {
     return this.project.link;

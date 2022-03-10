@@ -1,7 +1,7 @@
 <template>
   <v-row justify="center">
     <v-col cols="12" md="6">
-      <div class="pa-7">
+      <div class="pa-2">
         <div class="text-h4">act | a carbon tool</div>
         <div class="subtitle-2 font-weight-light">
           An open-source platform for performing embodied carbon emission

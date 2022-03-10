@@ -12,6 +12,7 @@
         flat
         class="d-flex align-center justify-center"
         height="100%"
+        min-height="400"
         width="100%"
       >
         <v-card-actions class="justify-center">

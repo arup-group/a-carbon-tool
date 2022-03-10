@@ -104,12 +104,12 @@ export default class Sidebar extends Vue {
   }
 
   items = [
+    { title: "Dashboard", icon: "mdi-view-dashboard-outline", route: "/" },
     {
       title: "New Assessment",
       icon: "mdi-molecule-co2",
       route: "/assessment",
     },
-    { title: "Dashboard", icon: "mdi-view-dashboard-outline", route: "/" },
     { title: "About", icon: "mdi-help-circle-outline", route: "/about" },
   ];
 }

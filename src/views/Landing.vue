@@ -1,5 +1,5 @@
 <template>
-  <v-main class="mr-7 ml-7">
+  <v-main class="mr-7 ml-7 pb-4">
     <landing-header />
     <v-container v-if="!loading && !error">
       <v-data-iterator

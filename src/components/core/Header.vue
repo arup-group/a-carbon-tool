@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar v-if="li" fixed app :clipped-left="clipped">
+  <v-app-bar v-if="li" fixed app :clipped-left="clipped" elevation="0">
     <v-app-bar-nav-icon @click.stop="toggleDrawer"></v-app-bar-nav-icon>
     <v-toolbar-title>
       act | a carbon tool &beta;

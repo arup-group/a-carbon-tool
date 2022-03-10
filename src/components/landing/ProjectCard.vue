@@ -25,7 +25,7 @@
         </v-card-actions>
         <v-divider class="mx-4"></v-divider>
         <v-card-actions class="d-flex justify-space-between mb-6 pa-2">
-          <span v-if="newMainAvailable">
+          <span v-if="true">
             <template>
               <span>
                 <v-btn icon color="red darken-1" @click="cardOverlay = true">
@@ -50,17 +50,24 @@
             </v-btn>
           </span>
         </v-card-actions>
-        <v-overlay class="d-inline-flex pa-2" :absolute="true" :opacity="0.98" :value="cardOverlay">
-          <v-col class="d-flex flex-column align-end mb-6">
-            <v-btn icon color="red darken-1" @click="cardOverlay = false">
-              <v-icon>mdi-close-circle</v-icon>
-            </v-btn>
+        <v-overlay class="d-flex align-start" :absolute="true" :z-index="0" :opacity="0.98" :value="cardOverlay">
+
+          <v-col class="d-flex align-start">
+            <v-col class="d-flex align-end flex-column">
+              <v-btn icon color="red darken-1" @click="cardOverlay = false">
+                <v-icon>mdi-close-circle</v-icon>
+              </v-btn>
+            </v-col>
           </v-col>
-          <v-col>
-            <v-card-text>
-              Theres an update on main branch, use edit to update your report.
-            </v-card-text>
-          </v-col>
+
+        
+            <v-col>
+              <v-card-text class="d-flex align-end mb-6">
+                Theres an update on main branch, use edit to update your report.
+              </v-card-text>
+            </v-col>
+          
+
         </v-overlay>
       </v-card>
     </v-sheet>

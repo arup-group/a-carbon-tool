@@ -301,7 +301,7 @@ export default class Landing extends Vue {
           co2Values: co2Data,
           totalCO2e: proj.data.data.stream.object.data.totalCO2,
           link: "",
-          category: `${proj.data.data.stream.object.data.projectData.components}`,
+          category: proj.data.data.stream.object.data.projectData.components,
           projectDate: proj.data.data.stream.object.createdAt,
           newMainAvailable: proj.newMainAvailable,
         };

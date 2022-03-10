@@ -10,7 +10,7 @@ export const userInfoQuery = () => `query {
     }
   }`;
 
-// REMOVE COMMENT WHEN COMPLETE
+
 export const streamsQuery = () => `query {
   user {
     name,

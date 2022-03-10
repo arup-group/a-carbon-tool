@@ -334,7 +334,6 @@ export default class Assessment extends Vue {
   }
 
   calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {
-    console.log("reportObjs:", reportObjs);
     let A1A3 = 0;
     let A4 = 0;
     let A5Site = 0;
@@ -349,7 +348,6 @@ export default class Assessment extends Vue {
       A5Value += rd.constructionCarbonA5.value;
     });
     let totalCO2 = A1A3 + A4 + A5Value;
-    console.log("[calcTotals] totalCO2:", totalCO2);
 
     return {
       transportCarbonA4: A4,

@@ -129,7 +129,6 @@ export async function loadStream(context: any, streamId: string) {
     streamId,
     branchData
   );
-  console.log("childrenData:", childrenData);
 
   const co2Data = extractCo2Data(branchData, childrenData);
 

@@ -22,6 +22,9 @@
     <v-main class="pt-4">
       <router-view />
     </v-main>
+    <Footer 
+      :li="isAuthenticated"
+    />
   </v-app>
 </template>
 
@@ -29,6 +32,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import Header from "./components/core/Header.vue";
 import Sidebar from "./components/core/Sidebar.vue";
+import Footer from "./components/core/Footer.vue"
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";
 import "@arc-web/components/dist/themes/light.css";
@@ -42,7 +46,7 @@ setBasePath("/");
 import "@/assets/style.css";
 
 @Component({
-  components: { Header, Sidebar },
+  components: { Header, Sidebar, Footer },
 })
 export default class App extends Vue {
   get name(): string {

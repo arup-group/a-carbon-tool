@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex">
-    <v-btn x-large icon color="primary">
+    <!-- <v-btn x-large icon color="primary">
       <v-icon>mdi-cog</v-icon>
     </v-btn>
     <v-btn x-large icon color="primary">
@@ -8,7 +8,7 @@
     </v-btn>
     <v-btn x-large icon color="primary">
       <v-icon>mdi-open-in-new</v-icon>
-    </v-btn>
+    </v-btn> -->
   </div>
 </template>
 

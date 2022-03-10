@@ -1,5 +1,5 @@
 <template>
-  <v-card width="">
+  <v-card width="" flat outlined>
     <v-card-title class="d-flex justify-space-between mb-5">
       <span class="text-h5">{{ name }}</span>
       <v-btn icon @click="show = !show">

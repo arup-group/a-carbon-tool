@@ -1,7 +1,7 @@
 <template>
-  <v-card>
-    <v-card-title class="mb-5 card">
-      <span class="text-h7">A1-5 BREAKDOWN</span>
+  <v-card flat outlined>
+    <v-card-title class="card">
+      <span class="text-h7">Product Stage Carbon (A1-A5)</span>
     </v-card-title>
     <v-card-text style="height: 100%">
       <h-bar-chart
@@ -13,7 +13,7 @@
       <v-divider class="mb-4 mt-4"></v-divider>
       <div class="d-flex justify-space-between">
         <div v-for="level in levels" :key="level.name">
-          <div class="font-weight-bold mb-3">{{ getName(level) }}:</div>
+          <div class="font-weight-bold">{{ getName(level) }}:</div>
           <div class="font-weight-light">
             {{ getTCO2e(level) }} tCO<sub>2</sub>e
           </div>

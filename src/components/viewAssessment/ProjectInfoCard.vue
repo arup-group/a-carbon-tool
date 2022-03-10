@@ -1,12 +1,12 @@
 <template>
   <v-card width="" flat outlined>
-    <v-card-title class="d-flex justify-space-between mb-5">
+    <v-card-title class="d-flex justify-space-between">
       <span class="text-h5">{{ name }}</span>
       <v-btn icon @click="show = !show">
         <v-icon>{{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}</v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-subtitle>
+    <v-card-subtitle class="pa-0">
       <BECChipGroup v-if="type.length !== 0" :categories="type" />
     </v-card-subtitle>
     <v-card-text>

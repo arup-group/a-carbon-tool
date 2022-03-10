@@ -2,7 +2,7 @@
   <div>
     <div v-if="volCalculated">
       <strong>Volume automatically calculated as:</strong><br />
-      <v-chip class="text-center">{{ displayVolume }}m3</v-chip>
+      <v-chip class="text-center">{{ displayVolume }}m<sup>3</sup></v-chip>
     </div>
     <div v-else>
       <strong>Volume being calculated</strong><br />

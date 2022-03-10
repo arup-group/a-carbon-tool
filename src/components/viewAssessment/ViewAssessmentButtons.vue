@@ -1,14 +1,6 @@
 <template>
   <div class="d-flex">
-    <!-- <v-btn x-large icon color="primary">
-      <v-icon>mdi-cog</v-icon>
-    </v-btn>
-    <v-btn x-large icon color="primary">
-      <v-icon>mdi-share-variant</v-icon>
-    </v-btn>
-    <v-btn x-large icon color="primary">
-      <v-icon>mdi-open-in-new</v-icon>
-    </v-btn> -->
+    <!-- buttons to go here when functionality exists -->
   </div>
 </template>
 

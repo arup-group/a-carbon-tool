@@ -23,6 +23,7 @@
             :streams="streams"
             :step="step"
             :becs="becs"
+            :form="form"
           />
           <v-card-actions>
             <v-spacer />
@@ -135,15 +136,22 @@
         </v-stepper-step>
         <v-stepper-content step="7">
           <v-card-actions>
-            <v-btn :style="colStyle" @click="step = 6" color="primary">
-              Previous
-            </v-btn>
+            <v-row>
+              <v-col cols="12">
+                <v-textarea v-model="form.notes" label="Notes"></v-textarea>
+              </v-col>
+              <v-col cols="12" class="d-flex justify-space-between">
+                <v-btn :style="colStyle" @click="step = 6" color="primary">
+                  Previous
+                </v-btn>
+                <menu-7
+                  :colStyle="colStyle"
+                  :canSave="canSave"
+                  @checkSave="checkSave"
+                />
+              </v-col>
+            </v-row>
             <v-spacer />
-            <menu-7
-              :colStyle="colStyle"
-              :canSave="canSave"
-              @checkSave="checkSave"
-            />
           </v-card-actions>
         </v-stepper-content>
       </v-stepper>
@@ -161,6 +169,7 @@ import Menu6 from "./Menu6.vue";
 import Menu7 from "./Menu7.vue";
 import {
   ProjectDataComplete,
+  ProjectDataTemp,
   MaterialUpdateOut,
   SpeckleType,
   Step,
@@ -186,6 +195,15 @@ export default class AssessmentStepper extends Vue {
   @Prop() becs!: string;
   @Prop() groupedMaterials!: GroupedMaterial[];
 
+  form: ProjectDataTemp = {
+    name: null,
+    components: null,
+    cost: null,
+    floorArea: null,
+    region: null,
+    jobNumber: null,
+    notes: null,
+  };
   completed = false;
 
   step: Step = 1;
@@ -249,6 +267,19 @@ export default class AssessmentStepper extends Vue {
   @Emit("checkSave")
   checkSave() {
     return;
+  }
+
+  @Watch("form.notes")
+  notesUpdate() {
+    this.uploadData({
+      name: this.form.name ? this.form.name : "",
+      components: this.form.components ? this.form.components : [""],
+      cost: this.form.cost ? +this.form.cost : 0,
+      floorArea: this.form.floorArea ? +this.form.floorArea : 1,
+      region: this.form.region ? this.form.region : "",
+      jobNumber: this.form.jobNumber ? this.form.jobNumber : "",
+      notes: this.form.notes ? this.form.notes : "",
+    });
   }
 }
 </script>

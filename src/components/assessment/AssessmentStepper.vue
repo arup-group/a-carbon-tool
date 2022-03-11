@@ -24,7 +24,6 @@
             :step="step"
             :becs="becs"
             :form="form"
-            :ifFinalFormValid="ifFinalFormValid"
           />
           <v-card-actions>
             <v-spacer />

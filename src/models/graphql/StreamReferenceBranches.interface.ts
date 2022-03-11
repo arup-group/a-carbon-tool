@@ -5,6 +5,9 @@ export interface StreamReferenceBranches {
         items: {
           id: string;
           name: string;
+          createdAt: string;
+          branchCommitDate: any;
+          commits: any;
         }[];
       };
     };

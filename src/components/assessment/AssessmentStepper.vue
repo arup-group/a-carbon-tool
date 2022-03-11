@@ -205,6 +205,7 @@ export default class AssessmentStepper extends Vue {
     jobNumber: null,
     notes: null,
   };
+  completed = false;
 
   step: Step = 1;
 

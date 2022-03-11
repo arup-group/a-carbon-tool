@@ -10,6 +10,7 @@ export const userInfoQuery = () => `query {
     }
   }`;
 
+
 export const streamsQuery = () => `query {
   user {
     name,
@@ -26,6 +27,7 @@ export const streamsDataQuery = (streamId: string, objId: string) => `query {
   stream(id: "${streamId}") {
     object(id: "${objId}") {
       data,
+      createdAt,
         children {
           objects {
             data
@@ -34,6 +36,7 @@ export const streamsDataQuery = (streamId: string, objId: string) => `query {
       }
     }
   }`;
+
 export const streamReferencedObjects = (id: string) => `query {
   stream(id: "${id}") {
     branch {
@@ -106,6 +109,7 @@ export const createCommitMutation = (
     totalChildrenCount: ${totalChildrenCount},
   })
 }`;
+
 export const streamCommmitObjects = (id: string) => `query {
 stream(id: "${id}") {
   branch (name:"actcarbonreport"){
@@ -118,12 +122,28 @@ stream(id: "${id}") {
   }
 }`;
 
+export const mainStreamCommmitObjects = (id: string) => `query {
+  stream(id: "${id}") {
+    branch (name:"main"){
+      commits {
+         items {
+           referencedObject
+          }
+        }
+      }
+    }
+  }`;
+
+// Gets all branches for a particular stream id including first commit date
 export const streamReferencedBranches = (id: string) => `query {
   stream(id: "${id}") {
     branches {
       items {
         id,
-        name
+        name,
+        commits {
+          cursor
+        }
       }
     }
   }

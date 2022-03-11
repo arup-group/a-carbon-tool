@@ -11,7 +11,10 @@
           </v-row>
         </v-card-title>
         <v-card-text>
-          {{ co2Total }} tCO2e
+          <v-row justify="start" class="text--primary" fill-height dense>
+            <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
+            <v-col align="right" cols="6"> updated: {{ branchDate }}</v-col>
+          </v-row>
         </v-card-text>
         <v-divider class="mx-4"></v-divider>
         <v-card-actions style="margin-bottom: auto" class="justify-center py-0">
@@ -21,9 +24,18 @@
           <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
         </v-card-actions>
         <v-divider class="mx-4"></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <div>
+        <v-card-actions class="d-flex justify-space-between mb-6 pa-2">
+          <span v-if="newMainAvailable">
+            <template>
+              <span>
+                <v-btn icon color="red darken-1" @click="cardOverlay = true">
+                  <v-icon>mdi-alert</v-icon>
+                </v-btn>
+              </span>
+            </template>
+          </span>
+          <span v-else></span>
+          <span>
             <landing-options @delete="checkDelete" />
             <v-select
               :menu-props="{ value: options }"
@@ -36,8 +48,27 @@
             <v-btn icon color="primary" @click="open">
               <v-icon>mdi-open-in-new</v-icon>
             </v-btn>
-          </div>
+          </span>
         </v-card-actions>
+        <v-overlay class="d-flex align-start" :absolute="true" :z-index="0" :opacity="0.98" :value="cardOverlay">
+
+          <v-col class="d-flex align-start">
+            <v-col class="d-flex align-end flex-column">
+              <v-btn icon color="red darken-1" @click="cardOverlay = false">
+                <v-icon>mdi-close-circle</v-icon>
+              </v-btn>
+            </v-col>
+          </v-col>
+
+        
+            <v-col>
+              <v-card-text class="d-flex align-end mb-6">
+                Theres an update on main branch, use edit to update your report.
+              </v-card-text>
+            </v-col>
+          
+
+        </v-overlay>
       </v-card>
     </v-sheet>
   </v-container>
@@ -59,6 +90,7 @@ export default class ProjectCard extends Vue {
   @Prop() project!: Project;
 
   options = false;
+  cardOverlay = false;
 
   get title() {
     return this.project.title;
@@ -72,6 +104,17 @@ export default class ProjectCard extends Vue {
   }
   get co2Total() {
     return this.convertKgToTonnes(this.project.totalCO2e).toLocaleString('en');
+  }
+
+  get branchDate() {
+    const branchDate = new Date(Date.parse(this.project.projectDate));
+    const enGBFormatter = new Intl.DateTimeFormat("en-GB");
+    const branchDateFormatted = enGBFormatter.format(branchDate);
+    return branchDateFormatted;
+  }
+
+  get newMainAvailable() {
+    return this.project.newMainAvailable;
   }
   get link() {
     return this.project.link;

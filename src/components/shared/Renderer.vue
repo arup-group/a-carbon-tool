@@ -88,14 +88,20 @@ export default class extends Vue {
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
     this.viewer = new Viewer({ contained: renderDomElement });
-    objecturls.forEach((url) => {
-      this.viewer.loadObject(url, this.token);
+    objecturls.forEach(async (url) => {
+      await this.viewer.loadObject(url, this.token);
+      console.log(this.viewer);
+      const properties = this.viewer.getObjectsProperties();
+      console.log("properties:", properties);
     });
 
     this.viewer.on("load-progress", (args: any) => {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
       if (this.loading === 100) {
+        // const properties = this.viewer.getObjectsProperties();
+        // console.log("properties:", properties);
+        // console.log("objectProperties", this.viewer.getObjectsProperties())
         const allObjects = this.viewer.sceneManager.sceneObjects
           .allObjects as THREE.Group;
         const allObjectsChildren = allObjects.children;

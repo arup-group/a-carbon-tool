@@ -22,8 +22,10 @@
           chips
         >
           <template #selection="{ item }">
-            <v-chip :color="item.color" :textColor="getContrastYIQ(item.color)"
-              ><strong>{{ item.name }}</strong></v-chip
+            <v-chip
+              :color="item.color"
+              :textColor="getContrastYIQ(item.color)"
+              >{{ item.name }}</v-chip
             >
           </template>
         </v-combobox>

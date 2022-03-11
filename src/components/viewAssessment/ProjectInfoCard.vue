@@ -55,7 +55,7 @@
             </div>
           </div>
           <div class="d-flex justify-space between">
-            <div>Notes:</div>
+            <div>Notes: </div>
             <div>{{ notes }}</div>
           </div>
         </div>

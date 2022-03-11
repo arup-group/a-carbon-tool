@@ -30,7 +30,6 @@ export function extractCo2Data(branchData: any) {
     [key: string]: { value: number; color: string; id: string };
   } = {};
   branchData.data.stream.object.children.objects.forEach((object: any) => {
-    console.log(branchData.data.stream.object.data.projectData.floorArea);
     levels.levels[0].kgCO2eperm2 +=
       parseFloat(object.data.act.reportData.productStageCarbonA1A3) / floorArea;
     levels.levels[0].tCO2e +=
@@ -103,7 +102,7 @@ export async function loadStream(context: any, streamId: string) {
     JN: branchData.data.stream.object.data.projectData.jobNumber,
     systemCost: branchData.data.stream.object.data.projectData.cost,
     floorArea: branchData.data.stream.object.data.projectData.floorArea,
-    notes: "",
+    notes: branchData.data.stream.object.data.projectData.notes,
     totalCO2e: Math.floor(branchData.data.stream.object.data.totalCO2 / 1000),
     totalkgCO2e: Math.floor(branchData.data.stream.object.data.totalCO2),
   };

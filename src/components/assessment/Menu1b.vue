@@ -74,16 +74,8 @@ export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject;
   @Prop() step!: Step;
   @Prop() becs!: string[];
+  @Prop() form!: ProjectDataTemp;
 
-  form: ProjectDataTemp = {
-    name: null,
-    components: null,
-    cost: null,
-    floorArea: null,
-    region: "",
-    jobNumber: null,
-    notes: null,
-  };
   speckleStream: StreamObject | null = null;
 
   streamSelected() {

@@ -14,6 +14,11 @@
         label="Project name"
         required
       ></v-text-field>
+      <v-text-field
+        v-model="form.jobNumber"
+        label="Job number"
+        required
+      ></v-text-field>
       <v-select
         v-model="form.region"
         :items="availableRegions()"
@@ -69,14 +74,8 @@ export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject;
   @Prop() step!: Step;
   @Prop() becs!: string[];
+  @Prop() form!: ProjectDataTemp;
 
-  form: ProjectDataTemp = {
-    name: null,
-    components: null,
-    cost: null,
-    floorArea: null,
-    region: "",
-  };
   speckleStream: StreamObject | null = null;
 
   streamSelected() {
@@ -123,6 +122,8 @@ export default class Menu1b extends Vue {
       cost: this.form.cost ? +this.form.cost : 0,
       floorArea: this.form.floorArea ? +this.form.floorArea : 1,
       region: this.form.region ? this.form.region : "",
+      jobNumber: this.form.jobNumber ? this.form.jobNumber : "",
+      notes: this.form.notes ? this.form.notes : "",
     };
   }
 }

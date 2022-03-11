@@ -19,9 +19,12 @@
       :clipped="clipped"
       @toggleDrawer="toggleDrawer"
     />
-    <v-main>
+    <v-main class="pt-4">
       <router-view />
     </v-main>
+    <Footer 
+      :li="isAuthenticated"
+    />
   </v-app>
 </template>
 
@@ -29,6 +32,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import Header from "./components/core/Header.vue";
 import Sidebar from "./components/core/Sidebar.vue";
+import Footer from "./components/core/Footer.vue"
 // ARC stuff
 import "@arc-web/components/dist/themes/index.css";
 import "@arc-web/components/dist/themes/light.css";
@@ -37,12 +41,16 @@ import "@arc-web/components/dist/components/container/arc-container.js";
 import "@arc-web/components/dist/components/navbar/arc-navbar.js";
 import { setBasePath } from "@arc-web/components/dist/utilities/base-path";
 
+// posthog
+import posthog from 'posthog-js'
+posthog.init('phc_fqFMQOjCjbDHKTP4VWaVGRQbPbGrG3RwQym5G8MQU3C', { api_host: 'https://posthog.insights.arup.com' })
+
 setBasePath("/");
 
 import "@/assets/style.css";
 
 @Component({
-  components: { Header, Sidebar },
+  components: { Header, Sidebar, Footer },
 })
 export default class App extends Vue {
   get name(): string {

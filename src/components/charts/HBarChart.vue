@@ -14,8 +14,8 @@ export default class HBarChart extends Mixins(VueChart.HorizontalBar) {
           labels: this.data.map((d) => d.label),
           datasets: [
             {
-              label: "Data One",
-              backgroundColor: ["#2962B2", "#2092D3", "#20acd3"],
+              label: "tCO2e",
+              backgroundColor: ["#52C4BA", "#77DCCC", "#9DEDDA"],
               data: this.data.map((d) => d.value),
             },
           ],

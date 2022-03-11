@@ -1,33 +1,21 @@
 <template>
-  <v-container class="d-flex justify-center mb-6 pa-2">
-    <v-row class="d-flex justify-center mb-6">
+  <v-container class="d-flex justify-center mb-6 pt-8">
+    <v-row class="d-flex justify-center mb-6 pt-4">
       <v-col cols="12" lg="8">
         <v-card flat outlined class="mt-8 mb-4">
           <v-card-title class="text-h4">Declaration</v-card-title>
           <v-card-text>
-            The construction industry currently faces significant challenges in
-            reducing its environmental impact. The built environment is directly
-            responsible for nearly 40% of all carbon emissions, with 10% coming
-            from embodied carbon - the emissions associated with the
-            construction, maintenance and deconstruction (<a
-              href="https://worldgbc.org/news-media/commitment-includes-embodied-carbon"
-              target="_blank"
-              >WGBC, 2021</a
-            >). <br /><br />
-            As an intitative, we believe that significant action needs to be
-            taken to curb these emissions, with a target of limiting global
-            temperature rise to 1.5C. Construction professionals - architects,
-            engineers, designers, consultants and contractors - with the power
-            to enact maningful change require the right tools to do so.
+            The construction industry currently faces significant challenges in reducing its environmental impact. The built environment is directly responsible for
+            nearly 40% of all carbon emissions, with 10% coming from embodied carbon - the emissions associated with the construction, maintenance and deconstruction
+            (<a href='https://worldgbc.org/news-media/commitment-includes-embodied-carbon' target='_blank'>WGBC, 2021</a>).
             <br /><br />
-            A carbon tool, or '<strong>act</strong> ', is an open-source
-            intitiative to create appropriate tools for the rapid assessment of
-            embodied carbon emissions within built-environment assets. It is a
-            work in progress intended to evolve over time. It is free to all to
-            use and it is open to anyone who would like to contribute. Unlike
-            other lifecycle analysis tools, <strong>act</strong> is intended to
-            be used by designers as they work to provide quick feedback and
-            enable carbon to be included as a factor in design as it happens.
+            As an initiative, we believe that significant action needs to be taken to curb these emissions, with a target of limiting global temperature rise to 1.5C.
+            Construction professionals - architects, engineers, designers, consultants and contractors - with the power to enact meaningful change require the right tools to do so.
+            <br /><br />
+            A carbon tool, or 'act', is an open-source initiative to create appropriate tools for the rapid assessment of embodied 
+            carbon emissions within built-environment assets. It is a work in progress intended to evolve over time. It is free to all to use and it is open to anyone who 
+            would like to contribute. Unlike other lifecycle analysis tools, act is intended to be used by designers as they work to provide quick feedback and enable carbon 
+            to be included as a factor in design as it happens.
           </v-card-text>
           <v-img src="/assets/globe.png" contain height="480"></v-img>
         </v-card>

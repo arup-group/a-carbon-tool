@@ -19,6 +19,7 @@ import {
   createCommitMutation,
   streamReferencedBranches,
   streamCommmitObjects,
+  mainStreamCommmitObjects,
   actReportBranchInfo,
   deleteBranchMutation,
 } from "./graphql/speckleQueries";
@@ -143,11 +144,18 @@ export const createCommit = (
     createCommitMutation(streamid, objectid, totalChildrenCount),
     context
   );
+
 export const getStreamCommit = (
   context: any,
   streamid: string
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(streamCommmitObjects(streamid), context);
+
+  export const getMainStreamCommit = (
+    context: any,
+    streamid: string
+  ): Promise<StreamReferenceObjects> =>
+    speckleFetch(mainStreamCommmitObjects(streamid), context);
 
 export const getStreamBranches = (
   context: any,

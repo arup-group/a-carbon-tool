@@ -1,12 +1,12 @@
 <template>
-  <v-card width="">
-    <v-card-title class="d-flex justify-space-between mb-5">
+  <v-card width="" flat outlined>
+    <v-card-title class="d-flex justify-space-between">
       <span class="text-h5">{{ name }}</span>
       <v-btn icon @click="show = !show">
         <v-icon>{{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}</v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-subtitle>
+    <v-card-subtitle class="pa-0">
       <BECChipGroup v-if="type.length !== 0" :categories="type" />
     </v-card-subtitle>
     <v-card-text>
@@ -18,7 +18,7 @@
           }}</span
           ><span class="font-weight-light">tCO<sub>2</sub>e</span>
         </div>
-        <div class="font-weight-bold">TOTAL A-5 CARBON</div>
+        <div class="font-weight-bold">TOTAL A1-A5 CARBON</div>
         <div class="font-weight-light">
           {{ Math.ceil(totalkgCO2e / floorArea) }} kgCO<sub>2</sub>e/m<sup
             >2</sup
@@ -55,7 +55,7 @@
             </div>
           </div>
           <div class="d-flex justify-space between">
-            <div>Notes:</div>
+            <div style="padding-right: 2px">Notes:</div>
             <div>{{ notes }}</div>
           </div>
         </div>

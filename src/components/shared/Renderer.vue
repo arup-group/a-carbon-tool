@@ -14,19 +14,13 @@ import { Component, Emit, Prop, Vue, Watch } from "vue-property-decorator";
 import { Viewer } from "@speckle/viewer";
 
 import * as THREE from "three";
-
-export interface Color {
-  color: string | null;
-  id: string; // should be unique to each item, making it a primary key
-}
-
-export type GradientColor = Gradient | null;
-export interface Gradient {
-  property: string;
-  minValue: number;
-  maxValue: number;
-  colors: string[];
-}
+import {
+  Color,
+  Filters,
+  GradientColor,
+  RendererLoaded,
+  SpeckleProperty,
+} from "@/models/renderer/";
 
 @Component
 export default class extends Vue {
@@ -87,21 +81,21 @@ export default class extends Vue {
     this.domElement.style.display = "inline-block";
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
-    this.viewer = new Viewer({ contained: renderDomElement });
+    this.viewer = new Viewer({ contained: renderDomElement, showStats: false });
     objecturls.forEach(async (url) => {
-      await this.viewer.loadObject(url, this.token);
-      console.log(this.viewer);
-      const properties = this.viewer.getObjectsProperties();
-      console.log("properties:", properties);
+      this.viewer.loadObject(url, this.token);
     });
 
     this.viewer.on("load-progress", (args: any) => {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
       if (this.loading === 100) {
-        // const properties = this.viewer.getObjectsProperties();
-        // console.log("properties:", properties);
-        // console.log("objectProperties", this.viewer.getObjectsProperties())
+        const properties = this.findFilters();
+        console.log("properties:", properties);
+        console.log(
+          "volume:",
+          properties.find((p) => p.name.toLowerCase() === "volume")
+        );
         const allObjects = this.viewer.sceneManager.sceneObjects
           .allObjects as THREE.Group;
         const allObjectsChildren = allObjects.children;
@@ -118,14 +112,40 @@ export default class extends Vue {
           this.setColors(this.colors);
         }
 
-        this.loaded(allMesh);
+        this.loaded(properties, allMesh);
       }
     });
     this.viewer.on("select", (objects: any[]) => {
+      console.log("objects:", objects);
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
       this.$emit("selection", this.selectedObjects);
     });
+  }
+
+  findFilters() {
+    const properties = this.viewer.getObjectsProperties() as {
+      [key: string]: SpeckleProperty<number | string | boolean>;
+    };
+    let keys = Object.keys(properties);
+    let cleanedProps: Filters = keys.map((k) => {
+      if (k.startsWith("parameters.")) {
+        if (k.endsWith(".value")) {
+          let name = properties[k.replace(".value", ".name")]
+            .allValues[0] as string;
+          let data = properties[k];
+          return {
+            name,
+            data,
+          };
+        }
+      }
+      return {
+        name: k,
+        data: properties[k],
+      };
+    });
+    return cleanedProps;
   }
 
   async setColors(colors: Color[]) {
@@ -161,8 +181,8 @@ export default class extends Vue {
   }
 
   @Emit("loaded")
-  loaded(allMesh: THREE.Mesh[]) {
-    return allMesh;
+  loaded(properties: Filters, allMesh: THREE.Mesh[]): RendererLoaded {
+    return { properties, allMesh };
   }
 }
 </script>

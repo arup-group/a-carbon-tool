@@ -62,11 +62,12 @@
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, {
+import Renderer from "@/components/shared/Renderer.vue";
+import {
   Color,
   Gradient,
   GradientColor,
-} from "@/components/shared/Renderer.vue";
+} from "@/models/renderer";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -419,6 +420,8 @@ export default class Assessment extends Vue {
 
     let totalVol = 0;
 console.log("res:", res);
+    const test = res.filter(r => r.speckle_type !== "Speckle.Core.Models.DataChunk");
+    console.log("test:", test);
     const filteredRes: ObjectDetailsComplete[] = [];
     res.forEach((r) => {
       if (r.parameters && r.parameters.HOST_VOLUME_COMPUTED) {
@@ -435,6 +438,8 @@ console.log("res:", res);
         totalVol += r.parameters.HOST_VOLUME_COMPUTED.value;
       }
     });
+
+    console.log("filteredRes:", filteredRes)
 
     filteredRes.forEach((r) => {
       this.objectsObj[r.id] = {

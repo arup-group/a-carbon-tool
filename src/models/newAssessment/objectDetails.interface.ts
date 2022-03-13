@@ -7,9 +7,3 @@ export interface ObjectDetails {
     };
   };
 }
-
-export interface ObjectDetailsComplete {
-  id: string;
-  speckle_type: string;
-  volume: number;
-}

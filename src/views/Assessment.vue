@@ -32,6 +32,7 @@
           @transportSelected="transportSelected"
           @uploadData="uploadData"
           @checkSave="checkSave"
+          @calcVol="calcVol"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -41,6 +42,7 @@
           :report="report"
           :becs="becs"
           :groupedMaterials="groupedMaterials"
+          :speckleVol="speckleVol"
         />
       </div>
     </v-container>
@@ -88,7 +90,6 @@ import {
   ReportTotals,
   ReportPassdown,
   ObjectDetails,
-  ObjectDetailsComplete,
   GroupedMaterial,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
@@ -104,6 +105,7 @@ import {
 import { UploadReportInput } from "@/store";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import { VolCalculator } from "./utils/VolCalculator";
 
 type ObjectsObj = { [id: string]: SpeckleObject };
 
@@ -141,6 +143,7 @@ export default class Assessment extends Vue {
   volProp = "";
   volumeGradient!: Gradient;
   volumeGradientPassdown: GradientColor = null;
+  speckleVol = false; // whether the volume can be got from speckle props
 
   groupedMaterials: GroupedMaterial[] = [];
 
@@ -206,31 +209,37 @@ export default class Assessment extends Vue {
       (p) => p.name.toLowerCase() === "volume"
     );
     this.volProp = volumeFilter ? volumeFilter.rawName : "";
-    const filteredRes: ObjectDetailsComplete[] = [];
     if (volumeFilter) {
+      this.speckleVol = true;
       res.forEach((r) => {
         const volume = this.findVolume(r, volumeFilter);
         if (volume) {
-          filteredRes.push({
+          this.objectsObj[r.id] = {
             id: r.id,
             speckle_type: r.speckle_type,
-            volume,
-          });
+            formData: {
+              volume: volume,
+            },
+          };
           // also find total volume here to avoid needing to loop through objects again
           totalVol += volume;
         }
       });
+    } else {
+      this.speckleVol = false;
+      res
+        .filter(
+          (r) =>
+            r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
+            r.speckle_type !== "Objects.Geometry.Mesh"
+        )
+        .forEach((r) => {
+          this.objectsObj[r.id] = {
+            id: r.id,
+            speckle_type: r.speckle_type,
+          };
+        });
     }
-
-    filteredRes.forEach((r) => {
-      this.objectsObj[r.id] = {
-        id: r.id,
-        speckle_type: r.speckle_type,
-        formData: {
-          volume: r.volume,
-        },
-      };
-    });
 
     this.types = this.findTypes(this.objectsObj);
     this.totalVolume = totalVol;
@@ -252,6 +261,30 @@ export default class Assessment extends Vue {
     return curr;
   }
 
+  calcVol() {
+    let totalVol = 0;
+    this.allMesh.forEach((m) => {
+      const volume = VolCalculator.getMeshVolume(m);
+      if (volume) {
+        try {
+          const id: string = m.userData.id;
+          this.objectsObj[id] = {
+            ...this.objectsObj[id],
+            formData: {
+              ...this.objectsObj[id].formData,
+              volume,
+            },
+          };
+        } catch (err) {
+          console.warn(err);
+        }
+        totalVol += volume;
+      }
+    });
+    this.totalVolume = totalVol;
+    this.speckleVol = true;
+  }
+
   stepperUpdate(step: Step) {
     switch (step) {
       case Step.DATA:
@@ -268,7 +301,7 @@ export default class Assessment extends Vue {
         break;
       case Step.QUANTITIES:
         this.resetColors();
-        if (this.volumeGradient)
+        if (this.volumeGradient && this.speckleVol)
           this.volumeGradientPassdown = this.volumeGradient;
         break;
       case Step.REVIEW:

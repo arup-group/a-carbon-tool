@@ -65,8 +65,10 @@ import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import Renderer from "@/components/shared/Renderer.vue";
 import {
   Color,
+  Filter,
   Gradient,
   GradientColor,
+  RendererLoaded,
 } from "@/models/renderer";
 
 import { Component, Vue } from "vue-property-decorator";
@@ -136,6 +138,7 @@ export default class Assessment extends Vue {
   transportColors: Color[] = [];
 
   // two separate values so that the colors can be found at the same time as the volume is calculated, rather than whenever the user goes onto the volume step
+  volProp = "";
   volumeGradient!: Gradient;
   volumeGradientPassdown: GradientColor = null;
 
@@ -153,7 +156,7 @@ export default class Assessment extends Vue {
   }
 
   async agreeSave() {
-    this.loading=true;
+    this.loading = true;
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
         const uploadReportInput: UploadReportInput = {
@@ -186,8 +189,67 @@ export default class Assessment extends Vue {
     this.dialog = true;
   }
 
-  rendererLoaded(allMesh: THREE.Mesh[]) {
+  async rendererLoaded({ properties, allMesh }: RendererLoaded) {
     this.allMesh = allMesh;
+
+    const res: ObjectDetails[] = await this.$store.dispatch(
+      "getObjectDetails",
+      {
+        streamid: this.streamid,
+        objecturl: this.objectURLs[0],
+      }
+    );
+
+    let totalVol = 0;
+
+    const volumeFilter = properties.find(
+      (p) => p.name.toLowerCase() === "volume"
+    );
+    this.volProp = volumeFilter ? volumeFilter.rawName : "";
+    const filteredRes: ObjectDetailsComplete[] = [];
+    if (volumeFilter) {
+      res.forEach((r) => {
+        const volume = this.findVolume(r, volumeFilter);
+        if (volume) {
+          filteredRes.push({
+            id: r.id,
+            speckle_type: r.speckle_type,
+            volume,
+          });
+          // also find total volume here to avoid needing to loop through objects again
+          totalVol += volume;
+        }
+      });
+    }
+
+    filteredRes.forEach((r) => {
+      this.objectsObj[r.id] = {
+        id: r.id,
+        speckle_type: r.speckle_type,
+        formData: {
+          volume: r.volume,
+        },
+      };
+    });
+
+    this.types = this.findTypes(this.objectsObj);
+    this.totalVolume = totalVol;
+
+    this.updateVolumeGradient();
+  }
+  findVolume(
+    object: ObjectDetails,
+    filter: Filter<string | boolean | number>
+  ): number | undefined {
+    let curr: any = object;
+    filter.rawName.split(".").forEach((f) => {
+      try {
+        curr = curr[f];
+      } catch (err) {
+        return;
+      }
+    });
+    return curr;
   }
 
   stepperUpdate(step: Step) {
@@ -291,7 +353,7 @@ export default class Assessment extends Vue {
     });
 
     this.volumeGradient = {
-      property: "parameters.HOST_VOLUME_COMPUTED.value",
+      property: this.volProp,
       minValue: minVol,
       maxValue: maxVol,
       colors: ["#4f7bff", "#ff4f84"],
@@ -409,52 +471,6 @@ export default class Assessment extends Vue {
     this.streamid = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
-
-    const res: ObjectDetails[] = await this.$store.dispatch(
-      "getObjectDetails",
-      {
-        streamid: id,
-        objecturl: this.objectURLs[0],
-      }
-    );
-
-    let totalVol = 0;
-console.log("res:", res);
-    const test = res.filter(r => r.speckle_type !== "Speckle.Core.Models.DataChunk");
-    console.log("test:", test);
-    const filteredRes: ObjectDetailsComplete[] = [];
-    res.forEach((r) => {
-      if (r.parameters && r.parameters.HOST_VOLUME_COMPUTED) {
-        filteredRes.push({
-          id: r.id,
-          speckle_type: r.speckle_type,
-          paramters: {
-            HOST_VOLUME_COMPUTED: {
-              value: r.parameters.HOST_VOLUME_COMPUTED.value,
-            },
-          },
-        });
-        // also find total volume here to avoid needing to loop through objects again
-        totalVol += r.parameters.HOST_VOLUME_COMPUTED.value;
-      }
-    });
-
-    console.log("filteredRes:", filteredRes)
-
-    filteredRes.forEach((r) => {
-      this.objectsObj[r.id] = {
-        id: r.id,
-        speckle_type: r.speckle_type,
-        formData: {
-          volume: r.paramters.HOST_VOLUME_COMPUTED.value,
-        },
-      };
-    });
-
-    this.types = this.findTypes(this.objectsObj);
-    this.totalVolume = totalVol;
-
-    this.updateVolumeGradient();
   }
 
   transportSelected(selected: TransportSelected) {

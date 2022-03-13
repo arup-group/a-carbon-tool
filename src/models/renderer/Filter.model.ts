@@ -8,6 +8,7 @@ export interface SpeckleProperty<T> {
 
 export interface Filter<T> {
   name: string;
+  rawName: string; // sometimes the name of the parameter and the name property on the parameter are different (eg, for Revit volume's "name" is "Volume", but the field is called "HOST_VOLUME_COMPUTED")
   data: SpeckleProperty<T>;
 }
 

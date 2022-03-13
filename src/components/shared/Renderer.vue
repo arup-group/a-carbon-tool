@@ -83,44 +83,40 @@ export default class extends Vue {
 
     this.viewer = new Viewer({ contained: renderDomElement, showStats: false });
     objecturls.forEach(async (url) => {
-      this.viewer.loadObject(url, this.token);
+      await this.viewer.loadObject(url, this.token);
+
+      this.afterLoad();
     });
 
     this.viewer.on("load-progress", (args: any) => {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
-      if (this.loading === 100) {
-        const properties = this.findFilters();
-        console.log("properties:", properties);
-        console.log(
-          "volume:",
-          properties.find((p) => p.name.toLowerCase() === "volume")
-        );
-        const allObjects = this.viewer.sceneManager.sceneObjects
-          .allObjects as THREE.Group;
-        const allObjectsChildren = allObjects.children;
-        const allMesh: THREE.Mesh[] = [];
-        allObjectsChildren.forEach((oc) => {
-          const meshChildren = oc.children.filter(
-            (c) => c.type === "Mesh"
-          ) as THREE.Mesh[];
-
-          allMesh.push(...meshChildren);
-        });
-        // set initial colors if needed
-        if (this.colors) {
-          this.setColors(this.colors);
-        }
-
-        this.loaded(properties, allMesh);
-      }
     });
     this.viewer.on("select", (objects: any[]) => {
-      console.log("objects:", objects);
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
-      this.$emit("selection", this.selectedObjects);
     });
+  }
+
+  afterLoad() {
+    const properties = this.findFilters();
+    const allObjects = this.viewer.sceneManager.sceneObjects
+      .allObjects as THREE.Group;
+    const allObjectsChildren = allObjects.children;
+    const allMesh: THREE.Mesh[] = [];
+    allObjectsChildren.forEach((oc) => {
+      const meshChildren = oc.children.filter(
+        (c) => c.type === "Mesh"
+      ) as THREE.Mesh[];
+
+      allMesh.push(...meshChildren);
+    });
+    // set initial colors if needed
+    if (this.colors) {
+      this.setColors(this.colors);
+    }
+
+    this.loaded(properties, allMesh);
   }
 
   findFilters() {
@@ -134,14 +130,18 @@ export default class extends Vue {
           let name = properties[k.replace(".value", ".name")]
             .allValues[0] as string;
           let data = properties[k];
+          let rawName = k;
           return {
             name,
+            rawName,
             data,
           };
         }
       }
+      let [rawName] = k.split(".").slice(-1);
       return {
         name: k,
+        rawName,
         data: properties[k],
       };
     });

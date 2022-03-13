@@ -11,9 +11,5 @@ export interface ObjectDetails {
 export interface ObjectDetailsComplete {
   id: string;
   speckle_type: string;
-  paramters: {
-    HOST_VOLUME_COMPUTED: {
-      value: number;
-    };
-  };
+  volume: number;
 }

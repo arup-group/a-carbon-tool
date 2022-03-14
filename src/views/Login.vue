@@ -26,10 +26,12 @@
           >
         </v-card>
       </v-col>
-      <v-col cols="12" md="9" class="d-flex justify-center align-center pb-0">
+      <v-col cols="12" sm="6" md="3" class="d-flex justify-center align-center pb-0">
         <LoginCard @submit="logIn"/>
       </v-col>
-      <v-col cols="12" md="9" class="d-flex justify-center align-center">
+    </v-row>
+    <v-row class="justify-center">
+      <v-col cols="12" sm="6" md="3" class="d-flex justify-center align-center">
         <DefineLogin @submit="logIn"/>
       </v-col>
       <v-col cols="12">

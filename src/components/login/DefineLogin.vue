@@ -10,7 +10,7 @@
         <v-card
             outlined
             class="align-center justify-center mt-0"
-            width="50%"
+            width="100%"
         >
             <v-card-text class="my-4 py-0" align="center">
               OR

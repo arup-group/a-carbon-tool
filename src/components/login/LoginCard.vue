@@ -10,7 +10,7 @@
     <v-card 
       outlined
       class="align-center justify-center"
-      width="50%"
+      width="100%"
     
     >
       <v-card-title>Login</v-card-title>

@@ -1,11 +1,25 @@
 <template>
-    <v-container class="ma-0 pb-2 pa-0">
-        <v-btn
-            outlined
-            @click="openDefine = true"
-        >
-            Define Manually
-        </v-btn>
+    <v-container
+        class="d-flex justify-center align-center"
+        :style="[
+        this.$store.state.darkMode
+            ? { 'background-color': '#121212 !important' }
+            : { 'background-color': '#FFFFFF !important' },
+        ]"
+    >
+        <v-card outlined class="align-center justify-center">
+            <v-card-text class="my-2 py-0" align="center">
+              OR
+            </v-card-text>
+            <v-card-actions class="justify-center">
+                <v-btn
+                outlined
+                @click="openDefine = true"
+            >
+                Enter Manually
+            </v-btn>
+            </v-card-actions>
+        </v-card>
         <v-dialog
             v-model="openDefine"
             max-width="640px"
@@ -13,8 +27,12 @@
         >
             <v-card flat outlined>
                 <v-card-title>
-                    Define your Speckle Server
+                    Speckle Server
                 </v-card-title>
+                <v-card-subtitle>
+                    Note that any speckle server will need to be registered
+                    with ACT before use. Visit our github site to request.
+                </v-card-subtitle>
                 <v-card-actions class="mx-8">
                     <v-text-field
                         label= "URL"
@@ -35,12 +53,29 @@
                     <v-btn
                         outlined
                         color="primary"
+                        @click="signIn(url)"
                     >
                         Submit
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-snackbar
+            v-model="urlFail"
+            multi-line="true"
+            outlined
+        >
+            This URL is not registered with ACT. Try again or visit our git repository 
+            to register
+            <v-btn
+                @click="urlFail=false"
+                text
+                color="secondary"
+                class="ma-2"
+            >
+                close
+            </v-btn>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -52,28 +87,27 @@ import { Server } from "@/models/auth";
 
 export default class DefinLogin extends Vue {
 
+    servers = this.$store.state.servers
+
     openDefine = false
-    url = "https://"
+    url = ""
+    urlFail = false
 
-    signIn(serverDestination: string) {
-        const servers = this.$store.state.servers
-        var match = false
-        var matchServer
-
-        // cycle through servers to find match
-
-        for (const [key, values] of Object.entries(servers)) {
-            
-            if (values.url === this.url)
-                match = true
-                matchServer = key
-                
+    signIn(serverUrl: string) {
+        if (serverUrl === this.servers.arup.url) {
+            this.submit(this.servers.arup);
+        } else if (serverUrl === this.servers.xyz_server.url) {
+            this.submit(this.servers.xyz_server);
+        }
+        else {
+            this.urlFail = true
         }
     }
 
-    
-
-
+    @Emit("submit")
+    submit(server: Server) {
+        return server
+    }
 }
 
 </script>

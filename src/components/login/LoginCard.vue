@@ -33,12 +33,7 @@
             </v-btn>
           </v-col>
           <v-col cols="12" align="center">
-            <v-card-text class="my-2 py-0">
-              OR
-            </v-card-text>
-          </v-col>
-          <v-col cols="12" align="center">
-            <DefineLogin />
+            
           </v-col>
         </v-row>
       </v-card-actions>
@@ -50,16 +45,14 @@
 import { Server } from "@/models/auth/";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import ArupLogin from "@/components/login/ArupLogin.vue"
-import DefineLogin from "@/components/login/DefineLogin.vue"
 
 @Component({ 
-  components: {
-    ArupLogin, DefineLogin
-  }
+  components: {}
 })
 
 export default class LoginCard extends Vue {
-  @Prop() servers!: { arup: Server; xyz_server: Server };
+  
+  servers = this.$store.state.servers
 
   signIn(serverDestination: string) {
     if (serverDestination === "arup") {

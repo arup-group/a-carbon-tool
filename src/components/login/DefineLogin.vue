@@ -32,7 +32,7 @@
         >
             <v-card flat outlined>
                 <v-card-title>
-                    Speckle Server
+                    Switching to manual
                 </v-card-title>
                 <v-card-subtitle>
                     Note that any speckle server will need to be registered

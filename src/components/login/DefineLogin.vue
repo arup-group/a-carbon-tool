@@ -61,9 +61,10 @@
             </v-card>
         </v-dialog>
         <v-snackbar
+            dark="!this.$store.state.darkMode"
             v-model="urlFail"
             multi-line="true"
-            outlined
+            
         >
             This URL is not registered with ACT. Try again or visit our git repository 
             to register
@@ -94,9 +95,10 @@ export default class DefinLogin extends Vue {
     urlFail = false
 
     signIn(serverUrl: string) {
-        if (serverUrl === this.servers.arup.url) {
+        const fullUrl = "https://" + serverUrl
+        if (fullUrl === this.servers.arup.url) {
             this.submit(this.servers.arup);
-        } else if (serverUrl === this.servers.xyz_server.url) {
+        } else if (fullUrl === this.servers.xyz_server.url) {
             this.submit(this.servers.xyz_server);
         }
         else {

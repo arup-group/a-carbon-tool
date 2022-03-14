@@ -1,16 +1,21 @@
 <template>
   <v-container
-    class="d-flex justify-center align-center"
+    class="d-flex justify-center align-center pb-0"
     :style="[
       this.$store.state.darkMode
         ? { 'background-color': '#121212 !important' }
         : { 'background-color': '#FFFFFF !important' },
     ]"
   >
-    <v-card outlined class="align-center justify-center">
+    <v-card 
+      outlined
+      class="align-center justify-center"
+      width="50%"
+    
+    >
       <v-card-title>Login</v-card-title>
       <v-card-subtitle>Select server to connect to:</v-card-subtitle>
-      <v-card-actions class="justify-center">
+      <v-card-actions class="justify-center mb-2">
         <v-row dense>
           <v-col cols="12" align="center">
             <v-btn

@@ -57,6 +57,18 @@ export default new Vuex.Store({
         speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
       },
+      hs2: {
+        region: "PRIVATE",
+        url: "https://hs2.speckle.arup.com",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
+      },
+      p500: {
+        region: "PRIVATE",
+        url: "https://p500.speckle.arup.com",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
+      },
     },
     selectedServer: {} as Server, // should be a server object
     token: {} as Token, // should be a Token object

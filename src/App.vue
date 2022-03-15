@@ -43,7 +43,7 @@ import { setBasePath } from "@arc-web/components/dist/utilities/base-path";
 
 // posthog
 import posthog from 'posthog-js'
-posthog.init('phc_fqFMQOjCjbDHKTP4VWaVGRQbPbGrG3RwQym5G8MQU3C', { api_host: 'https://posthog.insights.arup.com' })
+posthog.init(process.env.VUE_APP_POSTHOG, { api_host: 'https://posthog.insights.arup.com' })
 
 setBasePath("/");
 

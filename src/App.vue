@@ -41,6 +41,10 @@ import "@arc-web/components/dist/components/container/arc-container.js";
 import "@arc-web/components/dist/components/navbar/arc-navbar.js";
 import { setBasePath } from "@arc-web/components/dist/utilities/base-path";
 
+// posthog
+import posthog from 'posthog-js'
+posthog.init('phc_fqFMQOjCjbDHKTP4VWaVGRQbPbGrG3RwQym5G8MQU3C', { api_host: 'https://posthog.insights.arup.com' })
+
 setBasePath("/");
 
 import "@/assets/style.css";

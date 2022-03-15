@@ -115,10 +115,10 @@ export async function loadStream(context: any, streamId: string) {
       actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
     ),
     author: actReportBranchInfo.data.stream.branch.commits.items[0].authorName,
-    JN: "000001",
+    JN: branchData.projectData.jobNumber,
     systemCost: branchData.projectData.cost,
     floorArea: branchData.projectData.floorArea,
-    notes: "",
+    notes: branchData.projectData.notes,
     totalCO2e: Math.round((branchData.totalCO2 / 1000) * 100) / 100,
     totalkgCO2e: Math.floor(branchData.totalCO2),
   };

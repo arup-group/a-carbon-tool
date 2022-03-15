@@ -2,7 +2,7 @@
   <div>
     <div v-if="speckleVol">
       <strong>Volume automatically calculated as:</strong><br />
-      <v-chip class="text-center">{{ displayVolume }}m3</v-chip>
+      <v-chip class="text-center">{{ displayVolume }}m<sup>3</sup></v-chip>
     </div>
     <div v-else>
       <p>No volume props on speckle objects, calculate volume from model?</p>

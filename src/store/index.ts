@@ -15,6 +15,7 @@ import {
   speckleLogOut,
   uploadObjects,
   getStreamCommit,
+  getMainStreamCommit,
   getActReportBranchInfo,
   deleteBranch,
 } from "./speckle/speckleUtil";
@@ -42,7 +43,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.0.2 \u00DF",
+    version: "0.1.0 \u00DF",
     servers: {
       arup: {
         region: "UKIMEA",
@@ -297,6 +298,12 @@ export default new Vuex.Store({
 
     async getStreamCommit(context, streamid: string) {
       const streams = await getStreamCommit(context, streamid);
+      return streams;
+    },
+
+
+    async getMainStreamCommit(context, streamid: string) {
+      const streams = await getMainStreamCommit(context, streamid);
       return streams;
     },
 

@@ -270,11 +270,10 @@ export default class AssessmentStepper extends Vue {
     return;
   }
 
-<<<<<<< HEAD
   @Emit("calcVol")
   calcVol() {
     return;
-=======
+  }
   @Watch("form.notes")
   notesUpdate() {
     this.uploadData({
@@ -286,7 +285,6 @@ export default class AssessmentStepper extends Vue {
       jobNumber: this.form.jobNumber ? this.form.jobNumber : "",
       notes: this.form.notes ? this.form.notes : "",
     });
->>>>>>> 66bf832b3bd0251e4b5761d2afa4b679a9672959
   }
 }
 </script>

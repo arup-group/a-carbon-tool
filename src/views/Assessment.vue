@@ -204,6 +204,8 @@ export default class Assessment extends Vue {
     );
 
     let totalVol = 0;
+    const filteredRes = res.filter((r) => r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
+            r.speckle_type !== "Objects.Geometry.Mesh")
 
     const volumeFilter = properties.find(
       (p) => p.name.toLowerCase() === "volume"
@@ -211,7 +213,7 @@ export default class Assessment extends Vue {
     this.volProp = volumeFilter ? volumeFilter.rawName : "";
     if (volumeFilter) {
       this.speckleVol = true;
-      res.forEach((r) => {
+      filteredRes.forEach((r) => {
         const volume = this.findVolume(r, volumeFilter);
         if (volume) {
           this.objectsObj[r.id] = {
@@ -227,13 +229,7 @@ export default class Assessment extends Vue {
       });
     } else {
       this.speckleVol = false;
-      res
-        .filter(
-          (r) =>
-            r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
-            r.speckle_type !== "Objects.Geometry.Mesh"
-        )
-        .forEach((r) => {
+      filteredRes.forEach((r) => {
           this.objectsObj[r.id] = {
             id: r.id,
             speckle_type: r.speckle_type,

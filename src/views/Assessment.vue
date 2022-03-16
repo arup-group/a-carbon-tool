@@ -31,6 +31,7 @@
           @stepperUpdate="stepperUpdate"
           @transportSelected="transportSelected"
           @uploadData="uploadData"
+          @selectMaterial="selectMaterial"
           @checkSave="checkSave"
           :streams="availableStreams"
           :types="types"
@@ -182,6 +183,10 @@ export default class Assessment extends Vue {
     this.dialog = false;
   }
   checkSave() {
+    this.dialog = true;
+  }
+  selectMaterial() {
+    console.log(this, "TYPE");
     this.dialog = true;
   }
 

@@ -40,6 +40,7 @@
             :types="types"
             :materials="materials"
             @materialUpdated="materialUpdated"
+            @selectMaterial="selectMaterial"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 1" color="primary">
@@ -251,6 +252,11 @@ export default class AssessmentStepper extends Vue {
   @Emit("transportSelected")
   transportSelected(selected: TransportSelected) {
     return selected;
+  }
+
+  @Emit("selectMaterial")
+  selectMaterial() {
+    return;
   }
 
   @Emit("uploadData")

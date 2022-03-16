@@ -7,6 +7,7 @@
           :materials="materials"
           :type="type"
           @materialUpdated="materialUpdated"
+          @selectMaterial="selectMaterial"
         />
       </div>
     </v-form>
@@ -28,12 +29,18 @@ export default class Menu2 extends Vue {
   @Prop() materials!: MaterialFull[];
 
   get loadedTypes() {
+    console.log("types", this.types)
     return this.types ? this.types : [];
   }
 
   @Emit("materialUpdated")
   materialUpdated(material: MaterialUpdateOut) {
     return material;
+  }
+
+  @Emit("selectMaterial")
+  selectMaterial() {
+    return;
   }
 
   setMaterial = "";

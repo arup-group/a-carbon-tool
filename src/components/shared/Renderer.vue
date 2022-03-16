@@ -43,6 +43,11 @@ export default class extends Vue {
     else this.setColors(value);
   }
 
+  @Watch("selected")
+  onSelectionChanged(objects: []){
+    this.selectedObjects.push(...objects);
+  }
+
   @Watch("gradientColorProperty")
   async onGradientChange(value: GradientColor) {
     if (value) {
@@ -118,6 +123,7 @@ export default class extends Vue {
     this.viewer.on("select", (objects: any[]) => {
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
+      console.log(this.selectedObjects, "SELECT");
       this.$emit("selection", this.selectedObjects);
     });
   }

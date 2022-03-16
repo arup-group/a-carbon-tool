@@ -10,9 +10,14 @@
   >
     <v-row dense align="center">
       <v-col cols="12" md="4" class="pl-2">
-        <v-chip>
-          {{ cleanType(type.type) }}
-        </v-chip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
+              {{ cleanType(type.type) }}
+            </v-chip>
+          </template>
+          <span>Objects: {{ type.ids.length }} </span>
+        </v-tooltip>
       </v-col>
       <v-col coles="12" md="8" class="pr-2">
         <v-combobox
@@ -22,7 +27,9 @@
           chips
         >
           <template #selection="{ item }">
-            <v-chip :color="item.color"><strong>{{ item.name }}</strong></v-chip>
+            <v-chip :color="item.color"
+              ><strong>{{ item.name }}</strong></v-chip
+            >
           </template>
         </v-combobox>
       </v-col>
@@ -39,6 +46,13 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: SpeckleType;
+
+  hover = false;
+
+  @Emit("selectMaterial")
+  selectMaterial() {
+    return;
+  }
 
   cleanType(type: string) {
     const typeArr = type.split(".");
@@ -65,7 +79,8 @@ export default class MaterialType extends Vue {
     };
   }
 
-  instanceOfMaterialFull(object: any): object is MaterialFull {
+
+instanceOfMaterialFull(object: any): object is MaterialFull {
     return "name" in object;
   }
 }

@@ -255,7 +255,7 @@ export default class AssessmentStepper extends Vue {
   }
 
   @Emit("selectMaterial")
-  selectMaterial() {
+  selectMaterial(objects: []) {
     return;
   }
 

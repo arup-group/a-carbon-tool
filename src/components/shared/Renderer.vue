@@ -34,6 +34,7 @@ export default class extends Vue {
   @Prop() token!: string;
   @Prop() colors!: Color[];
   @Prop() gradientColorProperty!: GradientColor;
+  @Prop() selectedObjects!: any [];
 
   currentColors: Color[] = [];
 
@@ -43,9 +44,10 @@ export default class extends Vue {
     else this.setColors(value);
   }
 
-  @Watch("selected")
-  onSelectionChanged(objects: []){
-    this.selectedObjects.push(...objects);
+  @Watch("selectedObjects")
+  onSelectionChange(objects: []){
+    console.log(this.selectedObjects, "changeSelect");
+    this.$emit("selection", this.selectedObjects);
   }
 
   @Watch("gradientColorProperty")
@@ -67,7 +69,6 @@ export default class extends Vue {
   alertMessage!: string;
   showAlert = false;
   viewer!: any;
-  selectedObjects: any[] = [];
 
   loading = 0;
   failed = false;
@@ -81,6 +82,7 @@ export default class extends Vue {
   }
 
   renderStream(objecturls: string[]) {
+    console.log("URL", objecturls)
     let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
@@ -123,7 +125,6 @@ export default class extends Vue {
     this.viewer.on("select", (objects: any[]) => {
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
-      console.log(this.selectedObjects, "SELECT");
       this.$emit("selection", this.selectedObjects);
     });
   }

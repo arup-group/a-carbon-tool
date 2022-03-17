@@ -34,7 +34,7 @@ export default class extends Vue {
   @Prop() token!: string;
   @Prop() colors!: Color[];
   @Prop() gradientColorProperty!: GradientColor;
-  @Prop() selectedObjects!: any [];
+  @Prop() selectedMaterial!: any[];
 
   currentColors: Color[] = [];
 
@@ -44,10 +44,20 @@ export default class extends Vue {
     else this.setColors(value);
   }
 
-  @Watch("selectedObjects")
-  onSelectionChange(objects: []){
-    console.log(this.selectedObjects, "changeSelect");
-    this.$emit("selection", this.selectedObjects);
+  @Watch("selectedMaterial")
+  onMaterialChange() {
+    const allObjects = this.viewer.sceneManager.sceneObjects
+      .allObjects as THREE.Group;
+    const allObjectsChildren = allObjects.children;
+    const allMesh: THREE.Mesh[] = [];
+    allObjectsChildren.forEach((oc) => {
+      oc.children.forEach((child) => {
+        if (this.selectedMaterial.includes(child.uuid)) {
+          allMesh.push(child.userData as THREE.Mesh);
+        };
+      });
+    });
+    this.setSelect(allMesh);
   }
 
   @Watch("gradientColorProperty")
@@ -69,6 +79,7 @@ export default class extends Vue {
   alertMessage!: string;
   showAlert = false;
   viewer!: any;
+  selectedObjects: any[] = [];
 
   loading = 0;
   failed = false;
@@ -82,7 +93,7 @@ export default class extends Vue {
   }
 
   renderStream(objecturls: string[]) {
-    console.log("URL", objecturls)
+    console.log("URL", objecturls);
     let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
@@ -114,6 +125,7 @@ export default class extends Vue {
 
           allMesh.push(...meshChildren);
         });
+  
         // set initial colors if needed
         if (this.colors) {
           this.setColors(this.colors);
@@ -128,6 +140,13 @@ export default class extends Vue {
       this.$emit("selection", this.selectedObjects);
     });
   }
+
+  setSelect(selected: any[]){
+    console.log(selected)
+    this.selectedObjects.splice(0, this.selectedObjects.length);
+    this.selectedObjects.push(...selected);
+    this.$emit("selection", this.selectedObjects);
+  };
 
   async setColors(colors: Color[]) {
     if (colors && colors.length > 0) {

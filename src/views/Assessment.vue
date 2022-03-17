@@ -21,7 +21,7 @@
         :token="token"
         :colors="colors"
         :gradientColorProperty="volumeGradientPassdown"
-        :selectedObjects="selectedObjects"
+        :selectedMaterial="selectedMaterial"
       />
       <div style="width: 35%">
         <AssessmentStepper
@@ -136,7 +136,6 @@ export default class Assessment extends Vue {
   materialsColors: Color[] = [];
   transportColors: Color[] = [];
   selectedMaterial: any[] = [];
-  selectedObjects: any[] = [];
 
   // two separate values so that the colors can be found at the same time as the volume is calculated, rather than whenever the user goes onto the volume step
   volumeGradient!: Gradient;
@@ -193,8 +192,6 @@ export default class Assessment extends Vue {
     for (let i = 0; i < objects.length; i++) {
       this.selectedMaterial.push(objects[i]);
     }
-    this.selectedObjects = this.selectedMaterial;
-    console.log("SM", this.selectedObjects, this.selectedMaterial);
   }
 
   rendererLoaded(allMesh: THREE.Mesh[]) {

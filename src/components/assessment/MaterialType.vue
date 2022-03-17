@@ -12,7 +12,7 @@
       <v-col cols="12" md="4" class="pl-2">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial(type)">
+            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial(type.ids)">
               {{ cleanType(type.type) }}
             </v-chip>
           </template>

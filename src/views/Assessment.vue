@@ -135,6 +135,7 @@ export default class Assessment extends Vue {
   colors: Color[] = [];
   materialsColors: Color[] = [];
   transportColors: Color[] = [];
+  selectedMaterial: any[] = [];
   selectedObjects: any[] = [];
 
   // two separate values so that the colors can be found at the same time as the volume is calculated, rather than whenever the user goes onto the volume step
@@ -188,10 +189,12 @@ export default class Assessment extends Vue {
     this.dialog = true;
   }
   selectMaterial(objects: []) {
-    this.selectedObjects.splice(0, this.selectedObjects.length);
+    this.selectedMaterial.splice(0, this.selectedMaterial.length);
     for (let i = 0; i < objects.length; i++) {
-      this.selectedObjects.push(objects[i]);
+      this.selectedMaterial.push(objects[i]);
     }
+    this.selectedObjects = this.selectedMaterial;
+    console.log("SM", this.selectedObjects, this.selectedMaterial);
   }
 
   rendererLoaded(allMesh: THREE.Mesh[]) {

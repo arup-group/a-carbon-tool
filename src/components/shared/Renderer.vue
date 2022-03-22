@@ -135,6 +135,7 @@ export default class extends Vue {
       }
     });
     this.viewer.on("select", (objects: any[]) => {
+      console.log(this.viewer.interactions);
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
       this.$emit("selection", this.selectedObjects);
@@ -142,9 +143,12 @@ export default class extends Vue {
   }
 
   setSelect(selected: any[]){
-    console.log(selected)
+    console.log(selected, "SELECTED<<<<<<");
     this.selectedObjects.splice(0, this.selectedObjects.length);
     this.selectedObjects.push(...selected);
+    console.log(this.viewer.interactions);
+    this.viewer.interactions.selectedObjectsUserData = [...this.selectedObjects]
+    //this.viewer.interactions.selectedObjects = [...this.selectedObjects]
     this.$emit("selection", this.selectedObjects);
   };
 

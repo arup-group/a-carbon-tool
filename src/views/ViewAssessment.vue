@@ -35,7 +35,7 @@ import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
 import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
-import { Color } from "../components/shared/Renderer.vue";
+import { Color } from "@/models/renderer";
 
 @Component({
   components: {

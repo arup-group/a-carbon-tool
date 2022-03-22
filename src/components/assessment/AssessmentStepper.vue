@@ -82,7 +82,7 @@
           Quantities
         </v-stepper-step>
         <v-stepper-content step="4">
-          <menu-4 :totalVolume="totalVolume" />
+          <menu-4 @calcVol="calcVol" :totalVolume="totalVolume" :speckleVol="speckleVol" />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 3" color="primary">
               Previous
@@ -194,6 +194,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() report!: ReportPassdown;
   @Prop() becs!: string;
   @Prop() groupedMaterials!: GroupedMaterial[];
+  @Prop() speckleVol!: boolean;
 
   form: ProjectDataTemp = {
     name: null,
@@ -273,6 +274,10 @@ export default class AssessmentStepper extends Vue {
     return;
   }
 
+  @Emit("calcVol")
+  calcVol() {
+    return;
+  }
   @Watch("form.notes")
   notesUpdate() {
     this.uploadData({

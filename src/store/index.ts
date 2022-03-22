@@ -439,7 +439,6 @@ export default new Vuex.Store({
     },
   },
   modules: {},
-  // plugins: [createPersistedState()],
 });
 
 export interface DeleteBranchInput {

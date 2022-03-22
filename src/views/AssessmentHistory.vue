@@ -8,17 +8,22 @@
         hide-default-footer
       >
         <template v-slot:header>
-          <v-toolbar class="mb-2" dark flat>
+          <v-toolbar class="mb-2" flat>
             <v-toolbar-title>{{ streamName }}</v-toolbar-title>
           </v-toolbar>
-          <history-filters
-            @materials="materialsFilterUpdate"
-            @a15="a15FilterUpdate"
-            @categories="categoriesFilterUpdate"
-            @renderer="rendererFilterUpdate"
-            @direction="directionUpdate"
-            :defaultFilters="filters"
-          />
+          <v-row>
+            <v-col cols="3">
+              <history-filters
+                @materials="materialsFilterUpdate"
+                @a15="a15FilterUpdate"
+                @categories="categoriesFilterUpdate"
+                @renderer="rendererFilterUpdate"
+                @direction="directionUpdate"
+                :defaultFilters="filters"
+              />
+            </v-col>
+            <v-col cols="9"><history-graph :chartData="chartData" /></v-col>
+          </v-row>
         </template>
         <template v-slot:default="props">
           <div :style="historyProjectCardsContainerStyle">
@@ -59,6 +64,7 @@ import {
   ProjectAVals,
 } from "@/models/assessmentHistory";
 import HistoryFilters from "@/components/assessmentHistory/HistoryFilters.vue";
+import HistoryGraph from "@/components/assessmentHistory/HistoryGraph.vue";
 
 @Component({
   components: {
@@ -66,6 +72,7 @@ import HistoryFilters from "@/components/assessmentHistory/HistoryFilters.vue";
     ErrorRetry,
     HistoryProjectCard,
     HistoryFilters,
+    HistoryGraph
   },
 })
 export default class AssessmentHistory extends Vue {
@@ -84,6 +91,7 @@ export default class AssessmentHistory extends Vue {
     renderer: false,
     direction: HistoryProjectCardDirection.COL,
   };
+  chartData: ChartData[] = [];
 
   mounted() {
     this.streamId = this.$route.params.streamId;
@@ -98,7 +106,7 @@ export default class AssessmentHistory extends Vue {
     return this.direction ? "" : "display: flex; overflow-x: scroll;";
   }
   get historyProjectCardStyle() {
-    return this.direction ? "" : "min-width: 33%;"
+    return this.direction ? "" : "min-width: 33%;";
   }
 
   materialsFilterUpdate(material: boolean) {
@@ -142,6 +150,11 @@ export default class AssessmentHistory extends Vue {
         );
         this.reports = await this.getReports(branchData, this.streamId);
         this.cleanedReports = this.convReports(this.reports);
+        this.chartData = this.cleanedReports.map(r => ({
+          label: r.title,
+          value: r.totalCO2e,
+          color: ""
+        })).reverse();
         this.loading = false;
       }
     } catch (err) {

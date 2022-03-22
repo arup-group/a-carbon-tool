@@ -1,6 +1,7 @@
 <template>
   <v-sheet outlined color="primary" rounded height="100%">
     <v-card flat height="100%">
+      <v-card-title>Filters</v-card-title>
       <v-card-text>
         <v-checkbox v-model="materials" label="Materials graph" />
         <v-checkbox v-model="a15" label="A1-5 graph" />

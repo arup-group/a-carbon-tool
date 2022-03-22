@@ -127,7 +127,6 @@ export default class Assessment extends Vue {
   becs: TransportType[] = [];
   totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
-
   projectData!: ProjectDataComplete;
 
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes

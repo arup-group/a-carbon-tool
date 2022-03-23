@@ -34,7 +34,6 @@ import {
   SpeckleObjectComplete,
   TransportType,
 } from "@/models/newAssessment";
-import createPersistedState from "vuex-persistedstate";
 
 import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
@@ -64,11 +63,13 @@ export default new Vuex.Store({
     user: null,
     serverInfo: null,
 
-    darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
+    darkMode: localStorage.getItem("darkMode")
+      ? localStorage.getItem("darkMode") === "true"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches,
 
     // Carbon data
     selectedRegion: "UK",
-    availableRegions: ["India", "Netherlands", "UK",],
+    availableRegions: ["India", "Netherlands", "UK"],
     becs: [
       {
         name: "Superstructure" as BECName,
@@ -182,9 +183,15 @@ export default new Vuex.Store({
         Object.keys(materialCarbonFactors[region][type]).forEach((t) => {
           const material = materialCarbonFactors[region][type][t];
           const toPush: MaterialFull = {
-            name: `${type} - ${t} (${ (Math.round(100*material.productStageCarbonA1A3)/100) } kgCO2e/kg)`,
+            name: `${type} - ${t} (${
+              Math.round(100 * material.productStageCarbonA1A3) / 100
+            } kgCO2e/kg)`,
             ...material,
-            color: "#" + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6), // generates random hex code for color, should be replaced at some point
+            color:
+              "#" +
+              (
+                "000000" + Math.random().toString(16).slice(2, 8).toUpperCase()
+              ).slice(-6), // generates random hex code for color, should be replaced at some point
           };
           arr.push(toPush);
         });
@@ -219,7 +226,8 @@ export default new Vuex.Store({
       state.serverInfo = info;
     },
     setDarkMode(state) {
-      state.darkMode = state.darkMode ? false : true;
+      localStorage.setItem("darkMode", `${!state.darkMode}`);
+      state.darkMode = !state.darkMode;
     },
     setRegion(state, region) {
       state.selectedRegion = region;
@@ -260,7 +268,7 @@ export default new Vuex.Store({
         ) {
           const server = getServer(context);
           const token = getToken();
-          context.commit("login", { 
+          context.commit("login", {
             token,
             server,
           });
@@ -300,7 +308,6 @@ export default new Vuex.Store({
       const streams = await getStreamCommit(context, streamid);
       return streams;
     },
-
 
     async getMainStreamCommit(context, streamid: string) {
       const streams = await getMainStreamCommit(context, streamid);
@@ -432,7 +439,6 @@ export default new Vuex.Store({
     },
   },
   modules: {},
-  plugins: [createPersistedState()],
 });
 
 export interface DeleteBranchInput {

@@ -11,7 +11,7 @@
   "dependencies": {
     "@arc-web/components": "^1.4.2",
     "@speckle/objectloader": "^2.2.0",
-    "@speckle/viewer": "^2.0.12",
+    "@speckle/viewer": "^2.2.6",
     "@types/three": "^0.136.1",
     "axios": "^0.24.0",
     "chart.js": "^2.9.4",

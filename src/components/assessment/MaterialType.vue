@@ -22,7 +22,11 @@
           chips
         >
           <template #selection="{ item }">
-            <v-chip :color="item.color"><strong>{{ item.name }}</strong></v-chip>
+            <v-chip
+              :color="item.color"
+              :textColor="getContrastYIQ(item.color)"
+              >{{ item.name }}</v-chip
+            >
           </template>
         </v-combobox>
       </v-col>
@@ -43,6 +47,17 @@ export default class MaterialType extends Vue {
   cleanType(type: string) {
     const typeArr = type.split(".");
     return typeArr[typeArr.length - 1];
+  }
+
+  getContrastYIQ(hexcolor: string) {
+    if (hexcolor.slice(0, 1) === "#") {
+      hexcolor = hexcolor.slice(1);
+    }
+    var r = parseInt(hexcolor.substr(0, 2), 16);
+    var g = parseInt(hexcolor.substr(2, 2), 16);
+    var b = parseInt(hexcolor.substr(4, 2), 16);
+    var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? "black" : "white";
   }
 
   materialChanged(material: MaterialFull) {

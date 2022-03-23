@@ -1,22 +1,19 @@
 <template>
   <div>
-    <div v-if="volCalculated">
+    <div v-if="speckleVol">
       <strong>Volume automatically calculated as:</strong><br />
       <v-chip class="text-center">{{ displayVolume }}m<sup>3</sup></v-chip>
     </div>
     <div v-else>
-      <strong>Volume being calculated</strong><br />
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        :size="100"
-      ></v-progress-circular>
+      <p><b>No volume properties on speckle objects! Do you want to calculate volume from model?</b></p>
+      <p>Model assumed to be in m<sup>3</sup></p>
+      <v-btn color="primary" outlined @click="calcVol">Calculate</v-btn>
     </div>
   </div>
 </template>
 <script lang="ts">
 import { CalcModes } from "@/models/newAssessment";
-import { Vue, Component, Watch, Emit, Prop } from "vue-property-decorator";
+import { Vue, Component, Emit, Prop } from "vue-property-decorator";
 
 type CalcMode = {
   name: string;
@@ -27,8 +24,8 @@ type CalcMode = {
 export default class Menu4 extends Vue {
   @Prop() objWithProp!: number;
   @Prop() totalVolume!: number;
+  @Prop() speckleVol!: boolean;
   calcMode = null;
-  convFact = null;
 
   calcModes: CalcMode[] = [
     { name: "Using an Object's volume property", id: 0 },
@@ -43,10 +40,9 @@ export default class Menu4 extends Vue {
     return Math.round(this.totalVolume * 100) / 100;
   }
 
-  @Watch("calcMode")
-  @Emit("calcChange")
-  calcChange() {
-    return this.calcMode;
+  @Emit("calcVol")
+  calcVol() {
+    return;
   }
 }
 </script>

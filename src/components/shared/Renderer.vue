@@ -37,6 +37,7 @@ export default class extends Vue {
   @Prop() selectedMaterial!: any[];
 
   currentColors: Color[] = [];
+  filtered = false;
 
   @Watch("colors")
   onObjectColorChanged(value: Color[]) {
@@ -46,6 +47,11 @@ export default class extends Vue {
 
   @Watch("selectedMaterial")
   onMaterialChange() {
+    if (this.filtered) {
+      this.filtered = false;
+    } else {
+      this.filtered = true;
+    }
     const allObjects = this.viewer.sceneManager.sceneObjects
       .allObjects as THREE.Group;
     const allObjectsChildren = allObjects.children;
@@ -54,7 +60,7 @@ export default class extends Vue {
       oc.children.forEach((child) => {
         if (this.selectedMaterial.includes(child.uuid)) {
           allMesh.push(child.userData as THREE.Mesh);
-        };
+        }
       });
     });
     this.setSelect(allMesh);
@@ -125,7 +131,7 @@ export default class extends Vue {
 
           allMesh.push(...meshChildren);
         });
-  
+
         // set initial colors if needed
         if (this.colors) {
           this.setColors(this.colors);
@@ -142,15 +148,20 @@ export default class extends Vue {
     });
   }
 
-  setSelect(selected: any[]){
+  async setSelect(selected: any[]) {
     console.log(selected, "SELECTED<<<<<<");
-    this.selectedObjects.splice(0, this.selectedObjects.length);
-    this.selectedObjects.push(...selected);
-    console.log(this.viewer.interactions);
-    this.viewer.interactions.selectedObjectsUserData = [...this.selectedObjects]
-    //this.viewer.interactions.selectedObjects = [...this.selectedObjects]
-    this.$emit("selection", this.selectedObjects);
-  };
+    if (this.filtered === true) {
+      await this.viewer.applyFilter({
+        filterBy: {
+          speckle_type: selected[0].speckle_type,
+        },
+      });
+      this.$emit("selection", this.selectedObjects);
+    } else {
+      await this.viewer.applyFilter(null);
+      this.setColors(this.colors);
+    }
+  }
 
   async setColors(colors: Color[]) {
     if (colors && colors.length > 0) {
@@ -165,6 +176,7 @@ export default class extends Vue {
         (obj, item) => Object.assign(obj, { [item.key]: item.value }),
         {}
       );
+      console.log;
       const res = await this.viewer.applyFilter({
         colorBy: {
           type: "category",

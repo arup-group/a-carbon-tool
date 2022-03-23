@@ -255,9 +255,15 @@ export default class AssessmentStepper extends Vue {
   }
 
   @Emit("selectMaterial")
-  selectMaterial(objects: []) {
+  selectMaterial(objects: [], filtered: boolean) {
     return;
   }
+
+  @Emit("clearMaterial")
+  clearMaterial() {
+    return;
+  }
+
 
   @Emit("uploadData")
   uploadData(data: ProjectDataComplete) {

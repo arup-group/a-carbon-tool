@@ -39,7 +39,7 @@ export default class Menu2 extends Vue {
   }
 
   @Emit("selectMaterial")
-  selectMaterial(objects: []) {
+  selectMaterial(objects: [], filtered: boolean) {
     return;
   }
 

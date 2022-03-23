@@ -47,10 +47,10 @@ export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: SpeckleType;
 
-  hover = false;
+  filtered = true;
 
   @Emit("selectMaterial")
-  selectMaterial(objects: []) {
+  selectMaterial(objects: [], filtered: boolean) {
     return;
   }
 

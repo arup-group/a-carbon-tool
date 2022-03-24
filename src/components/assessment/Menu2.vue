@@ -29,7 +29,6 @@ export default class Menu2 extends Vue {
   @Prop() materials!: MaterialFull[];
 
   get loadedTypes() {
-    console.log("types", this.types)
     return this.types ? this.types : [];
   }
 

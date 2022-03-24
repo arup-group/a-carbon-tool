@@ -22,7 +22,6 @@
         :colors="colors"
         :gradientColorProperty="volumeGradientPassdown"
         :selectedMaterial="selectedMaterial"
-        :selected="selected"
       />
       <div style="width: 35%">
         <AssessmentStepper

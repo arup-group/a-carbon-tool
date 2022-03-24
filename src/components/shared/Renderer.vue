@@ -99,7 +99,6 @@ export default class extends Vue {
   }
 
   renderStream(objecturls: string[]) {
-    console.log("URL", objecturls);
     let renderDomElement = document.getElementById("renderer");
 
     if (!renderDomElement) {
@@ -141,7 +140,6 @@ export default class extends Vue {
       }
     });
     this.viewer.on("select", (objects: any[]) => {
-      console.log(this.viewer.interactions);
       this.selectedObjects.splice(0, this.selectedObjects.length);
       this.selectedObjects.push(...objects);
       this.$emit("selection", this.selectedObjects);
@@ -149,7 +147,6 @@ export default class extends Vue {
   }
 
   async setSelect(selected: any[]) {
-    console.log(selected, "SELECTED<<<<<<");
     if (this.filtered === true) {
       await this.viewer.applyFilter({
         filterBy: {
@@ -176,7 +173,6 @@ export default class extends Vue {
         (obj, item) => Object.assign(obj, { [item.key]: item.value }),
         {}
       );
-      console.log;
       const res = await this.viewer.applyFilter({
         colorBy: {
           type: "category",

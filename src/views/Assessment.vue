@@ -34,6 +34,7 @@
           @uploadData="uploadData"
           @selectMaterial="selectMaterial"
           @checkSave="checkSave"
+          @calcVol="calcVol"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -43,6 +44,7 @@
           :report="report"
           :becs="becs"
           :groupedMaterials="groupedMaterials"
+          :speckleVol="speckleVol"
         />
       </div>
     </v-container>
@@ -64,11 +66,14 @@
 
 <script lang="ts">
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import Renderer, {
+import Renderer from "@/components/shared/Renderer.vue";
+import {
   Color,
+  Filter,
   Gradient,
   GradientColor,
-} from "@/components/shared/Renderer.vue";
+  RendererLoaded,
+} from "@/models/renderer";
 
 import { Component, Vue } from "vue-property-decorator";
 
@@ -87,7 +92,6 @@ import {
   ReportTotals,
   ReportPassdown,
   ObjectDetails,
-  ObjectDetailsComplete,
   GroupedMaterial,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
@@ -103,6 +107,7 @@ import {
 import { UploadReportInput } from "@/store";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import { VolCalculator } from "./utils/VolCalculator";
 
 type ObjectsObj = { [id: string]: SpeckleObject };
 
@@ -124,7 +129,6 @@ export default class Assessment extends Vue {
   becs: TransportType[] = [];
   totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
-
   projectData!: ProjectDataComplete;
 
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
@@ -139,8 +143,10 @@ export default class Assessment extends Vue {
   filtered = false;
 
   // two separate values so that the colors can be found at the same time as the volume is calculated, rather than whenever the user goes onto the volume step
+  volProp = "";
   volumeGradient!: Gradient;
   volumeGradientPassdown: GradientColor = null;
+  speckleVol = false; // whether the volume can be got from speckle props
 
   groupedMaterials: GroupedMaterial[] = [];
 
@@ -196,8 +202,96 @@ export default class Assessment extends Vue {
     }
   }
 
-  rendererLoaded(allMesh: THREE.Mesh[]) {
+  async rendererLoaded({ properties, allMesh }: RendererLoaded) {
     this.allMesh = allMesh;
+
+    const res: ObjectDetails[] = await this.$store.dispatch(
+      "getObjectDetails",
+      {
+        streamid: this.streamid,
+        objecturl: this.objectURLs[0],
+      }
+    );
+
+    let totalVol = 0;
+    const filteredRes = res.filter(
+      (r) =>
+        r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
+        r.speckle_type !== "Objects.Geometry.Mesh"
+    );
+
+    const volumeFilter = properties.find(
+      (p) => p.name.toLowerCase() === "volume"
+    );
+    this.volProp = volumeFilter ? volumeFilter.rawName : "";
+    if (volumeFilter) {
+      this.speckleVol = true;
+      filteredRes.forEach((r) => {
+        const volume = this.findVolume(r, volumeFilter);
+        if (volume) {
+          this.objectsObj[r.id] = {
+            id: r.id,
+            speckle_type: r.speckle_type,
+            formData: {
+              volume: volume,
+            },
+          };
+          // also find total volume here to avoid needing to loop through objects again
+          totalVol += volume;
+        }
+      });
+    } else {
+      this.speckleVol = false;
+      filteredRes.forEach((r) => {
+        this.objectsObj[r.id] = {
+          id: r.id,
+          speckle_type: r.speckle_type,
+        };
+      });
+    }
+
+    this.types = this.findTypes(this.objectsObj);
+    this.totalVolume = totalVol;
+
+    this.updateVolumeGradient();
+  }
+  findVolume(
+    object: ObjectDetails,
+    filter: Filter<string | boolean | number>
+  ): number | undefined {
+    let curr: any = object;
+    filter.rawName.split(".").forEach((f) => {
+      try {
+        curr = curr[f];
+      } catch (err) {
+        return;
+      }
+    });
+    return curr;
+  }
+
+  calcVol() {
+    let totalVol = 0;
+    this.allMesh.forEach((m) => {
+      const volume = VolCalculator.getMeshVolume(m);
+      if (volume) {
+        try {
+          const id: string = m.userData.id;
+          this.objectsObj[id] = {
+            ...this.objectsObj[id],
+            formData: {
+              ...this.objectsObj[id].formData,
+              volume,
+            },
+          };
+        } catch (err) {
+          console.warn(err);
+        }
+        totalVol += volume;
+      }
+    });
+    this.totalVolume = totalVol;
+    this.speckleVol = true;
   }
 
   stepperUpdate(step: Step) {
@@ -216,7 +310,7 @@ export default class Assessment extends Vue {
         break;
       case Step.QUANTITIES:
         this.resetColors();
-        if (this.volumeGradient)
+        if (this.volumeGradient && this.speckleVol)
           this.volumeGradientPassdown = this.volumeGradient;
         break;
       case Step.REVIEW:
@@ -301,7 +395,7 @@ export default class Assessment extends Vue {
     });
 
     this.volumeGradient = {
-      property: "parameters.HOST_VOLUME_COMPUTED.value",
+      property: this.volProp,
       minValue: minVol,
       maxValue: maxVol,
       colors: ["#4f7bff", "#ff4f84"],
@@ -419,48 +513,6 @@ export default class Assessment extends Vue {
     this.streamid = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
-
-    const res: ObjectDetails[] = await this.$store.dispatch(
-      "getObjectDetails",
-      {
-        streamid: id,
-        objecturl: this.objectURLs[0],
-      }
-    );
-
-    let totalVol = 0;
-
-    const filteredRes: ObjectDetailsComplete[] = [];
-    res.forEach((r) => {
-      if (r.parameters && r.parameters.HOST_VOLUME_COMPUTED) {
-        filteredRes.push({
-          id: r.id,
-          speckle_type: r.speckle_type,
-          paramters: {
-            HOST_VOLUME_COMPUTED: {
-              value: r.parameters.HOST_VOLUME_COMPUTED.value,
-            },
-          },
-        });
-        // also find total volume here to avoid needing to loop through objects again
-        totalVol += r.parameters.HOST_VOLUME_COMPUTED.value;
-      }
-    });
-
-    filteredRes.forEach((r) => {
-      this.objectsObj[r.id] = {
-        id: r.id,
-        speckle_type: r.speckle_type,
-        formData: {
-          volume: r.paramters.HOST_VOLUME_COMPUTED.value,
-        },
-      };
-    });
-
-    this.types = this.findTypes(this.objectsObj);
-    this.totalVolume = totalVol;
-
-    this.updateVolumeGradient();
   }
 
   transportSelected(selected: TransportSelected) {

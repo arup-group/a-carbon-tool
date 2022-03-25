@@ -71,12 +71,21 @@ import store from "@/store";
 
 @Component({})
 export default class Menu1b extends Vue {
-  @Prop() streams!: StreamObject;
+  @Prop() streams!: StreamObject[];
   @Prop() step!: Step;
   @Prop() becs!: string[];
   @Prop() form!: ProjectDataTemp;
+  @Prop() streamId!: string;
 
-  speckleStream: StreamObject | null = null;
+  speckleStream: StreamObject | null = this.defaultSpeckleStream();
+  defaultSpeckleStream() {
+    if (this.streamId) {
+      const stream = this.streams?.find(s => s.value === this.streamId)
+      console.log("streamId:", this.streamId, "\nstreams:", this.streams, "\nstream:", stream, "\nspeckleStream", this.speckleStream)
+      return stream ? stream : null;
+    }
+    return null;
+  }
 
   streamSelected() {
     try {
@@ -118,7 +127,7 @@ export default class Menu1b extends Vue {
   uploadData(): ProjectDataComplete {
     return {
       name: this.form.name ? this.form.name : "",
-      components: this.form.components ? this.form.components : [""],
+      components: this.form.components ? this.form.components : [],
       cost: this.form.cost ? +this.form.cost : 0,
       floorArea: this.form.floorArea ? +this.form.floorArea : 1,
       region: this.form.region ? this.form.region : "",

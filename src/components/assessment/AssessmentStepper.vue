@@ -24,6 +24,7 @@
             :step="step"
             :becs="becs"
             :form="form"
+            :streamId="streamId"
           />
           <v-card-actions>
             <v-spacer />
@@ -196,7 +197,11 @@ export default class AssessmentStepper extends Vue {
   @Prop() groupedMaterials!: GroupedMaterial[];
   @Prop() speckleVol!: boolean;
 
-  form: ProjectDataTemp = {
+  @Prop() update!: boolean;
+  @Prop() streamId!: string;
+  @Prop() projectData!: ProjectDataComplete;
+
+  form: ProjectDataTemp = this.update ? this.projectData: {
     name: null,
     components: null,
     cost: null,
@@ -205,7 +210,7 @@ export default class AssessmentStepper extends Vue {
     jobNumber: null,
     notes: null,
   };
-  completed = false;
+  completed = this.update;
 
   step: Step = 1;
 
@@ -282,7 +287,7 @@ export default class AssessmentStepper extends Vue {
   notesUpdate() {
     this.uploadData({
       name: this.form.name ? this.form.name : "",
-      components: this.form.components ? this.form.components : [""],
+      components: this.form.components ? this.form.components : [],
       cost: this.form.cost ? +this.form.cost : 0,
       floorArea: this.form.floorArea ? +this.form.floorArea : 1,
       region: this.form.region ? this.form.region : "",

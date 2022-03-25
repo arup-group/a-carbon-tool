@@ -95,6 +95,7 @@ import {
   extractCo2Data,
   loadParent,
   getChildren,
+  LoadStreamOut,
 } from "../views/utils/viewAssessmentUtils";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
@@ -119,7 +120,7 @@ import { HTTPStreamDataParent } from "@/models/graphql/";
 })
 export default class Landing extends Vue {
   carbonBranches: { id: string; name: string; branchid: string, mainBranchID: string | undefined;}[] = [];
-  branchData: { id: string; name: string;  projectDate: string;  newMainAvailable: boolean; data: HTTPStreamDataParent }[] = [];
+  branchData: { id: string; name: string;  projectDate: string;  newMainAvailable: boolean; data: LoadStreamOut }[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
@@ -271,7 +272,7 @@ export default class Landing extends Vue {
           // Get data from the most recent arupcarbon branch
           const latestCarbonBranchData: StreamData = await this.$store.dispatch("getBranchData", [
             cb.id,
-            carbonCommit, 
+            carbonCommit,
           ]);
 
           const latestMainBranchData: StreamData = await this.$store.dispatch("getBranchData", [
@@ -281,7 +282,6 @@ export default class Landing extends Vue {
 
           const latestCarbonBranchCommit = new Date(latestCarbonBranchData.data.stream.object.createdAt).getTime();
           const latestMainBranchCommit = new Date(latestMainBranchData.data.stream.object.createdAt).getTime();
-          
 
           const parent = await loadParent(
             this.$store.state.selectedServer.url,
@@ -289,12 +289,13 @@ export default class Landing extends Vue {
             carbonCommit,
             this.$store.state.token.token
           );
+          const data: LoadStreamOut = await this.$store.dispatch("loadActReportData", cb.id);
 
 
           return {
             id: cb.id,
             name: cb.name,
-            data: parent,
+            data,
             projectDate: latestCarbonBranchData.data.stream.object.createdAt,
             newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit,
           };
@@ -303,26 +304,28 @@ export default class Landing extends Vue {
       // convert the data into the format that this page needs it to be in
       this.projects = await Promise.all(
         this.branchData.map(async (proj) => {
-          const childrenData = await getChildren(
-            this.$store.state.selectedServer.url,
-            this.$store.state.token.token,
-            proj.id,
-            proj.data
-          );
-          const co2Data = extractCo2Data(proj.data, childrenData).materials;
+          // const childrenData = await getChildren(
+          //   this.$store.state.selectedServer.url,
+          //   this.$store.state.token.token,
+          //   proj.id,
+          //   proj.data
+          // );
+          // const co2Data = extractCo2Data(proj.data, childrenData).materials;
 
-        const projName = proj.data.projectData.name;
+        const projName = proj.data.data.projectInfo.name;
+        console.log("data:", proj.data)
         return {
           title: `${projName} - ${proj.name}`,
           id: `${proj.id}`,
-          co2Values: co2Data,
-          totalCO2e: proj.data.totalCO2,
+          co2Values: proj.data.data.materialBreakdown.materials,
+          totalCO2e: proj.data.data.projectInfo.totalCO2e,
           link: "",
-          category: proj.data.projectData.components,
+          category: proj.data.data.projectInfo.components,
           projectDate: proj.projectDate,
           newMainAvailable: proj.newMainAvailable,
         };
       }));
+      console.log("this.projects:", this.projects);
 
       this.loading = false;
     } catch (err) {

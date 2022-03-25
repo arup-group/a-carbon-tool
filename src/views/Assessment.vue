@@ -43,6 +43,9 @@
           :becs="becs"
           :groupedMaterials="groupedMaterials"
           :speckleVol="speckleVol"
+          :update="update"
+          :streamId="streamId"
+          :projectData="projectData"
         />
       </div>
     </v-container>
@@ -106,8 +109,13 @@ import { UploadReportInput } from "@/store";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import { VolCalculator } from "./utils/VolCalculator";
+import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 
 type ObjectsObj = { [id: string]: SpeckleObject };
+interface AvailableStream {
+  label: string;
+  value: string;
+}
 
 @Component({
   components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar },
@@ -117,7 +125,7 @@ export default class Assessment extends Vue {
   saveSuccess = true;
   saveSnack = false;
   dialog = false;
-  availableStreams = [];
+  availableStreams: AvailableStream[] = [];
   objectURLs: string[] = [];
   token = "";
   types: SpeckleType[] = [];
@@ -132,7 +140,7 @@ export default class Assessment extends Vue {
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
-  streamid!: string;
+  streamId!: string;
 
   colors: Color[] = [];
   materialsColors: Color[] = [];
@@ -146,15 +154,44 @@ export default class Assessment extends Vue {
 
   groupedMaterials: GroupedMaterial[] = [];
 
-  mounted() {
+  update = false;
+
+  async mounted() {
     this.token = this.$store.state.token.token;
+    this.transportTypes = this.$store.state.transportTypes;
+    this.becs = this.$store.state.becs;
+    const streamId = this.$route.params.streamId;
+    if (streamId) {
+      await this.updateStream(streamId);
+    }
+
     this.$store.dispatch("getUserStreams").then((res) => {
       this.availableStreams = res.data.user.streams.items.map((i: any) => {
         return { label: i.name, value: i.id };
       });
     });
-    this.transportTypes = this.$store.state.transportTypes;
-    this.becs = this.$store.state.becs;
+  }
+
+  async updateStream(streamId: string) {
+    this.streamId = streamId;
+    this.update = true;
+    await this.loadStream(streamId);
+    const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
+      "loadActReportData",
+      this.$route.params.streamId
+    );
+    console.log("assessmentViewData:", assessmentViewData);
+    assessmentViewData.data.children.forEach((c) => {
+      this.objectsObj[c.act.id] = {
+        id: c.act.id,
+        speckle_type: c.speckleType,
+        formData: c.act.formData,
+        reportData: c.act.reportData,
+      };
+    });
+    console.log("this.objectsObj:", this.objectsObj);
+    this.projectData = assessmentViewData.data.projectInfo;
+    console.log("projectData:", this.projectData);
   }
 
   async agreeSave() {
@@ -162,7 +199,7 @@ export default class Assessment extends Vue {
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
         const uploadReportInput: UploadReportInput = {
-          streamid: this.streamid,
+          streamid: this.streamId,
           objects: this.report.reportObjs,
           reportTotals: this.report.totals,
           projectData: this.projectData,
@@ -172,7 +209,7 @@ export default class Assessment extends Vue {
         await this.$store.dispatch("uploadReport", uploadReportInput);
         this.loading = false;
         this.saveSnack = true;
-        this.$router.push(`/assessment/view/${this.streamid}`);
+        this.$router.push(`/assessment/view/${this.streamId}`);
       } else {
         this.saveSnack = true;
         this.saveSuccess = false;
@@ -193,56 +230,58 @@ export default class Assessment extends Vue {
 
   async rendererLoaded({ properties, allMesh }: RendererLoaded) {
     this.allMesh = allMesh;
+    if (!this.update) {
+      const res: ObjectDetails[] = await this.$store.dispatch(
+        "getObjectDetails",
+        {
+          streamid: this.streamId,
+          objecturl: this.objectURLs[0],
+        }
+      );
 
-    const res: ObjectDetails[] = await this.$store.dispatch(
-      "getObjectDetails",
-      {
-        streamid: this.streamid,
-        objecturl: this.objectURLs[0],
-      }
-    );
+      let totalVol = 0;
+      const filteredRes = res.filter(
+        (r) =>
+          r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
+          r.speckle_type !== "Objects.Geometry.Mesh"
+      );
 
-    let totalVol = 0;
-    const filteredRes = res.filter(
-      (r) =>
-        r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
-        r.speckle_type !== "Objects.Geometry.Mesh"
-    );
-
-    const volumeFilter = properties.find(
-      (p) => p.name.toLowerCase() === "volume"
-    );
-    this.volProp = volumeFilter ? volumeFilter.rawName : "";
-    if (volumeFilter) {
-      this.speckleVol = true;
-      filteredRes.forEach((r) => {
-        const volume = this.findVolume(r, volumeFilter);
-        if (volume) {
+      const volumeFilter = properties.find(
+        (p) => p.name.toLowerCase() === "volume"
+      );
+      this.volProp = volumeFilter ? volumeFilter.rawName : "";
+      if (volumeFilter) {
+        this.speckleVol = true;
+        filteredRes.forEach((r) => {
+          const volume = this.findVolume(r, volumeFilter);
+          if (volume) {
+            this.objectsObj[r.id] = {
+              id: r.id,
+              speckle_type: r.speckle_type,
+              formData: {
+                volume: volume,
+              },
+            };
+            // also find total volume here to avoid needing to loop through objects again
+            totalVol += volume;
+          }
+        });
+      } else {
+        this.speckleVol = false;
+        filteredRes.forEach((r) => {
           this.objectsObj[r.id] = {
             id: r.id,
             speckle_type: r.speckle_type,
-            formData: {
-              volume: volume,
-            },
           };
-          // also find total volume here to avoid needing to loop through objects again
-          totalVol += volume;
-        }
-      });
-    } else {
-      this.speckleVol = false;
-      filteredRes.forEach((r) => {
-        this.objectsObj[r.id] = {
-          id: r.id,
-          speckle_type: r.speckle_type,
-        };
-      });
+        });
+      }
+
+      this.types = this.findTypes(this.objectsObj);
+      this.totalVolume = totalVol;
+
+      this.updateVolumeGradient();
+      console.log("objectsObj:", this.objectsObj);
     }
-
-    this.types = this.findTypes(this.objectsObj);
-    this.totalVolume = totalVol;
-
-    this.updateVolumeGradient();
   }
   findVolume(
     object: ObjectDetails,
@@ -499,7 +538,7 @@ export default class Assessment extends Vue {
   }
 
   async loadStream(id: string) {
-    this.streamid = id;
+    this.streamId = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
   }

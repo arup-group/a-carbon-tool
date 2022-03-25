@@ -59,15 +59,11 @@
               </v-btn>
             </v-col>
           </v-col>
-
-        
             <v-col>
               <v-card-text class="d-flex align-end mb-6">
                 Theres an update on main branch, use edit to update your report.
               </v-card-text>
             </v-col>
-          
-
         </v-overlay>
       </v-card>
     </v-sheet>
@@ -103,7 +99,7 @@ export default class ProjectCard extends Vue {
     }));
   }
   get co2Total() {
-    return this.convertKgToTonnes(this.project.totalCO2e).toLocaleString('en');
+    return this.project.totalCO2e;
   }
 
   get branchDate() {

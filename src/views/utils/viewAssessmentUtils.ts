@@ -1,8 +1,13 @@
+import { ChartData } from "@/models/chart";
 import { HTTPStreamDataParent } from "@/models/graphql/";
 import { ChildSpeckleObjectData } from "@/models/graphql/StreamData.interface";
+import { ProjectComponent } from "@/models/newAssessment/projectData.interface";
 import { getActReportBranchInfo } from "@/store/speckle/speckleUtil";
 
-export function extractCo2Data(branchData: HTTPStreamDataParent, children: ChildSpeckleObjectData[]) {
+export function extractCo2Data(
+  branchData: HTTPStreamDataParent,
+  children: ChildSpeckleObjectData[]
+) {
   const levels = {
     levels: [
       {
@@ -35,8 +40,7 @@ export function extractCo2Data(branchData: HTTPStreamDataParent, children: Child
       object.act.reportData.productStageCarbonA1A3 / 1000;
     levels.levels[1].kgCO2eperm2 +=
       object.act.reportData.transportCarbonA4 / floorArea;
-    levels.levels[1].tCO2e +=
-      object.act.reportData.transportCarbonA4 / 1000;
+    levels.levels[1].tCO2e += object.act.reportData.transportCarbonA4 / 1000;
     levels.levels[2].kgCO2eperm2 +=
       object.act.reportData.constructionCarbonA5.value / floorArea;
     levels.levels[2].tCO2e +=
@@ -96,7 +100,48 @@ export async function loadParent(
   }).then((d) => d.json());
 }
 
-export async function loadStream(context: any, streamId: string) {
+export interface IProjectInfo {
+  name: string;
+  components: ProjectComponent[];
+  reportDate: Date;
+  author: string;
+  jobNumber: string;
+  cost: number;
+  floorArea: number;
+  notes: string;
+  totalCO2e: number;
+  totalkgCO2e: number;
+  region: string;
+}
+export interface IMaterialBreakdown {
+  materials: ChartData[];
+}
+export interface IColor {
+    id: string;
+    color: string;
+}
+export interface IABreakdown {
+  levels: {
+    name: string;
+    tCO2e: number;
+    kgCO2eperm2: number;
+  }[];
+}
+export interface ILoadStreamData {
+  streamId: string;
+  projectInfo: IProjectInfo;
+  materialBreakdown: IMaterialBreakdown;
+  aBreakdown: IABreakdown;
+  children: ChildSpeckleObjectData[];
+}
+
+export interface LoadStreamOut {
+  ready: boolean;
+  colors: IColor[];
+  data: ILoadStreamData;
+}
+
+export async function loadStream(context: any, streamId: string): Promise<LoadStreamOut> {
   const actReportBranchInfo = await getActReportBranchInfo(context, streamId);
   const parentId =
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
@@ -108,19 +153,20 @@ export async function loadStream(context: any, streamId: string) {
     context.state.token.token
   );
 
-  const projectInfoUpdated = {
+  const projectInfoUpdated: IProjectInfo = {
     name: branchData.projectData.name,
-    type: branchData.projectData.components,
+    components: branchData.projectData.components,
     reportDate: new Date(
       actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
     ),
     author: actReportBranchInfo.data.stream.branch.commits.items[0].authorName,
-    JN: branchData.projectData.jobNumber,
-    systemCost: branchData.projectData.cost,
+    jobNumber: branchData.projectData.jobNumber,
+    cost: branchData.projectData.cost,
     floorArea: branchData.projectData.floorArea,
     notes: branchData.projectData.notes,
     totalCO2e: Math.round((branchData.totalCO2 / 1000) * 100) / 100,
     totalkgCO2e: Math.floor(branchData.totalCO2),
+    region: "",
   };
 
   const childrenData = await getChildren(
@@ -132,9 +178,9 @@ export async function loadStream(context: any, streamId: string) {
 
   const co2Data = extractCo2Data(branchData, childrenData);
 
-  const levelsUpdated = co2Data.levels;
+  const levelsUpdated: IABreakdown = co2Data.levels;
 
-  const materialBreakdownUpdated = {
+  const materialBreakdownUpdated: IMaterialBreakdown = {
     materials: co2Data.materials,
   };
 
@@ -162,6 +208,7 @@ export async function loadStream(context: any, streamId: string) {
       projectInfo: projectInfoUpdated,
       materialBreakdown: materialBreakdownUpdated,
       aBreakdown: levelsUpdated,
+      children: childrenData,
     },
   };
 }

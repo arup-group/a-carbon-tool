@@ -16,6 +16,7 @@
       </v-col>
       <v-col coles="12" md="8" class="pr-2">
         <v-combobox
+          v-model="selectedMaterial"
           :items="materials"
           :item-text="(materials) => materials['name']"
           @change="checkMaterialUpdated"
@@ -43,6 +44,8 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: SpeckleType;
+
+  selectedMaterial = this.type.material;
 
   cleanType(type: string) {
     const typeArr = type.split(".");

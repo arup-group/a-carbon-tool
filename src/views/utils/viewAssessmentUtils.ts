@@ -2,6 +2,7 @@ import { ChartData } from "@/models/chart";
 import { HTTPStreamDataParent } from "@/models/graphql/";
 import { ChildSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 import { ProjectComponent } from "@/models/newAssessment/projectData.interface";
+import { Color } from "@/models/renderer";
 import { getActReportBranchInfo } from "@/store/speckle/speckleUtil";
 
 export function extractCo2Data(
@@ -116,10 +117,6 @@ export interface IProjectInfo {
 export interface IMaterialBreakdown {
   materials: ChartData[];
 }
-export interface IColor {
-    id: string;
-    color: string;
-}
 export interface IABreakdown {
   levels: {
     name: string;
@@ -137,7 +134,7 @@ export interface ILoadStreamData {
 
 export interface LoadStreamOut {
   ready: boolean;
-  colors: IColor[];
+  colors: Color[];
   data: ILoadStreamData;
 }
 

@@ -178,20 +178,32 @@ export default class Assessment extends Vue {
     await this.loadStream(streamId);
     const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
       "loadActReportData",
-      this.$route.params.streamId
+      streamId
     );
-    console.log("assessmentViewData:", assessmentViewData);
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
-        speckle_type: c.speckleType,
+        speckle_type: c.act.speckle_type,
         formData: c.act.formData,
         reportData: c.act.reportData,
       };
     });
-    console.log("this.objectsObj:", this.objectsObj);
+
+    this.types = this.findTypes(this.objectsObj);
+    this.materialsColors = this.types.map(t => ({
+        id: t.type,
+        color: t.material ? t.material.color : ""
+    }));
+    console.log("materialsColors:", this.materialsColors);
+    this.transportColors = this.types.map(t => ({
+      id: t.type,
+      color: t.transport ? t.transport.color : ""
+    }))
+
     this.projectData = assessmentViewData.data.projectInfo;
-    console.log("projectData:", this.projectData);
+
+    this.groupMaterials();
+    console.log("groupedMaterials", this.groupedMaterials)
   }
 
   async agreeSave() {
@@ -361,7 +373,10 @@ export default class Assessment extends Vue {
   groupMaterials() {
     let materialsObj: {
       [material: string]: {
-        [speckle_type: string]: string[] /* array should be object id's */;
+        transportType?: TransportType;
+        speckle_types: {
+          [speckle_type: string]: string[] /* array should be object id's */;
+        }
       };
     } = {};
 
@@ -370,13 +385,13 @@ export default class Assessment extends Vue {
       const material = o.formData?.material?.name;
       const speckle_type = o.speckle_type;
       if (material) {
-        if (materialsObj[material] && materialsObj[material][speckle_type]) {
-          materialsObj[material][speckle_type].push(o.id);
+        if (materialsObj[material] && materialsObj[material].speckle_types[speckle_type]) {
+          materialsObj[material].speckle_types[speckle_type].push(o.id);
         } else if (materialsObj[material]) {
-          materialsObj[material][speckle_type] = [o.id];
+          materialsObj[material].speckle_types[speckle_type] = [o.id];
         } else {
-          materialsObj[material] = {};
-          materialsObj[material][speckle_type] = [o.id];
+          materialsObj[material] = { speckle_types: {}, transportType: o.formData?.transport };
+          materialsObj[material].speckle_types[speckle_type] = [o.id];
         }
       }
     });
@@ -384,14 +399,15 @@ export default class Assessment extends Vue {
     const materialsArr: GroupedMaterial[] = Object.keys(materialsObj).map(
       (m) => {
         const ids: string[] = [];
-        const speckle_types = Object.keys(materialsObj[m]).map((s) => {
-          ids.push(...materialsObj[m][s]);
+        const speckle_types = Object.keys(materialsObj[m].speckle_types).map((s) => {
+          ids.push(...materialsObj[m].speckle_types[s]);
           return s;
         });
         return {
           material: m,
           objects: ids,
           speckle_types,
+          transportType: materialsObj[m].transportType
         };
       }
     );
@@ -591,6 +607,7 @@ export default class Assessment extends Vue {
         color: material.material.color,
       });
     this.materialsColors = this.colors;
+    console.log("materialsColors:", this.materialsColors)
 
     // update the objects to include this new material
     material.type.ids.forEach((i) => {
@@ -607,6 +624,7 @@ export default class Assessment extends Vue {
 
   findTypes(objects: ObjectsObj): SpeckleType[] {
     let types: SpeckleType[] = [];
+    console.log("objects:", this.objectsObj)
 
     Object.values(objects).forEach((o) => {
       let typeIndex = -1;
@@ -618,6 +636,8 @@ export default class Assessment extends Vue {
         types.push({
           type: o.speckle_type,
           ids: [o.id],
+          material: o.formData?.material,
+          transport: o.formData?.transport
         });
     });
 

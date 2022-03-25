@@ -12,7 +12,7 @@
         v-model="step"
         vertical
       >
-        <v-stepper-step step="1" color="secondary darken-2">
+        <v-stepper-step step="1" color="secondary darken-2" :complete="completed">
           Data
         </v-stepper-step>
         <v-stepper-content step="1">
@@ -33,7 +33,7 @@
             </v-btn>
           </v-card-actions>
         </v-stepper-content>
-        <v-stepper-step step="2" color="secondary darken-2">
+        <v-stepper-step step="2" color="secondary darken-2" :complete="completed">
           Materials
         </v-stepper-step>
         <v-stepper-content step="2">

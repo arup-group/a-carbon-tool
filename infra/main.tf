@@ -19,4 +19,5 @@ module "static_site" {
   redirect_uri = var.redirect_uri
   environment = var.environment
   project_name = "a-carbon-tool"
+  make_public_with_no_auth = var.make_public_with_no_auth
 }

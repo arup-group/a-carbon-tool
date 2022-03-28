@@ -113,6 +113,7 @@ export interface IProjectInfo {
   totalCO2e: number;
   totalkgCO2e: number;
   region: string;
+  volume: number;
 }
 export interface IMaterialBreakdown {
   materials: ChartData[];
@@ -163,7 +164,8 @@ export async function loadStream(context: any, streamId: string): Promise<LoadSt
     notes: branchData.projectData.notes,
     totalCO2e: Math.round((branchData.totalCO2 / 1000) * 100) / 100,
     totalkgCO2e: Math.floor(branchData.totalCO2),
-    region: "",
+    region: branchData.projectData.region,
+    volume: branchData.volume
   };
 
   const childrenData = await getChildren(

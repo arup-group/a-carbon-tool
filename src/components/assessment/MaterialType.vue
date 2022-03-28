@@ -45,7 +45,7 @@ export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: SpeckleType;
 
-  selectedMaterial = this.type.material;
+  selectedMaterial = this.type.material ? this.type.material : null;
 
   cleanType(type: string) {
     const typeArr = type.split(".");

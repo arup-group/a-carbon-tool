@@ -57,4 +57,5 @@ export interface CarbonA5 {
 
 export interface ReportTotals extends ReportData {
   totalCO2: number;
+  volume: number;
 }

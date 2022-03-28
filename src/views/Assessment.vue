@@ -45,7 +45,7 @@
           :speckleVol="speckleVol"
           :update="update"
           :streamId="streamId"
-          :projectData="projectData"
+          :projectData="projectDataPassdown"
         />
       </div>
     </v-container>
@@ -136,11 +136,12 @@ export default class Assessment extends Vue {
   totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
   projectData!: ProjectDataComplete;
+  projectDataPassdown: ProjectDataComplete | null = null
 
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
-  streamId!: string;
+  streamId = "";
 
   colors: Color[] = [];
   materialsColors: Color[] = [];
@@ -180,6 +181,7 @@ export default class Assessment extends Vue {
       "loadActReportData",
       streamId
     );
+    console.log("viewData:", assessmentViewData)
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -201,9 +203,14 @@ export default class Assessment extends Vue {
     }))
 
     this.projectData = assessmentViewData.data.projectInfo;
+    this.projectDataPassdown = assessmentViewData.data.projectInfo;
 
     this.groupMaterials();
-    console.log("groupedMaterials", this.groupedMaterials)
+    console.log("groupedMaterials", this.groupedMaterials);
+
+    this.totalVolume = assessmentViewData.data.projectInfo.volume;
+    this.speckleVol = true;
+    console.log("totalVolume:", this.totalVolume);
   }
 
   async agreeSave() {
@@ -507,6 +514,7 @@ export default class Assessment extends Vue {
         site: A5Site,
       },
       totalCO2,
+      volume: this.totalVolume
     };
   }
 

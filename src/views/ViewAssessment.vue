@@ -36,6 +36,7 @@ import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
 import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
 import { Color } from "@/models/renderer";
+import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 
 @Component({
   components: {
@@ -67,6 +68,7 @@ export default class ViewAssessment extends Vue {
       "loadActReportData",
       this.$route.params.streamId
     );
+    console.log("assessmentViewData:", assessmentViewData)
     this.assessment = assessmentViewData.data;
     this.colors = assessmentViewData.colors;
     this.chartDataReady = assessmentViewData.ready;

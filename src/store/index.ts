@@ -401,6 +401,7 @@ export default new Vuex.Store({
         productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
         constructionCarbonA5: reportTotals.constructionCarbonA5,
         totalCO2: reportTotals.totalCO2,
+        volume: reportTotals.volume,
         projectData,
         totalChildrenCount: 0,
       };

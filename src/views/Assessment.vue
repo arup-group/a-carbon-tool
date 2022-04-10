@@ -21,8 +21,9 @@
         :token="token"
         :colors="colors"
         :gradientColorProperty="volumeGradientPassdown"
+        :display="!modal"
       />
-      <div style="width: 35%">
+      <div :style="modal ? 'width: 100%;' : 'width: 35%;'">
         <AssessmentStepper
           style="z-index: 1"
           v-if="availableStreams.length !== 0"
@@ -33,6 +34,8 @@
           @uploadData="uploadData"
           @checkSave="checkSave"
           @calcVol="calcVol"
+          @close="close"
+          :modal="modal"
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -76,7 +79,7 @@ import {
   RendererLoaded,
 } from "@/models/renderer";
 
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 
 import {
   ProjectDataComplete,
@@ -121,6 +124,9 @@ interface AvailableStream {
   components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar },
 })
 export default class Assessment extends Vue {
+  @Prop() modal!: boolean;
+  @Prop() modalStreamid!: string;
+
   loading = false;
   saveSuccess = true;
   saveSnack = false;
@@ -157,11 +163,17 @@ export default class Assessment extends Vue {
 
   update = false;
 
+  @Emit("close")
+  close() {
+    return;
+  }
+
   async mounted() {
     this.token = this.$store.state.token.token;
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
-    const streamId = this.$route.params.streamId;
+    let streamId = this.$route.params.streamId;
+    if (!streamId) streamId = this.modalStreamid;
     if (streamId) {
       await this.updateStream(streamId);
     }

@@ -28,6 +28,7 @@ export default class extends Vue {
   @Prop() token!: string;
   @Prop() colors!: Color[];
   @Prop() gradientColorProperty!: GradientColor;
+  @Prop() display!: boolean;
 
   currentColors: Color[] = [];
 

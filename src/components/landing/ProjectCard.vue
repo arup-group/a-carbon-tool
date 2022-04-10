@@ -36,7 +36,7 @@
           </span>
           <span v-else></span>
           <span>
-            <landing-options @delete="checkDelete" />
+            <landing-options @delete="checkDelete" @edit="edit" />
             <v-select
               :menu-props="{ value: options }"
               v-if="options"
@@ -88,6 +88,9 @@ export default class ProjectCard extends Vue {
   options = false;
   cardOverlay = false;
 
+  get streamid() {
+    return this.project.id;
+  }
   get title() {
     return this.project.title;
   }
@@ -121,6 +124,11 @@ export default class ProjectCard extends Vue {
 
   @Emit("delete")
   checkDelete() {
+    return this.project.id;
+  }
+
+  @Emit("edit")
+  edit() {
     return this.project.id;
   }
 

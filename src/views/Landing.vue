@@ -37,6 +37,7 @@
                 v-else
                 :project="item"
                 @delete="checkDelete"
+                @edit="edit"
               ></project-card>
             </v-col>
           </v-row>
@@ -71,6 +72,11 @@
       @cancel="cancelDelete"
       message="Are you sure you want to permanently delete this report for all users? This action is not reversible"
     />
+    <quick-report
+      @close="quickReportClose"
+      :dialog="quickReport"
+      :streamid="quickStreamid"
+    />
     <SESnackBar
       @close="deleteSnackClose"
       :success="deleteSuccess"
@@ -92,9 +98,7 @@ import {
 
 import { DeleteBranchInput } from "@/store";
 import {
-  extractCo2Data,
   loadParent,
-  getChildren,
   LoadStreamOut,
 } from "../views/utils/viewAssessmentUtils";
 
@@ -103,6 +107,7 @@ import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingError from "@/components/landing/LandingError.vue";
+import QuickReport from "@/components/landing/QuickReport.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
@@ -116,6 +121,7 @@ import { HTTPStreamDataParent } from "@/models/graphql/";
     LandingError,
     ConfirmDialog,
     SESnackBar,
+    QuickReport,
   },
 })
 export default class Landing extends Vue {
@@ -129,6 +135,8 @@ export default class Landing extends Vue {
   loading = true;
   error = false;
   dialog = false;
+  quickReport = false;
+  quickStreamid = "";
   deleteid = "";
   deleteSuccess = true;
   deleteSnack = false;
@@ -136,6 +144,16 @@ export default class Landing extends Vue {
   async mounted() {
     this.token = this.$store.state.token.token;
     this.loadStreams();
+  }
+
+
+  edit(streamid: string) {
+    console.log("edit:", streamid);
+    this.quickStreamid = streamid;
+    this.quickReport = true;
+  }
+  quickReportClose() {
+    this.quickReport = false;
   }
 
   get numberOfPages() {
@@ -304,16 +322,7 @@ export default class Landing extends Vue {
       // convert the data into the format that this page needs it to be in
       this.projects = await Promise.all(
         this.branchData.map(async (proj) => {
-          // const childrenData = await getChildren(
-          //   this.$store.state.selectedServer.url,
-          //   this.$store.state.token.token,
-          //   proj.id,
-          //   proj.data
-          // );
-          // const co2Data = extractCo2Data(proj.data, childrenData).materials;
-
         const projName = proj.data.data.projectInfo.name;
-        console.log("data:", proj.data)
         return {
           title: `${projName} - ${proj.name}`,
           id: `${proj.id}`,

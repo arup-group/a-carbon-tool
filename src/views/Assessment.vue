@@ -58,6 +58,14 @@
       @cancel="cancelSave"
       message="Do you want to save and view this report? This will overwrite any existing reports for this stream"
     />
+    <new-branch-dialog
+      :dialog="newBranchDialog"
+      :branchNames="branchNames"
+      :reportName="reportName"
+      :branchExistsError="branchExistsError"
+      @newBranch="newBranchSelect"
+      @updateBranch="updateBranchSelect"
+    />
     <SESnackBar
       @close="saveSnackClose"
       :success="saveSuccess"
@@ -69,7 +77,13 @@
 </template>
 
 <script lang="ts">
+import { Component, Emit, Prop, Vue } from "vue-property-decorator";
+
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
+import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
+import SESnackBar from "@/components/shared/SESnackBar.vue";
+import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
+
 import Renderer from "@/components/shared/Renderer.vue";
 import {
   Color,
@@ -78,8 +92,6 @@ import {
   GradientColor,
   RendererLoaded,
 } from "@/models/renderer";
-
-import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 
 import {
   ProjectDataComplete,
@@ -108,9 +120,7 @@ import {
   productStageCarbonA1A3,
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
-import { UploadReportInput } from "@/store";
-import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
-import SESnackBar from "@/components/shared/SESnackBar.vue";
+import { CheckContainsChlidReportInput, UploadReportInput } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 
@@ -121,7 +131,13 @@ interface AvailableStream {
 }
 
 @Component({
-  components: { AssessmentStepper, Renderer, ConfirmDialog, SESnackBar },
+  components: {
+    AssessmentStepper,
+    Renderer,
+    ConfirmDialog,
+    SESnackBar,
+    NewBranchDialog,
+  },
 })
 export default class Assessment extends Vue {
   @Prop() modal!: boolean;
@@ -142,7 +158,7 @@ export default class Assessment extends Vue {
   totalVolume = -1;
   allMesh: THREE.Mesh[] = [];
   projectData!: ProjectDataComplete;
-  projectDataPassdown: ProjectDataComplete | null = null
+  projectDataPassdown: ProjectDataComplete | null = null;
 
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
@@ -162,6 +178,12 @@ export default class Assessment extends Vue {
   groupedMaterials: GroupedMaterial[] = [];
 
   update = false;
+
+  // new branch modal
+  newBranchDialog = false;
+  reportName = "";
+  branchNames: string[] = [];
+  branchExistsError = false;
 
   @Emit("close")
   close() {
@@ -185,6 +207,22 @@ export default class Assessment extends Vue {
     });
   }
 
+  async newBranchSelect(name: string) {
+    console.log("newBranchSelect", name);
+    const input: CheckContainsChlidReportInput = {
+      streamid: this.streamId,
+      branchName: name,
+    }
+    const branchExists = await this.$store.dispatch("checkContainsChlidReport", input);
+
+    console.log("branchExists:", branchExists);
+
+    this.branchExistsError = branchExists;
+  }
+  updateBranchSelect(name: string) {
+    console.log("updateBranchSelect", name);
+  }
+
   async updateStream(streamId: string) {
     this.streamId = streamId;
     this.update = true;
@@ -193,7 +231,7 @@ export default class Assessment extends Vue {
       "loadActReportData",
       streamId
     );
-    console.log("viewData:", assessmentViewData)
+    console.log("viewData:", assessmentViewData);
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -204,15 +242,15 @@ export default class Assessment extends Vue {
     });
 
     this.types = this.findTypes(this.objectsObj);
-    this.materialsColors = this.types.map(t => ({
-        id: t.type,
-        color: t.material ? t.material.color : ""
+    this.materialsColors = this.types.map((t) => ({
+      id: t.type,
+      color: t.material ? t.material.color : "",
     }));
     console.log("materialsColors:", this.materialsColors);
-    this.transportColors = this.types.map(t => ({
+    this.transportColors = this.types.map((t) => ({
       id: t.type,
-      color: t.transport ? t.transport.color : ""
-    }))
+      color: t.transport ? t.transport.color : "",
+    }));
 
     this.projectData = assessmentViewData.data.projectInfo;
     this.projectDataPassdown = assessmentViewData.data.projectInfo;
@@ -229,24 +267,45 @@ export default class Assessment extends Vue {
     this.loading = true;
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
-        const uploadReportInput: UploadReportInput = {
-          streamid: this.streamId,
-          objects: this.report.reportObjs,
-          reportTotals: this.report.totals,
-          projectData: this.projectData,
-        };
-        this.dialog = false;
-        this.loading = true;
-        await this.$store.dispatch("uploadReport", uploadReportInput);
-        this.loading = false;
-        this.saveSnack = true;
-        this.$router.push(`/assessment/view/${this.streamId}`);
+        console.log("1");
+        const containsReport: boolean = await this.$store.dispatch(
+          "checkContainsReport",
+          this.streamId
+        );
+        if (containsReport) {
+          console.log("2");
+          this.branchNames = await this.$store.dispatch(
+            "getAllReportBranches",
+            this.streamId
+          );
+          console.log("branchNames:", this.branchNames);
+          this.reportName = this.projectData.name;
+          this.newBranchDialog = true;
+        } else {
+          this.uploadReport();
+        }
       } else {
         this.saveSnack = true;
         this.saveSuccess = false;
         this.dialog = false;
         this.loading = false;
       }
+    }
+  }
+  async uploadReport() {
+    if (this.report && this.report.reportObjs.length > 0) {
+      const uploadReportInput: UploadReportInput = {
+        streamid: this.streamId,
+        objects: this.report.reportObjs,
+        reportTotals: this.report.totals,
+        projectData: this.projectData,
+      };
+      this.dialog = false;
+      this.loading = true;
+      await this.$store.dispatch("uploadReport", uploadReportInput);
+      this.loading = false;
+      this.saveSnack = true;
+      this.$router.push(`/assessment/view/${this.streamId}`);
     }
   }
   saveSnackClose() {
@@ -395,7 +454,7 @@ export default class Assessment extends Vue {
         transportType?: TransportType;
         speckle_types: {
           [speckle_type: string]: string[] /* array should be object id's */;
-        }
+        };
       };
     } = {};
 
@@ -404,12 +463,18 @@ export default class Assessment extends Vue {
       const material = o.formData?.material?.name;
       const speckle_type = o.speckle_type;
       if (material) {
-        if (materialsObj[material] && materialsObj[material].speckle_types[speckle_type]) {
+        if (
+          materialsObj[material] &&
+          materialsObj[material].speckle_types[speckle_type]
+        ) {
           materialsObj[material].speckle_types[speckle_type].push(o.id);
         } else if (materialsObj[material]) {
           materialsObj[material].speckle_types[speckle_type] = [o.id];
         } else {
-          materialsObj[material] = { speckle_types: {}, transportType: o.formData?.transport };
+          materialsObj[material] = {
+            speckle_types: {},
+            transportType: o.formData?.transport,
+          };
           materialsObj[material].speckle_types[speckle_type] = [o.id];
         }
       }
@@ -418,15 +483,17 @@ export default class Assessment extends Vue {
     const materialsArr: GroupedMaterial[] = Object.keys(materialsObj).map(
       (m) => {
         const ids: string[] = [];
-        const speckle_types = Object.keys(materialsObj[m].speckle_types).map((s) => {
-          ids.push(...materialsObj[m].speckle_types[s]);
-          return s;
-        });
+        const speckle_types = Object.keys(materialsObj[m].speckle_types).map(
+          (s) => {
+            ids.push(...materialsObj[m].speckle_types[s]);
+            return s;
+          }
+        );
         return {
           material: m,
           objects: ids,
           speckle_types,
-          transportType: materialsObj[m].transportType
+          transportType: materialsObj[m].transportType,
         };
       }
     );
@@ -526,7 +593,7 @@ export default class Assessment extends Vue {
         site: A5Site,
       },
       totalCO2,
-      volume: this.totalVolume
+      volume: this.totalVolume,
     };
   }
 
@@ -627,7 +694,7 @@ export default class Assessment extends Vue {
         color: material.material.color,
       });
     this.materialsColors = this.colors;
-    console.log("materialsColors:", this.materialsColors)
+    console.log("materialsColors:", this.materialsColors);
 
     // update the objects to include this new material
     material.type.ids.forEach((i) => {
@@ -644,7 +711,7 @@ export default class Assessment extends Vue {
 
   findTypes(objects: ObjectsObj): SpeckleType[] {
     let types: SpeckleType[] = [];
-    console.log("objects:", this.objectsObj)
+    console.log("objects:", this.objectsObj);
 
     Object.values(objects).forEach((o) => {
       let typeIndex = -1;
@@ -657,7 +724,7 @@ export default class Assessment extends Vue {
           type: o.speckle_type,
           ids: [o.id],
           material: o.formData?.material,
-          transport: o.formData?.transport
+          transport: o.formData?.transport,
         });
     });
 

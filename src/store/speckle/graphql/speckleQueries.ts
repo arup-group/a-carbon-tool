@@ -1,5 +1,13 @@
 import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 
+export const checkContainsBranch = (streamId: string, branchName: string) => `query {
+  stream(id: "${streamId}") {
+    branch(name: "${branchName}") {
+      id
+    }
+  }
+}`;
+
 export const userInfoQuery = () => `query {
     user {
       name

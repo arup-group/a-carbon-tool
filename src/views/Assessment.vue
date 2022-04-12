@@ -63,6 +63,7 @@
       :branchNames="branchNames"
       :reportName="reportName"
       :branchExistsError="branchExistsError"
+      :defaultBranchName="defaultBranchName"
       @newBranch="newBranchSelect"
       @updateBranch="updateBranchSelect"
     />
@@ -120,7 +121,7 @@ import {
   productStageCarbonA1A3,
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
-import { CheckContainsChlidReportInput, UploadReportInput } from "@/store";
+import { CheckContainsChlidReportInput, LoadActReportDataInput, UploadReportInput } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 
@@ -142,6 +143,7 @@ interface AvailableStream {
 export default class Assessment extends Vue {
   @Prop() modal!: boolean;
   @Prop() modalStreamid!: string;
+  @Prop() modalBranchName!: string;
 
   loading = false;
   saveSuccess = true;
@@ -174,6 +176,7 @@ export default class Assessment extends Vue {
   volumeGradient!: Gradient;
   volumeGradientPassdown: GradientColor = null;
   speckleVol = false; // whether the volume can be got from speckle props
+  defaultBranchName = "main";
 
   groupedMaterials: GroupedMaterial[] = [];
 
@@ -194,10 +197,11 @@ export default class Assessment extends Vue {
     this.token = this.$store.state.token.token;
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
-    let streamId = this.$route.params.streamId;
+    let {streamId, branchName} = this.$route.params;
     if (!streamId) streamId = this.modalStreamid;
-    if (streamId) {
-      await this.updateStream(streamId);
+    if (streamId && branchName) {
+      this.defaultBranchName = branchName;
+      await this.updateStream(streamId, branchName);
     }
 
     this.$store.dispatch("getUserStreams").then((res) => {
@@ -227,13 +231,14 @@ export default class Assessment extends Vue {
     this.uploadReport(name);
   }
 
-  async updateStream(streamId: string) {
+  async updateStream(streamId: string, branchName: string) {
     this.streamId = streamId;
     this.update = true;
     await this.loadStream(streamId);
+    const input: LoadActReportDataInput = { streamId, branchName }
     const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
       "loadActReportData",
-      streamId
+      input
     );
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {

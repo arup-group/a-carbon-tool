@@ -35,7 +35,8 @@ export default class NewBranchDialog extends Vue {
   @Prop() branchNames!: string[];
   @Prop() reportName!: string;
   @Prop() branchExistsError!: boolean;
-  selectModel: null | string = "main";
+  @Prop() defaultBranchName!: string;
+  selectModel = this.defaultBranchName;
   newBranchModel = this.reportName;
   newBranchRules = [
     (v: string) => !this.branchExistsError || "branch name already exists",
@@ -49,6 +50,11 @@ export default class NewBranchDialog extends Vue {
   @Watch("branchExistsError")
   branchExistsErrorUpdate() {
     (this.$refs.form as Vue & { validate: () => boolean }).validate();
+  }
+
+  @Watch("defaultBranchName")
+  defaultBranchNameUpdate() {
+    this.selectModel = this.defaultBranchName;
   }
 
   submitUpdate() {

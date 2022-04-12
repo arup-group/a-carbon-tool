@@ -107,7 +107,7 @@ export default class ProjectInfoCard extends Vue {
     return this.projectInfo.JN;
   }
   get systemCost() {
-    return `£${this.projectInfo.systemCost
+    return `£${this.projectInfo.cost
       .toString()
       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
   }

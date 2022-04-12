@@ -303,7 +303,7 @@ export default class Assessment extends Vue {
       await this.$store.dispatch("uploadReport", uploadReportInput);
       this.loading = false;
       this.saveSnack = true;
-      this.$router.push(`/assessment/view/${this.streamId}`);
+      this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
     }
   }
   saveSnackClose() {

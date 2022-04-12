@@ -158,19 +158,19 @@ export const streamReferencedBranches = (id: string) => `query {
   }
 }`;
 
-export const actReportBranchInfo = (id: string) => {
+export const actReportBranchInfo = (id: string, branchName: string) => {
   return `query {
   stream(id: "${id}") {
     name
-    branch(name: "actcarbonreport") {
-    commits {
-      items {
-        authorName
-        createdAt
-      	referencedObject
+    branch(name: "${branchName}") {
+      commits {
+        items {
+          authorName
+          createdAt
+      	  referencedObject
+        }
       }
     }
-  }
   }
 }`;
 };

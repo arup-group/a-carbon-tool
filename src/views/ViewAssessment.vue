@@ -37,6 +37,7 @@ import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdown
 import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
 import { Color } from "@/models/renderer";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
+import { LoadActReportDataInput } from "@/store";
 
 @Component({
   components: {
@@ -64,11 +65,13 @@ export default class ViewAssessment extends Vue {
   }
 
   async created() {
+    const { streamId, branchName } = this.$route.params;
+    console.log("streamId, branchName:", streamId, branchName);
+    const input: LoadActReportDataInput = { streamId, branchName}
     const assessmentViewData = await this.$store.dispatch(
       "loadActReportData",
-      this.$route.params.streamId
+      input
     );
-    console.log("assessmentViewData:", assessmentViewData)
     this.assessment = assessmentViewData.data;
     this.colors = assessmentViewData.colors;
     this.chartDataReady = assessmentViewData.ready;
@@ -99,7 +102,7 @@ export default class ViewAssessment extends Vue {
       reportDate: new Date(1946, 4, 1),
       author: "",
       JN: "000001",
-      systemCost: 0,
+      cost: 0,
       floorArea: 0,
       notes: "",
       totalCO2e: 0,

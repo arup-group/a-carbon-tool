@@ -320,15 +320,27 @@ export default new Vuex.Store({
       return streams;
     },
 
-    async getActReportBranchInfo(context, streamId) {
+    async getActReportBranchInfo(
+      context,
+      { streamid, branchName }: GetActReportBranchInfoInput
+    ) {
       const actReportBranchInfo = await speckleUtil.getActReportBranchInfo(
         context,
-        streamId
+        streamid,
+        branchName
       );
       return actReportBranchInfo;
     },
-    async loadActReportData(context, streamId: string) {
-      return await loadStream(context, streamId);
+    async loadActReportData(
+      context,
+      { streamId, branchName }: LoadActReportDataInput
+    ) {
+      console.log("1. streamId, branchName:", streamId, branchName)
+      return await loadStream(
+        context,
+        streamId,
+        `actcarbonreport/${branchName}`
+      );
     },
     async getObjectUrls(context, streamid: string) {
       const objectIds = await speckleUtil.getStreamObjects(context, streamid);
@@ -380,7 +392,16 @@ export default new Vuex.Store({
 
       return childrenObjects;
     },
-    async uploadReport(context, { streamid, objects, reportTotals, projectData, branchName }: UploadReportInput) {
+    async uploadReport(
+      context,
+      {
+        streamid,
+        objects,
+        reportTotals,
+        projectData,
+        branchName,
+      }: UploadReportInput
+    ) {
       branchName = `actcarbonreport/${branchName}`;
 
       // TODO: ADD ERROR HANDLING
@@ -436,12 +457,23 @@ export default new Vuex.Store({
       );
     },
     async checkContainsReport(context, streamid: string): Promise<boolean> {
-      const queryRes = await speckleUtil.checkContainsBranch(context, streamid, "actcarbonreport/main");
+      const queryRes = await speckleUtil.checkContainsBranch(
+        context,
+        streamid,
+        "actcarbonreport/main"
+      );
 
       return queryRes.data.stream.branch !== null;
     },
-    async checkContainsChlidReport(context, { streamid, branchName }: CheckContainsChlidReportInput) {
-      const queryRes = await speckleUtil.checkContainsBranch(context, streamid, `actcarbonreport/${branchName}`);
+    async checkContainsChlidReport(
+      context,
+      { streamid, branchName }: CheckContainsChlidReportInput
+    ) {
+      const queryRes = await speckleUtil.checkContainsBranch(
+        context,
+        streamid,
+        `actcarbonreport/${branchName}`
+      );
 
       return queryRes.data.stream.branch !== null;
     },
@@ -456,6 +488,16 @@ export default new Vuex.Store({
   },
   modules: {},
 });
+
+export interface GetActReportBranchInfoInput {
+  streamid: string;
+  branchName: string;
+}
+
+export interface LoadActReportDataInput {
+  streamId: string;
+  branchName: string;
+}
 
 export interface CheckContainsChlidReportInput {
   streamid: string;

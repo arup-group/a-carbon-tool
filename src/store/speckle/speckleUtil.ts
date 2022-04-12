@@ -176,9 +176,10 @@ export const getBranchData = (
 
 export const getActReportBranchInfo = (
   context: any,
-  streamId: string
+  streamId: string,
+  branchName: string
 ): Promise<ActReportData> =>
-  speckleFetch(queries.actReportBranchInfo(streamId), context);
+  speckleFetch(queries.actReportBranchInfo(streamId, branchName), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,

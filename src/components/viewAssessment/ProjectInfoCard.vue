@@ -74,12 +74,8 @@ import BECChipGroup from "../shared/BECChipGroup.vue";
 export default class ProjectInfoCard extends Vue {
   @Prop() projectInfo!: ProjectInfo;
   show = true;
-  mounted() {
-    console.log("this.projectInfo:",this.projectInfo)
-  }
 
   get name() {
-    console.log("projectInfo:", this.projectInfo)
     return this.projectInfo.name;
   }
   get type() {

@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="50%" persistent>
         <v-card>
             <v-card-text>
-                <assessment :modal="true" :modalStreamid="streamid" @close="close" />
+                <assessment :modal="true" :modalStreamid="streamid" :modalBranchName="branchName" @close="close" />
             </v-card-text>
         </v-card>
     </v-dialog>
@@ -18,6 +18,7 @@ import Assessment from "@/views/Assessment.vue";
 export default class QuickReport extends Vue {
     @Prop() dialog!: boolean;
     @Prop() streamid!: string;
+    @Prop() branchName!: string;
 
     @Emit("close")
     close() {

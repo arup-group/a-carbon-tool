@@ -137,9 +137,11 @@ export default class ProjectCard extends Vue {
     return Math.round(value * 0.001);
   }
 
+  @Emit("open")
   open() {
     // MAY NEED TO UPDATE DEPENDING ON HOW ASSESSMENT/VIEW ENDS UP WORKING
-    this.$router.push(`/assessment/view/${this.project.id}`);
+    // this.$router.push(`/assessment/view/${this.project.id}`);
+    return this.project.id;
   }
 }
 </script>

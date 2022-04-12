@@ -66,7 +66,6 @@ export default class ViewAssessment extends Vue {
 
   async created() {
     const { streamId, branchName } = this.$route.params;
-    console.log("streamId, branchName:", streamId, branchName);
     const input: LoadActReportDataInput = { streamId, branchName}
     const assessmentViewData = await this.$store.dispatch(
       "loadActReportData",

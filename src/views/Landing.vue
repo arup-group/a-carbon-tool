@@ -38,6 +38,7 @@
                 :project="item"
                 @delete="checkDelete"
                 @edit="edit"
+                @open="openViewAssessment"
               ></project-card>
             </v-col>
           </v-row>
@@ -76,6 +77,7 @@
       @close="quickReportClose"
       :dialog="quickReport"
       :streamid="quickStreamid"
+      :branchName="quickBranchName"
     />
     <SESnackBar
       @close="deleteSnackClose"
@@ -96,11 +98,14 @@ import {
   StreamReferenceBranches,
 } from "@/models/graphql";
 
-import { DeleteBranchInput } from "@/store";
+import { DeleteBranchInput, GetStreamBranchesOutput, LoadActReportDataInput } from "@/store";
+import { loadParent, LoadStreamOut } from "../views/utils/viewAssessmentUtils";
 import {
-  loadParent,
-  LoadStreamOut,
-} from "../views/utils/viewAssessmentUtils";
+  CarbonBranch,
+  BranchData,
+  StreamId,
+  StreamBranches,
+} from "@/models/landing";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -111,7 +116,7 @@ import QuickReport from "@/components/landing/QuickReport.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
-import { HTTPStreamDataParent } from "@/models/graphql/";
+
 @Component({
   components: {
     ProjectCard,
@@ -125,8 +130,8 @@ import { HTTPStreamDataParent } from "@/models/graphql/";
   },
 })
 export default class Landing extends Vue {
-  carbonBranches: { id: string; name: string; branchid: string, mainBranchID: string | undefined;}[] = [];
-  branchData: { id: string; name: string;  projectDate: string;  newMainAvailable: boolean; data: LoadStreamOut }[] = [];
+  carbonBranches: CarbonBranch[] = [];
+  branchData: BranchData[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
@@ -137,6 +142,7 @@ export default class Landing extends Vue {
   dialog = false;
   quickReport = false;
   quickStreamid = "";
+  quickBranchName = "";
   deleteid = "";
   deleteSuccess = true;
   deleteSnack = false;
@@ -146,14 +152,17 @@ export default class Landing extends Vue {
     this.loadStreams();
   }
 
-
   edit(streamid: string) {
-    console.log("edit:", streamid);
     this.quickStreamid = streamid;
+    this.quickBranchName = "main"
     this.quickReport = true;
   }
   quickReportClose() {
     this.quickReport = false;
+  }
+
+  openViewAssessment(streamid: string) {
+    this.$router.push(`/assessment/view/${streamid}/main`);
   }
 
   get numberOfPages() {
@@ -225,47 +234,34 @@ export default class Landing extends Vue {
       // get all of the user's streams
       const streams = await this.$store.dispatch("getUserStreams");
       // format the streams into a more usable format
-      const streamID: { name: string; id: string; createdAt: string }[] =
-        streams.data.user.streams.items.map((stream: any) => {
-          return { name: stream.name, id: stream.id};
-        });
+      const streamIDs: StreamId[] = streams.data.user.streams.items.map(
+        (stream: any) => {
+          return { name: stream.name, id: stream.id };
+        }
+      );
 
-      // get all of the branches that are on each stream
-      const streamBranches: {
-        branches: StreamReferenceBranches;
-        stream: { id: string; name: string; createdAt: string };
-      }[] = [];
-
-      for (let i = 0; i < streamID.length; i++) {
-        const branches: StreamReferenceBranches = await this.$store.dispatch(
-          "getStreamBranches",
-          streamID[i].id
-        );
-        streamBranches.push({ branches, stream: streamID[i] });
-      }
-
-      // filter those branches to only the "actcarbonreport" branches
-      // add any stream in its entiry if it contains a branch called 'actcarbonreport'
-      for (let i = 0; i < streamBranches.length; i++) {
-        // go through all items on streamBranches
-        streamBranches[i].branches.data.stream.branches.items.forEach(
-          (branch) => {
-            if (branch.name === "actcarbonreport") {
-              const mainBranch = streamBranches[i].branches.data.stream.branches.items.find(element => element.name === 'main');
-              this.carbonBranches.push({
-                ...streamBranches[i].stream,
-                branchid: branch.id,
-                mainBranchID: mainBranch?.id,
-              });
-            }
-          }
-        );
-      }
+      this.carbonBranches = await Promise.all(
+        streamIDs.map(async (sid): Promise<CarbonBranch> => {
+          const branches: GetStreamBranchesOutput = await this.$store.dispatch(
+            "getStreamBranches",
+            sid.id
+          );
+          const mainreportidtemp = branches.reportBranches.find(
+            (rb) => rb.name === "actcarbonreport/main"
+          )?.id;
+          const mainreportid = mainreportidtemp ? mainreportidtemp : "";
+          return {
+            id: sid.id,
+            name: sid.name,
+            branchid: mainreportid,
+            mainBranchID: branches.mainBranch.id,
+          };
+        })
+      ).then((res) => res.filter((r) => r.branchid !== ""));
 
       // get the most recent commit and the data from that commit
       this.branchData = await Promise.all(
         this.carbonBranches.map(async (cb) => {
-
           const branchCommit = await this.$store.dispatch(
             "getStreamCommit",
             cb.id
@@ -284,22 +280,27 @@ export default class Landing extends Vue {
           let latestMainCommitObj = "";
           if (mainBranchCommits.data.stream.branch) {
             latestMainCommitObj =
-              mainBranchCommits.data.stream.branch.commits.items[0].referencedObject;
+              mainBranchCommits.data.stream.branch.commits.items[0]
+                .referencedObject;
           }
 
           // Get data from the most recent arupcarbon branch
-          const latestCarbonBranchData: StreamData = await this.$store.dispatch("getBranchData", [
-            cb.id,
-            carbonCommit,
-          ]);
+          const latestCarbonBranchData: StreamData = await this.$store.dispatch(
+            "getBranchData",
+            [cb.id, carbonCommit]
+          );
 
-          const latestMainBranchData: StreamData = await this.$store.dispatch("getBranchData", [
-            cb.id,
-            latestMainCommitObj,
-          ]);
+          const latestMainBranchData: StreamData = await this.$store.dispatch(
+            "getBranchData",
+            [cb.id, latestMainCommitObj]
+          );
 
-          const latestCarbonBranchCommit = new Date(latestCarbonBranchData.data.stream.object.createdAt).getTime();
-          const latestMainBranchCommit = new Date(latestMainBranchData.data.stream.object.createdAt).getTime();
+          const latestCarbonBranchCommit = new Date(
+            latestCarbonBranchData.data.stream.object.createdAt
+          ).getTime();
+          const latestMainBranchCommit = new Date(
+            latestMainBranchData.data.stream.object.createdAt
+          ).getTime();
 
           const parent = await loadParent(
             this.$store.state.selectedServer.url,
@@ -307,8 +308,14 @@ export default class Landing extends Vue {
             carbonCommit,
             this.$store.state.token.token
           );
-          const data: LoadStreamOut = await this.$store.dispatch("loadActReportData", cb.id);
-
+          const loadActReportDataInput: LoadActReportDataInput = {
+            streamId: cb.id,
+            branchName: "main"
+          }
+          const data: LoadStreamOut = await this.$store.dispatch(
+            "loadActReportData",
+            loadActReportDataInput
+          );
 
           return {
             id: cb.id,
@@ -322,19 +329,19 @@ export default class Landing extends Vue {
       // convert the data into the format that this page needs it to be in
       this.projects = await Promise.all(
         this.branchData.map(async (proj) => {
-        const projName = proj.data.data.projectInfo.name;
-        return {
-          title: `${projName} - ${proj.name}`,
-          id: `${proj.id}`,
-          co2Values: proj.data.data.materialBreakdown.materials,
-          totalCO2e: proj.data.data.projectInfo.totalCO2e,
-          link: "",
-          category: proj.data.data.projectInfo.components,
-          projectDate: proj.projectDate,
-          newMainAvailable: proj.newMainAvailable,
-        };
-      }));
-      console.log("this.projects:", this.projects);
+          const projName = proj.data.data.projectInfo.name;
+          return {
+            title: `${projName} - ${proj.name}`,
+            id: `${proj.id}`,
+            co2Values: proj.data.data.materialBreakdown.materials,
+            totalCO2e: proj.data.data.projectInfo.totalCO2e,
+            link: "",
+            category: proj.data.data.projectInfo.components,
+            projectDate: proj.projectDate,
+            newMainAvailable: proj.newMainAvailable,
+          };
+        })
+      );
 
       this.loading = false;
     } catch (err) {

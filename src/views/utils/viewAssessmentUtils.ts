@@ -141,7 +141,6 @@ export interface LoadStreamOut {
 
 export async function loadStream(context: any, streamId: string, branchName: string): Promise<LoadStreamOut> {
   const actReportBranchInfo = await getActReportBranchInfo(context, streamId, branchName);
-  console.log("actReportBranchInfo:", actReportBranchInfo)
   const parentId =
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
 
@@ -200,17 +199,6 @@ export async function loadStream(context: any, streamId: string, branchName: str
   levelsUpdated.levels[2].tCO2e =
     Math.ceil(levelsUpdated.levels[2].tCO2e * 100) / 100;
 
-    console.log("loadStream:", {
-      ready: true,
-      colors: co2Data.colors,
-      data: {
-        streamId: streamId,
-        projectInfo: projectInfoUpdated,
-        materialBreakdown: materialBreakdownUpdated,
-        aBreakdown: levelsUpdated,
-        children: childrenData,
-      },
-    })
   return {
     ready: true,
     colors: co2Data.colors,

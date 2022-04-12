@@ -81,7 +81,6 @@ export default class Menu1b extends Vue {
   defaultSpeckleStream() {
     if (this.streamId) {
       const stream = this.streams?.find(s => s.value === this.streamId)
-      console.log("streamId:", this.streamId, "\nstreams:", this.streams, "\nstream:", stream, "\nspeckleStream", this.speckleStream)
       return stream ? stream : null;
     }
     return null;

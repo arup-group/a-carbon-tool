@@ -121,7 +121,7 @@ export const createCommitMutation = (
 
 export const streamCommmitObjects = (id: string) => `query {
 stream(id: "${id}") {
-  branch (name:"actcarbonreport"){
+  branch (name:"actcarbonreport/main"){
     commits {
        items {
          referencedObject

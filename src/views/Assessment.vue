@@ -121,7 +121,11 @@ import {
   productStageCarbonA1A3,
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
-import { CheckContainsChlidReportInput, LoadActReportDataInput, UploadReportInput } from "@/store";
+import {
+  CheckContainsChlidReportInput,
+  LoadActReportDataInput,
+  UploadReportInput,
+} from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 
@@ -197,8 +201,9 @@ export default class Assessment extends Vue {
     this.token = this.$store.state.token.token;
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
-    let {streamId, branchName} = this.$route.params;
+    let { streamId, branchName } = this.$route.params;
     if (!streamId) streamId = this.modalStreamid;
+    if (!branchName) branchName = this.modalBranchName;
     if (streamId && branchName) {
       this.defaultBranchName = branchName;
       await this.updateStream(streamId, branchName);
@@ -235,7 +240,7 @@ export default class Assessment extends Vue {
     this.streamId = streamId;
     this.update = true;
     await this.loadStream(streamId);
-    const input: LoadActReportDataInput = { streamId, branchName }
+    const input: LoadActReportDataInput = { streamId, branchName };
     const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
       "loadActReportData",
       input

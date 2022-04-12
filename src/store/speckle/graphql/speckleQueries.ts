@@ -95,10 +95,10 @@ export const uploadObjectsMutation = (
 }
 `;
 
-export const createBranchMutation = (streamid: string) => `mutation {
+export const createBranchMutation = (streamid: string, branchName: string) => `mutation {
   branchCreate(branch: {
     streamId: "${streamid}",
-    name: "actcarbonreport",
+    name: "${branchName}",
     description: "A Carbon Tool carbon report"
   })
 }`;
@@ -106,11 +106,12 @@ export const createBranchMutation = (streamid: string) => `mutation {
 export const createCommitMutation = (
   streamid: string,
   objectid: string,
-  totalChildrenCount: number
+  totalChildrenCount: number,
+  branchName: string
 ) => `mutation {
   commitCreate(commit: {
     streamId: "${streamid}",
-    branchName: "actcarbonreport",
+    branchName: "${branchName}",
     objectId: "${objectid}",
     message: "upload carbon report",
     sourceApplication: "ACT",

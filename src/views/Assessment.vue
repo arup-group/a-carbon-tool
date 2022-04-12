@@ -208,19 +208,23 @@ export default class Assessment extends Vue {
   }
 
   async newBranchSelect(name: string) {
-    console.log("newBranchSelect", name);
     const input: CheckContainsChlidReportInput = {
       streamid: this.streamId,
       branchName: name,
+    };
+    this.branchExistsError = await this.$store.dispatch(
+      "checkContainsChlidReport",
+      input
+    );
+
+    if (!this.branchExistsError) {
+      this.newBranchDialog = false;
+      this.uploadReport(name);
     }
-    const branchExists = await this.$store.dispatch("checkContainsChlidReport", input);
-
-    console.log("branchExists:", branchExists);
-
-    this.branchExistsError = branchExists;
   }
   updateBranchSelect(name: string) {
-    console.log("updateBranchSelect", name);
+    this.newBranchDialog = false;
+    this.uploadReport(name);
   }
 
   async updateStream(streamId: string) {
@@ -231,7 +235,6 @@ export default class Assessment extends Vue {
       "loadActReportData",
       streamId
     );
-    console.log("viewData:", assessmentViewData);
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -246,7 +249,6 @@ export default class Assessment extends Vue {
       id: t.type,
       color: t.material ? t.material.color : "",
     }));
-    console.log("materialsColors:", this.materialsColors);
     this.transportColors = this.types.map((t) => ({
       id: t.type,
       color: t.transport ? t.transport.color : "",
@@ -256,33 +258,28 @@ export default class Assessment extends Vue {
     this.projectDataPassdown = assessmentViewData.data.projectInfo;
 
     this.groupMaterials();
-    console.log("groupedMaterials", this.groupedMaterials);
 
     this.totalVolume = assessmentViewData.data.projectInfo.volume;
     this.speckleVol = true;
-    console.log("totalVolume:", this.totalVolume);
   }
 
   async agreeSave() {
     this.loading = true;
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
-        console.log("1");
         const containsReport: boolean = await this.$store.dispatch(
           "checkContainsReport",
           this.streamId
         );
         if (containsReport) {
-          console.log("2");
           this.branchNames = await this.$store.dispatch(
             "getAllReportBranches",
             this.streamId
           );
-          console.log("branchNames:", this.branchNames);
           this.reportName = this.projectData.name;
           this.newBranchDialog = true;
         } else {
-          this.uploadReport();
+          this.uploadReport("main");
         }
       } else {
         this.saveSnack = true;
@@ -292,13 +289,14 @@ export default class Assessment extends Vue {
       }
     }
   }
-  async uploadReport() {
+  async uploadReport(branchName: string) {
     if (this.report && this.report.reportObjs.length > 0) {
       const uploadReportInput: UploadReportInput = {
         streamid: this.streamId,
         objects: this.report.reportObjs,
         reportTotals: this.report.totals,
         projectData: this.projectData,
+        branchName,
       };
       this.dialog = false;
       this.loading = true;
@@ -370,7 +368,6 @@ export default class Assessment extends Vue {
       this.totalVolume = totalVol;
 
       this.updateVolumeGradient();
-      console.log("objectsObj:", this.objectsObj);
     }
   }
   findVolume(
@@ -694,7 +691,6 @@ export default class Assessment extends Vue {
         color: material.material.color,
       });
     this.materialsColors = this.colors;
-    console.log("materialsColors:", this.materialsColors);
 
     // update the objects to include this new material
     material.type.ids.forEach((i) => {
@@ -711,7 +707,6 @@ export default class Assessment extends Vue {
 
   findTypes(objects: ObjectsObj): SpeckleType[] {
     let types: SpeckleType[] = [];
-    console.log("objects:", this.objectsObj);
 
     Object.values(objects).forEach((o) => {
       let typeIndex = -1;

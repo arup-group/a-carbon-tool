@@ -123,8 +123,8 @@ export const uploadObjects = (
   objects: SpeckleObjectComplete[]
 ) => speckleFetch(queries.uploadObjectsMutation(streamid, objects), context);
 
-export const createReportBranch = (context: any, streamid: string) =>
-  speckleFetch(queries.createBranchMutation(streamid), context);
+export const createReportBranch = (context: any, streamid: string, branchName: string) =>
+  speckleFetch(queries.createBranchMutation(streamid, branchName), context);
 
 export const uploadObjectWithChildren = (
   context: any,
@@ -141,10 +141,11 @@ export const createCommit = (
   context: any,
   streamid: string,
   objectid: string,
-  totalChildrenCount: number
+  totalChildrenCount: number,
+  branchName: string
 ) =>
   speckleFetch(
-    queries.createCommitMutation(streamid, objectid, totalChildrenCount),
+    queries.createCommitMutation(streamid, objectid, totalChildrenCount, branchName),
     context
   );
 

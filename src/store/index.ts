@@ -380,8 +380,8 @@ export default new Vuex.Store({
 
       return childrenObjects;
     },
-    async uploadReport(context, input: UploadReportInput) {
-      const { streamid, objects, reportTotals, projectData } = input;
+    async uploadReport(context, { streamid, objects, reportTotals, projectData, branchName }: UploadReportInput) {
+      branchName = `actcarbonreport/${branchName}`;
 
       // TODO: ADD ERROR HANDLING
       const uploadObjectsRes: UploadObjectsRes =
@@ -423,7 +423,7 @@ export default new Vuex.Store({
       });
       // TODO: DELETE BRANCH FIRST TO ENSURE THE BRANCH ONLY CONTAINS OBJECTS FROM MOST RECENT REPORT
       const createBranch: SpeckleBranchRes =
-        await speckleUtil.createReportBranch(context, streamid);
+        await speckleUtil.createReportBranch(context, streamid, branchName);
 
       const totalChildrenCount = uploadObjectsRes.data.objectCreate.length;
 
@@ -431,11 +431,12 @@ export default new Vuex.Store({
         context,
         streamid,
         objectid,
-        totalChildrenCount
+        totalChildrenCount,
+        branchName
       );
     },
     async checkContainsReport(context, streamid: string): Promise<boolean> {
-      const queryRes = await speckleUtil.checkContainsBranch(context, streamid, "actcarbonreport");
+      const queryRes = await speckleUtil.checkContainsBranch(context, streamid, "actcarbonreport/main");
 
       return queryRes.data.stream.branch !== null;
     },
@@ -513,6 +514,7 @@ export interface UploadReportInput {
   objects: SpeckleObjectComplete[];
   reportTotals: ReportTotals;
   projectData: ProjectDataComplete;
+  branchName: string;
 }
 
 interface ObjectDetailsInput {

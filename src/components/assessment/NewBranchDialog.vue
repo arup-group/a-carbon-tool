@@ -18,9 +18,9 @@
             label="Branch name"
             v-model="newBranchModel"
             :rules="newBranchRules"
+            prefix="actcarbonreport/"
           ></v-text-field>
           <v-btn type="submit">New report</v-btn>
-          {{ branchExistsError }}
         </v-form>
       </v-card-text>
     </v-card>

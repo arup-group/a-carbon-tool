@@ -33,13 +33,14 @@
               style="display: flex"
             >
               <new-assessment-card v-if="item.title === 'New Assessment'" />
-              <project-card
+              <project-folder-card v-else :stream="item" />
+              <!-- <project-card
                 v-else
                 :project="item"
                 @delete="checkDelete"
                 @edit="edit"
                 @open="openViewAssessment"
-              ></project-card>
+              ></project-card> -->
             </v-col>
           </v-row>
         </template>
@@ -98,13 +99,18 @@ import {
   StreamReferenceBranches,
 } from "@/models/graphql";
 
-import { DeleteBranchInput, GetStreamBranchesOutput, LoadActReportDataInput } from "@/store";
+import {
+  DeleteBranchInput,
+  GetStreamBranchesOutput,
+  LoadActReportDataInput,
+} from "@/store";
 import { loadParent, LoadStreamOut } from "../views/utils/viewAssessmentUtils";
 import {
   CarbonBranch,
   BranchData,
   StreamId,
   StreamBranches,
+  StreamFolder,
 } from "@/models/landing";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
@@ -113,6 +119,7 @@ import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingError from "@/components/landing/LandingError.vue";
 import QuickReport from "@/components/landing/QuickReport.vue";
+import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
@@ -127,6 +134,7 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
     ConfirmDialog,
     SESnackBar,
     QuickReport,
+    ProjectFolderCard,
   },
 })
 export default class Landing extends Vue {
@@ -136,7 +144,7 @@ export default class Landing extends Vue {
   itemsPerPage = 8;
   search = "";
   page = 1;
-  projects: Project[] = [];
+  projects: StreamFolder[] = [];
   loading = true;
   error = false;
   dialog = false;
@@ -154,7 +162,7 @@ export default class Landing extends Vue {
 
   edit(streamid: string) {
     this.quickStreamid = streamid;
-    this.quickBranchName = "main"
+    this.quickBranchName = "main";
     this.quickReport = true;
   }
   quickReportClose() {
@@ -310,8 +318,8 @@ export default class Landing extends Vue {
           );
           const loadActReportDataInput: LoadActReportDataInput = {
             streamId: cb.id,
-            branchName: "main"
-          }
+            branchName: "main",
+          };
           const data: LoadStreamOut = await this.$store.dispatch(
             "loadActReportData",
             loadActReportDataInput
@@ -327,10 +335,12 @@ export default class Landing extends Vue {
         })
       );
       // convert the data into the format that this page needs it to be in
-      this.projects = await Promise.all(
-        this.branchData.map(async (proj) => {
-          const projName = proj.data.data.projectInfo.name;
-          return {
+      this.projects = this.branchData.map((proj) => {
+        const projName = proj.data.data.projectInfo.name;
+        return {
+          streamName: proj.name,
+          streamId: proj.id,
+          mainProject: {
             title: `${projName} - ${proj.name}`,
             id: `${proj.id}`,
             co2Values: proj.data.data.materialBreakdown.materials,
@@ -339,9 +349,19 @@ export default class Landing extends Vue {
             category: proj.data.data.projectInfo.components,
             projectDate: proj.projectDate,
             newMainAvailable: proj.newMainAvailable,
-          };
-        })
-      );
+          },
+        };
+        // return {
+        //   title: `${projName} - ${proj.name}`,
+        //   id: `${proj.id}`,
+        //   co2Values: proj.data.data.materialBreakdown.materials,
+        //   totalCO2e: proj.data.data.projectInfo.totalCO2e,
+        //   link: "",
+        //   category: proj.data.data.projectInfo.components,
+        //   projectDate: proj.projectDate,
+        //   newMainAvailable: proj.newMainAvailable,
+        // };
+      });
 
       this.loading = false;
     } catch (err) {

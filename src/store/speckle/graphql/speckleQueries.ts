@@ -151,7 +151,9 @@ export const streamReferencedBranches = (id: string) => `query {
         id,
         name,
         commits {
-          cursor
+          items{
+            referencedObject
+          }
         }
       }
     }
@@ -181,3 +183,11 @@ export const deleteBranchMutation = (
 ) => `mutation {
   branchDelete( branch: {streamId: "${streamId}", id: "${id}"})
 }`;
+
+export const getObjectInfo = (streamid: string, objectid: string) => `query {
+  stream(id: "${streamid}") {
+    object(id: "${objectid}") {
+      totalChildrenCount
+    }
+  }
+}`

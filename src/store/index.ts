@@ -21,6 +21,7 @@ import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 import { filterOnlyReportBranches } from "./utilities/filters";
 import { StreamReferenceBranches } from "@/models/graphql";
+import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
 
 Vue.use(Vuex);
 
@@ -289,7 +290,13 @@ export default new Vuex.Store({
     ): Promise<GetStreamBranchesOutput> {
       const branches: StreamReferenceBranches =
         await speckleUtil.getStreamBranches(context, streamid);
+
+      const oldBranch = branches.data.stream.branches.items.find(
+        (i) => i.name === "actcarbonreport"
+      );
       const reportBranches = filterOnlyReportBranches(branches);
+      const mainReport = reportBranches.find(b => b.name === "actcarbonreport/main")
+      if (oldBranch && !mainReport) speckleUtil.convOldReport(context, streamid, oldBranch);
       const mainBranch = branches.data.stream.branches.items.find(
         (i) => i.name === "main"
       );
@@ -301,8 +308,7 @@ export default new Vuex.Store({
               id: "",
               name: "",
               createdAt: "",
-              branchCommitDate: "",
-              commits: "",
+              commits: { items: [] },
             },
       };
     },
@@ -489,17 +495,9 @@ export default new Vuex.Store({
   modules: {},
 });
 
-interface Branch {
-  id: string;
-  name: string;
-  createdAt: string;
-  branchCommitDate: any;
-  commits: any;
-}
-
 export interface GetStreamBranchesOutput {
-  reportBranches: Branch[];
-  mainBranch: Branch;
+  reportBranches: BranchItem[];
+  mainBranch: BranchItem;
 }
 
 export interface GetActReportBranchInfoInput {

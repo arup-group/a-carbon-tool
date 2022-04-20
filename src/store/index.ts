@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
-import { loadStream } from "@/views/utils/viewAssessmentUtils";
+import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 import {
@@ -20,7 +20,7 @@ import {
 import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 import { filterOnlyReportBranches } from "./utilities/filters";
-import { StreamReferenceBranches } from "@/models/graphql";
+import { StreamReferenceBranches, StreamReferenceObjects } from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
 
 Vue.use(Vuex);
@@ -295,8 +295,11 @@ export default new Vuex.Store({
         (i) => i.name === "actcarbonreport"
       );
       const reportBranches = filterOnlyReportBranches(branches);
-      const mainReport = reportBranches.find(b => b.name === "actcarbonreport/main")
-      if (oldBranch && !mainReport) speckleUtil.convOldReport(context, streamid, oldBranch);
+      const mainReport = reportBranches.find(
+        (b) => b.name === "actcarbonreport/main"
+      );
+      if (oldBranch && !mainReport)
+        speckleUtil.convOldReport(context, streamid, oldBranch);
       const mainBranch = branches.data.stream.branches.items.find(
         (i) => i.name === "main"
       );
@@ -313,8 +316,15 @@ export default new Vuex.Store({
       };
     },
 
-    async getStreamCommit(context, streamid: string) {
-      const streams = await speckleUtil.getStreamCommit(context, streamid);
+    async getStreamCommit(
+      context,
+      { streamid, branchName }: GetStreamCommitInput
+    ): Promise<StreamReferenceObjects> {
+      const streams = await speckleUtil.getStreamCommit(
+        context,
+        streamid,
+        branchName
+      );
       return streams;
     },
 
@@ -361,8 +371,7 @@ export default new Vuex.Store({
       commit("setDarkMode");
     },
 
-    async getObjectDetails(context, input: ObjectDetailsInput) {
-      const { streamid, objecturl } = input;
+    async getObjectDetails(context, { streamid, objecturl }: ObjectDetailsInput) {
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
       const response = await fetch(
@@ -491,9 +500,38 @@ export default new Vuex.Store({
         (b) => b.name.split("/")[1]
       );
     },
+    async getAllReportObjects(context, streamid: string): Promise<GetAllReportObjectsOutputs> {
+      const branches: string[] = await context.dispatch(
+        "getAllReportBranches",
+        streamid
+      );
+
+      const objects: GetAllReportObjectsOutputs = await Promise.all(branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
+        const fullBranchName = `actcarbonreport/${branch}`;
+
+        const data = await loadStream(context, streamid, fullBranchName);
+        return {
+          branch,
+          data
+        }
+      }));
+      return objects;
+    },
   },
   modules: {},
 });
+
+export type GetAllReportObjectsOutputs = GetAllReportObjectsOutput[];
+
+export interface GetAllReportObjectsOutput {
+  branch: string;
+  data: LoadStreamOut;
+}
+
+export interface GetStreamCommitInput {
+  streamid: string;
+  branchName: string;
+}
 
 export interface GetStreamBranchesOutput {
   reportBranches: BranchItem[];

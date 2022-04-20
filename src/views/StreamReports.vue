@@ -33,14 +33,13 @@
               style="display: flex"
             >
               <new-assessment-card v-if="item.title === 'New Assessment'" />
-              <project-folder-card v-else :stream="item" @openStream="openStream" />
-              <!-- <project-card
+              <project-card
                 v-else
                 :project="item"
                 @delete="checkDelete"
                 @edit="edit"
                 @open="openViewAssessment"
-              ></project-card> -->
+              ></project-card>
             </v-col>
           </v-row>
         </template>
@@ -101,8 +100,8 @@ import {
 
 import {
   DeleteBranchInput,
+  GetAllReportObjectsOutputs,
   GetStreamBranchesOutput,
-  GetStreamCommitInput,
   LoadActReportDataInput,
 } from "@/store";
 import { loadParent, LoadStreamOut } from "../views/utils/viewAssessmentUtils";
@@ -138,14 +137,13 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
     ProjectFolderCard,
   },
 })
-export default class Landing extends Vue {
+export default class StreamReports extends Vue {
   carbonBranches: CarbonBranch[] = [];
-  branchData: BranchData[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
   page = 1;
-  projects: StreamFolder[] = [];
+  projects: Project[] = [];
   loading = true;
   error = false;
   dialog = false;
@@ -155,10 +153,13 @@ export default class Landing extends Vue {
   deleteid = "";
   deleteSuccess = true;
   deleteSnack = false;
+  streamid = "";
 
   async mounted() {
     this.token = this.$store.state.token.token;
-    this.loadStreams();
+    this.streamid = this.$route.params.streamid;
+
+    if (this.streamid) this.loadStreams();
   }
 
   edit(streamid: string) {
@@ -237,126 +238,27 @@ export default class Landing extends Vue {
     this.loading = true;
     this.error = false;
     this.projects = [];
-    this.carbonBranches = [];
-    this.branchData = [];
     try {
-      // get all of the user's streams
-      const streams = await this.$store.dispatch("getUserStreams");
-      // format the streams into a more usable format
-      const streamIDs: StreamId[] = streams.data.user.streams.items.map(
-        (stream: any) => {
-          return { name: stream.name, id: stream.id };
-        }
-      );
-
-      this.carbonBranches = await Promise.all(
-        streamIDs.map(async (sid): Promise<CarbonBranch> => {
-          const branches: GetStreamBranchesOutput = await this.$store.dispatch(
-            "getStreamBranches",
-            sid.id
-          );
-          const mainreportidtemp = branches.reportBranches.find(
-            (rb) => rb.name === "actcarbonreport/main"
-          )?.id;
-          const mainreportid = mainreportidtemp ? mainreportidtemp : "";
-          return {
-            id: sid.id,
-            name: sid.name,
-            branchid: mainreportid,
-            mainBranchID: branches.mainBranch.id,
-          };
-        })
-      ).then((res) => res.filter((r) => r.branchid !== ""));
-
-      // get the most recent commit and the data from that commit
-      this.branchData = await Promise.all(
-        this.carbonBranches.map(async (cb) => {
-          const streamCommitInput: GetStreamCommitInput = {
-            streamid: cb.id,
-            branchName: "actcarbonreport/main"
-          }
-          const branchCommit = await this.$store.dispatch(
-            "getStreamCommit",
-            streamCommitInput
-          );
-
-          const mainBranchCommits = await this.$store.dispatch(
-            "getMainStreamCommit",
-            cb.id
-          );
-
-          let carbonCommit = "";
-          if (branchCommit.data.stream.branch) {
-            carbonCommit =
-              branchCommit.data.stream.branch.commits.items[0].referencedObject;
-          }
-          let latestMainCommitObj = "";
-          if (mainBranchCommits.data.stream.branch) {
-            latestMainCommitObj =
-              mainBranchCommits.data.stream.branch.commits.items[0]
-                .referencedObject;
-          }
-
-          // Get data from the most recent arupcarbon branch
-          const latestCarbonBranchData: StreamData = await this.$store.dispatch(
-            "getBranchData",
-            [cb.id, carbonCommit]
-          );
-
-          const latestMainBranchData: StreamData = await this.$store.dispatch(
-            "getBranchData",
-            [cb.id, latestMainCommitObj]
-          );
-
-          const latestCarbonBranchCommit = new Date(
-            latestCarbonBranchData.data.stream.object.createdAt
-          ).getTime();
-          const latestMainBranchCommit = new Date(
-            latestMainBranchData.data.stream.object.createdAt
-          ).getTime();
-
-          const parent = await loadParent(
-            this.$store.state.selectedServer.url,
-            cb.id,
-            carbonCommit,
-            this.$store.state.token.token
-          );
-          const loadActReportDataInput: LoadActReportDataInput = {
-            streamId: cb.id,
-            branchName: "main",
-          };
-          const data: LoadStreamOut = await this.$store.dispatch(
-            "loadActReportData",
-            loadActReportDataInput
-          );
-
-          return {
-            id: cb.id,
-            name: cb.name,
-            data,
-            projectDate: latestCarbonBranchData.data.stream.object.createdAt,
-            newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit,
-          };
-        })
-      );
-      // convert the data into the format that this page needs it to be in
-      this.projects = this.branchData.map((proj) => {
-        const projName = proj.data.data.projectInfo.name;
-        return {
-          streamName: proj.name,
-          streamId: proj.id,
-          mainProject: {
-            title: `${projName} - ${proj.name}`,
-            id: `${proj.id}`,
-            co2Values: proj.data.data.materialBreakdown.materials,
-            totalCO2e: proj.data.data.projectInfo.totalCO2e,
-            link: "",
-            category: proj.data.data.projectInfo.components,
-            projectDate: proj.projectDate,
-            newMainAvailable: proj.newMainAvailable,
-          },
-        };
-      });
+      const reportObjects: GetAllReportObjectsOutputs =
+        await this.$store.dispatch("getAllReportObjects", this.streamid);
+      // make sure that the "main" branch is first in the array so that it appears at the top
+      const mainBranch = reportObjects.find((o) => o.branch === "main");
+      if (mainBranch) {
+        const reportObjectsReorder = [
+          mainBranch,
+          ...reportObjects.filter((o) => o.branch !== "main"),
+        ];
+        this.projects = reportObjectsReorder.map((o) => ({
+          title: `${o.data.data.projectInfo.name} - ${o.branch}`,
+          id: o.branch,
+          co2Values: o.data.data.materialBreakdown.materials,
+          totalCO2e: o.data.data.projectInfo.totalCO2e,
+          link: "",
+          category: o.data.data.projectInfo.components,
+          projectDate: o.data.data.projectInfo.reportDate.toString(),
+          newMainAvailable: false,
+        }));
+      }
 
       this.loading = false;
     } catch (err) {

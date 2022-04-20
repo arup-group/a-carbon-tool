@@ -178,9 +178,10 @@ export const createCommit = (
 
 export const getStreamCommit = (
   context: any,
-  streamid: string
+  streamid: string,
+  branchName: string
 ): Promise<StreamReferenceObjects> =>
-  speckleFetch(queries.streamCommmitObjects(streamid), context);
+  speckleFetch(queries.streamCommmitObjects(streamid, branchName), context);
 
 export const getMainStreamCommit = (
   context: any,

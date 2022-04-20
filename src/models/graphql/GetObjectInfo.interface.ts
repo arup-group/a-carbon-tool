@@ -3,6 +3,7 @@ export interface GetObjectInfo {
     stream: {
       object: {
         totalChildrenCount: number;
+        data: any;
       };
     };
   };

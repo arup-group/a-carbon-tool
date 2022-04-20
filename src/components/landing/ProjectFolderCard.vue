@@ -25,7 +25,7 @@
               class="transition-fast-in-fast-out v-card--reveal d-flex justify-center align-center"
               style="height: 100%"
             >
-              <v-btn>Open Stream</v-btn>
+              <v-btn @click="openStream">Open Stream</v-btn>
             </v-card>
           </v-expand-transition>
         </v-card>
@@ -36,7 +36,7 @@
 <script lang="ts">
 import { ChartData } from "@/models/chart";
 import { StreamFolder } from "@/models/landing";
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import DoughnutChart from "../charts/DoughnutChart.vue";
 
@@ -73,6 +73,11 @@ export default class ProjectFolderCard extends Vue {
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp
     return Math.round(value * 0.001);
+  }
+
+  @Emit("openStream")
+  openStream() {
+    return this.stream.streamId;
   }
 }
 </script>

@@ -233,6 +233,10 @@ export default class Landing extends Vue {
     this.deleteSnack = false;
   }
 
+  openStream(streamid: string) {
+    this.$router.push(`/${streamid}`);
+  }
+
   async loadStreams() {
     this.loading = true;
     this.error = false;

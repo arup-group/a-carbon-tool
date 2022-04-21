@@ -6,3 +6,4 @@ export { DeleteStreamData } from "./DeleteStreamData.interface";
 export { CheckContainsBranch } from "./CheckContainsBranch.interface";
 export { CreateReportBranch } from "./CreateReportBranch.interface";
 export { GetObjectInfo } from "./GetObjectInfo.interface";
+export { StreamName } from "./StreamName.interface";

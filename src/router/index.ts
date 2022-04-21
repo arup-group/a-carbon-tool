@@ -41,6 +41,11 @@ const routes: Array<RouteConfig> = [
     name: "About",
     component: () => import("../views/About.vue"),
   },
+  {
+    path: "/assessment-history/:streamId",
+    name: "AssessmentHistory",
+    component: () => import("../views/AssessmentHistory.vue"),
+  },
 ];
 
 const router = new VueRouter({

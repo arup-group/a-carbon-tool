@@ -5,14 +5,16 @@ import { SpeckleObjectComplete } from "../newAssessment";
 export interface StreamData {
   data: {
     stream: {
-      object: {
-        data: ParentSpeckleObjectData;
-        createdAt: string;
-        children: {
-          objects: { data: any }[];
-        };
-      };
+      object: ReportObj;
     };
+  };
+}
+
+export interface ReportObj {
+  data: ParentSpeckleObjectData;
+  createdAt: string;
+  children: {
+    objects: { data: any }[];
   };
 }
 

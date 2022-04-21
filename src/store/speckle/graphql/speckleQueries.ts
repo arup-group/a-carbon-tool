@@ -191,4 +191,10 @@ export const getObjectInfo = (streamid: string, objectid: string) => `query {
       data
     }
   }
+}`;
+
+export const streamNameQuery = (streamId: string) => `query {
+  stream(id: "${streamId}") {
+    name
+  }
 }`

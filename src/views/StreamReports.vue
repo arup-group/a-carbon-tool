@@ -65,7 +65,7 @@
       ></v-progress-circular>
     </div>
     <div v-else>
-      <landing-error @retry="loadStreams" />
+      <error-retry @retry="loadStreams" />
     </div>
     <confirm-dialog
       :dialog="dialog"
@@ -101,7 +101,7 @@ import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import LandingError from "@/components/landing/LandingError.vue";
+import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import QuickReport from "@/components/landing/QuickReport.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
@@ -113,7 +113,7 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
     NewAssessmentCard,
     LandingHeader,
     LandingFooter,
-    LandingError,
+    ErrorRetry,
     ConfirmDialog,
     SESnackBar,
     QuickReport,

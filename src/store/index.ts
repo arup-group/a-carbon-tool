@@ -2,6 +2,25 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
 import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
+import {
+  createCommit,
+  createReportBranch,
+  exchangeAccessCode,
+  getServer,
+  getStreamObjects,
+  getToken,
+  getUserData,
+  getUserStreams,
+  getStreamBranches,
+  getBranchData,
+  goToSpeckleAuthpage,
+  speckleLogOut,
+  uploadObjects,
+  getStreamCommit,
+  getActReportBranchInfo,
+  deleteBranch,
+  getStreamName,
+} from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 import {
@@ -335,8 +354,12 @@ export default new Vuex.Store({
       const streams = await speckleUtil.getMainStreamCommit(context, streamid);
       return streams;
     },
+    async getStreamName(context, streamid: string) {
+      return await speckleUtil.getStreamName(context, streamid);
+    },
+    
 
-    async getBranchData(context, [streamid, objId]) {
+    async getBranchData(context, { streamid, objId }: GetBranchDataInputs) {
       const streams = await speckleUtil.getBranchData(context, streamid, objId);
       return streams;
     },
@@ -573,6 +596,11 @@ export interface LoadActReportDataInput {
 export interface CheckContainsChlidReportInput {
   streamid: string;
   branchName: string;
+}
+
+export interface GetBranchDataInputs {
+  streamid: string;
+  objId: string;
 }
 
 export interface DeleteBranchInput {

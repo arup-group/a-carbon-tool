@@ -14,6 +14,23 @@ import {
 import * as queries from "./graphql/speckleQueries";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
 
+import {
+  streamReferencedObjects,
+  streamsDataQuery,
+  userInfoQuery,
+  streamsQuery,
+  uploadObjectsMutation,
+  createBranchMutation,
+  uploadObjectWithChildrenMutation,
+  createCommitMutation,
+  streamReferencedBranches,
+  streamCommmitObjects,
+  actReportBranchInfo,
+  deleteBranchMutation,
+  streamNameQuery,
+} from "./graphql/speckleQueries";
+import { StreamName } from "@/models/graphql/StreamName.interface";
+
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
 const TOKEN = `${APP_NAME}.AuthToken`;
@@ -227,3 +244,8 @@ export const checkContainsBranch = (
   branchName: string
 ): Promise<CheckContainsBranch> =>
   speckleFetch(queries.checkContainsBranch(streamid, branchName), context);
+
+export const getStreamName = (
+  context: any,
+  streamid: string
+): Promise<StreamName> => speckleFetch(streamNameQuery(streamid), context);

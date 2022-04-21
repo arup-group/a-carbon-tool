@@ -1,12 +1,6 @@
 <template>
   <v-main>
-    <div v-if="loading" style="width: 100%" class="d-flex justify-center">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        :size="200"
-      ></v-progress-circular>
-    </div>
+    <loading-spinner v-if="loading" />
     <v-container
       v-else
       fluid
@@ -121,6 +115,7 @@ import {
   productStageCarbonA1A3,
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
+<<<<<<< HEAD
 import {
   CheckContainsChlidReportInput,
   GetAllReportBranchesOutput,
@@ -129,6 +124,12 @@ import {
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
+=======
+import { UploadReportInput } from "@/store";
+import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
+import SESnackBar from "@/components/shared/SESnackBar.vue";
+import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
+>>>>>>> history-view
 
 type ObjectsObj = { [id: string]: SpeckleObject };
 interface AvailableStream {
@@ -142,7 +143,11 @@ interface AvailableStream {
     Renderer,
     ConfirmDialog,
     SESnackBar,
+<<<<<<< HEAD
     NewBranchDialog,
+=======
+    LoadingSpinner,
+>>>>>>> history-view
   },
 })
 export default class Assessment extends Vue {
@@ -653,6 +658,53 @@ export default class Assessment extends Vue {
     this.streamId = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
+<<<<<<< HEAD
+=======
+
+    const res: ObjectDetails[] = await this.$store.dispatch(
+      "getObjectDetails",
+      {
+        streamid: id,
+        objecturl: this.objectURLs[0],
+      }
+    );
+
+    let totalVol = 0;
+
+    console.log("res:", res);
+
+    const filteredRes: ObjectDetailsComplete[] = [];
+    res.forEach((r) => {
+      if (r.parameters && r.parameters.HOST_VOLUME_COMPUTED) {
+        filteredRes.push({
+          id: r.id,
+          speckle_type: r.speckle_type,
+          paramters: {
+            HOST_VOLUME_COMPUTED: {
+              value: r.parameters.HOST_VOLUME_COMPUTED.value,
+            },
+          },
+        });
+        // also find total volume here to avoid needing to loop through objects again
+        totalVol += r.parameters.HOST_VOLUME_COMPUTED.value;
+      }
+    });
+
+    filteredRes.forEach((r) => {
+      this.objectsObj[r.id] = {
+        id: r.id,
+        speckle_type: r.speckle_type,
+        formData: {
+          volume: r.paramters.HOST_VOLUME_COMPUTED.value,
+        },
+      };
+    });
+
+    this.types = this.findTypes(this.objectsObj);
+    this.totalVolume = totalVol;
+
+    this.updateVolumeGradient();
+>>>>>>> history-view
   }
 
   transportSelected(selected: TransportSelected) {

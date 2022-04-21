@@ -33,7 +33,11 @@
               style="display: flex"
             >
               <new-assessment-card v-if="item.title === 'New Assessment'" />
-              <project-folder-card v-else :stream="item" @openStream="openStream" />
+              <project-folder-card
+                v-else
+                :stream="item"
+                @openStream="openStream"
+              />
               <!-- <project-card
                 v-else
                 :project="item"
@@ -54,20 +58,8 @@
         </template>
       </v-data-iterator>
     </v-container>
-    <div
-      v-else-if="loading && !error"
-      style="width: 100%"
-      class="d-flex justify-center"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        :size="200"
-      ></v-progress-circular>
-    </div>
-    <div v-else>
-      <landing-error @retry="loadStreams" />
-    </div>
+    <loading-spinner v-else-if="loading && !error" />
+    <error-retry v-else @retry="loadStreams" />
     <confirm-dialog
       :dialog="dialog"
       @agree="agreeDelete"
@@ -92,15 +84,11 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 
-import { Project } from "@/models/project";
-import {
-  StreamData,
-  DeleteStreamData,
-  StreamReferenceBranches,
-} from "@/models/graphql";
+import { DeleteStreamData, StreamData } from "@/models/graphql";
 
 import {
   DeleteBranchInput,
+  GetBranchDataInputs,
   GetStreamBranchesOutput,
   GetStreamCommitInput,
   LoadActReportDataInput,
@@ -110,7 +98,6 @@ import {
   CarbonBranch,
   BranchData,
   StreamId,
-  StreamBranches,
   StreamFolder,
 } from "@/models/landing";
 
@@ -118,12 +105,13 @@ import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import LandingError from "@/components/landing/LandingError.vue";
 import QuickReport from "@/components/landing/QuickReport.vue";
 import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 
+import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 
 @Component({
   components: {
@@ -131,11 +119,12 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
     NewAssessmentCard,
     LandingHeader,
     LandingFooter,
-    LandingError,
+    ErrorRetry,
     ConfirmDialog,
     SESnackBar,
     QuickReport,
     ProjectFolderCard,
+    LoadingSpinner,
   },
 })
 export default class Landing extends Vue {
@@ -277,8 +266,8 @@ export default class Landing extends Vue {
         this.carbonBranches.map(async (cb) => {
           const streamCommitInput: GetStreamCommitInput = {
             streamid: cb.id,
-            branchName: "actcarbonreport/main"
-          }
+            branchName: "actcarbonreport/main",
+          };
           const branchCommit = await this.$store.dispatch(
             "getStreamCommit",
             streamCommitInput
@@ -302,14 +291,22 @@ export default class Landing extends Vue {
           }
 
           // Get data from the most recent arupcarbon branch
+          const getBranchDataInputs1: GetBranchDataInputs = {
+            streamid: cb.id,
+            objId: carbonCommit
+          }
           const latestCarbonBranchData: StreamData = await this.$store.dispatch(
             "getBranchData",
-            [cb.id, carbonCommit]
+            getBranchDataInputs1
           );
 
+          const getBranchDataInputs2: GetBranchDataInputs = {
+            streamid: cb.id,
+            objId: latestMainCommitObj
+          }
           const latestMainBranchData: StreamData = await this.$store.dispatch(
             "getBranchData",
-            [cb.id, latestMainCommitObj]
+            getBranchDataInputs2
           );
 
           const latestCarbonBranchCommit = new Date(
@@ -364,6 +361,7 @@ export default class Landing extends Vue {
 
       this.loading = false;
     } catch (err) {
+      console.error(err)
       this.error = true;
       this.loading = false;
     }

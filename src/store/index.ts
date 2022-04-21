@@ -20,7 +20,10 @@ import {
 import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 import { filterOnlyReportBranches } from "./utilities/filters";
-import { StreamReferenceBranches, StreamReferenceObjects } from "@/models/graphql";
+import {
+  StreamReferenceBranches,
+  StreamReferenceObjects,
+} from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
 
 Vue.use(Vuex);
@@ -371,7 +374,10 @@ export default new Vuex.Store({
       commit("setDarkMode");
     },
 
-    async getObjectDetails(context, { streamid, objecturl }: ObjectDetailsInput) {
+    async getObjectDetails(
+      context,
+      { streamid, objecturl }: ObjectDetailsInput
+    ) {
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
       const response = await fetch(
@@ -493,38 +499,54 @@ export default new Vuex.Store({
 
       return queryRes.data.stream.branch !== null;
     },
-    async getAllReportBranches(context, streamid: string): Promise<string[]> {
+    async getAllReportBranches(context, streamid: string): Promise<GetAllReportBranchesOutput> {
       const branches = await speckleUtil.getStreamBranches(context, streamid);
 
-      return filterOnlyReportBranches(branches).map(
-        (b) => b.name.split("/")[1]
-      );
+      return filterOnlyReportBranches(branches).map((b) => ({
+        name: b.name.split("/")[1],
+        id: b.id,
+      }));
     },
-    async getAllReportObjects(context, streamid: string): Promise<GetAllReportObjectsOutputs> {
-      const branches: string[] = await context.dispatch(
+    async getAllReportObjects(
+      context,
+      streamid: string
+    ): Promise<GetAllReportObjectsOutputs> {
+      const branches: GetAllReportBranchesOutput = await context.dispatch(
         "getAllReportBranches",
         streamid
       );
 
-      const objects: GetAllReportObjectsOutputs = await Promise.all(branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
-        const fullBranchName = `actcarbonreport/${branch}`;
+      const objects: GetAllReportObjectsOutputs = await Promise.all(
+        branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
+          const fullBranchName = `actcarbonreport/${branch.name}`;
 
-        const data = await loadStream(context, streamid, fullBranchName);
-        return {
-          branch,
-          data
-        }
-      }));
+          const data = await loadStream(context, streamid, fullBranchName);
+          return {
+            branch,
+            data,
+          };
+        })
+      );
       return objects;
     },
   },
   modules: {},
 });
 
+export type GetAllReportBranchesOutput = GetAllReportBranchesOutputItem[];
+
+export interface GetAllReportBranchesOutputItem {
+  name: string;
+  id: string;
+}
+
 export type GetAllReportObjectsOutputs = GetAllReportObjectsOutput[];
 
 export interface GetAllReportObjectsOutput {
-  branch: string;
+  branch: {
+    id: string;
+    name: string;
+  };
   data: LoadStreamOut;
 }
 

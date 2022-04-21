@@ -92,26 +92,10 @@
 import { Vue, Component } from "vue-property-decorator";
 
 import { Project } from "@/models/project";
-import {
-  StreamData,
-  DeleteStreamData,
-  StreamReferenceBranches,
-} from "@/models/graphql";
+import { DeleteStreamData } from "@/models/graphql";
 
-import {
-  DeleteBranchInput,
-  GetAllReportObjectsOutputs,
-  GetStreamBranchesOutput,
-  LoadActReportDataInput,
-} from "@/store";
-import { loadParent, LoadStreamOut } from "../views/utils/viewAssessmentUtils";
-import {
-  CarbonBranch,
-  BranchData,
-  StreamId,
-  StreamBranches,
-  StreamFolder,
-} from "@/models/landing";
+import { DeleteBranchInput, GetAllReportObjectsOutputs } from "@/store";
+import { CarbonBranch } from "@/models/landing";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -119,7 +103,6 @@ import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import LandingError from "@/components/landing/LandingError.vue";
 import QuickReport from "@/components/landing/QuickReport.vue";
-import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
@@ -134,7 +117,6 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
     ConfirmDialog,
     SESnackBar,
     QuickReport,
-    ProjectFolderCard,
   },
 })
 export default class StreamReports extends Vue {
@@ -193,35 +175,32 @@ export default class StreamReports extends Vue {
     if (this.page - 1 >= 1) this.page -= 1;
   }
 
-  checkDelete(streamid: string) {
-    this.deleteid = streamid;
+  checkDelete(branchid: string) {
+    this.deleteid = branchid;
     this.dialog = true;
   }
   async agreeDelete() {
     this.dialog = false;
-    const stream = this.carbonBranches.find((c) => c.id === this.deleteid);
-    if (stream) {
-      const input: DeleteBranchInput = {
-        streamid: stream.id,
-        branchid: stream.branchid,
-      };
-      try {
-        const deleted: DeleteStreamData = await this.$store.dispatch(
-          "deleteBranch",
-          input
-        );
-        if (deleted.data.branchDelete) {
-          this.deleteSuccess = true;
-          this.deleteSnack = true;
-          this.loadStreams();
-        } else {
-          this.deleteSuccess = false;
-          this.deleteSnack = true;
-        }
-      } catch (err) {
+    const input: DeleteBranchInput = {
+      streamid: this.streamid,
+      branchid: this.deleteid,
+    };
+    try {
+      const deleted: DeleteStreamData = await this.$store.dispatch(
+        "deleteBranch",
+        input
+      );
+      if (deleted.data.branchDelete) {
+        this.deleteSuccess = true;
+        this.deleteSnack = true;
+        this.loadStreams();
+      } else {
         this.deleteSuccess = false;
         this.deleteSnack = true;
       }
+    } catch (err) {
+      this.deleteSuccess = false;
+      this.deleteSnack = true;
     }
     return;
   }
@@ -242,15 +221,15 @@ export default class StreamReports extends Vue {
       const reportObjects: GetAllReportObjectsOutputs =
         await this.$store.dispatch("getAllReportObjects", this.streamid);
       // make sure that the "main" branch is first in the array so that it appears at the top
-      const mainBranch = reportObjects.find((o) => o.branch === "main");
+      const mainBranch = reportObjects.find((o) => o.branch.name === "main");
       if (mainBranch) {
         const reportObjectsReorder = [
           mainBranch,
-          ...reportObjects.filter((o) => o.branch !== "main"),
+          ...reportObjects.filter((o) => o.branch.name !== "main"),
         ];
         this.projects = reportObjectsReorder.map((o) => ({
-          title: `${o.data.data.projectInfo.name} - ${o.branch}`,
-          id: o.branch,
+          title: `${o.data.data.projectInfo.name} - ${o.branch.name}`,
+          id: o.branch.id,
           co2Values: o.data.data.materialBreakdown.materials,
           totalCO2e: o.data.data.projectInfo.totalCO2e,
           link: "",
@@ -262,6 +241,7 @@ export default class StreamReports extends Vue {
 
       this.loading = false;
     } catch (err) {
+      console.error(err);
       this.error = true;
       this.loading = false;
     }

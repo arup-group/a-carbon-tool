@@ -88,9 +88,6 @@ export default class ProjectCard extends Vue {
   options = false;
   cardOverlay = false;
 
-  get streamid() {
-    return this.project.id;
-  }
   get title() {
     return this.project.title;
   }

@@ -123,6 +123,7 @@ import {
 } from "@/store/utilities/carbonCalculator";
 import {
   CheckContainsChlidReportInput,
+  GetAllReportBranchesOutput,
   LoadActReportDataInput,
   UploadReportInput,
 } from "@/store";
@@ -282,10 +283,11 @@ export default class Assessment extends Vue {
           this.streamId
         );
         if (containsReport) {
-          this.branchNames = await this.$store.dispatch(
+           const getAllReportBranchesOut: GetAllReportBranchesOutput= await this.$store.dispatch(
             "getAllReportBranches",
             this.streamId
           );
+          this.branchNames = getAllReportBranchesOut.map(b => b.name);
           this.reportName = this.projectData.name;
           this.newBranchDialog = true;
         } else {

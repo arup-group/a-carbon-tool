@@ -2,25 +2,6 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
 import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
-import {
-  createCommit,
-  createReportBranch,
-  exchangeAccessCode,
-  getServer,
-  getStreamObjects,
-  getToken,
-  getUserData,
-  getUserStreams,
-  getStreamBranches,
-  getBranchData,
-  goToSpeckleAuthpage,
-  speckleLogOut,
-  uploadObjects,
-  getStreamCommit,
-  getActReportBranchInfo,
-  deleteBranch,
-  getStreamName,
-} from "./speckle/speckleUtil";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 import {

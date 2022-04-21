@@ -50,7 +50,7 @@ import {
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { ReportObj } from "@/models/graphql/StreamData.interface";
-import { GetBranchDataInputs } from "@/store";
+import { GetAllReportBranchesOutput, GetBranchDataInputs, GetStreamCommitInput } from "@/store";
 import { Vue, Component } from "vue-property-decorator";
 
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
@@ -139,15 +139,19 @@ export default class AssessmentHistory extends Vue {
     this.loading = true;
     this.error = false;
     try {
-      const branches: StreamReferenceBranches = await this.getBranches(
+      const branches = await this.getBranches(
         this.streamId
       );
-      const containsReport = this.findContainsReport(branches);
-      if (containsReport) {
+      if (branches.length !== 0) {
+        const getStreamCommitInput: GetStreamCommitInput = {
+          streamid: this.streamId,
+          branchName: "actcarbonreport/main"
+        }
         const branchData: StreamReferenceObjects = await this.$store.dispatch(
           "getStreamCommit",
-          this.streamId
+          getStreamCommitInput
         );
+        console.log("branchData:", branchData)
         this.reports = await this.getReports(branchData, this.streamId);
         this.cleanedReports = this.convReports(this.reports);
         this.chartData = this.cleanedReports.map(r => ({
@@ -158,19 +162,13 @@ export default class AssessmentHistory extends Vue {
         this.loading = false;
       }
     } catch (err) {
+      console.error(err);
       this.error = true;
     }
   }
 
-  async getBranches(streamId: string): Promise<StreamReferenceBranches> {
+  async getBranches(streamId: string): Promise<GetAllReportBranchesOutput> {
     return await this.$store.dispatch("getStreamBranches", streamId);
-  }
-  findContainsReport(branches: StreamReferenceBranches) {
-    let contains = false;
-    branches.data.stream.branches.items.forEach((b) => {
-      if (b.name === "actcarbonreport") contains = true;
-    });
-    return contains;
   }
   async getReports(
     branchData: StreamReferenceObjects,

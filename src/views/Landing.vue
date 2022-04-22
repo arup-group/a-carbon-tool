@@ -32,19 +32,12 @@
               lg="4"
               style="display: flex"
             >
-              <new-assessment-card v-if="item.title === 'New Assessment'" />
+              <new-assessment-card v-if="item.title === 'New Assessment'" @newAssessment="newAssessment" />
               <project-folder-card
                 v-else
                 :stream="item"
                 @openStream="openStream"
               />
-              <!-- <project-card
-                v-else
-                :project="item"
-                @delete="checkDelete"
-                @edit="edit"
-                @open="openViewAssessment"
-              ></project-card> -->
             </v-col>
           </v-row>
         </template>
@@ -146,6 +139,7 @@ export default class Landing extends Vue {
   deleteSnack = false;
 
   async mounted() {
+    console.log("landing")
     this.token = this.$store.state.token.token;
     this.loadStreams();
   }
@@ -161,6 +155,10 @@ export default class Landing extends Vue {
 
   openViewAssessment(streamid: string) {
     this.$router.push(`/assessment/view/${streamid}/main`);
+  }
+
+  newAssessment() {
+    this.$router.push("/assessment")
   }
 
   get numberOfPages() {

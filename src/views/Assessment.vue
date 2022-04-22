@@ -29,6 +29,7 @@
           @checkSave="checkSave"
           @calcVol="calcVol"
           @close="close"
+          @openFullView="openFullView"
           :modal="modal"
           :streams="availableStreams"
           :types="types"
@@ -195,6 +196,7 @@ export default class Assessment extends Vue {
   }
 
   async mounted() {
+    console.log("assessment page")
     this.token = this.$store.state.token.token;
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
@@ -205,12 +207,18 @@ export default class Assessment extends Vue {
       this.defaultBranchName = branchName;
       await this.updateStream(streamId, branchName);
     }
+    if (streamId && !branchName) {
+      this.loadStream(streamId);
+    }
 
     this.$store.dispatch("getUserStreams").then((res) => {
       this.availableStreams = res.data.user.streams.items.map((i: any) => {
         return { label: i.name, value: i.id };
       });
     });
+  }
+  openFullView() {
+    this.$router.push(`assessment/${this.modalStreamid}/${this.modalBranchName}`)
   }
 
   async newBranchSelect(name: string) {

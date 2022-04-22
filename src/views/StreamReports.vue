@@ -33,7 +33,7 @@
               lg="4"
               style="display: flex"
             >
-              <new-assessment-card v-if="item.title === 'New Assessment'" />
+              <new-assessment-card v-if="item.title === 'New Assessment'" @newAssessment="newAssessment" />
               <project-card
                 v-else
                 :project="item"
@@ -139,6 +139,7 @@ export default class StreamReports extends Vue {
   streamid = "";
 
   async mounted() {
+    console.log("streamreports")
     this.token = this.$store.state.token.token;
     this.streamid = this.$route.params.streamid;
 
@@ -149,9 +150,10 @@ export default class StreamReports extends Vue {
     this.$router.push(`assessment-history/${this.streamid}`)
   }
 
-  edit(streamid: string) {
-    this.quickStreamid = streamid;
-    this.quickBranchName = "main";
+  edit(branchName: string) {
+    console.log("branchName:", branchName)
+    this.quickStreamid = this.streamid;
+    this.quickBranchName = branchName;
     this.quickReport = true;
   }
   quickReportClose() {
@@ -160,6 +162,10 @@ export default class StreamReports extends Vue {
 
   openViewAssessment(streamid: string) {
     this.$router.push(`/assessment/view/${streamid}/main`);
+  }
+
+  newAssessment() {
+    this.$router.push(`/assessment/${this.streamid}`)
   }
 
   get numberOfPages() {
@@ -234,7 +240,7 @@ export default class StreamReports extends Vue {
         ];
         this.projects = reportObjectsReorder.map((o) => ({
           title: `${o.data.data.projectInfo.name} - ${o.branch.name}`,
-          id: o.branch.id,
+          id: o.branch.name,
           co2Values: o.data.data.materialBreakdown.materials,
           totalCO2e: o.data.data.projectInfo.totalCO2e,
           link: "",

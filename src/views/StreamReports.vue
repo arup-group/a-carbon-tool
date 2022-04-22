@@ -20,6 +20,7 @@
               prepend-inner-icon="mdi-magnify"
               label="Search"
             ></v-text-field>
+            <v-btn @click="openHistory">Open history</v-btn>
           </v-toolbar>
         </template>
         <template v-slot:default="props" class="my-2">
@@ -142,6 +143,10 @@ export default class StreamReports extends Vue {
     this.streamid = this.$route.params.streamid;
 
     if (this.streamid) this.loadStreams();
+  }
+
+  openHistory() {
+    this.$router.push(`assessment-history/${this.streamid}`)
   }
 
   edit(streamid: string) {

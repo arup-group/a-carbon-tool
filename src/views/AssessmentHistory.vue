@@ -9,7 +9,20 @@
       >
         <template v-slot:header>
           <v-toolbar class="mb-2" flat>
-            <v-toolbar-title>{{ streamName }}</v-toolbar-title>
+            <v-toolbar-title
+              class="d-flex justify-space-between align-center"
+              style="width: 100%"
+            >
+              <span>{{ streamName }}</span>
+              <v-select
+                v-if="branches.length > 0"
+                v-model="selectedBranch"
+                :items="branches"
+                :item-text="(obj) => obj.name.split('/')[1]"
+                :item-value="(obj) => obj"
+                style="max-width: 33%"
+              ></v-select>
+            </v-toolbar-title>
           </v-toolbar>
           <v-row>
             <v-col cols="3">
@@ -44,14 +57,18 @@
 </template>
 <script lang="ts">
 import {
+  BranchItem,
   StreamData,
   StreamName,
-  StreamReferenceBranches,
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { ReportObj } from "@/models/graphql/StreamData.interface";
-import { GetAllReportBranchesOutput, GetBranchDataInputs, GetStreamCommitInput } from "@/store";
-import { Vue, Component } from "vue-property-decorator";
+import {
+  GetBranchDataInputs,
+  GetStreamBranchesOutput,
+  GetStreamCommitInput,
+} from "@/store";
+import { Vue, Component, Watch } from "vue-property-decorator";
 
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 import ErrorRetry from "@/components/shared/ErrorRetry.vue";
@@ -72,7 +89,7 @@ import HistoryGraph from "@/components/assessmentHistory/HistoryGraph.vue";
     ErrorRetry,
     HistoryProjectCard,
     HistoryFilters,
-    HistoryGraph
+    HistoryGraph,
   },
 })
 export default class AssessmentHistory extends Vue {
@@ -92,10 +109,18 @@ export default class AssessmentHistory extends Vue {
     direction: HistoryProjectCardDirection.COL,
   };
   chartData: ChartData[] = [];
+  branches: BranchItem[] = [];
+  selectedBranch: BranchItem | null = null;
 
-  mounted() {
+  async mounted() {
     this.streamId = this.$route.params.streamId;
-    this.loadReports();
+    const tempBranch: GetStreamBranchesOutput = await this.$store.dispatch(
+      "getStreamBranches",
+      this.streamId
+    );
+    this.branches = [...tempBranch.reportBranches];
+    this.selectedBranch = this.branches[0];
+    this.loadReports(this.selectedBranch);
     this.getName();
   }
 
@@ -122,8 +147,14 @@ export default class AssessmentHistory extends Vue {
     this.filters.renderer = renderer;
   }
   directionUpdate(direction: HistoryProjectCardDirection) {
-    console.log("direction:", direction);
     this.filters.direction = direction;
+  }
+
+  @Watch("selectedBranch")
+  selectedBranchChanged(newVal: BranchItem, oldVal: BranchItem | null) {
+    if (oldVal !== null) {
+      this.loadReports(newVal);
+    }
   }
 
   async getName() {
@@ -135,30 +166,28 @@ export default class AssessmentHistory extends Vue {
     this.streamName = rawStreamName.data.stream.name;
   }
 
-  async loadReports() {
+  async loadReports(selectedBranch: BranchItem) {
     this.loading = true;
     this.error = false;
     try {
-      const branches = await this.getBranches(
-        this.streamId
-      );
-      if (branches.length !== 0) {
+      if (this.branches.length > 0) {
         const getStreamCommitInput: GetStreamCommitInput = {
           streamid: this.streamId,
-          branchName: "actcarbonreport/main"
-        }
+          branchName: `${selectedBranch.name}`,
+        };
         const branchData: StreamReferenceObjects = await this.$store.dispatch(
           "getStreamCommit",
           getStreamCommitInput
         );
-        console.log("branchData:", branchData)
         this.reports = await this.getReports(branchData, this.streamId);
         this.cleanedReports = this.convReports(this.reports);
-        this.chartData = this.cleanedReports.map(r => ({
-          label: r.title,
-          value: r.totalCO2e,
-          color: ""
-        })).reverse();
+        this.chartData = this.cleanedReports
+          .map((r) => ({
+            label: r.title,
+            value: r.totalCO2e,
+            color: "",
+          }))
+          .reverse();
         this.loading = false;
       }
     } catch (err) {
@@ -167,9 +196,6 @@ export default class AssessmentHistory extends Vue {
     }
   }
 
-  async getBranches(streamId: string): Promise<GetAllReportBranchesOutput> {
-    return await this.$store.dispatch("getStreamBranches", streamId);
-  }
   async getReports(
     branchData: StreamReferenceObjects,
     streamid: string

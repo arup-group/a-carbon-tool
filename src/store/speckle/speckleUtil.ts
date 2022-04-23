@@ -9,6 +9,7 @@ import {
   CheckContainsBranch,
   CreateReportBranch,
   GetObjectInfo,
+  StreamNameBranches,
 } from "@/models/graphql";
 
 import * as queries from "./graphql/speckleQueries";
@@ -248,4 +249,9 @@ export const checkContainsBranch = (
 export const getStreamName = (
   context: any,
   streamid: string
-): Promise<StreamName> => speckleFetch(streamNameQuery(streamid), context);
+): Promise<StreamName> => speckleFetch(queries.streamNameQuery(streamid), context);
+
+export const streamNameBranches = (
+  context: any,
+  streamid: string
+): Promise<StreamNameBranches> => speckleFetch(queries.streamNameBranches(streamid), context);

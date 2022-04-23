@@ -197,4 +197,16 @@ export const streamNameQuery = (streamId: string) => `query {
   stream(id: "${streamId}") {
     name
   }
-}`
+}`;
+
+// gets the stream name and all the branch names, used in Comparison.vue
+export const streamNameBranches = (streamId: string) => `query {
+  stream(id: "${streamId}") {
+    name
+    branches {
+      items {
+        name
+      }
+    }
+  }
+}`;

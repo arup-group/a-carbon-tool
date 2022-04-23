@@ -21,6 +21,7 @@ import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 import { filterOnlyReportBranches } from "./utilities/filters";
 import {
+  StreamNameBranches,
   StreamReferenceBranches,
   StreamReferenceObjects,
 } from "@/models/graphql";
@@ -297,7 +298,7 @@ export default new Vuex.Store({
       const oldBranch = branches.data.stream.branches.items.find(
         (i) => i.name === "actcarbonreport"
       );
-      const reportBranches = filterOnlyReportBranches(branches);
+      const reportBranches = filterOnlyReportBranches(branches.data.stream.branches.items);
       const mainReport = reportBranches.find(
         (b) => b.name === "actcarbonreport/main"
       );
@@ -338,7 +339,6 @@ export default new Vuex.Store({
     async getStreamName(context, streamid: string) {
       return await speckleUtil.getStreamName(context, streamid);
     },
-    
 
     async getBranchData(context, { streamid, objId }: GetBranchDataInputs) {
       const streams = await speckleUtil.getBranchData(context, streamid, objId);
@@ -503,10 +503,13 @@ export default new Vuex.Store({
 
       return queryRes.data.stream.branch !== null;
     },
-    async getAllReportBranches(context, streamid: string): Promise<GetAllReportBranchesOutput> {
+    async getAllReportBranches(
+      context,
+      streamid: string
+    ): Promise<GetAllReportBranchesOutput> {
       const branches = await speckleUtil.getStreamBranches(context, streamid);
 
-      return filterOnlyReportBranches(branches).map((b) => ({
+      return filterOnlyReportBranches(branches.data.stream.branches.items).map((b) => ({
         name: b.name.split("/")[1],
         id: b.id,
       }));
@@ -533,9 +536,23 @@ export default new Vuex.Store({
       );
       return objects;
     },
+
+    async getStreamNameReportBranches(context, streamid: string): Promise<GetStreamNameReportBranchesOutput> {
+      const res: StreamNameBranches = await speckleUtil.streamNameBranches(context, streamid);
+      const branches = filterOnlyReportBranches(res.data.stream.branches.items).map((b) => b.name);
+      return {
+        streamName: res.data.stream.name,
+        branches
+      }
+    },
   },
   modules: {},
 });
+
+export interface GetStreamNameReportBranchesOutput {
+  streamName: string;
+  branches: string[];
+}
 
 export type GetAllReportBranchesOutput = GetAllReportBranchesOutputItem[];
 

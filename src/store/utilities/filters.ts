@@ -1,7 +1,9 @@
-import { StreamReferenceBranches } from "@/models/graphql";
+interface Prop {
+  name: string;
+}
 
-export function filterOnlyReportBranches(branches: StreamReferenceBranches) {
-  return branches.data.stream.branches.items.filter((b) =>
+export function filterOnlyReportBranches<T extends Prop>(branches: T[]): T[] {
+  return branches.filter((b) =>
     b.name.includes("actcarbonreport/")
   );
 }

@@ -32,7 +32,6 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <!-- a warning appears if `chartData` is not passed in. The prop is not used -->
       </v-card>
     </v-sheet>
   </v-container>
@@ -54,6 +53,7 @@ import { HistoryFilterOptions, ProjectAVals } from "@/models/assessmentHistory";
 export default class HistoryProjectCard extends Vue {
   @Prop() project!: ProjectAVals;
   @Prop() filters!: HistoryFilterOptions;
+  @Prop() comparison!: boolean; // some things need to change if on comparison page
 
   options = false;
 
@@ -97,10 +97,12 @@ export default class HistoryProjectCard extends Vue {
 
   // different getters
   get materialGraphLgCols() {
-      return this.a15 ? "6" : "12";
+    if (this.comparison) return "12";
+    else return this.a15 ? "6" : "12";
   }
   get a15GraphLgCols() {
-      return this.materials ? "6" : "12";
+    if (this.comparison) return "12";
+    else return this.materials ? "6" : "12";
   }
 
   @Emit("delete")

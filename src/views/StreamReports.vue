@@ -20,6 +20,7 @@
               prepend-inner-icon="mdi-magnify"
               label="Search"
             ></v-text-field>
+            <v-btn @click="openComparison">Open comparison</v-btn>
             <v-btn @click="openHistory">Open history</v-btn>
           </v-toolbar>
         </template>
@@ -33,7 +34,10 @@
               lg="4"
               style="display: flex"
             >
-              <new-assessment-card v-if="item.title === 'New Assessment'" @newAssessment="newAssessment" />
+              <new-assessment-card
+                v-if="item.title === 'New Assessment'"
+                @newAssessment="newAssessment"
+              />
               <project-card
                 v-else
                 :project="item"
@@ -139,7 +143,7 @@ export default class StreamReports extends Vue {
   streamid = "";
 
   async mounted() {
-    console.log("streamreports")
+    console.log("streamreports");
     this.token = this.$store.state.token.token;
     this.streamid = this.$route.params.streamid;
 
@@ -147,11 +151,14 @@ export default class StreamReports extends Vue {
   }
 
   openHistory() {
-    this.$router.push(`assessment-history/${this.streamid}`)
+    this.$router.push(`assessment-history/${this.streamid}`);
+  }
+  openComparison() {
+    this.$router.push(`comparison/${this.streamid}`);
   }
 
   edit(branchName: string) {
-    console.log("branchName:", branchName)
+    console.log("branchName:", branchName);
     this.quickStreamid = this.streamid;
     this.quickBranchName = branchName;
     this.quickReport = true;
@@ -165,7 +172,7 @@ export default class StreamReports extends Vue {
   }
 
   newAssessment() {
-    this.$router.push(`/assessment/${this.streamid}`)
+    this.$router.push(`/assessment/${this.streamid}`);
   }
 
   get numberOfPages() {

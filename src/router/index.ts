@@ -28,7 +28,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/assessment/:streamId/:branchName",
-    name: "UpdateAssessment",
+    name: "UpdateAssessmentBranch",
     component: () => import("../views/Assessment.vue"),
   },
   {

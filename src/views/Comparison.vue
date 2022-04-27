@@ -18,6 +18,7 @@
           <div class="d-flex overflow-auto align-center">
             <history-project-card
               v-for="report in props.items"
+              @removeReport="removeReport"
               :style="historyProjectCardStyle"
               :key="report.id"
               :project="report"
@@ -121,6 +122,12 @@ export default class Comparison extends Vue {
     this.addReportDialog = false;
   }
 
+  removeReport(id: string) {
+    if (this.displayReports.length > 1) {
+      this.displayReports = this.displayReports.filter((r) => r.id !== id);
+    }
+  }
+
   get direction() {
     return this.filters.direction === HistoryProjectCardDirection.COL;
   }
@@ -176,7 +183,6 @@ export default class Comparison extends Vue {
         })),
       }));
       this.displayReports = [this.allReports[0]];
-      console.log(this.displayReports)
 
       this.loading = false;
     } catch (err) {

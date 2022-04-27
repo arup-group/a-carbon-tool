@@ -4,8 +4,11 @@
       <v-card flat height="100%" class="d-flex flex-column">
         <v-card-title>
           <v-row>
-            <v-col cols="12" class="limit-lines">
+            <v-col cols="12" class="limit-lines d-flex justify-space-between">
               {{ title }}
+              <v-btn v-if="comparison" icon @click="removeReport">
+                <v-icon>mdi-minus</v-icon>
+              </v-btn>
             </v-col>
             <BECChipGroup v-if="categories" :categories="category" />
           </v-row>
@@ -107,6 +110,11 @@ export default class HistoryProjectCard extends Vue {
 
   @Emit("delete")
   checkDelete() {
+    return this.project.id;
+  }
+
+  @Emit("removeReport")
+  removeReport() {
     return this.project.id;
   }
 

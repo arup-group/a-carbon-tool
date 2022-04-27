@@ -139,7 +139,6 @@ export default class Landing extends Vue {
   deleteSnack = false;
 
   async mounted() {
-    console.log("landing")
     this.token = this.$store.state.token.token;
     this.loadStreams();
   }

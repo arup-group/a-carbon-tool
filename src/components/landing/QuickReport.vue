@@ -1,16 +1,16 @@
 <template>
-  <v-dialog v-model="dialog" max-width="50%" persistent>
-    <v-card>
-      <v-card-text>
-        <assessment
-          :key="key"
-          :modal="true"
-          :modalStreamid="streamid"
-          :modalBranchName="branchName"
-          @close="close"
-        />
-      </v-card-text>
-    </v-card>
+  <v-dialog
+    v-model="dialog"
+    max-width="50%"
+    persistent
+  >
+    <assessment
+      :key="key"
+      :modal="true"
+      :modalStreamid="streamid"
+      :modalBranchName="branchName"
+      @close="close"
+    />
   </v-dialog>
 </template>
 <script lang="ts">
@@ -38,3 +38,9 @@ export default class QuickReport extends Vue {
   }
 }
 </script>
+<style>
+/* REMOVE BELOW IF DIALOG OVERFLOWS ARE NOT WORKING PROPERLY */
+.v-dialog {
+  overflow-y: visible;
+}
+</style>

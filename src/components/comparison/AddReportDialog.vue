@@ -109,12 +109,10 @@ export default class AddReportDialog extends Vue {
 
   submit() {
     if ((this.$refs.form as any).validate()) this.agree();
-    else console.log("no");
   }
 
   @Emit("agree")
   agree() {
-    console.log("validate:", (this.$refs.form as any).validate());
     return this.inputs;
   }
 }

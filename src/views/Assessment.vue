@@ -196,7 +196,6 @@ export default class Assessment extends Vue {
   }
 
   async mounted() {
-    console.log("assessment page")
     this.token = this.$store.state.token.token;
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;

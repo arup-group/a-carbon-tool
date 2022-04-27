@@ -143,7 +143,6 @@ export default class StreamReports extends Vue {
   streamid = "";
 
   async mounted() {
-    console.log("streamreports");
     this.token = this.$store.state.token.token;
     this.streamid = this.$route.params.streamid;
 
@@ -158,7 +157,6 @@ export default class StreamReports extends Vue {
   }
 
   edit(branchName: string) {
-    console.log("branchName:", branchName);
     this.quickStreamid = this.streamid;
     this.quickBranchName = branchName;
     this.quickReport = true;
@@ -167,8 +165,8 @@ export default class StreamReports extends Vue {
     this.quickReport = false;
   }
 
-  openViewAssessment(streamid: string) {
-    this.$router.push(`/assessment/view/${streamid}/main`);
+  openViewAssessment(branchName: string) {
+    this.$router.push(`/assessment/view/${this.streamid}/${branchName}`);
   }
 
   newAssessment() {

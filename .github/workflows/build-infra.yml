@@ -45,7 +45,7 @@ jobs:
             -var-file=${{ matrix. environment }}.tfvars \
             -var="azure_app_client_secret=${{ secrets.STATIC_PAGES_CLIENT_SECRET }}" \
             -var="private_key=${{ secrets.STATIC_PAGES_PRIVATE_KEY }}" \
-            -var="public_key=${{ secrets.STATIC_PAGES_PUBLIC_KEY }}"
+            -var="public_key=${{ secrets.STATIC_PAGES_PUBLIC_KEY }}" 
 
 
       - name: Build Infrastructure

@@ -1,6 +1,5 @@
 <template>
   <v-main class="mr-7 ml-7 pb-4">
-    <landing-header />
     <v-container v-if="!loading && !error">
       <v-data-iterator
         :items="projectData"
@@ -11,6 +10,9 @@
       >
         <template v-slot:header>
           <v-toolbar flat rounded outlined class="my-4">
+            <v-toolbar-title class="mr-4 ml-2">
+              {{ streamName }}
+            </v-toolbar-title>
             <v-text-field
               v-model="search"
               clearable
@@ -97,14 +99,13 @@
 import { Vue, Component } from "vue-property-decorator";
 
 import { Project } from "@/models/project";
-import { DeleteStreamData } from "@/models/graphql";
+import { DeleteStreamData, StreamName } from "@/models/graphql";
 
 import { DeleteBranchInput, GetAllReportObjectsOutputs } from "@/store";
 import { CarbonBranch } from "@/models/landing";
 
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
-import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import QuickReport from "@/components/landing/QuickReport.vue";
@@ -116,7 +117,6 @@ import SESnackBar from "@/components/shared/SESnackBar.vue";
   components: {
     ProjectCard,
     NewAssessmentCard,
-    LandingHeader,
     LandingFooter,
     ErrorRetry,
     ConfirmDialog,
@@ -141,10 +141,15 @@ export default class StreamReports extends Vue {
   deleteSuccess = true;
   deleteSnack = false;
   streamid = "";
+  streamName = "";
 
   async mounted() {
     this.token = this.$store.state.token.token;
     this.streamid = this.$route.params.streamid;
+
+    this.$store
+      .dispatch("getStreamName", this.streamid)
+      .then((res: StreamName) => (this.streamName = res.data.stream.name));
 
     if (this.streamid) this.loadStreams();
   }

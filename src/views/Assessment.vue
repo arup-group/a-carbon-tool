@@ -47,12 +47,6 @@
         />
       </div>
     </v-container>
-    <confirm-dialog
-      :dialog="dialog"
-      @agree="agreeSave"
-      @cancel="cancelSave"
-      message="Do you want to save and view this report? This will overwrite any existing reports for this stream"
-    />
     <new-branch-dialog
       :dialog="newBranchDialog"
       :branchNames="branchNames"
@@ -76,7 +70,6 @@
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
-import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
 
@@ -136,7 +129,6 @@ interface AvailableStream {
   components: {
     AssessmentStepper,
     Renderer,
-    ConfirmDialog,
     SESnackBar,
     NewBranchDialog,
     LoadingSpinner,
@@ -150,7 +142,6 @@ export default class Assessment extends Vue {
   loading = false;
   saveSuccess = true;
   saveSnack = false;
-  dialog = false;
   availableStreams: AvailableStream[] = [];
   objectURLs: string[] = [];
   token = "";
@@ -277,7 +268,7 @@ export default class Assessment extends Vue {
     this.speckleVol = true;
   }
 
-  async agreeSave() {
+  async checkSave() {
     this.loading = true;
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
@@ -299,7 +290,6 @@ export default class Assessment extends Vue {
       } else {
         this.saveSnack = true;
         this.saveSuccess = false;
-        this.dialog = false;
         this.loading = false;
       }
     }
@@ -313,7 +303,6 @@ export default class Assessment extends Vue {
         projectData: this.projectData,
         branchName,
       };
-      this.dialog = false;
       this.loading = true;
       await this.$store.dispatch("uploadReport", uploadReportInput);
       this.loading = false;
@@ -323,12 +312,6 @@ export default class Assessment extends Vue {
   }
   saveSnackClose() {
     this.saveSnack = false;
-  }
-  cancelSave() {
-    this.dialog = false;
-  }
-  checkSave() {
-    this.dialog = true;
   }
 
   async rendererLoaded({ properties, allMesh }: RendererLoaded) {

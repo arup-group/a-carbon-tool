@@ -2,11 +2,11 @@
   <v-sheet outlined color="primary" rounded height="100%">
     <v-card flat height="100%">
       <v-card-title>Filters</v-card-title>
-      <v-card-text>
-        <v-checkbox v-model="materials" label="Materials graph" />
-        <v-checkbox v-model="a15" label="A1-5 graph" />
-        <v-checkbox v-model="categories" label="Categories" />
-        <v-checkbox v-model="renderer" label="Renderer" />
+      <v-card-text class="d-flex">
+        <v-checkbox v-model="materials" label="Materials graph" class="mr-4" />
+        <v-checkbox v-model="a15" label="A1-5 graph" class="mr-4" />
+        <v-checkbox v-model="categories" label="Categories" class="mr-4" />
+        <v-checkbox v-model="renderer" label="Renderer" class="mr-4" />
         <v-switch v-model="direction" :label="directionLabel" />
       </v-card-text>
     </v-card>

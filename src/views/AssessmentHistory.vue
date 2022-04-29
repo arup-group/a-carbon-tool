@@ -25,7 +25,7 @@
             </v-toolbar-title>
           </v-toolbar>
           <v-row>
-            <v-col cols="3">
+            <v-col cols="12">
               <history-filters
                 @materials="materialsFilterUpdate"
                 @a15="a15FilterUpdate"
@@ -35,7 +35,7 @@
                 :defaultFilters="filters"
               />
             </v-col>
-            <v-col cols="9"><history-graph :chartData="chartData" /></v-col>
+            <v-col cols="12"><history-graph :chartData="chartData" /></v-col>
           </v-row>
         </template>
         <template v-slot:default="props">

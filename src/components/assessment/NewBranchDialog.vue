@@ -18,7 +18,7 @@
             label="Branch name"
             v-model="newBranchModel"
             :rules="newBranchRules"
-            prefix="actcarbonreport/"
+            :prefix="inputPrefix"
           ></v-text-field>
           <v-btn type="submit">New report</v-btn>
         </v-form>
@@ -41,6 +41,10 @@ export default class NewBranchDialog extends Vue {
   newBranchRules = [
     (v: string) => !this.branchExistsError || "branch name already exists",
   ];
+
+  get inputPrefix() {
+    return `${this.$store.state.speckleFolderName}/`
+  }
 
   @Watch("reportName")
   reportNameUpdate(newVal: string) {

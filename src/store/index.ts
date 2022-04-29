@@ -31,7 +31,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.2.0 \u00DF",
+    version: "0.5.0 \u00DF",
+    speckleFolderName: "actcarbonreport",
     servers: {
       arup: {
         region: "UKIMEA",
@@ -296,11 +297,11 @@ export default new Vuex.Store({
         await speckleUtil.getStreamBranches(context, streamid);
 
       const oldBranch = branches.data.stream.branches.items.find(
-        (i) => i.name === "actcarbonreport"
+        (i) => i.name === context.state.speckleFolderName
       );
-      const reportBranches = filterOnlyReportBranches(branches.data.stream.branches.items);
+      const reportBranches = filterOnlyReportBranches(context, branches.data.stream.branches.items);
       const mainReport = reportBranches.find(
-        (b) => b.name === "actcarbonreport/main"
+        (b) => b.name === `${context.state.speckleFolderName}/main`
       );
       if (oldBranch && !mainReport)
         speckleUtil.convOldReport(context, streamid, oldBranch);
@@ -363,7 +364,7 @@ export default new Vuex.Store({
       return await loadStream(
         context,
         streamId,
-        `actcarbonreport/${branchName}`
+        `${context.state.speckleFolderName}/${branchName}`
       );
     },
     async getObjectUrls(context, streamid: string) {
@@ -428,7 +429,7 @@ export default new Vuex.Store({
         branchName,
       }: UploadReportInput
     ) {
-      branchName = `actcarbonreport/${branchName}`;
+      branchName = `${context.state.speckleFolderName}/${branchName}`;
 
       // TODO: ADD ERROR HANDLING
       const uploadObjectsRes: UploadObjectsRes =
@@ -486,7 +487,7 @@ export default new Vuex.Store({
       const queryRes = await speckleUtil.checkContainsBranch(
         context,
         streamid,
-        "actcarbonreport/main"
+        `${context.state.speckleFolderName}/main`
       );
 
       return queryRes.data.stream.branch !== null;
@@ -498,7 +499,7 @@ export default new Vuex.Store({
       const queryRes = await speckleUtil.checkContainsBranch(
         context,
         streamid,
-        `actcarbonreport/${branchName}`
+        `${context.state.speckleFolderName}/${branchName}`
       );
 
       return queryRes.data.stream.branch !== null;
@@ -509,7 +510,7 @@ export default new Vuex.Store({
     ): Promise<GetAllReportBranchesOutput> {
       const branches = await speckleUtil.getStreamBranches(context, streamid);
 
-      return filterOnlyReportBranches(branches.data.stream.branches.items).map((b) => ({
+      return filterOnlyReportBranches(context, branches.data.stream.branches.items).map((b) => ({
         name: b.name.split("/")[1],
         id: b.id,
       }));
@@ -525,7 +526,7 @@ export default new Vuex.Store({
 
       const objects: GetAllReportObjectsOutputs = await Promise.all(
         branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
-          const fullBranchName = `actcarbonreport/${branch.name}`;
+          const fullBranchName = `${context.state.speckleFolderName}/${branch.name}`;
 
           const data = await loadStream(context, streamid, fullBranchName);
           return {
@@ -539,7 +540,7 @@ export default new Vuex.Store({
 
     async getStreamNameReportBranches(context, streamid: string): Promise<GetStreamNameReportBranchesOutput> {
       const res: StreamNameBranches = await speckleUtil.streamNameBranches(context, streamid);
-      const branches = filterOnlyReportBranches(res.data.stream.branches.items).map((b) => b.name);
+      const branches = filterOnlyReportBranches(context, res.data.stream.branches.items).map((b) => b.name);
       return {
         streamName: res.data.stream.name,
         branches

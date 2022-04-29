@@ -110,7 +110,7 @@ export default class Comparison extends Vue {
   }
 
   addReportAgree(rawReports: AddReportInput[]) {
-    const reports = rawReports.map((r) => `actcarbonreport/${r.model}`);
+    const reports = rawReports.map((r) => `${this.$store.state.speckleFolderName}/${r.model}`);
     const fullReports = this.allReports.filter((ar) => {
       let contained = false;
       reports.forEach((r) => {

@@ -116,7 +116,7 @@ export async function convOldReport(
   streamid: string,
   oldBranch: BranchItem
 ) {
-  const mainReportBranchName = "actcarbonreport/main";
+  const mainReportBranchName = `${context.state.speckleFolderName}/main`;
 
   const res = await createReportBranch(
     context,

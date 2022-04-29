@@ -32,7 +32,10 @@
               lg="4"
               style="display: flex"
             >
-              <new-assessment-card v-if="item.title === 'New Assessment'" @newAssessment="newAssessment" />
+              <new-assessment-card
+                v-if="item.title === 'New Assessment'"
+                @newAssessment="newAssessment"
+              />
               <project-folder-card
                 v-else
                 :stream="item"
@@ -53,34 +56,14 @@
     </v-container>
     <loading-spinner v-else-if="loading && !error" />
     <error-retry v-else @retry="loadStreams" />
-    <confirm-dialog
-      :dialog="dialog"
-      @agree="agreeDelete"
-      @cancel="cancelDelete"
-      message="Are you sure you want to permanently delete this report for all users? This action is not reversible"
-    />
-    <quick-report
-      @close="quickReportClose"
-      :dialog="quickReport"
-      :streamid="quickStreamid"
-      :branchName="quickBranchName"
-    />
-    <SESnackBar
-      @close="deleteSnackClose"
-      :success="deleteSuccess"
-      :model="deleteSnack"
-      textError="Something went wrong, please retry"
-      textSuccess="Report deleted!"
-    />
   </v-main>
 </template>
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 
-import { DeleteStreamData, StreamData } from "@/models/graphql";
+import { StreamData } from "@/models/graphql";
 
 import {
-  DeleteBranchInput,
   GetBranchDataInputs,
   GetStreamBranchesOutput,
   GetStreamCommitInput,
@@ -94,28 +77,20 @@ import {
   StreamFolder,
 } from "@/models/landing";
 
-import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import QuickReport from "@/components/landing/QuickReport.vue";
 import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 
 import ErrorRetry from "@/components/shared/ErrorRetry.vue";
-import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
-import SESnackBar from "@/components/shared/SESnackBar.vue";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 
 @Component({
   components: {
-    ProjectCard,
     NewAssessmentCard,
     LandingHeader,
     LandingFooter,
     ErrorRetry,
-    ConfirmDialog,
-    SESnackBar,
-    QuickReport,
     ProjectFolderCard,
     LoadingSpinner,
   },
@@ -130,34 +105,14 @@ export default class Landing extends Vue {
   projects: StreamFolder[] = [];
   loading = true;
   error = false;
-  dialog = false;
-  quickReport = false;
-  quickStreamid = "";
-  quickBranchName = "";
-  deleteid = "";
-  deleteSuccess = true;
-  deleteSnack = false;
 
   async mounted() {
     this.token = this.$store.state.token.token;
     this.loadStreams();
   }
 
-  edit(streamid: string) {
-    this.quickStreamid = streamid;
-    this.quickBranchName = "main";
-    this.quickReport = true;
-  }
-  quickReportClose() {
-    this.quickReport = false;
-  }
-
-  openViewAssessment(streamid: string) {
-    this.$router.push(`/assessment/view/${streamid}/main`);
-  }
-
   newAssessment() {
-    this.$router.push("/assessment")
+    this.$router.push("/assessment");
   }
 
   get numberOfPages() {
@@ -176,47 +131,6 @@ export default class Landing extends Vue {
 
   formerPage() {
     if (this.page - 1 >= 1) this.page -= 1;
-  }
-
-  checkDelete(streamid: string) {
-    this.deleteid = streamid;
-    this.dialog = true;
-  }
-  async agreeDelete() {
-    this.dialog = false;
-    const stream = this.carbonBranches.find((c) => c.id === this.deleteid);
-    if (stream) {
-      const input: DeleteBranchInput = {
-        streamid: stream.id,
-        branchid: stream.branchid,
-      };
-      try {
-        const deleted: DeleteStreamData = await this.$store.dispatch(
-          "deleteBranch",
-          input
-        );
-        if (deleted.data.branchDelete) {
-          this.deleteSuccess = true;
-          this.deleteSnack = true;
-          this.loadStreams();
-        } else {
-          this.deleteSuccess = false;
-          this.deleteSnack = true;
-        }
-      } catch (err) {
-        this.deleteSuccess = false;
-        this.deleteSnack = true;
-      }
-    }
-    return;
-  }
-  cancelDelete() {
-    this.dialog = false;
-    this.deleteid = "";
-  }
-  deleteSnackClose() {
-    this.error = false;
-    this.deleteSnack = false;
   }
 
   openStream(streamid: string) {
@@ -246,7 +160,7 @@ export default class Landing extends Vue {
             sid.id
           );
           const mainreportidtemp = branches.reportBranches.find(
-            (rb) => rb.name === "actcarbonreport/main"
+            (rb) => rb.name === `${this.$store.state.speckleFolderName}/main`
           )?.id;
           const mainreportid = mainreportidtemp ? mainreportidtemp : "";
           return {
@@ -263,7 +177,7 @@ export default class Landing extends Vue {
         this.carbonBranches.map(async (cb) => {
           const streamCommitInput: GetStreamCommitInput = {
             streamid: cb.id,
-            branchName: "actcarbonreport/main",
+            branchName: `${this.$store.state.speckleFolderName}/main`,
           };
           const branchCommit = await this.$store.dispatch(
             "getStreamCommit",
@@ -290,8 +204,8 @@ export default class Landing extends Vue {
           // Get data from the most recent arupcarbon branch
           const getBranchDataInputs1: GetBranchDataInputs = {
             streamid: cb.id,
-            objId: carbonCommit
-          }
+            objId: carbonCommit,
+          };
           const latestCarbonBranchData: StreamData = await this.$store.dispatch(
             "getBranchData",
             getBranchDataInputs1
@@ -299,8 +213,8 @@ export default class Landing extends Vue {
 
           const getBranchDataInputs2: GetBranchDataInputs = {
             streamid: cb.id,
-            objId: latestMainCommitObj
-          }
+            objId: latestMainCommitObj,
+          };
           const latestMainBranchData: StreamData = await this.$store.dispatch(
             "getBranchData",
             getBranchDataInputs2
@@ -358,7 +272,7 @@ export default class Landing extends Vue {
 
       this.loading = false;
     } catch (err) {
-      console.error(err)
+      console.error(err);
       this.error = true;
       this.loading = false;
     }

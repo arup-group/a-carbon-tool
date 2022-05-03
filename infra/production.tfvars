@@ -3,3 +3,4 @@ redirect_uri="https://act.speckle.arup.com/_callback"
 project_name="a-carbon-tool"
 environment = "prod"
 domain = "speckle.arup.com"
+make_public_with_no_auth=true

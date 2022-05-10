@@ -22,6 +22,11 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/ViewAssessment.vue"),
   },
   {
+    path: "/assessment/history/:streamId",
+    name: "AssessmentHistory",
+    component: () => import("../views/AssessmentHistory.vue"),
+  },
+  {
     path: "/assessment",
     name: "NewAssessment",
     component: () => import("../views/Assessment.vue"),
@@ -40,11 +45,6 @@ const routes: Array<RouteConfig> = [
     path: "/about",
     name: "About",
     component: () => import("../views/About.vue"),
-  },
-  {
-    path: "/assessment-history/:streamId",
-    name: "AssessmentHistory",
-    component: () => import("../views/AssessmentHistory.vue"),
   },
   {
     path: "/comparison/:streamId",

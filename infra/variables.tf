@@ -38,3 +38,9 @@ variable "domain" {
   type = string
   description = "base domain already configured in route 53"
 }
+
+variable "make_public_with_no_auth" {
+  type = string
+  description = "make this site open to the internet"
+  default = false
+}

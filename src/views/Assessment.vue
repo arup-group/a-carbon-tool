@@ -28,9 +28,12 @@
           @uploadData="uploadData"
           @checkSave="checkSave"
           @calcVol="calcVol"
+<<<<<<< HEAD
           @close="close"
           @openFullView="openFullView"
           :modal="modal"
+=======
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
           :streams="availableStreams"
           :types="types"
           :materials="materials"
@@ -41,9 +44,12 @@
           :becs="becs"
           :groupedMaterials="groupedMaterials"
           :speckleVol="speckleVol"
+<<<<<<< HEAD
           :update="update"
           :streamId="streamId"
           :projectData="projectDataPassdown"
+=======
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
         />
       </div>
     </v-container>
@@ -70,9 +76,12 @@
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
+<<<<<<< HEAD
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
 
+=======
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
 import Renderer from "@/components/shared/Renderer.vue";
 import {
   Color,
@@ -81,6 +90,11 @@ import {
   GradientColor,
   RendererLoaded,
 } from "@/models/renderer";
+<<<<<<< HEAD
+=======
+
+import { Component, Vue } from "vue-property-decorator";
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
 
 import {
   ProjectDataComplete,
@@ -109,6 +123,7 @@ import {
   productStageCarbonA1A3,
   transportCarbonA4,
 } from "@/store/utilities/carbonCalculator";
+<<<<<<< HEAD
 import {
   CheckContainsChlidReportInput,
   GetAllReportBranchesOutput,
@@ -118,6 +133,12 @@ import {
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
+=======
+import { UploadReportInput } from "@/store";
+import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
+import SESnackBar from "@/components/shared/SESnackBar.vue";
+import { VolCalculator } from "./utils/VolCalculator";
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
 
 type ObjectsObj = { [id: string]: SpeckleObject };
 interface AvailableStream {
@@ -169,7 +190,10 @@ export default class Assessment extends Vue {
   volumeGradient!: Gradient;
   volumeGradientPassdown: GradientColor = null;
   speckleVol = false; // whether the volume can be got from speckle props
+<<<<<<< HEAD
   defaultBranchName = "main";
+=======
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
 
   groupedMaterials: GroupedMaterial[] = [];
 
@@ -211,6 +235,7 @@ export default class Assessment extends Vue {
     this.$router.push(`assessment/${this.modalStreamid}/${this.modalBranchName}`)
   }
 
+<<<<<<< HEAD
   async newBranchSelect(name: string) {
     const input: CheckContainsChlidReportInput = {
       streamid: this.streamId,
@@ -269,6 +294,9 @@ export default class Assessment extends Vue {
   }
 
   async checkSave() {
+=======
+  async agreeSave() {
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
     this.loading = true;
     if (this.report) {
       if (this.report.reportObjs.length > 0) {
@@ -383,6 +411,77 @@ export default class Assessment extends Vue {
     return curr;
   }
 
+<<<<<<< HEAD
+=======
+  async rendererLoaded({ properties, allMesh }: RendererLoaded) {
+    this.allMesh = allMesh;
+
+    const res: ObjectDetails[] = await this.$store.dispatch(
+      "getObjectDetails",
+      {
+        streamid: this.streamid,
+        objecturl: this.objectURLs[0],
+      }
+    );
+
+    let totalVol = 0;
+    const filteredRes = res.filter(
+      (r) =>
+        r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
+        r.speckle_type !== "Objects.Geometry.Mesh"
+    );
+
+    const volumeFilter = properties.find(
+      (p) => p.name.toLowerCase() === "volume"
+    );
+    this.volProp = volumeFilter ? volumeFilter.rawName : "";
+    if (volumeFilter) {
+      this.speckleVol = true;
+      filteredRes.forEach((r) => {
+        const volume = this.findVolume(r, volumeFilter);
+        if (volume) {
+          this.objectsObj[r.id] = {
+            id: r.id,
+            speckle_type: r.speckle_type,
+            formData: {
+              volume: volume,
+            },
+          };
+          // also find total volume here to avoid needing to loop through objects again
+          totalVol += volume;
+        }
+      });
+    } else {
+      this.speckleVol = false;
+      filteredRes.forEach((r) => {
+        this.objectsObj[r.id] = {
+          id: r.id,
+          speckle_type: r.speckle_type,
+        };
+      });
+    }
+
+    this.types = this.findTypes(this.objectsObj);
+    this.totalVolume = totalVol;
+
+    this.updateVolumeGradient();
+  }
+  findVolume(
+    object: ObjectDetails,
+    filter: Filter<string | boolean | number>
+  ): number | undefined {
+    let curr: any = object;
+    filter.rawName.split(".").forEach((f) => {
+      try {
+        curr = curr[f];
+      } catch (err) {
+        return;
+      }
+    });
+    return curr;
+  }
+
+>>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
   calcVol() {
     let totalVol = 0;
     this.allMesh.forEach((m) => {

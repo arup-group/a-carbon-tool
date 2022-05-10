@@ -7,7 +7,7 @@
       </v-btn>
     </v-card-title>
     <v-card-subtitle class="pa-0">
-      <!-- <BECChipGroup v-if="type.length !== 0" :categories="type" /> -->
+      <BECChipGroup v-if="type.length !== 0" :categories="type" />
     </v-card-subtitle>
     <v-card-text>
       <v-divider class="mb-4 mt-3"></v-divider>
@@ -65,6 +65,7 @@
 </template>
 <script lang="ts">
 import { ProjectInfo } from "@/models/assessment";
+import { IProjectInfo } from "@/views/utils/viewAssessmentUtils";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import BECChipGroup from "../shared/BECChipGroup.vue";
 
@@ -72,14 +73,15 @@ import BECChipGroup from "../shared/BECChipGroup.vue";
   components: { BECChipGroup },
 })
 export default class ProjectInfoCard extends Vue {
-  @Prop() projectInfo!: ProjectInfo;
+  @Prop() projectInfo!: IProjectInfo;
+
   show = true;
 
   get name() {
     return this.projectInfo.name;
   }
   get type() {
-    return this.projectInfo.type;
+    return this.projectInfo.components;
   }
   get totalCO2e() {
     return this.projectInfo.totalCO2e
@@ -100,7 +102,7 @@ export default class ProjectInfoCard extends Vue {
     return this.projectInfo.author;
   }
   get jn() {
-    return this.projectInfo.JN;
+    return this.projectInfo.jobNumber;
   }
   get systemCost() {
     return `£${this.projectInfo.cost

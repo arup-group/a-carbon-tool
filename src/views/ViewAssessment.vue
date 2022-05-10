@@ -1,43 +1,48 @@
 <template>
   <v-main>
-    <v-container class="d-flex justify-space-between container" fluid>
-      <div class="d-flex flex-column justify-space-between card-container">
-        <project-info-card class="card" :projectInfo="projectInfo" />
-        <view-assessment-buttons class="card" />
-      </div>
-      <Renderer
-        v-if="urlsLoaded && chartDataReady"
-        :objecturls="objectUrls"
-        :token="token"
-        :colors="colors"
-        class="renderer"
-      />
-      <div
-        class="d-flex flex-column justify-space-between card-container"
-        v-if="urlsLoaded && chartDataReady"
+    <loading-container :error="error" :loading="loading" @retry="loadReport">
+      <v-container
+        v-if="!loading && !error"
+        class="d-flex justify-space-between container"
+        fluid
       >
-        <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
-        <material-breakdown-card
-          class="card"
-          :materialBreakdown="materialBreakdown"
+        <div class="d-flex flex-column justify-space-between card-container">
+          <project-info-card class="card" :projectInfo="projectInfo" />
+        </div>
+        <Renderer
+          v-if="urlsLoaded && chartDataReady"
+          :objecturls="objectUrls"
+          :token="token"
+          :colors="colors"
+          class="renderer"
         />
-      </div>
-    </v-container>
+        <div
+          class="d-flex flex-column justify-space-between card-container"
+          v-if="urlsLoaded && chartDataReady"
+        >
+          <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
+          <material-breakdown-card
+            class="card"
+            :materialBreakdown="materialBreakdown"
+          />
+        </div>
+      </v-container>
+    </loading-container>
   </v-main>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { AssessmentComplete } from "@/models/assessment";
 
 import Renderer from "@/components/shared/Renderer.vue";
 import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
-import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
 import { Color } from "@/models/renderer";
-import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 import { LoadActReportDataInput } from "@/store";
+import { ILoadStreamData, LoadStreamOut } from "./utils/viewAssessmentUtils";
+
+import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
 @Component({
   components: {
@@ -45,18 +50,22 @@ import { LoadActReportDataInput } from "@/store";
     ProjectInfoCard,
     ABreakdownCard,
     MaterialBreakdownCard,
-    ViewAssessmentButtons,
+    LoadingContainer,
   },
 })
 export default class ViewAssessment extends Vue {
   objectUrls: string[] = [];
   token!: string;
   chartDataReady = false;
-  colors!: Color;
+  colors: Color[] = [];
+  assessment!: ILoadStreamData;
+  loading = true;
+  error = false;
+  streamId = this.$route.params.streamId;
 
   mounted() {
     this.$store
-      .dispatch("getObjectUrls", this.assessment.streamId)
+      .dispatch("getObjectUrls", this.streamId)
       .then((res: string[]) => {
         this.objectUrls = [res[0]];
       });
@@ -64,16 +73,28 @@ export default class ViewAssessment extends Vue {
     this.token = this.$store.state.token.token;
   }
 
-  async created() {
-    const { streamId, branchName } = this.$route.params;
-    const input: LoadActReportDataInput = { streamId, branchName}
-    const assessmentViewData = await this.$store.dispatch(
-      "loadActReportData",
-      input
-    );
-    this.assessment = assessmentViewData.data;
-    this.colors = assessmentViewData.colors;
-    this.chartDataReady = assessmentViewData.ready;
+  created() {
+    this.loadReport();
+  }
+
+  async loadReport() {
+    this.loading = true;
+    this.error = false;
+    try {
+      const { streamId, branchName } = this.$route.params;
+      const input: LoadActReportDataInput = { streamId, branchName };
+      const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
+        "loadActReportData",
+        input
+      );
+      this.assessment = assessmentViewData.data;
+      this.colors = assessmentViewData.colors;
+      this.chartDataReady = assessmentViewData.ready;
+      this.loading = false;
+    } catch (err) {
+      console.error(err);
+      this.error = true;
+    }
   }
 
   get urlsLoaded() {
@@ -88,54 +109,6 @@ export default class ViewAssessment extends Vue {
   get materialBreakdown() {
     return this.assessment.materialBreakdown;
   }
-  get streamId() {
-    return this.$route.params.streamId;
-  }
-
-  assessment: AssessmentComplete = {
-    // dummy data
-    streamId: this.$route.params.streamId,
-    projectInfo: {
-      name: "",
-      type: [],
-      reportDate: new Date(1946, 4, 1),
-      author: "",
-      JN: "000001",
-      cost: 0,
-      floorArea: 0,
-      notes: "",
-      totalCO2e: 0,
-      totalkgCO2e: 0,
-    },
-    materialBreakdown: {
-      materials: [
-        {
-          label: "some value 1",
-          value: 50,
-          color: "",
-        },
-      ],
-    },
-    aBreakdown: {
-      levels: [
-        {
-          name: "A1-A3",
-          tCO2e: 0,
-          kgCO2eperm2: 0,
-        },
-        {
-          name: "A4",
-          tCO2e: 0,
-          kgCO2eperm2: 0,
-        },
-        {
-          name: "A5",
-          tCO2e: 0,
-          kgCO2eperm2: 0,
-        },
-      ],
-    },
-  };
 }
 </script>
 

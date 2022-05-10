@@ -1,3 +1,4 @@
+import { Level } from "@/models/assessment";
 import { ChartData } from "@/models/chart";
 import { HTTPStreamDataParent } from "@/models/graphql/";
 import { ChildSpeckleObjectData } from "@/models/graphql/StreamData.interface";
@@ -119,11 +120,7 @@ export interface IMaterialBreakdown {
   materials: ChartData[];
 }
 export interface IABreakdown {
-  levels: {
-    name: string;
-    tCO2e: number;
-    kgCO2eperm2: number;
-  }[];
+  levels: Level[];
 }
 export interface ILoadStreamData {
   streamId: string;

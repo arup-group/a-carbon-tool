@@ -6,19 +6,6 @@ import { ChartData } from "@/models/chart";
 @Component
 export default class LineChart extends Mixins(VueChart.Line) {
   @Prop() readonly data!: Array<ChartData>;
-//   data: ChartData[] = [{
-//       value: 1,
-//       label: "one",
-//       color: "blue"
-//   },{
-//       value: 2,
-//       label: "two",
-//       color: "blue"
-//   },{
-//       value: 3,
-//       label: "three",
-//       color: "blue"
-//   },]
 
   mounted() {
     if (this.data) {

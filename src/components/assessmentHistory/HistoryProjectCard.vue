@@ -108,11 +108,6 @@ export default class HistoryProjectCard extends Vue {
     else return this.materials ? "6" : "12";
   }
 
-  @Emit("delete")
-  checkDelete() {
-    return this.project.id;
-  }
-
   @Emit("removeReport")
   removeReport() {
     return this.project.id;
@@ -121,11 +116,6 @@ export default class HistoryProjectCard extends Vue {
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp
     return Math.round(value * 0.001);
-  }
-
-  open() {
-    // MAY NEED TO UPDATE DEPENDING ON HOW ASSESSMENT/VIEW ENDS UP WORKING
-    this.$router.push(`/assessment/view/${this.project.id}`);
   }
 }
 </script>

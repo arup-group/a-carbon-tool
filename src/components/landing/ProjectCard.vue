@@ -136,8 +136,6 @@ export default class ProjectCard extends Vue {
 
   @Emit("open")
   open() {
-    // MAY NEED TO UPDATE DEPENDING ON HOW ASSESSMENT/VIEW ENDS UP WORKING
-    // this.$router.push(`/assessment/view/${this.project.id}`);
     return this.project.id;
   }
 }

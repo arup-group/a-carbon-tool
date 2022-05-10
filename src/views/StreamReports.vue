@@ -1,79 +1,69 @@
 <template>
   <v-main class="mr-7 ml-7 pb-4">
-    <v-container v-if="!loading && !error">
-      <v-data-iterator
-        :items="projectData"
-        :items-per-page.sync="itemsPerPage"
-        :page.sync="page"
-        :search="search"
-        hide-default-footer
-      >
-        <template v-slot:header>
-          <v-toolbar flat rounded outlined class="my-4">
-            <v-toolbar-title class="mr-4 ml-2">
-              {{ streamName }}
-            </v-toolbar-title>
-            <v-text-field
-              v-model="search"
-              clearable
-              flat
-              solo
-              hide-details
-              prepend-inner-icon="mdi-magnify"
-              label="Search"
-            ></v-text-field>
-            <v-btn @click="openComparison">Open comparison</v-btn>
-            <v-btn @click="openHistory">Open history</v-btn>
-          </v-toolbar>
-        </template>
-        <template v-slot:default="props" class="my-2">
-          <v-row class="d-flex align-stretch">
-            <v-col
-              v-for="item in props.items"
-              :key="item.title"
-              cols="12"
-              md="6"
-              lg="4"
-              style="display: flex"
-            >
-              <new-assessment-card
-                v-if="item.title === 'New Assessment'"
-                @newAssessment="newAssessment"
+    <loading-container :error="error" :loading="loading" @retry="loadStreams">
+      <template v-slot="{ loaded }">
+        <v-container v-if="loaded">
+          <v-data-iterator
+            :items="projectData"
+            :items-per-page.sync="itemsPerPage"
+            :page.sync="page"
+            :search="search"
+            hide-default-footer
+          >
+            <template v-slot:header>
+              <v-toolbar flat rounded outlined class="my-4">
+                <v-toolbar-title class="mr-4 ml-2">
+                  {{ streamName }}
+                </v-toolbar-title>
+                <v-text-field
+                  v-model="search"
+                  clearable
+                  flat
+                  solo
+                  hide-details
+                  prepend-inner-icon="mdi-magnify"
+                  label="Search"
+                ></v-text-field>
+                <v-btn @click="openComparison">Open comparison</v-btn>
+                <v-btn @click="openHistory">Open history</v-btn>
+              </v-toolbar>
+            </template>
+            <template v-slot:default="props" class="my-2">
+              <v-row class="d-flex align-stretch">
+                <v-col
+                  v-for="item in props.items"
+                  :key="item.title"
+                  cols="12"
+                  md="6"
+                  lg="4"
+                  style="display: flex"
+                >
+                  <new-assessment-card
+                    v-if="item.title === 'New Assessment'"
+                    @newAssessment="newAssessment"
+                  />
+                  <project-card
+                    v-else
+                    :project="item"
+                    @delete="checkDelete"
+                    @edit="edit"
+                    @open="openViewAssessment"
+                  ></project-card>
+                </v-col>
+              </v-row>
+            </template>
+            <template v-slot:footer>
+              <landing-footer
+                :numberOfPages="numberOfPages"
+                :page="page"
+                @formerPage="formerPage"
+                @nextPage="nextPage"
               />
-              <project-card
-                v-else
-                :project="item"
-                @delete="checkDelete"
-                @edit="edit"
-                @open="openViewAssessment"
-              ></project-card>
-            </v-col>
-          </v-row>
-        </template>
-        <template v-slot:footer>
-          <landing-footer
-            :numberOfPages="numberOfPages"
-            :page="page"
-            @formerPage="formerPage"
-            @nextPage="nextPage"
-          />
-        </template>
-      </v-data-iterator>
-    </v-container>
-    <div
-      v-else-if="loading && !error"
-      style="width: 100%"
-      class="d-flex justify-center"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        :size="200"
-      ></v-progress-circular>
-    </div>
-    <div v-else>
-      <error-retry @retry="loadStreams" />
-    </div>
+            </template>
+          </v-data-iterator>
+        </v-container>
+      </template>
+    </loading-container>
     <confirm-dialog
       :dialog="dialog"
       @agree="agreeDelete"
@@ -107,21 +97,21 @@ import { CarbonBranch } from "@/models/landing";
 import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import QuickReport from "@/components/landing/QuickReport.vue";
 
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
+import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
 @Component({
   components: {
     ProjectCard,
     NewAssessmentCard,
     LandingFooter,
-    ErrorRetry,
     ConfirmDialog,
     SESnackBar,
     QuickReport,
+    LoadingContainer,
   },
 })
 export default class StreamReports extends Vue {

@@ -1,14 +1,14 @@
 <template>
   <div>
     <div v-if="!loading && !error">
-      <slot></slot>
+      <slot v-bind:loaded="loaded">{{ loaded }}</slot>
     </div>
     <loading-spinner v-else-if="loading && !error" />
     <error-retry v-else @retry="retry" />
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import ErrorRetry from "./ErrorRetry.vue";
 
@@ -18,6 +18,10 @@ import ErrorRetry from "./ErrorRetry.vue";
 export default class LoadingContainer extends Vue {
   @Prop() loading!: boolean;
   @Prop() error!: boolean;
+
+  get loaded() {
+    return !this.loading && !this.error;
+  }
 
   @Emit("retry")
   retry() {

@@ -1,47 +1,49 @@
 <template>
   <v-main class="mr-7 ml-7">
-    <v-container v-if="!loading && !error">
-      <v-data-iterator
-        :items="displayReports"
-        :items-per-page.sync="itemsPerPage"
-        :page.sync="page"
-        hide-default-footer
-      >
-        <template v-slot:header>
-          <v-toolbar class="mb-2" flat>
-            <v-toolbar-title class="d-flex">
-              {{ streamName }}
-            </v-toolbar-title>
-          </v-toolbar>
-        </template>
-        <template v-slot:default="props" class="my-2">
-          <div class="d-flex overflow-auto align-center">
-            <history-project-card
-              v-for="report in props.items"
-              @removeReport="removeReport"
-              :style="historyProjectCardStyle"
-              :key="report.id"
-              :project="report"
-              :filters="filters"
-              :comparison="true"
-            />
-            <v-btn
-              class="mx-2"
-              fab
-              dark
-              outlined
-              x-large
-              color="primary"
-              @click="addReport"
-            >
-              <v-icon> mdi-plus </v-icon>
-            </v-btn>
-          </div>
-        </template>
-      </v-data-iterator>
-    </v-container>
-    <loading-spinner v-else-if="loading && !error" />
-    <error-retry v-else @retry="load" />
+    <loading-container :error="error" :loading="loading" @retry="load">
+      <template v-slot="{ loaded }">
+        <v-container v-if="loaded">
+          <v-data-iterator
+            :items="displayReports"
+            :items-per-page.sync="itemsPerPage"
+            :page.sync="page"
+            hide-default-footer
+          >
+            <template v-slot:header>
+              <v-toolbar class="mb-2" flat>
+                <v-toolbar-title class="d-flex">
+                  {{ streamName }}
+                </v-toolbar-title>
+              </v-toolbar>
+            </template>
+            <template v-slot:default="props" class="my-2">
+              <div class="d-flex overflow-auto align-center">
+                <history-project-card
+                  v-for="report in props.items"
+                  @removeReport="removeReport"
+                  :style="historyProjectCardStyle"
+                  :key="report.id"
+                  :project="report"
+                  :filters="filters"
+                  :comparison="true"
+                />
+                <v-btn
+                  class="mx-2"
+                  fab
+                  dark
+                  outlined
+                  x-large
+                  color="primary"
+                  @click="addReport"
+                >
+                  <v-icon> mdi-plus </v-icon>
+                </v-btn>
+              </div>
+            </template>
+          </v-data-iterator>
+        </v-container>
+      </template>
+    </loading-container>
     <add-report-dialog
       :key="dialogKey"
       :dialog="addReportDialog"
@@ -54,25 +56,26 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 
-import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
-import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import { GetStreamNameReportBranchesOutput } from "@/store";
+
 import { loadStream } from "./utils/viewAssessmentUtils";
+
 import {
   HistoryFilterOptions,
   HistoryProjectCardDirection,
   ProjectAVals,
 } from "@/models/assessmentHistory";
+import { AddReportInput } from "@/models/comparison";
+
 import HistoryProjectCard from "@/components/assessmentHistory/HistoryProjectCard.vue";
 import AddReportDialog from "@/components/comparison/AddReportDialog.vue";
-import { AddReportInput } from "@/models/comparison";
+import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
 @Component({
   components: {
-    LoadingSpinner,
-    ErrorRetry,
     HistoryProjectCard,
     AddReportDialog,
+    LoadingContainer,
   },
 })
 export default class Comparison extends Vue {
@@ -110,7 +113,9 @@ export default class Comparison extends Vue {
   }
 
   addReportAgree(rawReports: AddReportInput[]) {
-    const reports = rawReports.map((r) => `${this.$store.state.speckleFolderName}/${r.model}`);
+    const reports = rawReports.map(
+      (r) => `${this.$store.state.speckleFolderName}/${r.model}`
+    );
     const fullReports = this.allReports.filter((ar) => {
       let contained = false;
       reports.forEach((r) => {

@@ -1,61 +1,63 @@
 <template>
   <v-main class="mr-7 ml-7 pb-4">
     <landing-header />
-    <v-container v-if="!loading && !error">
-      <v-data-iterator
-        :items="projectData"
-        :items-per-page.sync="itemsPerPage"
-        :page.sync="page"
-        :search="search"
-        hide-default-footer
-      >
-        <template v-slot:header>
-          <v-toolbar flat rounded outlined class="my-4">
-            <v-text-field
-              v-model="search"
-              clearable
-              flat
-              solo
-              hide-details
-              prepend-inner-icon="mdi-magnify"
-              label="Search"
-            ></v-text-field>
-          </v-toolbar>
-        </template>
-        <template v-slot:default="props" class="my-2">
-          <v-row class="d-flex align-stretch">
-            <v-col
-              v-for="item in props.items"
-              :key="item.title"
-              cols="12"
-              md="6"
-              lg="4"
-              style="display: flex"
-            >
-              <new-assessment-card
-                v-if="item.title === 'New Assessment'"
-                @newAssessment="newAssessment"
+    <loading-container :error="error" :loading="loading" @retry="loadStreams">
+      <template v-slot="{ loaded }">
+        <v-container v-if="loaded">
+          <v-data-iterator
+            :items="projectData"
+            :items-per-page.sync="itemsPerPage"
+            :page.sync="page"
+            :search="search"
+            hide-default-footer
+          >
+            <template v-slot:header>
+              <v-toolbar flat rounded outlined class="my-4">
+                <v-text-field
+                  v-model="search"
+                  clearable
+                  flat
+                  solo
+                  hide-details
+                  prepend-inner-icon="mdi-magnify"
+                  label="Search"
+                ></v-text-field>
+              </v-toolbar>
+            </template>
+            <template v-slot:default="props" class="my-2">
+              <v-row class="d-flex align-stretch">
+                <v-col
+                  v-for="item in props.items"
+                  :key="item.title"
+                  cols="12"
+                  md="6"
+                  lg="4"
+                  style="display: flex"
+                >
+                  <new-assessment-card
+                    v-if="item.title === 'New Assessment'"
+                    @newAssessment="newAssessment"
+                  />
+                  <project-folder-card
+                    v-else
+                    :stream="item"
+                    @openStream="openStream"
+                  />
+                </v-col>
+              </v-row>
+            </template>
+            <template v-slot:footer>
+              <landing-footer
+                :numberOfPages="numberOfPages"
+                :page="page"
+                @formerPage="formerPage"
+                @nextPage="nextPage"
               />
-              <project-folder-card
-                v-else
-                :stream="item"
-                @openStream="openStream"
-              />
-            </v-col>
-          </v-row>
-        </template>
-        <template v-slot:footer>
-          <landing-footer
-            :numberOfPages="numberOfPages"
-            :page="page"
-            @formerPage="formerPage"
-            @nextPage="nextPage"
-          />
-        </template>
-      </v-data-iterator>
-    </v-container>
-    <loading-spinner v-else-if="loading && !error" />
-    <error-retry v-else @retry="loadStreams" />
+            </template>
+          </v-data-iterator>
+        </v-container>
+      </template>
+    </loading-container>
   </v-main>
 </template>
 <script lang="ts">
@@ -82,17 +84,15 @@ import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 
-import ErrorRetry from "@/components/shared/ErrorRetry.vue";
-import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
+import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
 @Component({
   components: {
     NewAssessmentCard,
     LandingHeader,
     LandingFooter,
-    ErrorRetry,
     ProjectFolderCard,
-    LoadingSpinner,
+    LoadingContainer,
   },
 })
 export default class Landing extends Vue {

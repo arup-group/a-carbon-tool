@@ -1,32 +1,34 @@
 <template>
   <v-main>
     <loading-container :error="error" :loading="loading" @retry="loadReport">
-      <v-container
-        v-if="!loading && !error"
-        class="d-flex justify-space-between container"
-        fluid
-      >
-        <div class="d-flex flex-column justify-space-between card-container">
-          <project-info-card class="card" :projectInfo="projectInfo" />
-        </div>
-        <Renderer
-          v-if="urlsLoaded && chartDataReady"
-          :objecturls="objectUrls"
-          :token="token"
-          :colors="colors"
-          class="renderer"
-        />
-        <div
-          class="d-flex flex-column justify-space-between card-container"
-          v-if="urlsLoaded && chartDataReady"
+      <template v-slot="{ loaded }">
+        <v-container
+          v-if="loaded"
+          class="d-flex justify-space-between container"
+          fluid
         >
-          <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
-          <material-breakdown-card
-            class="card"
-            :materialBreakdown="materialBreakdown"
+          <div class="d-flex flex-column justify-space-between card-container">
+            <project-info-card class="card" :projectInfo="projectInfo" />
+          </div>
+          <Renderer
+            v-if="urlsLoaded && chartDataReady"
+            :objecturls="objectUrls"
+            :token="token"
+            :colors="colors"
+            class="renderer"
           />
-        </div>
-      </v-container>
+          <div
+            class="d-flex flex-column justify-space-between card-container"
+            v-if="urlsLoaded && chartDataReady"
+          >
+            <a-breakdown-card class="card" :aBreakdown="aBreakdown" />
+            <material-breakdown-card
+              class="card"
+              :materialBreakdown="materialBreakdown"
+            />
+          </div>
+        </v-container>
+      </template>
     </loading-container>
   </v-main>
 </template>

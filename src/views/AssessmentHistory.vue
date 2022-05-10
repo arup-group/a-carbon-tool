@@ -1,95 +1,98 @@
 <template>
   <v-main class="mr-7 ml-7">
-    <v-container v-if="!loading && !error">
-      <v-data-iterator
-        :items="cleanedReports"
-        :items-per-page.sync="itemsPerPage"
-        :page.sync="page"
-        hide-default-footer
-      >
-        <template v-slot:header>
-          <v-toolbar class="mb-2" flat>
-            <v-toolbar-title
-              class="d-flex justify-space-between align-center"
-              style="width: 100%"
-            >
-              <span>{{ streamName }}</span>
-              <v-select
-                v-if="branches.length > 0"
-                v-model="selectedBranch"
-                :items="branches"
-                :item-text="(obj) => obj.name.split('/')[1]"
-                :item-value="(obj) => obj"
-                style="max-width: 33%"
-              ></v-select>
-            </v-toolbar-title>
-          </v-toolbar>
-          <v-row>
-            <v-col cols="12">
-              <history-filters
-                @materials="materialsFilterUpdate"
-                @a15="a15FilterUpdate"
-                @categories="categoriesFilterUpdate"
-                @renderer="rendererFilterUpdate"
-                @direction="directionUpdate"
-                :defaultFilters="filters"
-              />
-            </v-col>
-            <v-col cols="12"><history-graph :chartData="chartData" /></v-col>
-          </v-row>
-        </template>
-        <template v-slot:default="props">
-          <div :style="historyProjectCardsContainerStyle">
-            <history-project-card
-              v-for="report in props.items"
-              :style="historyProjectCardStyle"
-              :key="report.id"
-              :project="report"
-              :filters="filters"
-            />
-          </div>
-        </template>
-      </v-data-iterator>
-    </v-container>
-    <loading-spinner v-else-if="loading && !error" />
-    <error-retry v-else @retry="loadReports" />
+    <loading-container :error="error" :loading="loading" @retry="loadReports">
+      <template v-slot="{ loaded }">
+        <v-container v-if="loaded">
+          <v-data-iterator
+            :items="cleanedReports"
+            :items-per-page.sync="itemsPerPage"
+            :page.sync="page"
+            hide-default-footer
+          >
+            <template v-slot:header>
+              <v-toolbar class="mb-2" flat>
+                <v-toolbar-title
+                  class="d-flex justify-space-between align-center"
+                  style="width: 100%"
+                >
+                  <span>{{ streamName }}</span>
+                  <v-select
+                    v-if="branches.length > 0"
+                    v-model="selectedBranch"
+                    :items="branches"
+                    :item-text="(obj) => obj.name.split('/')[1]"
+                    :item-value="(obj) => obj"
+                    style="max-width: 33%"
+                  ></v-select>
+                </v-toolbar-title>
+              </v-toolbar>
+              <v-row>
+                <v-col cols="12">
+                  <history-filters
+                    @materials="materialsFilterUpdate"
+                    @a15="a15FilterUpdate"
+                    @categories="categoriesFilterUpdate"
+                    @renderer="rendererFilterUpdate"
+                    @direction="directionUpdate"
+                    :defaultFilters="filters"
+                  />
+                </v-col>
+                <v-col cols="12"
+                  ><history-graph :chartData="chartData"
+                /></v-col>
+              </v-row>
+            </template>
+            <template v-slot:default="props">
+              <div :style="historyProjectCardsContainerStyle">
+                <history-project-card
+                  v-for="report in props.items"
+                  :style="historyProjectCardStyle"
+                  :key="report.id"
+                  :project="report"
+                  :filters="filters"
+                />
+              </div>
+            </template>
+          </v-data-iterator>
+        </v-container>
+      </template>
+    </loading-container>
   </v-main>
 </template>
 <script lang="ts">
+import { Vue, Component, Watch } from "vue-property-decorator";
+import {
+  GetBranchDataInputs,
+  GetStreamBranchesOutput,
+  GetStreamCommitInput,
+} from "@/store";
+
+import { ReportObj } from "@/models/graphql/StreamData.interface";
+import { Project } from "@/models/project";
 import {
   BranchItem,
   StreamData,
   StreamName,
   StreamReferenceObjects,
 } from "@/models/graphql";
-import { ReportObj } from "@/models/graphql/StreamData.interface";
-import {
-  GetBranchDataInputs,
-  GetStreamBranchesOutput,
-  GetStreamCommitInput,
-} from "@/store";
-import { Vue, Component, Watch } from "vue-property-decorator";
-
-import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
-import ErrorRetry from "@/components/shared/ErrorRetry.vue";
-import { Project } from "@/models/project";
-import HistoryProjectCard from "@/components/assessmentHistory/HistoryProjectCard.vue";
 import { ChartData } from "@/models/chart";
 import {
   HistoryFilterOptions,
   HistoryProjectCardDirection,
   ProjectAVals,
 } from "@/models/assessmentHistory";
+
+import HistoryProjectCard from "@/components/assessmentHistory/HistoryProjectCard.vue";
 import HistoryFilters from "@/components/assessmentHistory/HistoryFilters.vue";
 import HistoryGraph from "@/components/assessmentHistory/HistoryGraph.vue";
+import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
 @Component({
   components: {
-    LoadingSpinner,
-    ErrorRetry,
     HistoryProjectCard,
     HistoryFilters,
     HistoryGraph,
+    LoadingContainer,
   },
 })
 export default class AssessmentHistory extends Vue {

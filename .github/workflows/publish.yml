@@ -37,7 +37,7 @@ jobs:
       env:
         VUE_APP_SPECKLE_ID_ARUP: c7b971c70c
         VUE_APP_SPECKLE_SECRET_ARUP: ${{ secrets.VUE_APP_SPECKLE_SECRET_ARUP }}
-        VUE_APP_SPECKLE_ID_XYZ: c7b971c70c
+        VUE_APP_SPECKLE_ID_XYZ: 6f249d7a6f
         VUE_APP_SPECKLE_SECRET_XYZ: ${{ secrets.VUE_APP_SPECKLE_SECRET_XYZ }}
         VUE_APP_SPECKLE_NAME: A Carbon Tool
         VUE_APP_POSTHOG: ${{ secrets.VUE_APP_POSTHOG }}

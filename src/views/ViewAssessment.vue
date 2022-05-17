@@ -40,16 +40,11 @@ import Renderer from "@/components/shared/Renderer.vue";
 import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
-<<<<<<< HEAD
 import { Color } from "@/models/renderer";
 import { LoadActReportDataInput } from "@/store";
 import { ILoadStreamData, LoadStreamOut } from "./utils/viewAssessmentUtils";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
-=======
-import ViewAssessmentButtons from "@/components/viewAssessment/ViewAssessmentButtons.vue";
-import { Color } from "@/models/renderer";
->>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
 
 @Component({
   components: {

@@ -31,12 +31,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-<<<<<<< HEAD
     version: "0.5.0 \u00DF",
     speckleFolderName: "actcarbonreport",
-=======
-    version: "0.2.0 \u00DF",
->>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
     servers: {
       arup: {
         region: "UKIMEA",
@@ -260,13 +256,8 @@ export default new Vuex.Store({
           Object.keys(context.state.selectedServer).length === 0 ||
           Object.keys(context.state.token).length === 0
         ) {
-<<<<<<< HEAD
           const server = speckleUtil.getServer(context);
           const token = speckleUtil.getToken();
-=======
-          const server = getServer(context);
-          const token = getToken();
->>>>>>> 76cfc455815b8ad73ba2a5d49e81452a76d05339
           context.commit("login", {
             token,
             server,

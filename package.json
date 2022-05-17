@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@arc-web/components": "^1.4.2",
-    "@speckle/objectloader": "^2.5.4",
-    "@speckle/viewer": "^2.5.4",
+    "@speckle/objectloader": "^2.5.5",
+    "@speckle/viewer": "^2.5.5",
     "@types/three": "^0.136.1",
     "axios": "^0.24.0",
     "chart.js": "^2.9.4",

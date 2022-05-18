@@ -79,7 +79,7 @@
           <v-btn
             text
             color='primary'
-            @click="dialog = false"
+            @click="closeDialog"
           >Close</v-btn>
         </v-card-actions>
       </v-card>
@@ -96,7 +96,11 @@ import { Server } from "@/models/auth/";
   components: { LoginCard },
 })
 export default class Login extends Vue {
-  dialog = true;
+  dialog = window.localStorage.getItem("hide-dialog") !== "true";
+  closeDialog() {
+    this.dialog = false;
+    window.localStorage.setItem("hide-dialog", "true");
+  }
 
   servers: { arup: Server; xyz_server: Server } = this.$store.state.servers;
 

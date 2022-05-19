@@ -60,7 +60,7 @@ export default class App extends Vue {
   mounted() {
     // update = true if the version has updated since the user last came to the site and they have visited the site before
     const storedVersion = window.localStorage.getItem("version");
-    this.update = storedVersion !== null && storedVersion !== this.$store.state.version;
+    this.update = storedVersion !== this.$store.state.version;
   }
 
   get name(): string {

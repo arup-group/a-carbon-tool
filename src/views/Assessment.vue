@@ -259,13 +259,13 @@ export default class Assessment extends Vue {
     });
 
     this.types = this.findTypes(this.objectsObj);
-    this.materialsColors = this.types.map((t) => ({
-      id: t.type,
-      color: t.material ? t.material.color : "",
+    this.materialsColors = Object.values(this.objectsObj).map((o) => ({
+      id: o.id,
+      color: o.formData?.material?.color as string,
     }));
-    this.transportColors = this.types.map((t) => ({
-      id: t.type,
-      color: t.transport ? t.transport.color : "",
+    this.transportColors = Object.values(this.objectsObj).map((o) => ({
+      id: o.id,
+      color: o.formData?.transport?.color as string,
     }));
 
     this.projectData = assessmentViewData.data.projectInfo;
@@ -670,13 +670,13 @@ export default class Assessment extends Vue {
 
   transportSelected(selected: TransportSelected) {
     const ids = selected.material.objects;
-    this.colors = this.colors.filter(c => !ids.includes(c.id));
-    ids.forEach(id => {
+    this.colors = this.colors.filter((c) => !ids.includes(c.id));
+    ids.forEach((id) => {
       this.colors.push({
         color: selected.transportType.color,
-        id
+        id,
       });
-    })
+    });
     this.transportColors = this.colors;
 
     selected.material.objects.forEach((i) => {
@@ -693,11 +693,11 @@ export default class Assessment extends Vue {
 
   materialUpdated(material: MaterialUpdateOut) {
     const ids = material.type.ids;
-    this.colors = this.colors.filter(c => !ids.includes(c.id));
-    ids.forEach(id => {
+    this.colors = this.colors.filter((c) => !ids.includes(c.id));
+    ids.forEach((id) => {
       this.colors.push({
         color: material.material.color,
-        id
+        id,
       });
     });
     this.materialsColors = this.colors;

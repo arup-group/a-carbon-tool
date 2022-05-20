@@ -61,6 +61,10 @@ export default class VersionUpdateDialog extends Vue {
       subtitle:
         "Compare different reports that you have run on the same building model",
     },
+    {
+      title: "Custom grouping of materials",
+      subtitle: "You can now create your own groups on the assessment page",
+    },
   ];
 
   @Emit("close")

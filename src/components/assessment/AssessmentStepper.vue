@@ -44,7 +44,9 @@
           <Menu2
             :types="types"
             :materials="materials"
+            :selectedObjects="selectedObjects"
             @materialUpdated="materialUpdated"
+            @createNewGroup="createNewGroup"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 1" color="primary">
@@ -207,6 +209,8 @@ export default class AssessmentStepper extends Vue {
 
   @Prop() modal!: boolean;
 
+  @Prop() selectedObjects!: string[];
+
   form: ProjectDataTemp = this.update ? this.projectData: {
     name: null,
     components: null,
@@ -252,6 +256,11 @@ export default class AssessmentStepper extends Vue {
 
   get canSave() {
     return this.report ? true : false;
+  }
+
+  @Emit("createNewGroup")
+  createNewGroup(groupName: string) {
+    return groupName;
   }
 
   @Emit("openFullView")

@@ -11,6 +11,7 @@
         class="justify-flex-end"
         v-if="objectURLs.length !== 0"
         @loaded="rendererLoaded"
+        @objectsSelected="objectsSelected"
         :objecturls="objectURLs"
         :token="token"
         :colors="colors"
@@ -30,6 +31,7 @@
           @calcVol="calcVol"
           @close="close"
           @openFullView="openFullView"
+          @createNewGroup="createNewObjectGroup"
           :modal="modal"
           :streams="availableStreams"
           :types="types"
@@ -44,6 +46,7 @@
           :update="update"
           :streamId="streamId"
           :projectData="projectDataPassdown"
+          :selectedObjects="selectedObjects"
         />
       </div>
     </v-container>
@@ -80,6 +83,7 @@ import {
   Gradient,
   GradientColor,
   RendererLoaded,
+  UserData,
 } from "@/models/renderer";
 
 import {
@@ -181,6 +185,9 @@ export default class Assessment extends Vue {
   branchNames: string[] = [];
   branchExistsError = false;
 
+  step: Step = 1;
+  selectedObjects: string[] = []; // contains the id's of each selected object
+
   @Emit("close")
   close() {
     return;
@@ -208,7 +215,9 @@ export default class Assessment extends Vue {
     });
   }
   openFullView() {
-    this.$router.push(`assessment/${this.modalStreamid}/${this.modalBranchName}`)
+    this.$router.push(
+      `assessment/${this.modalStreamid}/${this.modalBranchName}`
+    );
   }
 
   async newBranchSelect(name: string) {
@@ -277,11 +286,9 @@ export default class Assessment extends Vue {
           this.streamId
         );
         if (containsReport) {
-           const getAllReportBranchesOut: GetAllReportBranchesOutput= await this.$store.dispatch(
-            "getAllReportBranches",
-            this.streamId
-          );
-          this.branchNames = getAllReportBranchesOut.map(b => b.name);
+          const getAllReportBranchesOut: GetAllReportBranchesOutput =
+            await this.$store.dispatch("getAllReportBranches", this.streamId);
+          this.branchNames = getAllReportBranchesOut.map((b) => b.name);
           this.reportName = this.projectData.name;
           this.newBranchDialog = true;
         } else {
@@ -408,6 +415,7 @@ export default class Assessment extends Vue {
   }
 
   stepperUpdate(step: Step) {
+    this.step = step;
     switch (step) {
       case Step.DATA:
         this.resetColors();
@@ -441,6 +449,25 @@ export default class Assessment extends Vue {
         this.resetColors();
         break;
     }
+  }
+
+  objectsSelected(objects: UserData[]) {
+    if (this.step === Step.MATERIALS) {
+      this.selectedObjects = objects.map((o) => o.id);
+    }
+  }
+
+  createNewObjectGroup(name: string) {
+    this.types = this.types.map((t) => ({
+      ...t,
+      ids: t.ids.filter((i) => !this.selectedObjects.includes(i)),
+    }));
+    this.types.push({
+      ids: this.selectedObjects,
+      material: undefined,
+      transport: undefined,
+      type: name,
+    });
   }
 
   groupMaterials() {
@@ -642,20 +669,14 @@ export default class Assessment extends Vue {
   }
 
   transportSelected(selected: TransportSelected) {
-    selected.material.speckle_types.forEach((st) => {
-      let added = false;
-      this.colors = this.colors.map((c) => {
-        if (c.id === st) {
-          added = true;
-          return {
-            id: st,
-            color: selected.transportType.color,
-          };
-        } else return c;
+    const ids = selected.material.objects;
+    this.colors = this.colors.filter(c => !ids.includes(c.id));
+    ids.forEach(id => {
+      this.colors.push({
+        color: selected.transportType.color,
+        id
       });
-      if (!added)
-        this.colors.push({ id: st, color: selected.transportType.color });
-    });
+    })
     this.transportColors = this.colors;
 
     selected.material.objects.forEach((i) => {
@@ -671,23 +692,14 @@ export default class Assessment extends Vue {
   }
 
   materialUpdated(material: MaterialUpdateOut) {
-    // update material in `colors`, or add the material if it is not already there
-    let added = false;
-    this.colors = this.colors.map((c) => {
-      if (c.id === material.type.type) {
-        added = true;
-        return {
-          id: material.type.type,
-          color: material.material.color,
-        };
-      } else return c;
-    });
-
-    if (!added)
+    const ids = material.type.ids;
+    this.colors = this.colors.filter(c => !ids.includes(c.id));
+    ids.forEach(id => {
       this.colors.push({
-        id: material.type.type,
         color: material.material.color,
+        id
       });
+    });
     this.materialsColors = this.colors;
 
     // update the objects to include this new material

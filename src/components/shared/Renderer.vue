@@ -19,7 +19,9 @@ import {
   Filters,
   GradientColor,
   RendererLoaded,
+  SelectObject,
   SpeckleProperty,
+  UserData,
 } from "@/models/renderer/";
 
 @Component
@@ -93,9 +95,8 @@ export default class extends Vue {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
     });
-    this.viewer.on("select", (objects: any[]) => {
-      this.selectedObjects.splice(0, this.selectedObjects.length);
-      this.selectedObjects.push(...objects);
+    this.viewer.on("select", ({ userData }: SelectObject) => {
+      this.objectsSelected(userData);
     });
   }
 
@@ -151,22 +152,15 @@ export default class extends Vue {
 
   async setColors(colors: Color[]) {
     if (colors && colors.length > 0) {
-      const changeList = colors.map((c) => {
-        return {
-          key: c.id,
-          value: c.color,
-        };
+      const values: { [id: string]: string } = {};
+      colors.forEach((c) => {
+        Object.assign(values, { [c.id]: c.color });
       });
-
-      const changeListObj = changeList.reduce(
-        (obj, item) => Object.assign(obj, { [item.key]: item.value }),
-        {}
-      );
-      const res = await this.viewer.applyFilter({
+      await this.viewer.applyFilter({
         colorBy: {
           type: "category",
-          property: "speckle_type",
-          values: changeListObj,
+          property: "id",
+          values,
           default: "#636363",
         },
       });
@@ -184,6 +178,11 @@ export default class extends Vue {
   @Emit("loaded")
   loaded(properties: Filters, allMesh: THREE.Mesh[]): RendererLoaded {
     return { properties, allMesh };
+  }
+
+  @Emit("objectsSelected")
+  objectsSelected(objects: UserData[]) {
+    return objects;
   }
 }
 </script>

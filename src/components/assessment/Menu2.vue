@@ -10,6 +10,12 @@
         />
       </div>
     </v-form>
+    <v-form v-if="selectedObjects.length > 0" @submit.prevent="newGroup">
+      <v-divider class="pb-4 mt-4"></v-divider>
+      <strong>{{ selectedObjects.length }} Objects selected</strong>
+      <v-text-field label="Group name" v-model="newGroupName"></v-text-field>
+      <v-btn type="submit" outlined class="mb-4">Create new group</v-btn>
+    </v-form>
   </div>
 </template>
 
@@ -26,9 +32,21 @@ import MaterialType from "./MaterialType.vue";
 export default class Menu2 extends Vue {
   @Prop() types!: SpeckleType[];
   @Prop() materials!: MaterialFull[];
+  @Prop() selectedObjects!: string[];
+
+  newGroupName = "";
 
   get loadedTypes() {
     return this.types ? this.types : [];
+  }
+
+  newGroup() {
+    if (this.newGroupName) this.createNewGroup();
+  }
+
+  @Emit("createNewGroup")
+  createNewGroup() {
+    return this.newGroupName;
   }
 
   @Emit("materialUpdated")

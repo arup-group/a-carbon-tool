@@ -299,7 +299,10 @@ export default new Vuex.Store({
       const oldBranch = branches.data.stream.branches.items.find(
         (i) => i.name === context.state.speckleFolderName
       );
-      const reportBranches = filterOnlyReportBranches(context, branches.data.stream.branches.items);
+      const reportBranches = filterOnlyReportBranches(
+        context,
+        branches.data.stream.branches.items
+      );
       const mainReport = reportBranches.find(
         (b) => b.name === `${context.state.speckleFolderName}/main`
       );
@@ -510,7 +513,10 @@ export default new Vuex.Store({
     ): Promise<GetAllReportBranchesOutput> {
       const branches = await speckleUtil.getStreamBranches(context, streamid);
 
-      return filterOnlyReportBranches(context, branches.data.stream.branches.items).map((b) => ({
+      return filterOnlyReportBranches(
+        context,
+        branches.data.stream.branches.items
+      ).map((b) => ({
         name: b.name.split("/")[1],
         id: b.id,
       }));
@@ -538,13 +544,22 @@ export default new Vuex.Store({
       return objects;
     },
 
-    async getStreamNameReportBranches(context, streamid: string): Promise<GetStreamNameReportBranchesOutput> {
-      const res: StreamNameBranches = await speckleUtil.streamNameBranches(context, streamid);
-      const branches = filterOnlyReportBranches(context, res.data.stream.branches.items).map((b) => b.name);
+    async getStreamNameReportBranches(
+      context,
+      streamid: string
+    ): Promise<GetStreamNameReportBranchesOutput> {
+      const res: StreamNameBranches = await speckleUtil.streamNameBranches(
+        context,
+        streamid
+      );
+      const branches = filterOnlyReportBranches(
+        context,
+        res.data.stream.branches.items
+      ).map((b) => b.name);
       return {
         streamName: res.data.stream.name,
-        branches
-      }
+        branches,
+      };
     },
   },
   modules: {},

@@ -35,7 +35,6 @@
 <script lang="ts">
 import {
   GroupedMaterial,
-  SpeckleType,
   TransportSelected,
   TransportType,
 } from "@/models/newAssessment";
@@ -48,7 +47,9 @@ export default class Item extends Vue {
   @Prop() transportTypes!: TransportType[];
   @Prop() groupedMaterial!: GroupedMaterial;
 
-  selected: Selected = this.groupedMaterial.transportType ? this.groupedMaterial.transportType : null;
+  selected: Selected = this.groupedMaterial.transportType
+    ? this.groupedMaterial.transportType
+    : null;
   road = 0;
   rail = 0;
   sea = 0;

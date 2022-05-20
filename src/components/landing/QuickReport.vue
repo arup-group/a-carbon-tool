@@ -1,9 +1,5 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    max-width="50%"
-    persistent
-  >
+  <v-dialog v-model="dialog" max-width="50%" persistent>
     <assessment
       :key="key"
       :modal="true"

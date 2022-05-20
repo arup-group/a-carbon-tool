@@ -38,9 +38,9 @@
         chips
       >
         <template #selection="{ item }">
-          <v-chip :color="item.backgroundColor" :text-color="item.color">{{
-            item.name
-          }}</v-chip>
+          <v-chip :color="item.backgroundColor" :text-color="item.color">
+            {{ item.name }}
+          </v-chip>
         </template>
       </v-select>
       <v-text-field
@@ -80,7 +80,7 @@ export default class Menu1b extends Vue {
   speckleStream: StreamObject | null = this.defaultSpeckleStream();
   defaultSpeckleStream() {
     if (this.streamId) {
-      const stream = this.streams?.find(s => s.value === this.streamId)
+      const stream = this.streams?.find((s) => s.value === this.streamId);
       return stream ? stream : null;
     }
     return null;

@@ -16,12 +16,7 @@
         width="100%"
       >
         <v-card-actions class="justify-center">
-          <v-btn
-            x-large
-            outlined
-            color="primary"
-            @click="newAssessment"
-          >
+          <v-btn x-large outlined color="primary" @click="newAssessment">
             <v-icon> mdi-plus </v-icon>
             New Assessment
           </v-btn>

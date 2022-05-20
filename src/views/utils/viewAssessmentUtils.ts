@@ -136,8 +136,16 @@ export interface LoadStreamOut {
   data: ILoadStreamData;
 }
 
-export async function loadStream(context: any, streamId: string, branchName: string): Promise<LoadStreamOut> {
-  const actReportBranchInfo = await getActReportBranchInfo(context, streamId, branchName);
+export async function loadStream(
+  context: any,
+  streamId: string,
+  branchName: string
+): Promise<LoadStreamOut> {
+  const actReportBranchInfo = await getActReportBranchInfo(
+    context,
+    streamId,
+    branchName
+  );
   const parentId =
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
 
@@ -162,7 +170,7 @@ export async function loadStream(context: any, streamId: string, branchName: str
     totalCO2e: Math.round((branchData.totalCO2 / 1000) * 100) / 100,
     totalkgCO2e: Math.floor(branchData.totalCO2),
     region: branchData.projectData.region,
-    volume: branchData.volume
+    volume: branchData.volume,
   };
 
   const childrenData = await getChildren(

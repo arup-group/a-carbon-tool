@@ -28,7 +28,6 @@ export interface ChildSpeckleObjectData {
   act: SpeckleObjectComplete;
 }
 
-
 export interface ParentSpeckleObjectData {
   constructionCarbonA5: CarbonA5;
   id: string;

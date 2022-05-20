@@ -1,6 +1,9 @@
 import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 
-export const checkContainsBranch = (streamId: string, branchName: string) => `query {
+export const checkContainsBranch = (
+  streamId: string,
+  branchName: string
+) => `query {
   stream(id: "${streamId}") {
     branch(name: "${branchName}") {
       id
@@ -17,7 +20,6 @@ export const userInfoQuery = () => `query {
       company
     }
   }`;
-
 
 export const streamsQuery = () => `query {
   user {
@@ -95,7 +97,10 @@ export const uploadObjectsMutation = (
 }
 `;
 
-export const createBranchMutation = (streamid: string, branchName: string) => `mutation {
+export const createBranchMutation = (
+  streamid: string,
+  branchName: string
+) => `mutation {
   branchCreate(branch: {
     streamId: "${streamid}",
     name: "${branchName}",

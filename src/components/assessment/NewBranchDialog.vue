@@ -43,7 +43,7 @@ export default class NewBranchDialog extends Vue {
   ];
 
   get inputPrefix() {
-    return `${this.$store.state.speckleFolderName}/`
+    return `${this.$store.state.speckleFolderName}/`;
   }
 
   @Watch("reportName")

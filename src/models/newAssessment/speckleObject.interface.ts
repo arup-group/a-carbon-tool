@@ -32,7 +32,7 @@ export interface ObjectFormDataComplete {
 export interface SpeckleObjectComplete {
   id: string;
   speckle_type: string;
-  formData: ObjectFormDataComplete,
+  formData: ObjectFormDataComplete;
   reportData: ReportData;
 }
 

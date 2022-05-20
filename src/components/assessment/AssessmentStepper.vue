@@ -10,13 +10,17 @@
         <div>New Assessment</div>
         <v-btn v-if="modal" @click="openFullView">Open in full view</v-btn>
         <v-btn v-if="modal" @click="close">Close</v-btn>
-        </v-card-title>
+      </v-card-title>
       <v-stepper
         style="overflow-y: scroll; height: 75vh"
         v-model="step"
         vertical
       >
-        <v-stepper-step step="1" color="secondary darken-2" :complete="completed">
+        <v-stepper-step
+          step="1"
+          color="secondary darken-2"
+          :complete="completed"
+        >
           Data
         </v-stepper-step>
         <v-stepper-content step="1">
@@ -37,7 +41,11 @@
             </v-btn>
           </v-card-actions>
         </v-stepper-content>
-        <v-stepper-step step="2" color="secondary darken-2" :complete="completed">
+        <v-stepper-step
+          step="2"
+          color="secondary darken-2"
+          :complete="completed"
+        >
           Materials
         </v-stepper-step>
         <v-stepper-content step="2">
@@ -89,7 +97,11 @@
           Quantities
         </v-stepper-step>
         <v-stepper-content step="4">
-          <menu-4 @calcVol="calcVol" :totalVolume="totalVolume" :speckleVol="speckleVol" />
+          <menu-4
+            @calcVol="calcVol"
+            :totalVolume="totalVolume"
+            :speckleVol="speckleVol"
+          />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 3" color="primary">
               Previous
@@ -211,15 +223,17 @@ export default class AssessmentStepper extends Vue {
 
   @Prop() selectedObjects!: string[];
 
-  form: ProjectDataTemp = this.update ? this.projectData: {
-    name: null,
-    components: null,
-    cost: null,
-    floorArea: null,
-    region: null,
-    jobNumber: null,
-    notes: null,
-  };
+  form: ProjectDataTemp = this.update
+    ? this.projectData
+    : {
+        name: null,
+        components: null,
+        cost: null,
+        floorArea: null,
+        region: null,
+        jobNumber: null,
+        notes: null,
+      };
   completed = this.update;
 
   step: Step = 1;

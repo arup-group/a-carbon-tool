@@ -11,4 +11,3 @@ export interface Project {
   projectDate: string;
   newMainAvailable: boolean;
 }
-

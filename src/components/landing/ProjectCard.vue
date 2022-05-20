@@ -50,8 +50,13 @@
             </v-btn>
           </span>
         </v-card-actions>
-        <v-overlay class="d-flex align-start" :absolute="true" :z-index="0" :opacity="0.98" :value="cardOverlay">
-
+        <v-overlay
+          class="d-flex align-start"
+          :absolute="true"
+          :z-index="0"
+          :opacity="0.98"
+          :value="cardOverlay"
+        >
           <v-col class="d-flex align-start">
             <v-col class="d-flex align-end flex-column">
               <v-btn icon color="red darken-1" @click="cardOverlay = false">
@@ -59,11 +64,11 @@
               </v-btn>
             </v-col>
           </v-col>
-            <v-col>
-              <v-card-text class="d-flex align-end mb-6">
-                Theres an update on main branch, use edit to update your report.
-              </v-card-text>
-            </v-col>
+          <v-col>
+            <v-card-text class="d-flex align-end mb-6">
+              Theres an update on main branch, use edit to update your report.
+            </v-card-text>
+          </v-col>
         </v-overlay>
       </v-card>
     </v-sheet>

@@ -1,5 +1,8 @@
 export { StreamReferenceObjects } from "./StreamReferenceObjects.interface";
-export { StreamReferenceBranches, BranchItem } from "./StreamReferenceBranches.interface";
+export {
+  StreamReferenceBranches,
+  BranchItem,
+} from "./StreamReferenceBranches.interface";
 export { StreamData, HTTPStreamDataParent } from "./StreamData.interface";
 export { ActReportData } from "./ActReportData.interface";
 export { DeleteStreamData } from "./DeleteStreamData.interface";

@@ -13,7 +13,10 @@
   </v-sheet>
 </template>
 <script lang="ts">
-import { HistoryFilterOptions, HistoryProjectCardDirection } from "@/models/assessmentHistory";
+import {
+  HistoryFilterOptions,
+  HistoryProjectCardDirection,
+} from "@/models/assessmentHistory";
 import { Vue, Component, Watch, Emit, Prop } from "vue-property-decorator";
 
 @Component
@@ -83,10 +86,12 @@ export default class HistoryFilters extends Vue {
     this.filters.categories = val;
   }
   get direction() {
-      return this.filters.direction === HistoryProjectCardDirection.COL;
+    return this.filters.direction === HistoryProjectCardDirection.COL;
   }
   set direction(val) {
-      this.filters.direction = val ? HistoryProjectCardDirection.COL : HistoryProjectCardDirection.ROW;
+    this.filters.direction = val
+      ? HistoryProjectCardDirection.COL
+      : HistoryProjectCardDirection.ROW;
   }
   get renderer() {
     return this.filters.renderer;
@@ -96,7 +101,7 @@ export default class HistoryFilters extends Vue {
   }
 
   get directionLabel() {
-      return `Direction: ${this.filters.direction}`
+    return `Direction: ${this.filters.direction}`;
   }
 }
 </script>

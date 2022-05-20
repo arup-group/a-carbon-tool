@@ -64,7 +64,6 @@
   </v-card>
 </template>
 <script lang="ts">
-import { ProjectInfo } from "@/models/assessment";
 import { IProjectInfo } from "@/views/utils/viewAssessmentUtils";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import BECChipGroup from "../shared/BECChipGroup.vue";

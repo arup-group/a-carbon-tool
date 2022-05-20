@@ -118,18 +118,20 @@ export async function convOldReport(
 ) {
   const mainReportBranchName = `${context.state.speckleFolderName}/main`;
 
-  const res = await createReportBranch(
-    context,
-    streamid,
-    mainReportBranchName
-  );
-  const reportObjId = oldBranch.commits.items[0].referencedObject
+  const res = await createReportBranch(context, streamid, mainReportBranchName);
+  const reportObjId = oldBranch.commits.items[0].referencedObject;
 
   const objectInfo = await getObjectInfo(context, streamid, reportObjId);
 
-  const totalChildrenCount = objectInfo.data.stream.object.totalChildrenCount
+  const totalChildrenCount = objectInfo.data.stream.object.totalChildrenCount;
 
-  const commitRes = await createCommit(context, streamid, reportObjId, totalChildrenCount, mainReportBranchName);
+  const commitRes = await createCommit(
+    context,
+    streamid,
+    reportObjId,
+    totalChildrenCount,
+    mainReportBranchName
+  );
 
   return commitRes;
 }
@@ -249,9 +251,11 @@ export const checkContainsBranch = (
 export const getStreamName = (
   context: any,
   streamid: string
-): Promise<StreamName> => speckleFetch(queries.streamNameQuery(streamid), context);
+): Promise<StreamName> =>
+  speckleFetch(queries.streamNameQuery(streamid), context);
 
 export const streamNameBranches = (
   context: any,
   streamid: string
-): Promise<StreamNameBranches> => speckleFetch(queries.streamNameBranches(streamid), context);
+): Promise<StreamNameBranches> =>
+  speckleFetch(queries.streamNameBranches(streamid), context);

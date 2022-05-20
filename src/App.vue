@@ -24,7 +24,11 @@
     </v-main>
     <Footer :li="isAuthenticated" />
 
-    <version-update-dialog :dialog="update" :version="version" @close="closeDialog" />
+    <version-update-dialog
+      :dialog="update"
+      :version="version"
+      @close="closeDialog"
+    />
   </v-app>
 </template>
 

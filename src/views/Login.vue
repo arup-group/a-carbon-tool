@@ -26,8 +26,13 @@
           >
         </v-card>
       </v-col>
-      <v-col cols="12" md="9" class="d-flex justify-center align-center">
-        <LoginCard :servers="servers" @submit="logIn"/>
+      <v-col cols="12" sm="6" md="3" class="d-flex justify-center align-center pb-0">
+        <LoginCard @submit="logIn"/>
+      </v-col>
+    </v-row>
+    <v-row class="justify-center">
+      <v-col cols="12" sm="6" md="3" class="d-flex justify-center align-center">
+        <DefineLogin @submit="logIn"/>
       </v-col>
       <v-col cols="12">
         <v-card flat :color="this.$store.state.darkMode ? '#121212' : ''">
@@ -91,9 +96,10 @@
 import LoginCard from "@/components/login/LoginCard.vue";
 import { Vue, Component } from "vue-property-decorator";
 import { Server } from "@/models/auth/";
+import DefineLogin from "@/components/login/DefineLogin.vue"
 
 @Component({
-  components: { LoginCard },
+  components: { LoginCard, DefineLogin },
 })
 export default class Login extends Vue {
   dialog = true;

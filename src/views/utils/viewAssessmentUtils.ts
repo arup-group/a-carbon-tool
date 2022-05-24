@@ -35,6 +35,7 @@ export function extractCo2Data(
   const co2Obj: {
     [key: string]: { value: number; color: string; id: string };
   } = {};
+  const colorsArr: Color[] = [];
   children.forEach((object) => {
     levels.levels[0].kgCO2eperm2 +=
       object.act.reportData.productStageCarbonA1A3 / floorArea;
@@ -68,6 +69,7 @@ export function extractCo2Data(
         id: object.act.speckle_type,
       };
     }
+    colorsArr.push({ id: object.act.id, color: object.act.formData.material.color });
   });
   const co2Arr = Object.entries(co2Obj);
   const materials = co2Arr.map((obj) => {
@@ -77,13 +79,7 @@ export function extractCo2Data(
       color: obj[1].color,
     };
   });
-
-  const colors = co2Arr.map((obj) => {
-    return {
-      id: obj[1].id,
-      color: obj[1].color,
-    };
-  });
+  const colors = colorsArr;
   return { levels, materials, colors };
 }
 

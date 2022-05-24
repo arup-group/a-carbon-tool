@@ -440,8 +440,7 @@ export default new Vuex.Store({
       const children = uploadObjectsRes.data.objectCreate;
       const formData = new FormData();
       // below line means that some objects may be given duplicate strings and the report won't save properly
-      // TODO: FIND SOME BETTER WAY OF SETTING THE OBJECT ID
-      const objectid = Math.floor(Math.random() * 1000000).toString();
+      const objectid = `${new Date().getTime().toString()}-act`;
       const objectData: ParentSpeckleObjectData = {
         id: objectid,
         speckleType: "act-totals",

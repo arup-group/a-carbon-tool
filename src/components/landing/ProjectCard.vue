@@ -42,9 +42,6 @@
               v-if="options"
               :items="['one', 'two']"
             />
-            <v-btn icon color="primary">
-              <v-icon>mdi-share-variant</v-icon>
-            </v-btn>
             <v-btn icon color="primary" @click="open">
               <v-icon>mdi-open-in-new</v-icon>
             </v-btn>

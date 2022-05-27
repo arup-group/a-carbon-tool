@@ -557,6 +557,7 @@ export default class Assessment extends Vue {
   // for now we're just assuming that all data is filled in if the user reaches this step TODO: ONLY ALLOW USER ON THIS PAGE IF REVIEW IS SUCCESSFUL
   carbonCalc() {
     // convert objects from SpeckleObject to SpeckleObjectFormComplete
+
     const objs = this.convertToFormComplete();
 
     const reportObjs = objs.map((o): SpeckleObjectComplete => {
@@ -695,6 +696,7 @@ export default class Assessment extends Vue {
     const ids = material.type.ids;
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
+      this.objectsObj[id].speckle_type = material.type.type;
       this.colors.push({
         color: material.material.color,
         id,

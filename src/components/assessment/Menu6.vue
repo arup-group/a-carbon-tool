@@ -47,25 +47,19 @@ export default class Menu6 extends Vue {
             kgCO2e: this.report.totals.transportCarbonA4,
             tCO2e: Math.round(this.report.totals.transportCarbonA4 * 0.001),
             kgCO2eperm2: Math.round(
-              this.report.totals.productStageCarbonA1A3 / this.floorArea
+              this.report.totals.transportCarbonA4 / this.floorArea
             ),
           },
           {
             name: "A5",
             kgCO2e:
-              this.report.totals.constructionCarbonA5.value +
-              this.report.totals.constructionCarbonA5.waste +
-              this.report.totals.constructionCarbonA5.site,
+              this.report.totals.constructionCarbonA5.value,
             tCO2e:
               Math.round(
                 this.report.totals.constructionCarbonA5.value * 0.001
-              ) +
-              Math.round(
-                this.report.totals.constructionCarbonA5.waste * 0.001
-              ) +
-              Math.round(this.report.totals.constructionCarbonA5.site * 0.001),
+              ),
             kgCO2eperm2: Math.round(
-              this.report.totals.productStageCarbonA1A3 / this.floorArea
+              this.report.totals.constructionCarbonA5.value / this.floorArea
             ),
           },
         ],

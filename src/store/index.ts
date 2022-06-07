@@ -1,25 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import {
-  createCommit,
-  createReportBranch,
-  exchangeAccessCode,
-  getServer,
-  getStreamObjects,
-  getToken,
-  getUserData,
-  getUserStreams,
-  getStreamBranches,
-  getBranchData,
-  goToSpeckleAuthpage,
-  speckleLogOut,
-  uploadObjects,
-  getStreamCommit,
-  getMainStreamCommit,
-  getActReportBranchInfo,
-  deleteBranch,
-} from "./speckle/speckleUtil";
-import { loadStream } from "@/views/utils/viewAssessmentUtils";
+import * as speckleUtil from "./speckle/speckleUtil";
+import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
 import { Login, Server, AuthError, Token } from "@/models/auth/";
 import router from "@/router";
 import {
@@ -37,12 +19,20 @@ import {
 
 import { BECName } from "@/models/shared";
 import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
+import { filterOnlyReportBranches } from "./utilities/filters";
+import {
+  StreamNameBranches,
+  StreamReferenceBranches,
+  StreamReferenceObjects,
+} from "@/models/graphql";
+import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.2.0 \u00DF",
+    version: "0.8.0 \u00DF",
+    speckleFolderName: "actcarbonreport",
     servers: {
       arup: {
         region: "UKIMEA",
@@ -244,21 +234,21 @@ export default new Vuex.Store({
       context.commit("logout");
 
       // wipe the tokens
-      speckleLogOut();
+      speckleUtil.speckleLogOut();
 
       router.push("login");
     },
     async exchangeAccessCode(context, accessCode: string) {
-      const server = getServer(context);
+      const server = speckleUtil.getServer(context);
 
-      const token = await exchangeAccessCode(accessCode, server);
+      const token = await speckleUtil.exchangeAccessCode(accessCode, server);
       context.commit("login", {
         token,
         server,
       });
     },
     redirectToAuth(context, server: Server) {
-      goToSpeckleAuthpage(server);
+      speckleUtil.goToSpeckleAuthpage(server);
     },
     async getUser(context) {
       try {
@@ -266,14 +256,14 @@ export default new Vuex.Store({
           Object.keys(context.state.selectedServer).length === 0 ||
           Object.keys(context.state.token).length === 0
         ) {
-          const server = getServer(context);
-          const token = getToken();
+          const server = speckleUtil.getServer(context);
+          const token = speckleUtil.getToken();
           context.commit("login", {
             token,
             server,
           });
         }
-        const json = await getUserData(context);
+        const json = await speckleUtil.getUserData(context);
         const data = json.data;
         context.commit("setUser", data.user);
         context.commit("setServerInfo", data.serverInfo);
@@ -284,53 +274,104 @@ export default new Vuex.Store({
       }
     },
     async getUserStreams(context) {
-      const streams = await getUserStreams(context);
+      const streams = await speckleUtil.getUserStreams(context);
       return streams;
     },
     async getStreamObjects(context, streamid: string) {
-      const streams = await getStreamObjects(context, streamid);
+      const streams = await speckleUtil.getStreamObjects(context, streamid);
       return streams;
     },
     async deleteBranch(context, input: DeleteBranchInput) {
-      const branch = await deleteBranch(
+      const branch = await speckleUtil.deleteBranch(
         context,
         input.streamid,
         input.branchid
       );
       return branch;
     },
-    async getStreamBranches(context, streamid: string) {
-      const streams = await getStreamBranches(context, streamid);
-      return streams;
+    async getStreamBranches(
+      context,
+      streamid: string
+    ): Promise<GetStreamBranchesOutput> {
+      const branches: StreamReferenceBranches =
+        await speckleUtil.getStreamBranches(context, streamid);
+
+      const oldBranch = branches.data.stream.branches.items.find(
+        (i) => i.name === context.state.speckleFolderName
+      );
+      const reportBranches = filterOnlyReportBranches(
+        context,
+        branches.data.stream.branches.items
+      );
+      const mainReport = reportBranches.find(
+        (b) => b.name === `${context.state.speckleFolderName}/main`
+      );
+      if (oldBranch && !mainReport)
+        speckleUtil.convOldReport(context, streamid, oldBranch);
+      const mainBranch = branches.data.stream.branches.items.find(
+        (i) => i.name === "main"
+      );
+      return {
+        reportBranches,
+        mainBranch: mainBranch
+          ? mainBranch
+          : {
+              id: "",
+              name: "",
+              createdAt: "",
+              commits: { items: [] },
+            },
+      };
     },
 
-    async getStreamCommit(context, streamid: string) {
-      const streams = await getStreamCommit(context, streamid);
+    async getStreamCommit(
+      context,
+      { streamid, branchName }: GetStreamCommitInput
+    ): Promise<StreamReferenceObjects> {
+      const streams = await speckleUtil.getStreamCommit(
+        context,
+        streamid,
+        branchName
+      );
       return streams;
     },
 
     async getMainStreamCommit(context, streamid: string) {
-      const streams = await getMainStreamCommit(context, streamid);
+      const streams = await speckleUtil.getMainStreamCommit(context, streamid);
+      return streams;
+    },
+    async getStreamName(context, streamid: string) {
+      return await speckleUtil.getStreamName(context, streamid);
+    },
+
+    async getBranchData(context, { streamid, objId }: GetBranchDataInputs) {
+      const streams = await speckleUtil.getBranchData(context, streamid, objId);
       return streams;
     },
 
-    async getBranchData(context, [streamid, objId]) {
-      const streams = await getBranchData(context, streamid, objId);
-      return streams;
-    },
-
-    async getActReportBranchInfo(context, streamId) {
-      const actReportBranchInfo = await getActReportBranchInfo(
+    async getActReportBranchInfo(
+      context,
+      { streamid, branchName }: GetActReportBranchInfoInput
+    ) {
+      const actReportBranchInfo = await speckleUtil.getActReportBranchInfo(
         context,
-        streamId
+        streamid,
+        branchName
       );
       return actReportBranchInfo;
     },
-    async loadActReportData(context, streamId: string) {
-      return await loadStream(context, streamId);
+    async loadActReportData(
+      context,
+      { streamId, branchName }: LoadActReportDataInput
+    ) {
+      return await loadStream(
+        context,
+        streamId,
+        `${context.state.speckleFolderName}/${branchName}`
+      );
     },
     async getObjectUrls(context, streamid: string) {
-      const objectIds = await getStreamObjects(context, streamid);
+      const objectIds = await speckleUtil.getStreamObjects(context, streamid);
 
       return objectIds.data.stream.branch.commits.items.map((item) => {
         return `${context.state.selectedServer.url}/streams/${streamid}/objects/${item.referencedObject}`;
@@ -341,8 +382,10 @@ export default new Vuex.Store({
       commit("setDarkMode");
     },
 
-    async getObjectDetails(context, input: ObjectDetailsInput) {
-      const { streamid, objecturl } = input;
+    async getObjectDetails(
+      context,
+      { streamid, objecturl }: ObjectDetailsInput
+    ) {
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
       const response = await fetch(
@@ -379,20 +422,25 @@ export default new Vuex.Store({
 
       return childrenObjects;
     },
-    async uploadReport(context, input: UploadReportInput) {
-      const { streamid, objects, reportTotals, projectData } = input;
+    async uploadReport(
+      context,
+      {
+        streamid,
+        objects,
+        reportTotals,
+        projectData,
+        branchName,
+      }: UploadReportInput
+    ) {
+      branchName = `${context.state.speckleFolderName}/${branchName}`;
 
       // TODO: ADD ERROR HANDLING
-      const uploadObjectsRes: UploadObjectsRes = await uploadObjects(
-        context,
-        streamid,
-        objects
-      );
+      const uploadObjectsRes: UploadObjectsRes =
+        await speckleUtil.uploadObjects(context, streamid, objects);
       const children = uploadObjectsRes.data.objectCreate;
       const formData = new FormData();
       // below line means that some objects may be given duplicate strings and the report won't save properly
-      // TODO: FIND SOME BETTER WAY OF SETTING THE OBJECT ID
-      const objectid = Math.floor(Math.random() * 1000000).toString();
+      const objectid = `${new Date().getTime().toString()}-act`;
       const objectData: ParentSpeckleObjectData = {
         id: objectid,
         speckleType: "act-totals",
@@ -401,6 +449,7 @@ export default new Vuex.Store({
         productStageCarbonA1A3: reportTotals.productStageCarbonA1A3,
         constructionCarbonA5: reportTotals.constructionCarbonA5,
         totalCO2: reportTotals.totalCO2,
+        volume: reportTotals.volume,
         projectData,
         totalChildrenCount: 0,
       };
@@ -423,23 +472,149 @@ export default new Vuex.Store({
         body: formData,
       });
       // TODO: DELETE BRANCH FIRST TO ENSURE THE BRANCH ONLY CONTAINS OBJECTS FROM MOST RECENT REPORT
-      const createBranch: SpeckleBranchRes = await createReportBranch(
-        context,
-        streamid
-      );
+      const createBranch: SpeckleBranchRes =
+        await speckleUtil.createReportBranch(context, streamid, branchName);
 
       const totalChildrenCount = uploadObjectsRes.data.objectCreate.length;
 
-      const createCommitRes: CreateCommitRes = await createCommit(
+      const createCommitRes: CreateCommitRes = await speckleUtil.createCommit(
         context,
         streamid,
         objectid,
-        totalChildrenCount
+        totalChildrenCount,
+        branchName
       );
+    },
+    async checkContainsReport(context, streamid: string): Promise<boolean> {
+      const queryRes = await speckleUtil.checkContainsBranch(
+        context,
+        streamid,
+        `${context.state.speckleFolderName}/main`
+      );
+
+      return queryRes.data.stream.branch !== null;
+    },
+    async checkContainsChlidReport(
+      context,
+      { streamid, branchName }: CheckContainsChlidReportInput
+    ) {
+      const queryRes = await speckleUtil.checkContainsBranch(
+        context,
+        streamid,
+        `${context.state.speckleFolderName}/${branchName}`
+      );
+
+      return queryRes.data.stream.branch !== null;
+    },
+    async getAllReportBranches(
+      context,
+      streamid: string
+    ): Promise<GetAllReportBranchesOutput> {
+      const branches = await speckleUtil.getStreamBranches(context, streamid);
+
+      return filterOnlyReportBranches(
+        context,
+        branches.data.stream.branches.items
+      ).map((b) => ({
+        name: b.name.split("/")[1],
+        id: b.id,
+      }));
+    },
+    async getAllReportObjects(
+      context,
+      streamid: string
+    ): Promise<GetAllReportObjectsOutputs> {
+      const branches: GetAllReportBranchesOutput = await context.dispatch(
+        "getAllReportBranches",
+        streamid
+      );
+
+      const objects: GetAllReportObjectsOutputs = await Promise.all(
+        branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
+          const fullBranchName = `${context.state.speckleFolderName}/${branch.name}`;
+
+          const data = await loadStream(context, streamid, fullBranchName);
+          return {
+            branch,
+            data,
+          };
+        })
+      );
+      return objects;
+    },
+
+    async getStreamNameReportBranches(
+      context,
+      streamid: string
+    ): Promise<GetStreamNameReportBranchesOutput> {
+      const res: StreamNameBranches = await speckleUtil.streamNameBranches(
+        context,
+        streamid
+      );
+      const branches = filterOnlyReportBranches(
+        context,
+        res.data.stream.branches.items
+      ).map((b) => b.name);
+      return {
+        streamName: res.data.stream.name,
+        branches,
+      };
     },
   },
   modules: {},
 });
+
+export interface GetStreamNameReportBranchesOutput {
+  streamName: string;
+  branches: string[];
+}
+
+export type GetAllReportBranchesOutput = GetAllReportBranchesOutputItem[];
+
+export interface GetAllReportBranchesOutputItem {
+  name: string;
+  id: string;
+}
+
+export type GetAllReportObjectsOutputs = GetAllReportObjectsOutput[];
+
+export interface GetAllReportObjectsOutput {
+  branch: {
+    id: string;
+    name: string;
+  };
+  data: LoadStreamOut;
+}
+
+export interface GetStreamCommitInput {
+  streamid: string;
+  branchName: string;
+}
+
+export interface GetStreamBranchesOutput {
+  reportBranches: BranchItem[];
+  mainBranch: BranchItem;
+}
+
+export interface GetActReportBranchInfoInput {
+  streamid: string;
+  branchName: string;
+}
+
+export interface LoadActReportDataInput {
+  streamId: string;
+  branchName: string;
+}
+
+export interface CheckContainsChlidReportInput {
+  streamid: string;
+  branchName: string;
+}
+
+export interface GetBranchDataInputs {
+  streamid: string;
+  objId: string;
+}
 
 export interface DeleteBranchInput {
   streamid: string;
@@ -493,6 +668,7 @@ export interface UploadReportInput {
   objects: SpeckleObjectComplete[];
   reportTotals: ReportTotals;
   projectData: ProjectDataComplete;
+  branchName: string;
 }
 
 interface ObjectDetailsInput {

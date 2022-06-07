@@ -15,7 +15,6 @@ export { MaterialUpdateOut } from "./materialUpdateOut.interface";
 export { TransportType, TransportValues } from "./transportType.interface";
 export { Step } from "./step.enum";
 export { TransportSelected } from "./transportSelected.interface";
-export { CalcModes } from "./calcModes.enum";
 export { ProjectDataTemp, ProjectDataComplete } from "./projectData.interface";
 export { EmptyProps, EmptyPropsPassdown } from "./emptyProps.interface";
 export { ObjectDetails } from "./objectDetails.interface";

@@ -32,7 +32,7 @@ export interface ObjectFormDataComplete {
 export interface SpeckleObjectComplete {
   id: string;
   speckle_type: string;
-  formData: ObjectFormDataComplete,
+  formData: ObjectFormDataComplete;
   reportData: ReportData;
 }
 
@@ -57,4 +57,5 @@ export interface CarbonA5 {
 
 export interface ReportTotals extends ReportData {
   totalCO2: number;
+  volume: number;
 }

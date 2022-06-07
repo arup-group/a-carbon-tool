@@ -26,8 +26,9 @@
   </v-card>
 </template>
 <script lang="ts">
-import { ABreakdown, Level } from "@/models/assessment";
+import { Level } from "@/models/assessment";
 import { ChartData } from "@/models/chart";
+import { IABreakdown } from "@/views/utils/viewAssessmentUtils";
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 import HBarChart from "../charts/HBarChart.vue";
@@ -36,7 +37,7 @@ import HBarChart from "../charts/HBarChart.vue";
   components: { HBarChart },
 })
 export default class ABreakdownCard extends Vue {
-  @Prop() aBreakdown!: ABreakdown;
+  @Prop() aBreakdown!: IABreakdown;
 
   get levels() {
     return this.aBreakdown.levels;

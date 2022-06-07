@@ -5,14 +5,16 @@ import { SpeckleObjectComplete } from "../newAssessment";
 export interface StreamData {
   data: {
     stream: {
-      object: {
-        data: ParentSpeckleObjectData;
-        createdAt: string;
-        children: {
-          objects: { data: any }[];
-        };
-      };
+      object: ReportObj;
     };
+  };
+}
+
+export interface ReportObj {
+  data: ParentSpeckleObjectData;
+  createdAt: string;
+  children: {
+    objects: { data: any }[];
   };
 }
 
@@ -26,7 +28,6 @@ export interface ChildSpeckleObjectData {
   act: SpeckleObjectComplete;
 }
 
-
 export interface ParentSpeckleObjectData {
   constructionCarbonA5: CarbonA5;
   id: string;
@@ -37,4 +38,5 @@ export interface ParentSpeckleObjectData {
   totalCO2: number;
   totalChildrenCount: number;
   transportCarbonA4: number;
+  volume: number;
 }

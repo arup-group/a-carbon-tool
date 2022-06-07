@@ -5,32 +5,25 @@
       <v-chip class="text-center">{{ displayVolume }}m<sup>3</sup></v-chip>
     </div>
     <div v-else>
-      <p><b>No volume properties on speckle objects! Do you want to calculate volume from model?</b></p>
+      <p>
+        <b>
+          No volume properties on speckle objects! Do you want to calculate
+          volume from model?
+        </b>
+      </p>
       <p>Model assumed to be in m<sup>3</sup></p>
       <v-btn color="primary" outlined @click="calcVol">Calculate</v-btn>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { CalcModes } from "@/models/newAssessment";
 import { Vue, Component, Emit, Prop } from "vue-property-decorator";
-
-type CalcMode = {
-  name: string;
-  id: CalcModes;
-};
 
 @Component
 export default class Menu4 extends Vue {
   @Prop() objWithProp!: number;
   @Prop() totalVolume!: number;
   @Prop() speckleVol!: boolean;
-  calcMode = null;
-
-  calcModes: CalcMode[] = [
-    { name: "Using an Object's volume property", id: 0 },
-    { name: "Try calculating volumes automatically", id: 1 },
-  ];
 
   get volCalculated() {
     return this.totalVolume !== -1;

@@ -8,7 +8,7 @@
 import { Vue, Component, Emit } from "vue-property-decorator";
 
 @Component
-export default class LandingError extends Vue {
+export default class ErrorRetry extends Vue {
   @Emit("retry")
   retry() {
     return;

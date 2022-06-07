@@ -44,7 +44,14 @@ export function constructionCarbonA5Waste(obj: SpeckleObjectFormComplete) {
     obj.formData.volume * (1 / (1 - obj.formData.material.wastage) - 1);
 
   // create new object with waste volume
-  const wasteObj = obj;
+  // const wasteObj = obj;
+  const wasteObj: SpeckleObjectFormComplete = {
+    ...obj,
+    formData: {
+      ...obj.formData,
+      volume: wasteVolume,
+    },
+  };
   wasteObj.formData.volume = wasteVolume;
 
   // compute a1-a4 for waste materials

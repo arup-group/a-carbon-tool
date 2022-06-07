@@ -7,8 +7,8 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MaterialBreakdown } from "@/models/assessment";
 import { ChartData } from "@/models/chart";
+import { IMaterialBreakdown } from "@/views/utils/viewAssessmentUtils";
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 import DoughtnutChart from "../charts/DoughnutChart.vue";
@@ -17,7 +17,7 @@ import DoughtnutChart from "../charts/DoughnutChart.vue";
   components: { DoughtnutChart },
 })
 export default class MaterialBreakdownCard extends Vue {
-  @Prop() materialBreakdown!: MaterialBreakdown;
+  @Prop() materialBreakdown!: IMaterialBreakdown;
 
   get materials() {
     return this.materialBreakdown.materials;

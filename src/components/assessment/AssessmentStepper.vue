@@ -6,13 +6,21 @@
     class="d-flex justify-center align-center"
   >
     <v-card style="width: 100%; height: 85vh">
-      <v-card-title style="height: 10vh" class="">New Assessment</v-card-title>
+      <v-card-title style="height: 10vh" class="d-flex justify-space-between">
+        <div>New Assessment</div>
+        <v-btn v-if="modal" @click="openFullView">Open in full view</v-btn>
+        <v-btn v-if="modal" @click="close">Close</v-btn>
+      </v-card-title>
       <v-stepper
         style="overflow-y: scroll; height: 75vh"
         v-model="step"
         vertical
       >
-        <v-stepper-step step="1" color="secondary darken-2">
+        <v-stepper-step
+          step="1"
+          color="secondary darken-2"
+          :complete="completed"
+        >
           Data
         </v-stepper-step>
         <v-stepper-content step="1">
@@ -24,6 +32,7 @@
             :step="step"
             :becs="becs"
             :form="form"
+            :streamId="streamId"
           />
           <v-card-actions>
             <v-spacer />
@@ -32,14 +41,20 @@
             </v-btn>
           </v-card-actions>
         </v-stepper-content>
-        <v-stepper-step step="2" color="secondary darken-2">
+        <v-stepper-step
+          step="2"
+          color="secondary darken-2"
+          :complete="completed"
+        >
           Materials
         </v-stepper-step>
         <v-stepper-content step="2">
           <Menu2
             :types="types"
             :materials="materials"
+            :selectedObjects="selectedObjects"
             @materialUpdated="materialUpdated"
+            @createNewGroup="createNewGroup"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 1" color="primary">
@@ -82,7 +97,11 @@
           Quantities
         </v-stepper-step>
         <v-stepper-content step="4">
-          <menu-4 @calcVol="calcVol" :totalVolume="totalVolume" :speckleVol="speckleVol" />
+          <menu-4
+            @calcVol="calcVol"
+            :totalVolume="totalVolume"
+            :speckleVol="speckleVol"
+          />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 3" color="primary">
               Previous
@@ -196,16 +215,26 @@ export default class AssessmentStepper extends Vue {
   @Prop() groupedMaterials!: GroupedMaterial[];
   @Prop() speckleVol!: boolean;
 
-  form: ProjectDataTemp = {
-    name: null,
-    components: null,
-    cost: null,
-    floorArea: null,
-    region: null,
-    jobNumber: null,
-    notes: null,
-  };
-  completed = false;
+  @Prop() update!: boolean;
+  @Prop() streamId!: string;
+  @Prop() projectData!: ProjectDataComplete;
+
+  @Prop() modal!: boolean;
+
+  @Prop() selectedObjects!: string[];
+
+  form: ProjectDataTemp = this.update
+    ? this.projectData
+    : {
+        name: null,
+        components: null,
+        cost: null,
+        floorArea: null,
+        region: null,
+        jobNumber: null,
+        notes: null,
+      };
+  completed = this.update;
 
   step: Step = 1;
 
@@ -243,6 +272,16 @@ export default class AssessmentStepper extends Vue {
     return this.report ? true : false;
   }
 
+  @Emit("createNewGroup")
+  createNewGroup(groupName: string) {
+    return groupName;
+  }
+
+  @Emit("openFullView")
+  openFullView() {
+    return;
+  }
+
   @Emit("materialUpdated")
   materialUpdated(material: MaterialUpdateOut) {
     return material;
@@ -261,6 +300,11 @@ export default class AssessmentStepper extends Vue {
   @Emit("uploadData")
   uploadData(data: ProjectDataComplete) {
     return data;
+  }
+
+  @Emit("close")
+  close() {
+    return;
   }
 
   @Watch("step")
@@ -282,7 +326,7 @@ export default class AssessmentStepper extends Vue {
   notesUpdate() {
     this.uploadData({
       name: this.form.name ? this.form.name : "",
-      components: this.form.components ? this.form.components : [""],
+      components: this.form.components ? this.form.components : [],
       cost: this.form.cost ? +this.form.cost : 0,
       floorArea: this.form.floorArea ? +this.form.floorArea : 1,
       region: this.form.region ? this.form.region : "",

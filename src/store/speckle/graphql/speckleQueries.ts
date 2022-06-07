@@ -1,5 +1,16 @@
 import { ReportTotals, SpeckleObjectComplete } from "@/models/newAssessment";
 
+export const checkContainsBranch = (
+  streamId: string,
+  branchName: string
+) => `query {
+  stream(id: "${streamId}") {
+    branch(name: "${branchName}") {
+      id
+    }
+  }
+}`;
+
 export const userInfoQuery = () => `query {
     user {
       name
@@ -9,7 +20,6 @@ export const userInfoQuery = () => `query {
       company
     }
   }`;
-
 
 export const streamsQuery = () => `query {
   user {
@@ -87,10 +97,13 @@ export const uploadObjectsMutation = (
 }
 `;
 
-export const createBranchMutation = (streamid: string) => `mutation {
+export const createBranchMutation = (
+  streamid: string,
+  branchName: string
+) => `mutation {
   branchCreate(branch: {
     streamId: "${streamid}",
-    name: "actcarbonreport",
+    name: "${branchName}",
     description: "A Carbon Tool carbon report"
   })
 }`;
@@ -98,11 +111,12 @@ export const createBranchMutation = (streamid: string) => `mutation {
 export const createCommitMutation = (
   streamid: string,
   objectid: string,
-  totalChildrenCount: number
+  totalChildrenCount: number,
+  branchName: string
 ) => `mutation {
   commitCreate(commit: {
     streamId: "${streamid}",
-    branchName: "actcarbonreport",
+    branchName: "${branchName}",
     objectId: "${objectid}",
     message: "upload carbon report",
     sourceApplication: "ACT",
@@ -110,9 +124,9 @@ export const createCommitMutation = (
   })
 }`;
 
-export const streamCommmitObjects = (id: string) => `query {
+export const streamCommmitObjects = (id: string, branchName: string) => `query {
 stream(id: "${id}") {
-  branch (name:"actcarbonreport"){
+  branch (name:"${branchName}"){
     commits {
        items {
          referencedObject
@@ -142,26 +156,28 @@ export const streamReferencedBranches = (id: string) => `query {
         id,
         name,
         commits {
-          cursor
+          items{
+            referencedObject
+          }
         }
       }
     }
   }
 }`;
 
-export const actReportBranchInfo = (id: string) => {
+export const actReportBranchInfo = (id: string, branchName: string) => {
   return `query {
   stream(id: "${id}") {
     name
-    branch(name: "actcarbonreport") {
-    commits {
-      items {
-        authorName
-        createdAt
-      	referencedObject
+    branch(name: "${branchName}") {
+      commits {
+        items {
+          authorName
+          createdAt
+      	  referencedObject
+        }
       }
     }
-  }
   }
 }`;
 };
@@ -171,4 +187,31 @@ export const deleteBranchMutation = (
   id: string
 ) => `mutation {
   branchDelete( branch: {streamId: "${streamId}", id: "${id}"})
+}`;
+
+export const getObjectInfo = (streamid: string, objectid: string) => `query {
+  stream(id: "${streamid}") {
+    object(id: "${objectid}") {
+      totalChildrenCount,
+      data
+    }
+  }
+}`;
+
+export const streamNameQuery = (streamId: string) => `query {
+  stream(id: "${streamId}") {
+    name
+  }
+}`;
+
+// gets the stream name and all the branch names, used in Comparison.vue
+export const streamNameBranches = (streamId: string) => `query {
+  stream(id: "${streamId}") {
+    name
+    branches {
+      items {
+        name
+      }
+    }
+  }
 }`;

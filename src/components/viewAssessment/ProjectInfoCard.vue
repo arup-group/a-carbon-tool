@@ -64,7 +64,7 @@
   </v-card>
 </template>
 <script lang="ts">
-import { ProjectInfo } from "@/models/assessment";
+import { IProjectInfo } from "@/views/utils/viewAssessmentUtils";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import BECChipGroup from "../shared/BECChipGroup.vue";
 
@@ -72,14 +72,15 @@ import BECChipGroup from "../shared/BECChipGroup.vue";
   components: { BECChipGroup },
 })
 export default class ProjectInfoCard extends Vue {
-  @Prop() projectInfo!: ProjectInfo;
+  @Prop() projectInfo!: IProjectInfo;
+
   show = true;
 
   get name() {
     return this.projectInfo.name;
   }
   get type() {
-    return this.projectInfo.type;
+    return this.projectInfo.components;
   }
   get totalCO2e() {
     return this.projectInfo.totalCO2e
@@ -100,10 +101,10 @@ export default class ProjectInfoCard extends Vue {
     return this.projectInfo.author;
   }
   get jn() {
-    return this.projectInfo.JN;
+    return this.projectInfo.jobNumber;
   }
   get systemCost() {
-    return `£${this.projectInfo.systemCost
+    return `£${this.projectInfo.cost
       .toString()
       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
   }

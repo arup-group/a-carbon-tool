@@ -52,12 +52,10 @@ export default class Menu6 extends Vue {
           },
           {
             name: "A5",
-            kgCO2e:
-              this.report.totals.constructionCarbonA5.value,
-            tCO2e:
-              Math.round(
-                this.report.totals.constructionCarbonA5.value * 0.001
-              ),
+            kgCO2e: this.report.totals.constructionCarbonA5.value,
+            tCO2e: Math.round(
+              this.report.totals.constructionCarbonA5.value * 0.001
+            ),
             kgCO2eperm2: Math.round(
               this.report.totals.constructionCarbonA5.value / this.floorArea
             ),

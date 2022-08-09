@@ -39,9 +39,16 @@
                     @newAssessment="newAssessment"
                   />
                   <project-folder-card
-                    v-else
+                    v-else-if="projectError(item)"
                     :stream="item"
                     @openStream="openStream"
+                  />
+                  <landing-error
+                    v-else
+                    :streamFolder="item"
+                    @rerun="landingErrorRerun"
+                    @retry="landingErrorRetry"
+                    @openErrorInfoDialog="openErrorInfoDialog"
                   />
                 </v-col>
               </v-row>
@@ -58,6 +65,7 @@
         </v-container>
       </template>
     </loading-container>
+    <error-info-dialog :dialog="errorInfoDialog" @close="closeErrorInfoDialog" />
   </v-main>
 </template>
 <script lang="ts">
@@ -77,14 +85,22 @@ import {
   BranchData,
   StreamId,
   StreamFolder,
+  instanceOfBranchData,
+  instanceOfStreamFolder,
+  BranchDataError,
+  StreamFolderError,
 } from "@/models/landing";
 
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
 import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
+import LandingError from "@/components/landing/LandingError.vue";
+import ErrorInfoDialog from "@/components/landing/ErrorInfoDialog.vue";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+
+type ProjectFolder = StreamFolder | StreamFolderError;
 
 @Component({
   components: {
@@ -93,18 +109,19 @@ import LoadingContainer from "@/components/shared/LoadingContainer.vue";
     LandingFooter,
     ProjectFolderCard,
     LoadingContainer,
+    LandingError,
+    ErrorInfoDialog
   },
 })
 export default class Landing extends Vue {
-  carbonBranches: CarbonBranch[] = [];
-  branchData: BranchData[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
   page = 1;
-  projects: StreamFolder[] = [];
+  projects: Array<ProjectFolder> = [];
   loading = true;
   error = false;
+  errorInfoDialog = false;
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -113,6 +130,10 @@ export default class Landing extends Vue {
 
   newAssessment() {
     this.$router.push("/assessment");
+  }
+
+  projectError(item: ProjectFolder) {
+    return instanceOfStreamFolder(item);
   }
 
   get numberOfPages() {
@@ -137,12 +158,174 @@ export default class Landing extends Vue {
     this.$router.push(`/${streamid}`);
   }
 
+  closeErrorInfoDialog() {
+    this.errorInfoDialog = false;
+  }
+  openErrorInfoDialog() {
+    this.errorInfoDialog = true;
+    return;
+  }
+
+  landingErrorRerun(streamid: string) {
+    this.$router.push(`/assessment/${streamid}`);
+  }
+  async landingErrorRetry(streamFolderError: StreamFolderError) {
+    let streamData = await this.getStreamData({
+      id: streamFolderError.streamId,
+      name: streamFolderError.streamName,
+      createdAt: streamFolderError.createdAt,
+    });
+
+    if (this.instaceOfProjectFolder(streamData)) {
+      this.projects = this.projects.map((p) =>
+        p.streamId === streamFolderError.streamId && streamData !== undefined
+          ? streamData
+          : p
+      );
+    }
+
+    streamFolderError.loading = false;
+  }
+
+  async getStreamData(streamID: StreamId): Promise<ProjectFolder | undefined> {
+    let carbonBranch: CarbonBranch;
+    let branchData: BranchData | BranchDataError;
+
+    const branches: GetStreamBranchesOutput = await this.$store.dispatch(
+      "getStreamBranches",
+      streamID.id
+    );
+    const mainreportidtemp = branches.reportBranches.find(
+      (rb) => rb.name === `${this.$store.state.speckleFolderName}/main`
+    )?.id;
+    const mainreportid = mainreportidtemp ? mainreportidtemp : "";
+
+    carbonBranch = {
+      id: streamID.id,
+      name: streamID.name,
+      branchid: mainreportid,
+      mainBranchID: branches.mainBranch.id,
+    };
+    if (carbonBranch.branchid === "") return;
+
+    try {
+      const streamCommitInput: GetStreamCommitInput = {
+        streamid: carbonBranch.id,
+        branchName: `${this.$store.state.speckleFolderName}/main`,
+      };
+      const branchCommit = await this.$store.dispatch(
+        "getStreamCommit",
+        streamCommitInput
+      );
+
+      const mainBranchCommits = await this.$store.dispatch(
+        "getMainStreamCommit",
+        carbonBranch.id
+      );
+
+      let carbonCommit = "";
+      if (branchCommit.data.stream.branch) {
+        carbonCommit =
+          branchCommit.data.stream.branch.commits.items[0].referencedObject;
+      }
+      let latestMainCommitObj = "";
+      if (mainBranchCommits.data.stream.branch) {
+        latestMainCommitObj =
+          mainBranchCommits.data.stream.branch.commits.items[0]
+            .referencedObject;
+      }
+
+      // Get data from the most recent arupcarbon branch
+      const getBranchDataInputs1: GetBranchDataInputs = {
+        streamid: carbonBranch.id,
+        objId: carbonCommit,
+      };
+      const latestCarbonBranchData: StreamData = await this.$store.dispatch(
+        "getBranchData",
+        getBranchDataInputs1
+      );
+
+      const getBranchDataInputs2: GetBranchDataInputs = {
+        streamid: carbonBranch.id,
+        objId: latestMainCommitObj,
+      };
+      const latestMainBranchData: StreamData = await this.$store.dispatch(
+        "getBranchData",
+        getBranchDataInputs2
+      );
+
+      const latestCarbonBranchCommit = new Date(
+        latestCarbonBranchData.data.stream.object.createdAt
+      ).getTime();
+      const latestMainBranchCommit = new Date(
+        latestMainBranchData.data.stream.object.createdAt
+      ).getTime();
+
+      const parent = await loadParent(
+        this.$store.state.selectedServer.url,
+        carbonBranch.id,
+        carbonCommit,
+        this.$store.state.token.token
+      );
+      const loadActReportDataInput: LoadActReportDataInput = {
+        streamId: carbonBranch.id,
+        branchName: "main",
+      };
+      const data: LoadStreamOut = await this.$store.dispatch(
+        "loadActReportData",
+        loadActReportDataInput
+      );
+
+      branchData = {
+        id: carbonBranch.id,
+        name: carbonBranch.name,
+        data,
+        projectDate: latestCarbonBranchData.data.stream.object.createdAt,
+        newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit,
+      };
+    } catch (err) {
+      branchData = {
+        id: carbonBranch.id,
+        name: carbonBranch.name,
+      };
+    }
+
+    if (instanceOfBranchData(branchData)) {
+      const projName = branchData.data.data.projectInfo.name;
+      return {
+        streamName: branchData.name,
+        streamId: branchData.id,
+        mainProject: {
+          title: `${projName} - ${branchData.name}`,
+          id: `${branchData.id}`,
+          co2Values: branchData.data.data.materialBreakdown.materials,
+          totalCO2e: branchData.data.data.projectInfo.totalCO2e,
+          link: "",
+          category: branchData.data.data.projectInfo.components,
+          projectDate: branchData.projectDate,
+          newMainAvailable: branchData.newMainAvailable,
+        },
+      };
+    } else
+      return {
+        streamId: branchData.id,
+        streamName: branchData.name,
+        createdAt: streamID.createdAt,
+        loading: false
+      };
+  }
+
+  instaceOfProjectFolder(
+    item: ProjectFolder | undefined
+  ): item is ProjectFolder {
+    return !!item;
+  }
+
   async loadStreams() {
     this.loading = true;
     this.error = false;
     this.projects = [];
-    this.carbonBranches = [];
-    this.branchData = [];
+
     try {
       // get all of the user's streams
       const streams = await this.$store.dispatch("getUserStreams");
@@ -153,122 +336,9 @@ export default class Landing extends Vue {
         }
       );
 
-      this.carbonBranches = await Promise.all(
-        streamIDs.map(async (sid): Promise<CarbonBranch> => {
-          const branches: GetStreamBranchesOutput = await this.$store.dispatch(
-            "getStreamBranches",
-            sid.id
-          );
-          const mainreportidtemp = branches.reportBranches.find(
-            (rb) => rb.name === `${this.$store.state.speckleFolderName}/main`
-          )?.id;
-          const mainreportid = mainreportidtemp ? mainreportidtemp : "";
-          return {
-            id: sid.id,
-            name: sid.name,
-            branchid: mainreportid,
-            mainBranchID: branches.mainBranch.id,
-          };
-        })
-      ).then((res) => res.filter((r) => r.branchid !== ""));
-
-      // get the most recent commit and the data from that commit
-      this.branchData = await Promise.all(
-        this.carbonBranches.map(async (cb) => {
-          const streamCommitInput: GetStreamCommitInput = {
-            streamid: cb.id,
-            branchName: `${this.$store.state.speckleFolderName}/main`,
-          };
-          const branchCommit = await this.$store.dispatch(
-            "getStreamCommit",
-            streamCommitInput
-          );
-
-          const mainBranchCommits = await this.$store.dispatch(
-            "getMainStreamCommit",
-            cb.id
-          );
-
-          let carbonCommit = "";
-          if (branchCommit.data.stream.branch) {
-            carbonCommit =
-              branchCommit.data.stream.branch.commits.items[0].referencedObject;
-          }
-          let latestMainCommitObj = "";
-          if (mainBranchCommits.data.stream.branch) {
-            latestMainCommitObj =
-              mainBranchCommits.data.stream.branch.commits.items[0]
-                .referencedObject;
-          }
-
-          // Get data from the most recent arupcarbon branch
-          const getBranchDataInputs1: GetBranchDataInputs = {
-            streamid: cb.id,
-            objId: carbonCommit,
-          };
-          const latestCarbonBranchData: StreamData = await this.$store.dispatch(
-            "getBranchData",
-            getBranchDataInputs1
-          );
-
-          const getBranchDataInputs2: GetBranchDataInputs = {
-            streamid: cb.id,
-            objId: latestMainCommitObj,
-          };
-          const latestMainBranchData: StreamData = await this.$store.dispatch(
-            "getBranchData",
-            getBranchDataInputs2
-          );
-
-          const latestCarbonBranchCommit = new Date(
-            latestCarbonBranchData.data.stream.object.createdAt
-          ).getTime();
-          const latestMainBranchCommit = new Date(
-            latestMainBranchData.data.stream.object.createdAt
-          ).getTime();
-
-          const parent = await loadParent(
-            this.$store.state.selectedServer.url,
-            cb.id,
-            carbonCommit,
-            this.$store.state.token.token
-          );
-          const loadActReportDataInput: LoadActReportDataInput = {
-            streamId: cb.id,
-            branchName: "main",
-          };
-          const data: LoadStreamOut = await this.$store.dispatch(
-            "loadActReportData",
-            loadActReportDataInput
-          );
-
-          return {
-            id: cb.id,
-            name: cb.name,
-            data,
-            projectDate: latestCarbonBranchData.data.stream.object.createdAt,
-            newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit,
-          };
-        })
-      );
-      // convert the data into the format that this page needs it to be in
-      this.projects = this.branchData.map((proj) => {
-        const projName = proj.data.data.projectInfo.name;
-        return {
-          streamName: proj.name,
-          streamId: proj.id,
-          mainProject: {
-            title: `${projName} - ${proj.name}`,
-            id: `${proj.id}`,
-            co2Values: proj.data.data.materialBreakdown.materials,
-            totalCO2e: proj.data.data.projectInfo.totalCO2e,
-            link: "",
-            category: proj.data.data.projectInfo.components,
-            projectDate: proj.projectDate,
-            newMainAvailable: proj.newMainAvailable,
-          },
-        };
-      });
+      this.projects = await Promise.all(
+        streamIDs.map((sid) => this.getStreamData(sid))
+      ).then((sd) => sd.filter(this.instaceOfProjectFolder));
 
       this.loading = false;
     } catch (err) {

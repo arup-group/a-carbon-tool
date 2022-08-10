@@ -115,10 +115,6 @@ export default class extends Vue {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
     });
-    this.viewer.on("select", (objects: any[]) => {
-      this.selectedObjects.splice(0, this.selectedObjects.length);
-      this.selectedObjects.push(...objects);
-    });
   }
 
   async setSelect(selected: any[]) {

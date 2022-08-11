@@ -28,13 +28,36 @@ export default class extends Vue {
   @Prop() token!: string;
   @Prop() colors!: Color[];
   @Prop() gradientColorProperty!: GradientColor;
+  @Prop() selectedMaterial!: any[];
 
   currentColors: Color[] = [];
+  filtered = false;
 
   @Watch("colors")
   onObjectColorChanged(value: Color[]) {
     if (value.length === 0 || this.gradientColorProperty) this.resetColors();
     else this.setColors(value);
+  }
+
+  @Watch("selectedMaterial")
+  onMaterialChange() {
+    if (this.filtered) {
+      this.filtered = false;
+    } else {
+      this.filtered = true;
+    }
+    const allObjects = this.viewer.sceneManager.sceneObjects
+      .allObjects as THREE.Group;
+    const allObjectsChildren = allObjects.children;
+    const allMesh: THREE.Mesh[] = [];
+    allObjectsChildren.forEach((oc) => {
+      oc.children.forEach((child) => {
+        if (this.selectedMaterial.includes(child.uuid)) {
+          allMesh.push(child.userData as THREE.Mesh);
+        }
+      });
+    });
+    this.setSelect(allMesh);
   }
 
   @Watch("gradientColorProperty")
@@ -92,12 +115,21 @@ export default class extends Vue {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
     });
-    this.viewer.on("select", (objects: any[]) => {
-      this.selectedObjects.splice(0, this.selectedObjects.length);
-      this.selectedObjects.push(...objects);
-    });
   }
 
+  async setSelect(selected: any[]) {
+    if (this.filtered === true) {
+      await this.viewer.applyFilter({
+        filterBy: {
+          speckle_type: selected[0].speckle_type,
+        },
+      });
+      this.$emit("selection", this.selectedObjects);
+    } else {
+      await this.viewer.applyFilter(null);
+      this.setColors(this.colors);
+    }
+  }
   afterLoad() {
     const properties = this.findFilters();
     const allObjects = this.viewer.sceneManager.sceneObjects

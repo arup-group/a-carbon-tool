@@ -1,26 +1,44 @@
 <template>
-  <v-row dense align="center">
-    <v-col cols="12" md="4" class="pl-2">
-      <v-chip>
-        {{ cleanType(type.type) }}
-      </v-chip>
-    </v-col>
-    <v-col coles="12" md="8" class="pr-2">
-      <v-combobox
-        v-model="selectedMaterial"
-        :items="materials"
-        :item-text="(materials) => materials['name']"
-        @change="checkMaterialUpdated"
-        chips
-      >
-        <template #selection="{ item }">
-          <v-chip :color="item.color" :textColor="getContrastYIQ(item.color)">{{
-            item.name
-          }}</v-chip>
-        </template>
-      </v-combobox>
-    </v-col>
-  </v-row>
+  <v-card
+    flat
+    color=""
+    :style="[
+      this.$store.state.darkMode
+        ? { 'background-color': '#1C1C1C !important' }
+        : { 'background-color': '#FFFFFF !important' },
+    ]"
+  >
+    <v-row dense align="center">
+      <v-col cols="12" md="4" class="pl-2">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial(type.ids)">
+              {{ cleanType(type.type) }}
+            </v-chip>
+          </template>
+          <span>Objects: {{ type.ids.length }} </span>
+        </v-tooltip>
+      </v-col>
+      <v-col coles="12" md="8" class="pr-2">
+        <v-combobox
+          v-model="currentMaterial"
+          :items="materials"
+          :item-text="(materials) => materials['name']"
+          @change="checkMaterialUpdated"
+          chips
+        >
+          <template #selection="{ item }">
+            <v-chip
+              :color="item.color"
+              :textColor="getContrastYIQ(item.color)"
+              >{{ item.name }}</v-chip
+            >
+          </template>
+        </v-combobox>
+      </v-col>
+    </v-row>
+    <div class="d-flex align-center justify-space-between"></div>
+  </v-card>
 </template>
 <script lang="ts">
 import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
@@ -32,7 +50,13 @@ export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: SpeckleType;
 
-  selectedMaterial = this.type.material ? this.type.material : null;
+  currentMaterial = this.type.material ? this.type.material : null;
+  filtered = true;
+
+  @Emit("selectMaterial")
+  selectMaterial(objects: [], filtered: boolean) {
+    return;
+  }
 
   cleanType(type: string) {
     const typeArr = type.split(".");
@@ -70,7 +94,8 @@ export default class MaterialType extends Vue {
     };
   }
 
-  instanceOfMaterialFull(object: any): object is MaterialFull {
+
+instanceOfMaterialFull(object: any): object is MaterialFull {
     return "name" in object;
   }
 }

@@ -6,13 +6,13 @@
     class="d-flex justify-center align-center"
   >
     <v-card style="width: 100%; height: 85vh">
-      <v-card-title style="height: 10vh" class="d-flex justify-space-between">
+      <v-card-title style="height: 50px" class="d-flex justify-space-between">
         <div>New Assessment</div>
         <v-btn v-if="modal" @click="openFullView">Open in full view</v-btn>
         <v-btn v-if="modal" @click="close">Close</v-btn>
       </v-card-title>
       <v-stepper
-        style="overflow-y: scroll; height: 75vh"
+        style="overflow-y: scroll; height: 77vh"
         v-model="step"
         vertical
       >
@@ -55,6 +55,7 @@
             :selectedObjects="selectedObjects"
             @materialUpdated="materialUpdated"
             @createNewGroup="createNewGroup"
+            @selectMaterial="selectMaterial"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 1" color="primary">
@@ -296,6 +297,17 @@ export default class AssessmentStepper extends Vue {
   transportSelected(selected: TransportSelected) {
     return selected;
   }
+
+  @Emit("selectMaterial")
+  selectMaterial(objects: [], filtered: boolean) {
+    return;
+  }
+
+  @Emit("clearMaterial")
+  clearMaterial() {
+    return;
+  }
+
 
   @Emit("uploadData")
   uploadData(data: ProjectDataComplete) {

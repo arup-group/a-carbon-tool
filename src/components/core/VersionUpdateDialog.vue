@@ -13,7 +13,7 @@
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title> NEW: {{ item.title }} </v-list-item-title>
-                  <v-list-item-subtitle>
+                  <v-list-item-subtitle style="white-space: normal">
                     {{ item.subtitle }}
                   </v-list-item-subtitle>
                 </v-list-item-content>
@@ -48,7 +48,7 @@ export default class VersionUpdateDialog extends Vue {
         "Multiple reports can now be run and saved on the same speckle stream",
     },
     {
-      title: `"Quick report" feature"`,
+      title: `"Quick report" feature`,
       subtitle: `Select the "edit" button on a report and a popup with your report will appear for quick editing`,
     },
     {
@@ -65,6 +65,10 @@ export default class VersionUpdateDialog extends Vue {
       title: "Custom grouping of materials",
       subtitle: "You can now create your own groups on the assessment page",
     },
+    {
+      title: "Filter objects",
+      subtitle: "On the 'Materials' tab when running an assessment, click the group name to see just those objects"
+    }
   ];
 
   @Emit("close")

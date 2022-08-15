@@ -198,6 +198,7 @@ import {
   EmptyPropsPassdown,
   ReportPassdown,
   GroupedMaterial,
+  SelectedMaterialEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -299,8 +300,8 @@ export default class AssessmentStepper extends Vue {
   }
 
   @Emit("selectMaterial")
-  selectMaterial(objects: [], filtered: boolean) {
-    return;
+  selectMaterial(material: SelectedMaterialEmit) {
+    return material;
   }
 
   @Emit("clearMaterial")

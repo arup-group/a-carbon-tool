@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
+import { MaterialUpdateOut, SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
@@ -51,13 +51,13 @@ export default class Menu2 extends Vue {
   }
 
   @Emit("materialUpdated")
-  materialUpdated(material: MaterialUpdateOut) {
+  materialUpdated(material: SelectedMaterialEmit) {
     return material;
   }
 
   @Emit("selectMaterial")
-  selectMaterial(objects: [], filtered: boolean) {
-    return;
+  selectMaterial(selectedMaterial: SelectedMaterialEmit) {
+    return selectedMaterial;
   }
 
   setMaterial = "";

@@ -12,7 +12,7 @@
       <v-col cols="12" md="4" class="pl-2">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial(type.ids)">
+            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
               {{ cleanType(type.type) }}
             </v-chip>
           </template>
@@ -41,7 +41,7 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
+import { MaterialUpdateOut, SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
@@ -54,8 +54,11 @@ export default class MaterialType extends Vue {
   filtered = true;
 
   @Emit("selectMaterial")
-  selectMaterial(objects: [], filtered: boolean) {
-    return;
+  selectMaterial(): SelectedMaterialEmit {
+    return {
+      ids: this.type.ids,
+      type: this.type.type
+    };
   }
 
   cleanType(type: string) {

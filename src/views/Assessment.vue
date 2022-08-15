@@ -17,7 +17,8 @@
         :colors="colors"
         :gradientColorProperty="volumeGradientPassdown"
         :display="!modal"
-        :selectedMaterial="selectedMaterial"
+        :selectedIds="selectedIds"
+        :filtered="filtered"
       />
       <div :style="modal ? 'width: 100%;' : 'width: 35%;'">
         <AssessmentStepper
@@ -104,6 +105,7 @@ import {
   ReportPassdown,
   ObjectDetails,
   GroupedMaterial,
+  SelectedMaterialEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -169,7 +171,9 @@ export default class Assessment extends Vue {
   colors: Color[] = [];
   materialsColors: Color[] = [];
   transportColors: Color[] = [];
-  selectedMaterial: any[] = [];
+
+  selectedIds: string[] = [];
+  filteredType = "";
   filtered = false;
 
   // two separate values so that the colors can be found at the same time as the volume is calculated, rather than whenever the user goes onto the volume step
@@ -324,18 +328,17 @@ export default class Assessment extends Vue {
   saveSnackClose() {
     this.saveSnack = false;
   }
-  // cancelSave() {
-  //   this.dialog = false;
-  // }
-  // checkSave() {
-  //   this.dialog = true;
-  // }
-  selectMaterial(objects: [], filtered: boolean) {
-    this.filtered = filtered;
-    this.selectedMaterial.splice(0, this.selectedMaterial.length);
-    for (let i = 0; i < objects.length; i++) {
-      this.selectedMaterial.push(objects[i]);
+
+  selectMaterial(material: SelectedMaterialEmit) {
+    if (material.type === this.filteredType) {
+      this.filtered = false;
+      this.selectedIds = [];
     }
+    else {
+      this.filtered = true;
+      this.selectedIds = material.ids;
+    }
+    this.filteredType = material.type;
   }
 
   async rendererLoaded({ properties, allMesh }: RendererLoaded) {

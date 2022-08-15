@@ -14,14 +14,18 @@
     <v-form v-if="selectedObjects.length > 0" @submit.prevent="newGroup">
       <v-divider class="pb-4 mt-4"></v-divider>
       <strong>{{ selectedObjects.length }} Objects selected</strong>
-      <v-text-field label="Group name" v-model="newGroupName"></v-text-field>
+      <v-text-field
+        label="Group name"
+        v-model="newGroupName"
+        :rules="nameRules"
+      ></v-text-field>
       <v-btn type="submit" outlined class="mb-4">Create new group</v-btn>
     </v-form>
   </div>
 </template>
 
 <script lang="ts">
-import { MaterialUpdateOut, SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
+import { SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
@@ -36,18 +40,30 @@ export default class Menu2 extends Vue {
   @Prop() selectedObjects!: string[];
 
   newGroupName = "";
+  groupNames: string[] = [];
+
+  nameRules = [
+    (n: string) => this.newGroupCheck(this.groupNames, n) || "Group name already taken",
+  ];
 
   get loadedTypes() {
     return this.types ? this.types : [];
   }
 
   newGroup() {
-    if (this.newGroupName) this.createNewGroup();
+    if (this.newGroupName && this.newGroupCheck(this.groupNames, this.newGroupName)) this.createNewGroup();
+  }
+
+  newGroupCheck(groupNames: string[], name: string) {
+    return !groupNames.includes(name)
   }
 
   @Emit("createNewGroup")
   createNewGroup() {
-    return this.newGroupName;
+    const name = this.newGroupName;
+    this.groupNames.push(name);
+    this.newGroupName = "";
+    return name;
   }
 
   @Emit("materialUpdated")

@@ -21,14 +21,19 @@ export type Causes = {
   [key in CauseType]?: Cause;
 };
 
+export interface IssueFactory {
+  new(context: Context, streamid: string): Issue;
+}
+
 export interface Issue {
   name: IssueType;
   description: string;
   context: Context;
   present: boolean;
   subDetectors?: Causes; // may have a sub detector
-  check: (streamid: string) => Promise<CheckRes>; // function to check if issue is present, returns whether the issue is present
-  fix: (streamid: string) => Promise<FixRes>; // function to (attempt to) fix issue, returns whether the issue was fixed
+  streamid: string;
+  check: () => Promise<CheckRes>; // function to check if issue is present, returns whether the issue is present
+  fix: () => Promise<FixRes>; // function to (attempt to) fix issue, returns whether the issue was fixed
 }
 
 export interface Cause {
@@ -36,8 +41,9 @@ export interface Cause {
   description: string;
   context: Context;
   present: boolean;
-  check: (streamid: string) => Promise<CheckRes>; // function to check if issue is present, returns whether the issue is present
-  fix: (streamid: string) => Promise<FixRes>; // function to (attempt to) fix issue, returns whether the issue was fixed
+  streamid: string;
+  check: () => Promise<CheckRes>; // function to check if issue is present, returns whether the issue is present
+  fix: () => Promise<FixRes>; // function to (attempt to) fix issue, returns whether the issue was fixed
 }
 
 export interface CheckRes {
@@ -46,6 +52,9 @@ export interface CheckRes {
 }
 
 export interface FixRes {
+  name: string;
   fixed: boolean;
   message: string;
 }
+
+export type IssuesImport = { [key: string]: IssueFactory }

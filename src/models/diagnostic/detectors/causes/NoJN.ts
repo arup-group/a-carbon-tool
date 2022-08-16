@@ -1,6 +1,6 @@
-import { Cause, CauseType, Context, CheckRes, FixRes } from "../";
-import { toContextType } from ".";
-import { SpeckleRequests } from "../speckleRequests";
+import { Cause, CauseType, Context, CheckRes, FixRes } from "../..";
+import { toContextType } from "..";
+import { SpeckleRequests } from "../../speckleRequests";
 
 export class NoJN implements Cause {
   name: CauseType = CauseType.NO_JN;

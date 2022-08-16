@@ -18,6 +18,9 @@
               <v-btn @click="rerun" outlined color="primary">
                 Rerun report
               </v-btn>
+              <v-btn @click="diagnostics" outlined color="primary">
+                Run diagnostics
+              </v-btn>
             </div>
           </div>
         </v-card-text>
@@ -69,6 +72,11 @@ export default class LandingError extends Vue {
 
   @Emit("rerun")
   rerun() {
+    return this.streamid;
+  }
+
+  @Emit("diagnostics")
+  diagnostics() {
     return this.streamid;
   }
 }

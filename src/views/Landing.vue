@@ -49,6 +49,7 @@
                     @rerun="landingErrorRerun"
                     @retry="landingErrorRetry"
                     @openErrorInfoDialog="openErrorInfoDialog"
+                    @diagnostics="runDiagnostics"
                   />
                 </v-col>
               </v-row>
@@ -66,6 +67,7 @@
       </template>
     </loading-container>
     <error-info-dialog :dialog="errorInfoDialog" @close="closeErrorInfoDialog" />
+    <diagnostics-dialog :dialog="diagnosticsDialog" :streamid="diagnosticsStreamid" @close="closeDiagnostics" />
   </v-main>
 </template>
 <script lang="ts">
@@ -97,6 +99,7 @@ import LandingFooter from "@/components/landing/LandingFooter.vue";
 import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 import LandingError from "@/components/landing/LandingError.vue";
 import ErrorInfoDialog from "@/components/landing/ErrorInfoDialog.vue";
+import DiagnosticsDialog from "@/components/landing/DiagnosticsDialog.vue";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
@@ -110,7 +113,8 @@ type ProjectFolder = StreamFolder | StreamFolderError;
     ProjectFolderCard,
     LoadingContainer,
     LandingError,
-    ErrorInfoDialog
+    ErrorInfoDialog,
+    DiagnosticsDialog
   },
 })
 export default class Landing extends Vue {
@@ -122,6 +126,8 @@ export default class Landing extends Vue {
   loading = true;
   error = false;
   errorInfoDialog = false;
+  diagnosticsDialog = false;
+  diagnosticsStreamid = "";
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -144,6 +150,15 @@ export default class Landing extends Vue {
 
   get projectData() {
     return [{ title: "New Assessment" }, ...this.projects];
+  }
+
+  runDiagnostics(streamid: string) {
+    this.diagnosticsStreamid = streamid;
+    this.diagnosticsDialog = true;
+  }
+
+  closeDiagnostics() {
+    this.diagnosticsDialog = false;
   }
 
   nextPage() {

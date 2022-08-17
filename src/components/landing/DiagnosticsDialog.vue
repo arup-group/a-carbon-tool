@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" max-width="50%" persistent>
-    <v-card>
+    <v-card height="50%">
       <v-card-title>Diagnostics tool</v-card-title>
       <v-card-subtitle>
         The stream is broken, please follow the below steps
@@ -9,7 +9,7 @@
         <div v-if="loadingStep" style="width: 100%">
           <loading-spinner />
         </div>
-        <div v-else-if="detectStep" class="d-flex justify-center align center">
+        <div v-else-if="detectStep" class="d-flex justify-center align-center" style="height: 100%">
           <v-btn color="primary" outlined @click="detect">Find issues</v-btn>
         </div>
         <div v-else-if="fixStep">
@@ -119,7 +119,6 @@ export default class DiagnosticsDialog extends Vue {
   }
 
   get someErrors() {
-    console.log("some errors");
     for (let i = 0; i < this.issuesFixed.length; i++) {
       if (this.issuesFixed[i].fixed === false) return true;
     }

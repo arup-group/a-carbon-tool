@@ -66,8 +66,16 @@
         </v-container>
       </template>
     </loading-container>
-    <error-info-dialog :dialog="errorInfoDialog" @close="closeErrorInfoDialog" />
-    <diagnostics-dialog :dialog="diagnosticsDialog" :streamid="diagnosticsStreamid" @close="closeDiagnostics" />
+    <error-info-dialog
+      :dialog="errorInfoDialog"
+      @close="closeErrorInfoDialog"
+    />
+    <diagnostics-dialog
+      :dialog="diagnosticsDialog"
+      :streamid="diagnosticsStreamid"
+      @close="closeDiagnostics"
+      :key="diagnosticKey"
+    />
   </v-main>
 </template>
 <script lang="ts">
@@ -114,7 +122,7 @@ type ProjectFolder = StreamFolder | StreamFolderError;
     LoadingContainer,
     LandingError,
     ErrorInfoDialog,
-    DiagnosticsDialog
+    DiagnosticsDialog,
   },
 })
 export default class Landing extends Vue {
@@ -128,6 +136,7 @@ export default class Landing extends Vue {
   errorInfoDialog = false;
   diagnosticsDialog = false;
   diagnosticsStreamid = "";
+  diagnosticKey = 0;
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -154,6 +163,7 @@ export default class Landing extends Vue {
 
   runDiagnostics(streamid: string) {
     this.diagnosticsStreamid = streamid;
+    this.diagnosticKey++;
     this.diagnosticsDialog = true;
   }
 
@@ -326,7 +336,7 @@ export default class Landing extends Vue {
         streamId: branchData.id,
         streamName: branchData.name,
         createdAt: streamID.createdAt,
-        loading: false
+        loading: false,
       };
   }
 

@@ -1,5 +1,8 @@
 <template>
   <v-main>
+    <v-btn color="primary" outlined @click="back" style="z-index: 1">
+      Back to reports
+    </v-btn>
     <loading-container :error="error" :loading="loading" @retry="loadReport">
       <template v-slot="{ loaded }">
         <v-container
@@ -73,6 +76,10 @@ export default class ViewAssessment extends Vue {
       });
 
     this.token = this.$store.state.token.token;
+  }
+
+  back() {
+    this.$router.push(`/${this.streamId}`);
   }
 
   created() {

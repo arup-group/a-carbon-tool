@@ -181,7 +181,7 @@ export default class AssessmentHistory extends Vue {
         this.cleanedReports = this.convReports(this.reports);
         this.chartData = this.cleanedReports
           .map((r) => ({
-            label: r.title,
+            label: `${r.title} ${r.projectDate}`,
             value: r.totalCO2e,
             color: "",
           }))
@@ -263,7 +263,7 @@ export default class AssessmentHistory extends Vue {
         totalCO2e: r.data.totalCO2,
         link: "",
         category: r.data.projectData.components,
-        projectDate: "",
+        projectDate: new Date(r.createdAt).toDateString(),
         newMainAvailable: false,
       };
     });

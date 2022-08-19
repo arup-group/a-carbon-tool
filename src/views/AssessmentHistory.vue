@@ -32,7 +32,6 @@
                     @materials="materialsFilterUpdate"
                     @a15="a15FilterUpdate"
                     @categories="categoriesFilterUpdate"
-                    @renderer="rendererFilterUpdate"
                     @direction="directionUpdate"
                     :defaultFilters="filters"
                   />
@@ -108,7 +107,6 @@ export default class AssessmentHistory extends Vue {
     materials: true,
     a15: false,
     categories: true,
-    renderer: false,
     direction: HistoryProjectCardDirection.COL,
   };
   chartData: ChartData[] = [];
@@ -145,9 +143,6 @@ export default class AssessmentHistory extends Vue {
   }
   categoriesFilterUpdate(categories: boolean) {
     this.filters.categories = categories;
-  }
-  rendererFilterUpdate(renderer: boolean) {
-    this.filters.renderer = renderer;
   }
   directionUpdate(direction: HistoryProjectCardDirection) {
     this.filters.direction = direction;

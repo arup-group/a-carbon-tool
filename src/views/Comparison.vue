@@ -91,7 +91,6 @@ export default class Comparison extends Vue {
     materials: true,
     a15: true,
     categories: true,
-    renderer: false,
     direction: HistoryProjectCardDirection.ROW,
   };
   addReportDialog = false;

@@ -94,9 +94,6 @@ export default class HistoryProjectCard extends Vue {
   get categories() {
     return this.filters.categories;
   }
-  get renderer() {
-    return this.filters.renderer;
-  }
 
   // different getters
   get materialGraphLgCols() {

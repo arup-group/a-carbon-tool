@@ -92,6 +92,7 @@ export default class extends Vue {
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
     this.viewer = new Viewer({ contained: renderDomElement, showStats: false });
+    console.log("this.viewer:", this.viewer);
     objecturls.forEach(async (url) => {
       await this.viewer.loadObject(url, this.token);
 
@@ -102,8 +103,10 @@ export default class extends Vue {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
     });
-    this.viewer.on("select", ({ userData }: SelectObject) => {
-      this.objectsSelected(userData);
+
+    // no event for object deselection, so the below is a little weird (and will probably break at some point)
+    this.viewer.interactions.selectionHelper.on("object-clicked", () => {
+      this.objectsSelected(this.viewer.interactions.selectedObjectsUserData);
     });
   }
 

@@ -5,7 +5,7 @@
     color="primary"
     class="d-flex justify-center align-center"
   >
-    <v-card style="width: 100%; height: 85vh">
+    <v-card style="width: 100%;">
       <v-card-title style="height: 50px" class="d-flex justify-space-between">
         <div>New Assessment</div>
         <v-btn v-if="modal" @click="openFullView">Open in full view</v-btn>
@@ -53,6 +53,7 @@
             :types="types"
             :materials="materials"
             :selectedObjects="selectedObjects"
+            :invalidObjects="invalidSelectedObjects"
             @materialUpdated="materialUpdated"
             @createNewGroup="createNewGroup"
             @selectMaterial="selectMaterial"
@@ -224,6 +225,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() modal!: boolean;
 
   @Prop() selectedObjects!: string[];
+  @Prop() invalidSelectedObjects!: boolean;
 
   form: ProjectDataTemp = this.update
     ? this.projectData

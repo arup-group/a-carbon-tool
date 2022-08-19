@@ -50,6 +50,7 @@
           :streamId="streamId"
           :projectData="projectDataPassdown"
           :selectedObjects="selectedObjects"
+          :invalidSelectedObjects="invalidSelectedObjects"
         />
       </div>
     </v-container>
@@ -195,6 +196,7 @@ export default class Assessment extends Vue {
 
   step: Step = 1;
   selectedObjects: string[] = []; // contains the id's of each selected object
+  invalidSelectedObjects = false;
 
   @Emit("close")
   close() {
@@ -473,7 +475,9 @@ export default class Assessment extends Vue {
 
   objectsSelected(objects: UserData[]) {
     if (this.step === Step.MATERIALS) {
-      this.selectedObjects = objects.map((o) => o.id);
+      const keys = Object.keys(this.objectsObj)
+      this.selectedObjects = objects.filter((o) => keys.includes(o.id)).map((o) => o.id);
+      this.invalidSelectedObjects = this.selectedObjects.length !== objects.length;
     }
   }
 
@@ -715,11 +719,14 @@ export default class Assessment extends Vue {
     const ids = material.type.ids;
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
-      this.objectsObj[id].speckle_type = material.type.type;
-      this.colors.push({
-        color: material.material.color,
-        id,
-      });
+      console.log("id:", id);
+      try {
+        this.objectsObj[id].speckle_type = material.type.type;
+        this.colors.push({
+          color: material.material.color,
+          id,
+        });
+      } catch(err) { console.log("err:", id) }
     });
     this.materialsColors = this.colors;
 

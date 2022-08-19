@@ -24,8 +24,8 @@
                   prepend-inner-icon="mdi-magnify"
                   label="Search"
                 ></v-text-field>
-                <v-btn @click="openComparison">Open comparison</v-btn>
-                <v-btn @click="openHistory">Open history</v-btn>
+                <v-btn @click="openComparison" class="ml-4">Open comparison</v-btn>
+                <v-btn @click="openHistory" class="ml-4">Open history</v-btn>
               </v-toolbar>
             </template>
             <template v-slot:default="props" class="my-2">
@@ -68,7 +68,7 @@
       :dialog="dialog"
       @agree="agreeDelete"
       @cancel="cancelDelete"
-      message="Are you sure you want to permanently delete this report for all users? This action is not reversible"
+      message="Are you sure you want to permanently delete this report for all users? This action is irreversible!"
     />
     <quick-report
       @close="quickReportClose"

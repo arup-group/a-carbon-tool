@@ -5,7 +5,7 @@
       <v-card-text>
         An error has occurred while loading this stream. Please either retry to
         load the stream, rerun a report on this stream, or contact one of the
-        act team to solve this issue.
+        <b>act</b> team to solve this issue.
       </v-card-text>
       <v-card-actions>
         <v-btn outlined color="primary" @click="close">Ok</v-btn>

@@ -15,7 +15,7 @@
               <v-btn class="mr-3" @click="retry" outlined color="primary">
                 Retry
               </v-btn>
-              <v-btn @click="rerun" outlined color="primary">
+              <v-btn class="mr-3" @click="rerun" outlined color="primary">
                 Rerun report
               </v-btn>
               <v-btn @click="diagnostics" outlined color="primary">

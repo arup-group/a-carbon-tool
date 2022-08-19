@@ -3,7 +3,7 @@ import { SpeckleRequests } from "../../speckleRequests";
 
 export class NoJN implements Cause {
   name: CauseType = CauseType.NO_JN;
-  description = "The stream does not have a job number attached to it";
+  description = "The stream does not have a job number attached to it.";
   present = false;
   constructor(public context: Context, public streamid: string) {
   }
@@ -28,7 +28,7 @@ export class NoJN implements Cause {
     return {
       name: this.name,
       fixed: false,
-      message: "Please manually add a job number to the stream then rerun the diagnostic tool"
+      message: "Please add a job number to the stream manually and rerun the diagnostic tool."
     };
   }
 }

@@ -3,7 +3,7 @@
     <v-card height="50%">
       <v-card-title>Diagnostics tool</v-card-title>
       <v-card-subtitle>
-        The stream is broken, please follow the below steps
+        The stream is broken, please follow the below steps.
       </v-card-subtitle>
       <v-card-text style="height: 100%">
         <div v-if="loadingStep" style="width: 100%">
@@ -37,7 +37,7 @@
           </ul>
           <p v-if="someErrors">
             Sorry, looks like there were some errors. Please contact a member of
-            the act team and give them the name of the issues that were not
+            the <b>act</b> team and give them the name of the issues that were not
             fixed
           </p>
         </div>

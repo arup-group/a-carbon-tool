@@ -5,7 +5,7 @@ import { SpeckleRequests } from "../../speckleRequests";
 
 export class BranchConversion implements Issue {
   name: IssueType = IssueType.BRANCH_CONVERSION;
-  description = "Error in converting the report from the old version to new";
+  description = "Error in converting the report from the old to the new version.";
   subDetectors: Causes = {};
   present = false;
   constructor(public context: Context, public streamid: string) {
@@ -24,13 +24,13 @@ export class BranchConversion implements Issue {
       this.present = true;
       return {
         present: true,
-        message: "Issue with branch conversion"
+        message: "Issue with branch conversion."
       };
     }
     this.present = false;
     return {
       present: false,
-      message: "No issue with branch conversion"
+      message: "No issue with branch conversion."
     }
   }
   async fix(): Promise<FixRes> {

@@ -63,7 +63,7 @@
           </v-col>
           <v-col>
             <v-card-text class="d-flex align-end mb-6">
-              Theres an update on main branch, use edit to update your report.
+              There is an update on the main branch. Use the edit option to update your report.
             </v-card-text>
           </v-col>
         </v-overlay>

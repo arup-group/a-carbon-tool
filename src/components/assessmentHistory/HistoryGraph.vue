@@ -1,7 +1,7 @@
 <template>
   <v-sheet outlined color="primary" rounded height="100%">
     <v-card flat height="100%">
-      <v-card-title>Total CO2 over time</v-card-title>
+      <v-card-title>Total CO2 over time (tCO2e)</v-card-title>
       <v-card-text>
         <line-chart :data="chartData" />
       </v-card-text>

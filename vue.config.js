@@ -1,6 +1,6 @@
 module.exports = {
-  transpileDependencies: [
-    "vuetify",
-    "@speckle/objectloader",
-  ],
+  transpileDependencies: ["vuetify", "@speckle/objectloader"],
+  devServer: {
+    clientLogLevel: "silent",
+  },
 };

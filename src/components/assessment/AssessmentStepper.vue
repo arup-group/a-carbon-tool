@@ -238,7 +238,12 @@ export default class AssessmentStepper extends Vue {
         jobNumber: null,
         notes: null,
       };
-  completed = this.update;
+  completed = false; //this.update;
+  mounted() {
+    console.log("this.update:", this.update);
+    this.completed = this.update;
+    console.log("this.completed:", this.completed)
+  }
 
   step: Step = 1;
 

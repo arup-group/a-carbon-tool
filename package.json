@@ -9,7 +9,6 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@arc-web/components": "^1.4.2",
     "@speckle/objectloader": "^2.7.1",
     "@speckle/viewer": "^2.7.1",
     "@types/three": "^0.136.1",
@@ -53,7 +52,8 @@
   },
   "eslintConfig": {
     "rules": {
-      "vue/no-deprecated-slot-attribute": "off"
+      "vue/no-deprecated-slot-attribute": "off",
+      "vue/no-useless-template-attributes": "off"
     }
   }
 }

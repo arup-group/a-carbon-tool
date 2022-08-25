@@ -24,7 +24,7 @@
                 ></v-text-field>
               </v-toolbar>
             </template>
-            <template v-slot:default="props" class="my-2">
+            <template v-slot:default="props">
               <v-row class="d-flex align-stretch">
                 <v-col
                   v-for="item in props.items"

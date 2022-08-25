@@ -28,7 +28,7 @@
                 <v-btn @click="openHistory" class="ml-4">Open history</v-btn>
               </v-toolbar>
             </template>
-            <template v-slot:default="props" class="my-2">
+            <template v-slot:default="props">
               <v-row class="d-flex align-stretch">
                 <v-col
                   v-for="item in props.items"

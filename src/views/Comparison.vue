@@ -16,7 +16,7 @@
                 </v-toolbar-title>
               </v-toolbar>
             </template>
-            <template v-slot:default="props" class="my-2">
+            <template v-slot:default="props">
               <div class="d-flex overflow-auto align-center">
                 <history-project-card
                   v-for="report in props.items"

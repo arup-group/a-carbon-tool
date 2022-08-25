@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@speckle/objectloader": "^2.7.1",
-    "@speckle/viewer": "^2.7.1",
+    "@speckle/viewer": "2.2.8",
     "@types/three": "^0.136.1",
     "@vue/vue2-jest": "^27.0.0",
     "axios": "^0.24.0",

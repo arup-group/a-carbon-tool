@@ -12,6 +12,7 @@
     "@speckle/objectloader": "^2.7.1",
     "@speckle/viewer": "^2.7.1",
     "@types/three": "^0.136.1",
+    "@vue/vue2-jest": "^27.0.0",
     "axios": "^0.24.0",
     "chart.js": "^2.9.4",
     "core-js": "^3.6.5",
@@ -27,7 +28,7 @@
   },
   "devDependencies": {
     "@mdi/font": "^6.5.95",
-    "@types/jest": "^24.0.19",
+    "@types/jest": "^27.0.0",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-babel": "^5.0.0",

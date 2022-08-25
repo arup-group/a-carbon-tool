@@ -41,7 +41,7 @@ jobs:
         VUE_APP_SPECKLE_SECRET_XYZ: ${{ secrets.VUE_APP_SPECKLE_SECRET_XYZ }}
         VUE_APP_SPECKLE_NAME: A Carbon Tool
         VUE_APP_POSTHOG: ${{ secrets.VUE_APP_POSTHOG }}
-    - run: npm run test:unit
+    - run: npm run test:unit -- --passWithNoTests
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

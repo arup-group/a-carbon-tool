@@ -39,12 +39,12 @@ import Sidebar from "./components/core/Sidebar.vue";
 import Footer from "./components/core/Footer.vue";
 import VersionUpdateDialog from "./components/core/VersionUpdateDialog.vue";
 // ARC stuff
-import "@arc-web/components/dist/themes/index.css";
-import "@arc-web/components/dist/themes/light.css";
-import "@arc-web/components/dist/themes/dark.css";
-import "@arc-web/components/dist/components/container/arc-container.js";
-import "@arc-web/components/dist/components/navbar/arc-navbar.js";
-import { setBasePath } from "@arc-web/components/dist/utilities/base-path";
+// import "@arc-web/components/dist/themes/index.css";
+// import "@arc-web/components/dist/themes/light.css";
+// import "@arc-web/components/dist/themes/dark.css";
+// import "@arc-web/components/dist/components/container/arc-container.js";
+// import "@arc-web/components/dist/components/navbar/arc-navbar.js";
+// import { setBasePath } from "@arc-web/components/dist/utilities/base-path";
 
 // posthog
 import posthog from "posthog-js";
@@ -52,7 +52,7 @@ posthog.init(process.env.VUE_APP_POSTHOG, {
   api_host: "https://posthog.insights.arup.com",
 });
 
-setBasePath("/");
+// setBasePath("/");
 
 import "@/assets/style.css";
 

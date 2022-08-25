@@ -5,7 +5,7 @@
     color="primary"
     class="d-flex justify-center align-center"
   >
-    <v-card style="width: 100%;">
+    <v-card style="width: 100%">
       <v-card-title style="height: 50px" class="d-flex justify-space-between">
         <div>New Assessment</div>
         <v-btn v-if="modal" @click="openFullView">Open in full view</v-btn>
@@ -242,7 +242,18 @@ export default class AssessmentStepper extends Vue {
   mounted() {
     console.log("this.update:", this.update);
     this.completed = this.update;
-    console.log("this.completed:", this.completed)
+    console.log("this.completed:", this.completed);
+    this.form = this.update
+      ? this.projectData
+      : {
+          name: null,
+          components: null,
+          cost: null,
+          floorArea: null,
+          region: null,
+          jobNumber: null,
+          notes: null,
+        };
   }
 
   step: Step = 1;
@@ -315,7 +326,6 @@ export default class AssessmentStepper extends Vue {
   clearMaterial() {
     return;
   }
-
 
   @Emit("uploadData")
   uploadData(data: ProjectDataComplete) {

@@ -50,8 +50,12 @@ export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: SpeckleType;
 
-  currentMaterial = this.type.material ? this.type.material : null;
+  currentMaterial = this.type && this.type.material ? this.type.material : null;
   filtered = true;
+
+  mounted() {
+    this.currentMaterial = this.type && this.type.material ? this.type.material : null;
+  }
 
   @Emit("selectMaterial")
   selectMaterial(): SelectedMaterialEmit {

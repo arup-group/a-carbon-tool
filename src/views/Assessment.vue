@@ -260,6 +260,7 @@ export default class Assessment extends Vue {
       "loadActReportData",
       input
     );
+    console.log("assessmentViewData:", assessmentViewData);
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,

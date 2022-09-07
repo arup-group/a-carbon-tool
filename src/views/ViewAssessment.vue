@@ -1,8 +1,6 @@
 <template>
   <v-main>
-    <v-btn color="primary" outlined @click="back" style="z-index: 1">
-      Back to reports
-    </v-btn>
+    <back-button style="z-index: 1;" :overrideRoute="true" @back="back" />
     <loading-container :error="error" :loading="loading" @retry="loadReport">
       <template v-slot="{ loaded }">
         <v-container
@@ -48,6 +46,7 @@ import { LoadActReportDataInput } from "@/store";
 import { ILoadStreamData, LoadStreamOut } from "./utils/viewAssessmentUtils";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+import BackButton from "@/components/shared/BackButton.vue";
 
 @Component({
   components: {
@@ -56,6 +55,7 @@ import LoadingContainer from "@/components/shared/LoadingContainer.vue";
     ABreakdownCard,
     MaterialBreakdownCard,
     LoadingContainer,
+    BackButton,
   },
 })
 export default class ViewAssessment extends Vue {

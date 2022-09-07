@@ -42,10 +42,6 @@ export default class NewBranchDialog extends Vue {
     (v: string) => !this.branchExistsError || "branch name already exists",
   ];
 
-  mounted() {
-    console.log("newbranchdialog.vue, reportName:", this.reportName);
-  }
-
   get inputPrefix() {
     return `${this.$store.state.speckleFolderName}/`;
   }

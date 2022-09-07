@@ -204,7 +204,6 @@ export default class Assessment extends Vue {
   }
 
   async mounted() {
-    console.log("assessment.vue, reportName:", this.reportName);
     this.token = this.$store.state.token.token;
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
@@ -260,7 +259,6 @@ export default class Assessment extends Vue {
       "loadActReportData",
       input
     );
-    console.log("assessmentViewData:", assessmentViewData);
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -721,7 +719,6 @@ export default class Assessment extends Vue {
     const ids = material.type.ids;
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
-      console.log("id:", id);
       try {
         this.objectsObj[id].speckle_type = material.type.type;
         this.colors.push({

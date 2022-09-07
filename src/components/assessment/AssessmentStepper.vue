@@ -240,9 +240,7 @@ export default class AssessmentStepper extends Vue {
       };
   completed = false; //this.update;
   mounted() {
-    console.log("this.update:", this.update);
     this.completed = this.update;
-    console.log("this.completed:", this.completed);
     this.form = this.update
       ? this.projectData
       : {

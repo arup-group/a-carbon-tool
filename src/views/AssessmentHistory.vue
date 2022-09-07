@@ -3,7 +3,6 @@
     <loading-container :error="error" :loading="loading" @retry="loadReports">
       <template v-slot="{ loaded }">
         <v-container v-if="loaded">
-          <v-btn @click="back">Back</v-btn>
           <v-data-iterator
             :items="cleanedReports"
             :items-per-page.sync="itemsPerPage"
@@ -12,6 +11,7 @@
           >
             <template v-slot:header>
               <v-toolbar class="mb-2" flat>
+                <back-button />
                 <v-toolbar-title
                   class="d-flex justify-space-between align-center"
                   style="width: 100%"
@@ -87,6 +87,7 @@ import HistoryProjectCard from "@/components/assessmentHistory/HistoryProjectCar
 import HistoryFilters from "@/components/assessmentHistory/HistoryFilters.vue";
 import HistoryGraph from "@/components/assessmentHistory/HistoryGraph.vue";
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+import BackButton from "@/components/shared/BackButton.vue";
 
 @Component({
   components: {
@@ -94,6 +95,7 @@ import LoadingContainer from "@/components/shared/LoadingContainer.vue";
     HistoryFilters,
     HistoryGraph,
     LoadingContainer,
+    BackButton,
   },
 })
 export default class AssessmentHistory extends Vue {
@@ -135,11 +137,6 @@ export default class AssessmentHistory extends Vue {
   }
   get historyProjectCardStyle() {
     return this.direction ? "" : "min-width: 33%;";
-  }
-
-  back() {
-    console.log("going back...", this.streamId);
-    this.$router.push({ name: "StreamReports", params: { streamid: this.streamId }});
   }
 
   materialsFilterUpdate(material: boolean) {

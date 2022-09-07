@@ -92,7 +92,6 @@ export default class extends Vue {
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
     this.viewer = new Viewer({ contained: renderDomElement, showStats: false });
-    console.log("this.viewer:", this.viewer);
     objecturls.forEach(async (url) => {
       await this.viewer.loadObject(url, this.token);
 

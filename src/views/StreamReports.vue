@@ -12,6 +12,7 @@
           >
             <template v-slot:header>
               <v-toolbar flat rounded outlined class="my-4">
+                <back-button />
                 <v-toolbar-title class="mr-4 ml-2">
                   {{ streamName }}
                 </v-toolbar-title>
@@ -102,6 +103,7 @@ import QuickReport from "@/components/landing/QuickReport.vue";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+import BackButton from "@/components/shared/BackButton.vue";
 
 @Component({
   components: {
@@ -112,6 +114,7 @@ import LoadingContainer from "@/components/shared/LoadingContainer.vue";
     SESnackBar,
     QuickReport,
     LoadingContainer,
+    BackButton
   },
 })
 export default class StreamReports extends Vue {

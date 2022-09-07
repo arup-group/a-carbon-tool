@@ -3,7 +3,6 @@
     <loading-container :error="error" :loading="loading" @retry="load">
       <template v-slot="{ loaded }">
         <v-container v-if="loaded">
-          <v-btn @click="back">Back</v-btn>
           <v-data-iterator
             :items="displayReports"
             :items-per-page.sync="itemsPerPage"
@@ -12,6 +11,7 @@
           >
             <template v-slot:header>
               <v-toolbar class="mb-2" flat>
+                <back-button />
                 <v-toolbar-title class="d-flex">
                   {{ streamName }}
                 </v-toolbar-title>
@@ -72,11 +72,14 @@ import HistoryProjectCard from "@/components/assessmentHistory/HistoryProjectCar
 import AddReportDialog from "@/components/comparison/AddReportDialog.vue";
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
+import BackButton from "@/components/shared/BackButton.vue";
+
 @Component({
   components: {
     HistoryProjectCard,
     AddReportDialog,
     LoadingContainer,
+    BackButton,
   },
 })
 export default class Comparison extends Vue {
@@ -102,11 +105,6 @@ export default class Comparison extends Vue {
     this.streamid = this.$route.params.streamId;
     this.load();
   }
-
-  back() {
-    this.$router.push({ name: "StreamReports", params: { streamid: this.streamid }});
-  }
-
   addReport() {
     this.addReportDialog = true;
   }

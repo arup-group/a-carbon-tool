@@ -57,6 +57,7 @@ export default class HistoryProjectCard extends Vue {
   @Prop() project!: ProjectAVals;
   @Prop() filters!: HistoryFilterOptions;
   @Prop() comparison!: boolean; // some things need to change if on comparison page
+  @Prop() noConvert!: boolean; // whether to convert from kg-tonnes or not (true = don't convert, false = convert)
 
   options = false;
 
@@ -112,7 +113,7 @@ export default class HistoryProjectCard extends Vue {
 
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp
-    return Math.round(value * 0.001);
+    return this.noConvert ? value : Math.round(value * 0.001);
   }
 }
 </script>

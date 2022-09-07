@@ -50,6 +50,7 @@
                   :key="report.id"
                   :project="report"
                   :filters="filters"
+                  :noConvert="true"
                 />
               </div>
             </template>
@@ -246,17 +247,17 @@ export default class AssessmentHistory extends Vue {
       const aValues: ChartData[] = [
         {
           label: "A1-A3",
-          value: a1A3Tot,
+          value: this.convertKgToTonnes(a1A3Tot),
           color: "",
         },
         {
           label: "A4",
-          value: a4Tot,
+          value: this.convertKgToTonnes(a4Tot),
           color: "",
         },
         {
           label: "A5",
-          value: a5Tot,
+          value: this.convertKgToTonnes(a5Tot),
           color: "",
         },
       ];
@@ -266,13 +267,18 @@ export default class AssessmentHistory extends Vue {
         id: `${r.data.id}`,
         co2Values: co2Data,
         aValues,
-        totalCO2e: r.data.totalCO2,
+        totalCO2e: this.convertKgToTonnes(r.data.totalCO2),
         link: "",
         category: r.data.projectData.components,
         projectDate: new Date(r.createdAt).toDateString(),
         newMainAvailable: false,
       };
     });
+  }
+
+  convertKgToTonnes(value: number) {
+    // converts kg to tonnes and rounds to 2 dp
+    return Math.round(value * 0.001);
   }
 }
 </script>

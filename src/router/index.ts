@@ -22,7 +22,7 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/ViewAssessment.vue"),
   },
   {
-    path: "/assessment/history/:streamId",
+    path: "/:streamId/history",
     name: "AssessmentHistory",
     component: () => import("../views/AssessmentHistory.vue"),
   },
@@ -47,7 +47,7 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/About.vue"),
   },
   {
-    path: "/comparison/:streamId",
+    path: "/:streamId/comparison",
     name: "Comparison",
     component: () => import("../views/Comparison.vue"),
   },

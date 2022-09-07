@@ -3,6 +3,7 @@
     <loading-container :error="error" :loading="loading" @retry="loadReports">
       <template v-slot="{ loaded }">
         <v-container v-if="loaded">
+          <v-btn @click="back">Back</v-btn>
           <v-data-iterator
             :items="cleanedReports"
             :items-per-page.sync="itemsPerPage"
@@ -133,6 +134,11 @@ export default class AssessmentHistory extends Vue {
   }
   get historyProjectCardStyle() {
     return this.direction ? "" : "min-width: 33%;";
+  }
+
+  back() {
+    console.log("going back...", this.streamId);
+    this.$router.push({ name: "StreamReports", params: { streamid: this.streamId }});
   }
 
   materialsFilterUpdate(material: boolean) {

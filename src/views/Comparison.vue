@@ -3,6 +3,7 @@
     <loading-container :error="error" :loading="loading" @retry="load">
       <template v-slot="{ loaded }">
         <v-container v-if="loaded">
+          <v-btn @click="back">Back</v-btn>
           <v-data-iterator
             :items="displayReports"
             :items-per-page.sync="itemsPerPage"
@@ -100,6 +101,10 @@ export default class Comparison extends Vue {
   async mounted() {
     this.streamid = this.$route.params.streamId;
     this.load();
+  }
+
+  back() {
+    this.$router.push({ name: "StreamReports", params: { streamid: this.streamid }});
   }
 
   addReport() {

@@ -145,10 +145,10 @@ export default class StreamReports extends Vue {
   }
 
   openHistory() {
-    this.$router.push(`assessment/history/${this.streamid}`);
+    this.$router.push({ name: "AssessmentHistory", params: { streamId: this.streamid }});
   }
   openComparison() {
-    this.$router.push(`comparison/${this.streamid}`);
+    this.$router.push({ name: "Comparison", params: { streamId: this.streamid }});
   }
 
   edit(branchName: string) {

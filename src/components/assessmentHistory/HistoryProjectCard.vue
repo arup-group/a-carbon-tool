@@ -16,6 +16,7 @@
         <v-card-text>
           <v-row justify="start" class="text--primary" fill-height dense>
             <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
+            <v-col cols="6"> updated: {{ branchDate }} </v-col>
           </v-row>
           <v-divider class="mb-4 mt-2"></v-divider>
           <v-row>
@@ -83,6 +84,16 @@ export default class HistoryProjectCard extends Vue {
   }
   get category() {
     return this.project.category;
+  }
+
+  get branchDate() {
+    if (this.project.projectDate) {
+      const branchDate = new Date(Date.parse(this.project.projectDate));
+      const enGBFormatter = new Intl.DateTimeFormat("en-GB");
+      const branchDateFormatted = enGBFormatter.format(branchDate);
+      return branchDateFormatted;
+    }
+    return "N/A";
   }
 
   // filters getters

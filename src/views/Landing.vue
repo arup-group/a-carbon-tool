@@ -150,6 +150,7 @@ export default class Landing extends Vue {
     const filteredStreams = allStreams.data.streams.items.filter(s => s.actBranch && s.actBranch.commits.items.length > 0);
     console.log("allStreams:", allStreams);
     console.log("filteredStreams:", filteredStreams);
+    // ready to display cards at this point, just no graph
     const reports = await Promise.all(filteredStreams.map(async (s) => {
       if (s.actBranch) {
         // update available

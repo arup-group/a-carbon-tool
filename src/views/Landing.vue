@@ -99,6 +99,7 @@ import {
   instanceOfStreamFolder,
   BranchDataError,
   StreamFolderError,
+  AllStreams,
 } from "@/models/landing";
 
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -140,7 +141,50 @@ export default class Landing extends Vue {
 
   async mounted() {
     this.token = this.$store.state.token.token;
+    this.test_loadStreams();
     this.loadStreams();
+  }
+
+  async test_loadStreams() {
+    const allStreams: AllStreams = await this.$store.dispatch("testLoadActReportData");
+    const filteredStreams = allStreams.data.streams.items.filter(s => s.actBranch && s.actBranch.commits.items.length > 0);
+    console.log("allStreams:", allStreams);
+    console.log("filteredStreams:", filteredStreams);
+    const reports = await Promise.all(filteredStreams.map(async (s) => {
+      if (s.actBranch) {
+        // update available
+        const mainDate = new Date(s.mainBranch.commits.items[0].createdAt);
+        const reportDate = new Date(s.actBranch.commits.items[0].createdAt);
+        const newMainAvailable = mainDate > reportDate;
+
+        // report info
+        const loadActReportDataInput: LoadActReportDataInput = {
+          streamId: s.id,
+          branchName: "main",
+        };
+        const data: LoadStreamOut = await this.$store.dispatch(
+          "loadActReportData",
+          loadActReportDataInput
+        );
+        const reportData = data.data;
+        const returnObj: ProjectFolder = {
+          streamName: s.name,
+          streamId: s.id,
+          mainProject: {
+            title: `${reportData.projectInfo.name} - ${s.name}`,
+            id: s.id,
+            co2Values: reportData.materialBreakdown.materials,
+            totalCO2e: reportData.projectInfo.totalCO2e,
+            link: "",
+            category: reportData.projectInfo.components,
+            projectDate: reportDate.toString(),
+            newMainAvailable
+          }
+        }
+        return returnObj;
+      } else return null;
+    }));
+    console.log("reports:", reports);
   }
 
   newAssessment() {

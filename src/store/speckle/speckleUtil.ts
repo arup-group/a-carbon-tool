@@ -6,23 +6,16 @@ import {
   StreamData,
   ActReportData,
   DeleteStreamData,
+  CheckContainsBranch,
+  CreateReportBranch,
+  GetObjectInfo,
+  StreamNameBranches,
 } from "@/models/graphql";
 
-import {
-  streamReferencedObjects,
-  streamsDataQuery,
-  userInfoQuery,
-  streamsQuery,
-  uploadObjectsMutation,
-  createBranchMutation,
-  uploadObjectWithChildrenMutation,
-  createCommitMutation,
-  streamReferencedBranches,
-  streamCommmitObjects,
-  mainStreamCommmitObjects,
-  actReportBranchInfo,
-  deleteBranchMutation,
-} from "./graphql/speckleQueries";
+import * as queries from "./graphql/speckleQueries";
+import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
+
+import { StreamName } from "@/models/graphql/StreamName.interface";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -38,7 +31,7 @@ export function goToSpeckleAuthpage(server: Server) {
   localStorage.setItem(CHALLENGE, challenge);
   localStorage.setItem(SERVER, JSON.stringify(server));
 
-  // Send user to auth page 
+  // Send user to auth page
   window.location.href = `${server.url}/authn/verify/${server.speckleId}/${challenge}`;
 }
 
@@ -102,26 +95,63 @@ export async function speckleFetch(query: any, context: any) {
   } else return Promise.reject(AuthError.NOT_SIGNED_IN);
 }
 
+// converts the old branch naming scheme to the new one
+export async function convOldReport(
+  context: any,
+  streamid: string,
+  oldBranch: BranchItem
+) {
+  const mainReportBranchName = `${context.state.speckleFolderName}/main`;
+
+  const res = await createReportBranch(context, streamid, mainReportBranchName);
+  const reportObjId = oldBranch.commits.items[0].referencedObject;
+
+  const objectInfo = await getObjectInfo(context, streamid, reportObjId);
+
+  const totalChildrenCount = objectInfo.data.stream.object.totalChildrenCount;
+
+  const commitRes = await createCommit(
+    context,
+    streamid,
+    reportObjId,
+    totalChildrenCount,
+    mainReportBranchName
+  );
+
+  return commitRes;
+}
+
+export const getObjectInfo = (
+  context: any,
+  streamid: string,
+  objectid: string
+): Promise<GetObjectInfo> =>
+  speckleFetch(queries.getObjectInfo(streamid, objectid), context);
+
 export const getUserData = (context: any) =>
-  speckleFetch(userInfoQuery(), context);
+  speckleFetch(queries.userInfoQuery(), context);
 
 export const getStreamObjects = (
   context: any,
   streamid: string
 ): Promise<StreamReferenceObjects> =>
-  speckleFetch(streamReferencedObjects(streamid), context);
+  speckleFetch(queries.streamReferencedObjects(streamid), context);
 
 export const getUserStreams = (context: any) =>
-  speckleFetch(streamsQuery(), context);
+  speckleFetch(queries.streamsQuery(), context);
 
 export const uploadObjects = (
   context: any,
   streamid: string,
   objects: SpeckleObjectComplete[]
-) => speckleFetch(uploadObjectsMutation(streamid, objects), context);
+) => speckleFetch(queries.uploadObjectsMutation(streamid, objects), context);
 
-export const createReportBranch = (context: any, streamid: string) =>
-  speckleFetch(createBranchMutation(streamid), context);
+export const createReportBranch = (
+  context: any,
+  streamid: string,
+  branchName: string
+): Promise<CreateReportBranch> =>
+  speckleFetch(queries.createBranchMutation(streamid, branchName), context);
 
 export const uploadObjectWithChildren = (
   context: any,
@@ -130,7 +160,7 @@ export const uploadObjectWithChildren = (
   children: string[]
 ) =>
   speckleFetch(
-    uploadObjectWithChildrenMutation(streamid, object, children),
+    queries.uploadObjectWithChildrenMutation(streamid, object, children),
     context
   );
 
@@ -138,43 +168,51 @@ export const createCommit = (
   context: any,
   streamid: string,
   objectid: string,
-  totalChildrenCount: number
+  totalChildrenCount: number,
+  branchName: string
 ) =>
   speckleFetch(
-    createCommitMutation(streamid, objectid, totalChildrenCount),
+    queries.createCommitMutation(
+      streamid,
+      objectid,
+      totalChildrenCount,
+      branchName
+    ),
     context
   );
 
 export const getStreamCommit = (
   context: any,
+  streamid: string,
+  branchName: string
+): Promise<StreamReferenceObjects> =>
+  speckleFetch(queries.streamCommmitObjects(streamid, branchName), context);
+
+export const getMainStreamCommit = (
+  context: any,
   streamid: string
 ): Promise<StreamReferenceObjects> =>
-  speckleFetch(streamCommmitObjects(streamid), context);
-
-  export const getMainStreamCommit = (
-    context: any,
-    streamid: string
-  ): Promise<StreamReferenceObjects> =>
-    speckleFetch(mainStreamCommmitObjects(streamid), context);
+  speckleFetch(queries.mainStreamCommmitObjects(streamid), context);
 
 export const getStreamBranches = (
   context: any,
   streamid: string
 ): Promise<StreamReferenceBranches> =>
-  speckleFetch(streamReferencedBranches(streamid), context);
+  speckleFetch(queries.streamReferencedBranches(streamid), context);
 
 export const getBranchData = (
   context: any,
   streamid: string,
   objId: string
 ): Promise<StreamData> =>
-  speckleFetch(streamsDataQuery(streamid, objId), context);
+  speckleFetch(queries.streamsDataQuery(streamid, objId), context);
 
 export const getActReportBranchInfo = (
   context: any,
-  streamId: string
+  streamId: string,
+  branchName: string
 ): Promise<ActReportData> =>
-  speckleFetch(actReportBranchInfo(streamId), context);
+  speckleFetch(queries.actReportBranchInfo(streamId, branchName), context);
 
 export const getToken = (): Token => ({
   token: localStorage.getItem(TOKEN) as string,
@@ -186,4 +224,23 @@ export const deleteBranch = (
   streamid: string,
   branchid: string
 ): Promise<DeleteStreamData> =>
-  speckleFetch(deleteBranchMutation(streamid, branchid), context);
+  speckleFetch(queries.deleteBranchMutation(streamid, branchid), context);
+
+export const checkContainsBranch = (
+  context: any,
+  streamid: string,
+  branchName: string
+): Promise<CheckContainsBranch> =>
+  speckleFetch(queries.checkContainsBranch(streamid, branchName), context);
+
+export const getStreamName = (
+  context: any,
+  streamid: string
+): Promise<StreamName> =>
+  speckleFetch(queries.streamNameQuery(streamid), context);
+
+export const streamNameBranches = (
+  context: any,
+  streamid: string
+): Promise<StreamNameBranches> =>
+  speckleFetch(queries.streamNameBranches(streamid), context);

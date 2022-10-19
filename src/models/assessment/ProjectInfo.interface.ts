@@ -4,7 +4,7 @@ export interface ProjectInfo {
   reportDate: Date;
   author: string;
   JN: string;
-  systemCost: number;
+  cost: number;
   floorArea: number;
   notes: string;
   totalCO2e: number;

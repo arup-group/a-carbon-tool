@@ -20,7 +20,7 @@ export default class BECChip extends Vue {
   switchShowDots() {
     return;
   }
-  
+
   get backgroundColor() {
     return this.becs.find((b) => b.name === this.category)?.backgroundColor;
   }

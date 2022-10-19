@@ -17,9 +17,14 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Landing.vue"),
   },
   {
-    path: "/assessment/view/:streamId",
+    path: "/assessment/view/:streamId/:branchName",
     name: "ViewAssessment",
     component: () => import("../views/ViewAssessment.vue"),
+  },
+  {
+    path: "/:streamId/history",
+    name: "AssessmentHistory",
+    component: () => import("../views/AssessmentHistory.vue"),
   },
   {
     path: "/assessment",
@@ -27,9 +32,29 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Assessment.vue"),
   },
   {
+    path: "/assessment/:streamId/:branchName",
+    name: "UpdateAssessmentBranch",
+    component: () => import("../views/Assessment.vue"),
+  },
+  {
+    path: "/assessment/:streamId",
+    name: "UpdateAssessment",
+    component: () => import("../views/Assessment.vue"),
+  },
+  {
     path: "/about",
     name: "About",
     component: () => import("../views/About.vue"),
+  },
+  {
+    path: "/:streamId/comparison",
+    name: "Comparison",
+    component: () => import("../views/Comparison.vue"),
+  },
+  {
+    path: "/:streamid",
+    name: "StreamReports",
+    component: () => import("../views/StreamReports.vue"),
   },
 ];
 

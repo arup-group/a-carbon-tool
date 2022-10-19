@@ -5,17 +5,29 @@
         <v-card flat outlined class="mt-8 mb-4">
           <v-card-title class="text-h4">Declaration</v-card-title>
           <v-card-text>
-            The construction industry currently faces significant challenges in reducing its environmental impact. The built environment is directly responsible for
-            nearly 40% of all carbon emissions, with 10% coming from embodied carbon - the emissions associated with the construction, maintenance and deconstruction
-            (<a href='https://worldgbc.org/news-media/commitment-includes-embodied-carbon' target='_blank'>WGBC, 2021</a>).
+            The construction industry currently faces significant challenges in
+            reducing its environmental impact. The built environment is directly
+            responsible for nearly 40% of all carbon emissions, with 10% coming
+            from embodied carbon - the emissions associated with the
+            construction, maintenance and deconstruction (<a
+              href="https://worldgbc.org/news-media/commitment-includes-embodied-carbon"
+              target="_blank"
+              >WGBC, 2021</a
+            >). <br /><br />
+            As an initiative, we believe that significant action needs to be
+            taken to curb these emissions, with a target of limiting global
+            temperature rise to 1.5C. Construction professionals - architects,
+            engineers, designers, consultants and contractors - with the power
+            to enact meaningful change require the right tools to do so.
             <br /><br />
-            As an initiative, we believe that significant action needs to be taken to curb these emissions, with a target of limiting global temperature rise to 1.5C.
-            Construction professionals - architects, engineers, designers, consultants and contractors - with the power to enact meaningful change require the right tools to do so.
-            <br /><br />
-            A carbon tool, or 'act', is an open-source initiative to create appropriate tools for the rapid assessment of embodied 
-            carbon emissions within built-environment assets. It is a work in progress intended to evolve over time. It is free to all to use and it is open to anyone who 
-            would like to contribute. Unlike other lifecycle analysis tools, act is intended to be used by designers as they work to provide quick feedback and enable carbon 
-            to be included as a factor in design as it happens.
+            A carbon tool, or 'act', is an open-source initiative to create
+            appropriate tools for the rapid assessment of embodied carbon
+            emissions within built-environment assets. It is a work in progress
+            intended to evolve over time. It is free to all to use and it is
+            open to anyone who would like to contribute. Unlike other lifecycle
+            analysis tools, act is intended to be used by designers as they work
+            to provide quick feedback and enable carbon to be included as a
+            factor in design as it happens.
           </v-card-text>
           <v-img src="/assets/globe.png" contain height="480"></v-img>
         </v-card>
@@ -362,45 +374,45 @@ export default class About extends Vue {
       sources: [
         {
           name: "IFC India Construction Materials Database Methodology Report 2017",
-          url: "https://edgebuildings.com/wp-content/uploads/2017/12/IFC-India-Construction-Materials-Database-Methodology-Report.pdf"
+          url: "https://edgebuildings.com/wp-content/uploads/2017/12/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
         },
         {
           name: "EPD of Average PPC and PSC Cement, ACC Limited 2018",
-          url: "https://www.environdec.com/library/epd1112"
+          url: "https://www.environdec.com/library/epd1112",
         },
         {
           name: "EPD of Average PPC and Compocem Cement, Ambuja Cements Limited 2018",
-          url: "https://www.environdec.com/library/epd1113"
+          url: "https://www.environdec.com/library/epd1113",
         },
         {
           name: "EPD of Greencor sheet, Hicem & Hilux board, RAMCO INDUSTRIES LTD.(RIL) 2019",
-          url: "https://www.environdec.com/library/epd1410"
+          url: "https://www.environdec.com/library/epd1410",
         },
         {
           name: "EPD of 1cu.m of Average Ready Mix Concrete, ACC Limited 2018",
-          url: "https://www.environdec.com/library/epd1116"
+          url: "https://www.environdec.com/library/epd1116",
         },
         {
           name: "EPD Gypboard Plain (Standard board), Gyproc, Saint Gobain 2020",
-          url: "https://www.gyproc.in/pdf/Verified-EPD-Gyproc-Gypboard-Plain-2020.pdf"
+          url: "https://www.gyproc.in/pdf/Verified-EPD-Gyproc-Gypboard-Plain-2020.pdf",
         },
         {
           name: "EPD 12.5mm and 15mm Gypboard Plain, Gyproc, Saint Gobain 2018",
-          url: "https://www.environdec.com/library/epd945"
+          url: "https://www.environdec.com/library/epd945",
         },
         {
           name: "Berger External Thermal Insulation & Composite Systems (ETICS) EPD, Berger 2020",
-          url: "https://www.environdec.com/library/epd1418"
+          url: "https://www.environdec.com/library/epd1418",
         },
         {
           name: "EPD Average of Finished Long Products (Steel), JSW 2021",
-          url: "https://www.environdec.com/library/epd4326"
+          url: "https://www.environdec.com/library/epd4326",
         },
         {
           name: "EPD Average of Finished Flat Products (Steel), JSW 2022",
-          url: "https://www.environdec.com/library/epd5017"
-        }
-      ]
+          url: "https://www.environdec.com/library/epd5017",
+        },
+      ],
     },
     {
       name: "Netherlands",

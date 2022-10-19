@@ -19,7 +19,9 @@ import {
   Filters,
   GradientColor,
   RendererLoaded,
+  SelectObject,
   SpeckleProperty,
+  UserData,
 } from "@/models/renderer/";
 
 @Component
@@ -28,10 +30,11 @@ export default class extends Vue {
   @Prop() token!: string;
   @Prop() colors!: Color[];
   @Prop() gradientColorProperty!: GradientColor;
-  @Prop() selectedMaterial!: any[];
+  @Prop() display!: boolean;
+  @Prop() selectedIds!: string[];
+  @Prop() filtered!: boolean;
 
   currentColors: Color[] = [];
-  filtered = false;
 
   @Watch("colors")
   onObjectColorChanged(value: Color[]) {
@@ -39,25 +42,9 @@ export default class extends Vue {
     else this.setColors(value);
   }
 
-  @Watch("selectedMaterial")
+  @Watch("selectedIds")
   onMaterialChange() {
-    if (this.filtered) {
-      this.filtered = false;
-    } else {
-      this.filtered = true;
-    }
-    const allObjects = this.viewer.sceneManager.sceneObjects
-      .allObjects as THREE.Group;
-    const allObjectsChildren = allObjects.children;
-    const allMesh: THREE.Mesh[] = [];
-    allObjectsChildren.forEach((oc) => {
-      oc.children.forEach((child) => {
-        if (this.selectedMaterial.includes(child.uuid)) {
-          allMesh.push(child.userData as THREE.Mesh);
-        }
-      });
-    });
-    this.setSelect(allMesh);
+    this.setSelect();
   }
 
   @Watch("gradientColorProperty")
@@ -115,16 +102,20 @@ export default class extends Vue {
       this.loading = Math.ceil(args.progress * 100);
       this.viewer.interactions.zoomExtents();
     });
+
+    // no event for object deselection, so the below is a little weird (and will probably break at some point)
+    this.viewer.interactions.selectionHelper.on("object-clicked", () => {
+      this.objectsSelected(this.viewer.interactions.selectedObjectsUserData);
+    });
   }
 
-  async setSelect(selected: any[]) {
+  async setSelect() {
     if (this.filtered === true) {
       await this.viewer.applyFilter({
         filterBy: {
-          speckle_type: selected[0].speckle_type,
-        },
+          id: this.selectedIds
+        }
       });
-      this.$emit("selection", this.selectedObjects);
     } else {
       await this.viewer.applyFilter(null);
       this.setColors(this.colors);
@@ -182,22 +173,15 @@ export default class extends Vue {
 
   async setColors(colors: Color[]) {
     if (colors && colors.length > 0) {
-      const changeList = colors.map((c) => {
-        return {
-          key: c.id,
-          value: c.color,
-        };
+      const values: { [id: string]: string } = {};
+      colors.forEach((c) => {
+        Object.assign(values, { [c.id]: c.color });
       });
-
-      const changeListObj = changeList.reduce(
-        (obj, item) => Object.assign(obj, { [item.key]: item.value }),
-        {}
-      );
-      const res = await this.viewer.applyFilter({
+      await this.viewer.applyFilter({
         colorBy: {
           type: "category",
-          property: "speckle_type",
-          values: changeListObj,
+          property: "id",
+          values,
           default: "#636363",
         },
       });
@@ -215,6 +199,11 @@ export default class extends Vue {
   @Emit("loaded")
   loaded(properties: Filters, allMesh: THREE.Mesh[]): RendererLoaded {
     return { properties, allMesh };
+  }
+
+  @Emit("objectsSelected")
+  objectsSelected(objects: UserData[]) {
+    return objects;
   }
 }
 </script>

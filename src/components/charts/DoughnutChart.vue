@@ -4,10 +4,7 @@ import VueChart from "vue-chartjs";
 import { ChartData } from "@/models/chart";
 
 @Component
-export default class DoughnutChart extends Mixins(
-  VueChart.Doughnut,
-  VueChart.mixins.reactiveProp
-) {
+export default class DoughnutChart extends Mixins(VueChart.Doughnut) {
   @Prop() readonly data!: Array<ChartData>;
 
   mounted() {

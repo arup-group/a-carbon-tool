@@ -11,42 +11,49 @@
         />
       </div>
     </v-form>
+    <v-divider class="pb-4 mt-4"></v-divider>
+    <custom-group
+      :invalidObjects="invalidObjects"
+      :selectedObjects="selectedObjects"
+      @createNewGroup="createNewGroup"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
+import { SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import MaterialType from "./MaterialType.vue";
+import CustomGroup from "./CustomGroup.vue";
 
 @Component({
-  components: { MaterialType },
+  components: { MaterialType, CustomGroup },
 })
 export default class Menu2 extends Vue {
   @Prop() types!: SpeckleType[];
   @Prop() materials!: MaterialFull[];
+  @Prop() selectedObjects!: string[];
+  @Prop() invalidObjects!: boolean;
 
   get loadedTypes() {
     return this.types ? this.types : [];
   }
 
+  @Emit("createNewGroup")
+  createNewGroup(name: string) {
+    return name;
+  }
+
   @Emit("materialUpdated")
-  materialUpdated(material: MaterialUpdateOut) {
+  materialUpdated(material: SelectedMaterialEmit) {
     return material;
   }
 
   @Emit("selectMaterial")
-  selectMaterial(objects: [], filtered: boolean) {
-    return;
+  selectMaterial(selectedMaterial: SelectedMaterialEmit) {
+    return selectedMaterial;
   }
-
-  setMaterial = "";
-  groupBy = "";
-  source = "";
-  sourceItems = [];
-  groupByItems = [];
-  materialItems = [];
 }
 </script>

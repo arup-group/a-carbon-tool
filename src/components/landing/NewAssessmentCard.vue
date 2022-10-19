@@ -16,12 +16,7 @@
         width="100%"
       >
         <v-card-actions class="justify-center">
-          <v-btn
-            x-large
-            outlined
-            color="primary"
-            @click="$router.push('/assessment')"
-          >
+          <v-btn x-large outlined color="primary" @click="newAssessment">
             <v-icon> mdi-plus </v-icon>
             New Assessment
           </v-btn>
@@ -31,8 +26,13 @@
   </v-container>
 </template>
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Emit } from "vue-property-decorator";
 
 @Component
-export default class NewAssessmentCard extends Vue {}
+export default class NewAssessmentCard extends Vue {
+  @Emit("newAssessment")
+  newAssessment() {
+    return;
+  }
+}
 </script>

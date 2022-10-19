@@ -92,9 +92,10 @@ export default class Sidebar extends Vue {
     return;
   }
 
-  changeRoute(newPath: string) {
+  async changeRoute(newPath: string) {
     if (this.$route.path !== newPath) {
-      this.$router.push(newPath);
+      await this.$router.push(newPath);
+      this.toggleDrawer();
     }
     return;
   }

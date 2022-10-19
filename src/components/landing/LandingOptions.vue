@@ -37,8 +37,12 @@ interface Item {
 @Component
 export default class LandingOptions extends Vue {
   update(val: Name) {
-    if (val === "Edit") this.$router.push("/assessment");
+    if (val === "Edit") this.edit();
     else this.delete();
+  }
+  @Emit("edit")
+  edit() {
+    return;
   }
 
   @Emit("delete")

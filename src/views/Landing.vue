@@ -1,140 +1,154 @@
 <template>
   <v-main class="mr-7 ml-7 pb-4">
     <landing-header />
-    <v-container v-if="!loading && !error">
-      <v-data-iterator
-        :items="projectData"
-        :items-per-page.sync="itemsPerPage"
-        :page.sync="page"
-        :search="search"
-        hide-default-footer
-      >
-        <template v-slot:header>
-          <v-toolbar flat rounded outlined class="my-4">
-            <v-text-field
-              v-model="search"
-              clearable
-              flat
-              solo
-              hide-details
-              prepend-inner-icon="mdi-magnify"
-              label="Search"
-            ></v-text-field>
-          </v-toolbar>
-        </template>
-        <template v-slot:default="props" class="my-2">
-          <v-row class="d-flex align-stretch">
-            <v-col
-              v-for="item in props.items"
-              :key="item.title"
-              cols="12"
-              md="6"
-              lg="4"
-              style="display: flex"
-            >
-              <new-assessment-card v-if="item.title === 'New Assessment'" />
-              <project-card
-                v-else
-                :project="item"
-                @delete="checkDelete"
-              ></project-card>
-            </v-col>
-          </v-row>
-        </template>
-        <template v-slot:footer>
-          <landing-footer
-            :numberOfPages="numberOfPages"
-            :page="page"
-            @formerPage="formerPage"
-            @nextPage="nextPage"
-          />
-        </template>
-      </v-data-iterator>
-    </v-container>
-    <div
-      v-else-if="loading && !error"
-      style="width: 100%"
-      class="d-flex justify-center"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        :size="200"
-      ></v-progress-circular>
-    </div>
-    <div v-else>
-      <landing-error @retry="loadStreams" />
-    </div>
-    <confirm-dialog
-      :dialog="dialog"
-      @agree="agreeDelete"
-      @cancel="cancelDelete"
-      message="Are you sure you want to permanently delete this report for all users? This action is not reversible"
+    <loading-container :error="error" :loading="loading" @retry="loadStreams">
+      <template v-slot="{ loaded }">
+        <v-container v-if="loaded">
+          <v-data-iterator
+            :items="projectData"
+            :items-per-page.sync="itemsPerPage"
+            :page.sync="page"
+            :search="search"
+            hide-default-footer
+          >
+            <template v-slot:header>
+              <v-toolbar flat rounded outlined class="my-4">
+                <v-text-field
+                  v-model="search"
+                  clearable
+                  flat
+                  solo
+                  hide-details
+                  prepend-inner-icon="mdi-magnify"
+                  label="Search"
+                ></v-text-field>
+              </v-toolbar>
+            </template>
+            <template v-slot:default="props">
+              <v-row class="d-flex align-stretch">
+                <v-col
+                  v-for="item in props.items"
+                  :key="item.title"
+                  cols="12"
+                  md="6"
+                  lg="4"
+                  style="display: flex"
+                >
+                  <new-assessment-card
+                    v-if="item.title === 'New Assessment'"
+                    @newAssessment="newAssessment"
+                  />
+                  <project-folder-card
+                    v-else-if="projectError(item)"
+                    :stream="item"
+                    @openStream="openStream"
+                  />
+                  <landing-error
+                    v-else
+                    :streamFolder="item"
+                    @rerun="landingErrorRerun"
+                    @retry="landingErrorRetry"
+                    @openErrorInfoDialog="openErrorInfoDialog"
+                    @diagnostics="runDiagnostics"
+                  />
+                </v-col>
+              </v-row>
+            </template>
+            <template v-slot:footer>
+              <landing-footer
+                :numberOfPages="numberOfPages"
+                :page="page"
+                @formerPage="formerPage"
+                @nextPage="nextPage"
+              />
+            </template>
+          </v-data-iterator>
+        </v-container>
+      </template>
+    </loading-container>
+    <error-info-dialog
+      :dialog="errorInfoDialog"
+      @close="closeErrorInfoDialog"
     />
-    <SESnackBar
-      @close="deleteSnackClose"
-      :success="deleteSuccess"
-      :model="deleteSnack"
-      textError="Something went wrong, please retry"
-      textSuccess="Report deleted!"
+    <diagnostics-dialog
+      :dialog="diagnosticsDialog"
+      :streamid="diagnosticsStreamid"
+      @close="closeDiagnostics"
+      :key="diagnosticKey"
     />
   </v-main>
 </template>
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 
-import { Project } from "@/models/project";
-import {
-  StreamData,
-  DeleteStreamData,
-  StreamReferenceBranches,
-} from "@/models/graphql";
+import { StreamData } from "@/models/graphql";
 
-import { DeleteBranchInput } from "@/store";
 import {
-  extractCo2Data,
-  loadParent,
-  getChildren,
-} from "../views/utils/viewAssessmentUtils";
+  GetBranchDataInputs,
+  GetStreamBranchesOutput,
+  GetStreamCommitInput,
+  LoadActReportDataInput,
+} from "@/store";
+import { loadParent, LoadStreamOut } from "../views/utils/viewAssessmentUtils";
+import {
+  CarbonBranch,
+  BranchData,
+  StreamId,
+  StreamFolder,
+  instanceOfBranchData,
+  instanceOfStreamFolder,
+  BranchDataError,
+  StreamFolderError,
+} from "@/models/landing";
 
-import ProjectCard from "@/components/landing/ProjectCard.vue";
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
+import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 import LandingError from "@/components/landing/LandingError.vue";
+import ErrorInfoDialog from "@/components/landing/ErrorInfoDialog.vue";
+import DiagnosticsDialog from "@/components/landing/DiagnosticsDialog.vue";
 
-import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
-import SESnackBar from "@/components/shared/SESnackBar.vue";
-import { HTTPStreamDataParent } from "@/models/graphql/";
+import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+
+type ProjectFolder = StreamFolder | StreamFolderError;
+
 @Component({
   components: {
-    ProjectCard,
     NewAssessmentCard,
     LandingHeader,
     LandingFooter,
+    ProjectFolderCard,
+    LoadingContainer,
     LandingError,
-    ConfirmDialog,
-    SESnackBar,
+    ErrorInfoDialog,
+    DiagnosticsDialog,
   },
 })
 export default class Landing extends Vue {
-  carbonBranches: { id: string; name: string; branchid: string, mainBranchID: string | undefined;}[] = [];
-  branchData: { id: string; name: string;  projectDate: string;  newMainAvailable: boolean; data: HTTPStreamDataParent }[] = [];
   token = "";
   itemsPerPage = 8;
   search = "";
   page = 1;
-  projects: Project[] = [];
+  projects: Array<ProjectFolder> = [];
   loading = true;
   error = false;
-  dialog = false;
-  deleteid = "";
-  deleteSuccess = true;
-  deleteSnack = false;
+  errorInfoDialog = false;
+  diagnosticsDialog = false;
+  diagnosticsStreamid = "";
+  diagnosticKey = 0;
 
   async mounted() {
     this.token = this.$store.state.token.token;
     this.loadStreams();
+  }
+
+  newAssessment() {
+    this.$router.push("/assessment");
+  }
+
+  projectError(item: ProjectFolder) {
+    return instanceOfStreamFolder(item);
   }
 
   get numberOfPages() {
@@ -147,6 +161,16 @@ export default class Landing extends Vue {
     return [{ title: "New Assessment" }, ...this.projects];
   }
 
+  runDiagnostics(streamid: string) {
+    this.diagnosticsStreamid = streamid;
+    this.diagnosticKey++;
+    this.diagnosticsDialog = true;
+  }
+
+  closeDiagnostics() {
+    this.diagnosticsDialog = false;
+  }
+
   nextPage() {
     if (this.page + 1 <= this.numberOfPages) this.page += 1;
   }
@@ -155,177 +179,195 @@ export default class Landing extends Vue {
     if (this.page - 1 >= 1) this.page -= 1;
   }
 
-  checkDelete(streamid: string) {
-    this.deleteid = streamid;
-    this.dialog = true;
+  openStream(streamid: string) {
+    this.$router.push(`/${streamid}`);
   }
-  async agreeDelete() {
-    this.dialog = false;
-    const stream = this.carbonBranches.find((c) => c.id === this.deleteid);
-    if (stream) {
-      const input: DeleteBranchInput = {
-        streamid: stream.id,
-        branchid: stream.branchid,
-      };
-      try {
-        const deleted: DeleteStreamData = await this.$store.dispatch(
-          "deleteBranch",
-          input
-        );
-        if (deleted.data.branchDelete) {
-          this.deleteSuccess = true;
-          this.deleteSnack = true;
-          this.loadStreams();
-        } else {
-          this.deleteSuccess = false;
-          this.deleteSnack = true;
-        }
-      } catch (err) {
-        this.deleteSuccess = false;
-        this.deleteSnack = true;
-      }
-    }
+
+  closeErrorInfoDialog() {
+    this.errorInfoDialog = false;
+  }
+  openErrorInfoDialog() {
+    this.errorInfoDialog = true;
     return;
   }
-  cancelDelete() {
-    this.dialog = false;
-    this.deleteid = "";
+
+  landingErrorRerun(streamid: string) {
+    this.$router.push(`/assessment/${streamid}`);
   }
-  deleteSnackClose() {
-    this.error = false;
-    this.deleteSnack = false;
+  async landingErrorRetry(streamFolderError: StreamFolderError) {
+    let streamData = await this.getStreamData({
+      id: streamFolderError.streamId,
+      name: streamFolderError.streamName,
+      createdAt: streamFolderError.createdAt,
+    });
+
+    if (this.instaceOfProjectFolder(streamData)) {
+      this.projects = this.projects.map((p) =>
+        p.streamId === streamFolderError.streamId && streamData !== undefined
+          ? streamData
+          : p
+      );
+    }
+
+    streamFolderError.loading = false;
+  }
+
+  async getStreamData(streamID: StreamId): Promise<ProjectFolder | undefined> {
+    let carbonBranch: CarbonBranch;
+    let branchData: BranchData | BranchDataError;
+
+    const branches: GetStreamBranchesOutput = await this.$store.dispatch(
+      "getStreamBranches",
+      streamID.id
+    );
+    const mainreportidtemp = branches.reportBranches.find(
+      (rb) => rb.name === `${this.$store.state.speckleFolderName}/main`
+    )?.id;
+    const mainreportid = mainreportidtemp ? mainreportidtemp : "";
+
+    carbonBranch = {
+      id: streamID.id,
+      name: streamID.name,
+      branchid: mainreportid,
+      mainBranchID: branches.mainBranch.id,
+    };
+    if (carbonBranch.branchid === "") return;
+
+    try {
+      const streamCommitInput: GetStreamCommitInput = {
+        streamid: carbonBranch.id,
+        branchName: `${this.$store.state.speckleFolderName}/main`,
+      };
+      const branchCommit = await this.$store.dispatch(
+        "getStreamCommit",
+        streamCommitInput
+      );
+
+      const mainBranchCommits = await this.$store.dispatch(
+        "getMainStreamCommit",
+        carbonBranch.id
+      );
+
+      let carbonCommit = "";
+      if (branchCommit.data.stream.branch) {
+        carbonCommit =
+          branchCommit.data.stream.branch.commits.items[0].referencedObject;
+      }
+      let latestMainCommitObj = "";
+      if (mainBranchCommits.data.stream.branch) {
+        latestMainCommitObj =
+          mainBranchCommits.data.stream.branch.commits.items[0]
+            .referencedObject;
+      }
+
+      // Get data from the most recent arupcarbon branch
+      const getBranchDataInputs1: GetBranchDataInputs = {
+        streamid: carbonBranch.id,
+        objId: carbonCommit,
+      };
+      const latestCarbonBranchData: StreamData = await this.$store.dispatch(
+        "getBranchData",
+        getBranchDataInputs1
+      );
+
+      const getBranchDataInputs2: GetBranchDataInputs = {
+        streamid: carbonBranch.id,
+        objId: latestMainCommitObj,
+      };
+      const latestMainBranchData: StreamData = await this.$store.dispatch(
+        "getBranchData",
+        getBranchDataInputs2
+      );
+
+      const latestCarbonBranchCommit = new Date(
+        latestCarbonBranchData.data.stream.object.createdAt
+      ).getTime();
+      const latestMainBranchCommit = new Date(
+        latestMainBranchData.data.stream.object.createdAt
+      ).getTime();
+
+      const parent = await loadParent(
+        this.$store.state.selectedServer.url,
+        carbonBranch.id,
+        carbonCommit,
+        this.$store.state.token.token
+      );
+      const loadActReportDataInput: LoadActReportDataInput = {
+        streamId: carbonBranch.id,
+        branchName: "main",
+      };
+      const data: LoadStreamOut = await this.$store.dispatch(
+        "loadActReportData",
+        loadActReportDataInput
+      );
+
+      branchData = {
+        id: carbonBranch.id,
+        name: carbonBranch.name,
+        data,
+        projectDate: latestCarbonBranchData.data.stream.object.createdAt,
+        newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit,
+      };
+    } catch (err) {
+      branchData = {
+        id: carbonBranch.id,
+        name: carbonBranch.name,
+      };
+    }
+
+    if (instanceOfBranchData(branchData)) {
+      const projName = branchData.data.data.projectInfo.name;
+      return {
+        streamName: branchData.name,
+        streamId: branchData.id,
+        mainProject: {
+          title: `${projName} - ${branchData.name}`,
+          id: `${branchData.id}`,
+          co2Values: branchData.data.data.materialBreakdown.materials,
+          totalCO2e: branchData.data.data.projectInfo.totalCO2e,
+          link: "",
+          category: branchData.data.data.projectInfo.components,
+          projectDate: branchData.projectDate,
+          newMainAvailable: branchData.newMainAvailable,
+        },
+      };
+    } else
+      return {
+        streamId: branchData.id,
+        streamName: branchData.name,
+        createdAt: streamID.createdAt,
+        loading: false,
+      };
+  }
+
+  instaceOfProjectFolder(
+    item: ProjectFolder | undefined
+  ): item is ProjectFolder {
+    return !!item;
   }
 
   async loadStreams() {
     this.loading = true;
     this.error = false;
     this.projects = [];
-    this.carbonBranches = [];
-    this.branchData = [];
+
     try {
       // get all of the user's streams
       const streams = await this.$store.dispatch("getUserStreams");
       // format the streams into a more usable format
-      const streamID: { name: string; id: string; createdAt: string }[] =
-        streams.data.user.streams.items.map((stream: any) => {
-          return { name: stream.name, id: stream.id};
-        });
-
-      // get all of the branches that are on each stream
-      const streamBranches: {
-        branches: StreamReferenceBranches;
-        stream: { id: string; name: string; createdAt: string };
-      }[] = [];
-
-      for (let i = 0; i < streamID.length; i++) {
-        const branches: StreamReferenceBranches = await this.$store.dispatch(
-          "getStreamBranches",
-          streamID[i].id
-        );
-        streamBranches.push({ branches, stream: streamID[i] });
-      }
-
-      // filter those branches to only the "actcarbonreport" branches
-      // add any stream in its entiry if it contains a branch called 'actcarbonreport'
-      for (let i = 0; i < streamBranches.length; i++) {
-        // go through all items on streamBranches
-        streamBranches[i].branches.data.stream.branches.items.forEach(
-          (branch) => {
-            if (branch.name === "actcarbonreport") {
-              const mainBranch = streamBranches[i].branches.data.stream.branches.items.find(element => element.name === 'main');
-              this.carbonBranches.push({
-                ...streamBranches[i].stream,
-                branchid: branch.id,
-                mainBranchID: mainBranch?.id,
-              });
-            }
-          }
-        );
-      }
-
-      // get the most recent commit and the data from that commit
-      this.branchData = await Promise.all(
-        this.carbonBranches.map(async (cb) => {
-
-          const branchCommit = await this.$store.dispatch(
-            "getStreamCommit",
-            cb.id
-          );
-
-          const mainBranchCommits = await this.$store.dispatch(
-            "getMainStreamCommit",
-            cb.id
-          );
-
-          let carbonCommit = "";
-          if (branchCommit.data.stream.branch) {
-            carbonCommit =
-              branchCommit.data.stream.branch.commits.items[0].referencedObject;
-          }
-          let latestMainCommitObj = "";
-          if (mainBranchCommits.data.stream.branch) {
-            latestMainCommitObj =
-              mainBranchCommits.data.stream.branch.commits.items[0].referencedObject;
-          }
-
-          // Get data from the most recent arupcarbon branch
-          const latestCarbonBranchData: StreamData = await this.$store.dispatch("getBranchData", [
-            cb.id,
-            carbonCommit, 
-          ]);
-
-          const latestMainBranchData: StreamData = await this.$store.dispatch("getBranchData", [
-            cb.id,
-            latestMainCommitObj,
-          ]);
-
-          const latestCarbonBranchCommit = new Date(latestCarbonBranchData.data.stream.object.createdAt).getTime();
-          const latestMainBranchCommit = new Date(latestMainBranchData.data.stream.object.createdAt).getTime();
-          
-
-          const parent = await loadParent(
-            this.$store.state.selectedServer.url,
-            cb.id,
-            carbonCommit,
-            this.$store.state.token.token
-          );
-
-
-          return {
-            id: cb.id,
-            name: cb.name,
-            data: parent,
-            projectDate: latestCarbonBranchData.data.stream.object.createdAt,
-            newMainAvailable: latestMainBranchCommit > latestCarbonBranchCommit,
-          };
-        })
+      const streamIDs: StreamId[] = streams.data.user.streams.items.map(
+        (stream: any) => {
+          return { name: stream.name, id: stream.id };
+        }
       );
-      // convert the data into the format that this page needs it to be in
-      this.projects = await Promise.all(
-        this.branchData.map(async (proj) => {
-          const childrenData = await getChildren(
-            this.$store.state.selectedServer.url,
-            this.$store.state.token.token,
-            proj.id,
-            proj.data
-          );
-          const co2Data = extractCo2Data(proj.data, childrenData).materials;
 
-        const projName = proj.data.projectData.name;
-        return {
-          title: `${projName} - ${proj.name}`,
-          id: `${proj.id}`,
-          co2Values: co2Data,
-          totalCO2e: proj.data.totalCO2,
-          link: "",
-          category: proj.data.projectData.components,
-          projectDate: proj.projectDate,
-          newMainAvailable: proj.newMainAvailable,
-        };
-      }));
+      this.projects = await Promise.all(
+        streamIDs.map((sid) => this.getStreamData(sid))
+      ).then((sd) => sd.filter(this.instaceOfProjectFolder));
 
       this.loading = false;
     } catch (err) {
+      console.error(err);
       this.error = true;
       this.loading = false;
     }

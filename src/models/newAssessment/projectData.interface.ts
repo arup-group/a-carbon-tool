@@ -1,6 +1,6 @@
 export interface ProjectDataTemp {
   name: string | null;
-  components: string[] | null;
+  components: ProjectComponent[] | null;
   cost: number | null;
   floorArea: number | null;
   region: string | null;
@@ -8,9 +8,15 @@ export interface ProjectDataTemp {
   notes: string | null;
 }
 
+export interface ProjectComponent {
+  backgroundColor: string;
+  color: string;
+  name: string;
+}
+
 export interface ProjectDataComplete {
   name: string;
-  components: string[];
+  components: ProjectComponent[];
   cost: number;
   floorArea: number;
   region: string;

@@ -36,22 +36,24 @@
           </span>
           <span v-else></span>
           <span>
-            <landing-options @delete="checkDelete" />
+            <landing-options @delete="checkDelete" @edit="edit" />
             <v-select
               :menu-props="{ value: options }"
               v-if="options"
               :items="['one', 'two']"
             />
-            <v-btn icon color="primary">
-              <v-icon>mdi-share-variant</v-icon>
-            </v-btn>
             <v-btn icon color="primary" @click="open">
               <v-icon>mdi-open-in-new</v-icon>
             </v-btn>
           </span>
         </v-card-actions>
-        <v-overlay class="d-flex align-start" :absolute="true" :z-index="0" :opacity="0.98" :value="cardOverlay">
-
+        <v-overlay
+          class="d-flex align-start"
+          :absolute="true"
+          :z-index="0"
+          :opacity="0.98"
+          :value="cardOverlay"
+        >
           <v-col class="d-flex align-start">
             <v-col class="d-flex align-end flex-column">
               <v-btn icon color="red darken-1" @click="cardOverlay = false">
@@ -59,15 +61,11 @@
               </v-btn>
             </v-col>
           </v-col>
-
-        
-            <v-col>
-              <v-card-text class="d-flex align-end mb-6">
-                Theres an update on main branch, use edit to update your report.
-              </v-card-text>
-            </v-col>
-          
-
+          <v-col>
+            <v-card-text class="d-flex align-end mb-6">
+              There is an update on the main branch. Use the edit option to update your report.
+            </v-card-text>
+          </v-col>
         </v-overlay>
       </v-card>
     </v-sheet>
@@ -103,7 +101,7 @@ export default class ProjectCard extends Vue {
     }));
   }
   get co2Total() {
-    return this.convertKgToTonnes(this.project.totalCO2e).toLocaleString('en');
+    return this.project.totalCO2e;
   }
 
   get branchDate() {
@@ -128,14 +126,19 @@ export default class ProjectCard extends Vue {
     return this.project.id;
   }
 
+  @Emit("edit")
+  edit() {
+    return this.project.id;
+  }
+
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp
     return Math.round(value * 0.001);
   }
 
+  @Emit("open")
   open() {
-    // MAY NEED TO UPDATE DEPENDING ON HOW ASSESSMENT/VIEW ENDS UP WORKING
-    this.$router.push(`/assessment/view/${this.project.id}`);
+    return this.project.id;
   }
 }
 </script>

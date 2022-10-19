@@ -24,21 +24,24 @@ import BECChip from "./BECChip.vue";
 export default class BECChipGroup extends Vue {
   @Prop() categories!: string[];
   showDots = this.moreThanTwoCats ? true : false;
+  get cats() {
+    return this.categories ? this.categories : [];
+  }
 
   get moreThanTwoCats() {
-    return [...this.categories].length > 2;
+    return [...this.cats].length > 2;
   }
 
   get firstTwoCategories() {
-    if ([...this.categories].length > 1) {
-      return [...this.categories.slice(0, 2)];
+    if ([...this.cats].length > 1) {
+      return [...this.cats.slice(0, 2)];
     } else {
-      return [...this.categories];
+      return [...this.cats];
     }
   }
 
   get dotCat() {
-    return "+" + ([...this.categories].length - 2) + " more...";
+    return "+" + ([...this.cats].length - 2) + " more...";
   }
 
   switchShowDots() {

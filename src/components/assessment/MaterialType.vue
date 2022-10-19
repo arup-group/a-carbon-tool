@@ -10,12 +10,18 @@
   >
     <v-row dense align="center">
       <v-col cols="12" md="4" class="pl-2">
-        <v-chip>
-          {{ cleanType(type.type) }}
-        </v-chip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
+              {{ cleanType(type.type) }}
+            </v-chip>
+          </template>
+          <span>Objects: {{ type.ids.length }} </span>
+        </v-tooltip>
       </v-col>
       <v-col coles="12" md="8" class="pr-2">
         <v-combobox
+          v-model="currentMaterial"
           :items="materials"
           :item-text="(materials) => materials['name']"
           @change="checkMaterialUpdated"
@@ -35,7 +41,7 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MaterialUpdateOut, SpeckleType } from "@/models/newAssessment";
+import { MaterialUpdateOut, SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
@@ -43,6 +49,21 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: SpeckleType;
+
+  currentMaterial = this.type && this.type.material ? this.type.material : null;
+  filtered = true;
+
+  mounted() {
+    this.currentMaterial = this.type && this.type.material ? this.type.material : null;
+  }
+
+  @Emit("selectMaterial")
+  selectMaterial(): SelectedMaterialEmit {
+    return {
+      ids: this.type.ids,
+      type: this.type.type
+    };
+  }
 
   cleanType(type: string) {
     const typeArr = type.split(".");
@@ -80,7 +101,8 @@ export default class MaterialType extends Vue {
     };
   }
 
-  instanceOfMaterialFull(object: any): object is MaterialFull {
+
+instanceOfMaterialFull(object: any): object is MaterialFull {
     return "name" in object;
   }
 }

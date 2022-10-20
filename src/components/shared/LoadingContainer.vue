@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!loading && !error">
+    <div v-if="!loading && !error" style="width: 100%">
       <slot v-bind:loaded="loaded">{{ loaded }}</slot>
     </div>
     <loading-spinner v-else-if="loading && !error" />

@@ -4,22 +4,24 @@
       <v-sheet outlined color="primary" rounded style="min-height: 35rem">
         <v-card flat style="min-height: 35rem" class="d-flex flex-column">
           <v-card-title>{{ title }}</v-card-title>
-          <loading-container :error="error" :loading="loading" @retry="retry" class="d-flex align-center">
-            <v-card-text>
-              <v-row justify="start" class="text--primary" fill-height dense>
-                <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
-                <v-col align="right" cols="6"> updated: {{ branchDate }}</v-col>
-              </v-row>
-            </v-card-text>
-            <v-divider class="mx-4"></v-divider>
-            <v-card-actions
-              style="margin-bottom: auto"
-              class="justify-center py-0"
-            >
-              <v-card flat width="80%" class="ma-0 pa-0 mx-auto">
-                <DoughnutChart :data="co2Values" :chartData="{}" />
-              </v-card>
-            </v-card-actions>
+          <loading-container :error="error" :loading="loading" @retry="retry" class="d-flex align-center" style="width: 100%">
+            <template style="width: 100%">
+              <v-card-text>
+                <v-row justify="start" class="text--primary" fill-height dense>
+                  <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
+                  <v-col align="right" cols="6"> updated: {{ branchDate }}</v-col>
+                </v-row>
+              </v-card-text>
+              <v-divider class="mx-4"></v-divider>
+              <v-card-actions
+                style="margin-bottom: auto"
+                class="justify-center py-0"
+              >
+                <v-card flat width="80%" class="ma-0 pa-0 mx-auto">
+                  <DoughnutChart :data="co2Values" :chartData="{}" />
+                </v-card>
+              </v-card-actions>
+            </template>
           </loading-container>
           <v-expand-transition>
             <v-card

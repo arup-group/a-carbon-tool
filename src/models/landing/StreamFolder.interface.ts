@@ -13,6 +13,15 @@ export interface StreamFolderError {
   loading: boolean;
 }
 
+export interface StreamFolderLoading {
+  streamName: string;
+  streamId: string;
+}
+
 export function instanceOfStreamFolder(object: any): object is StreamFolder {
   return "mainProject" in object;
+}
+
+export function instanceOfStreamFolderLoading(object: any): object is StreamFolderLoading {
+  return "streamName" in object && "streamId" in object && !("mainProject" in object);
 }

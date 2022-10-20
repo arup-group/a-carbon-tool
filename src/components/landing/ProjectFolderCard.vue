@@ -1,24 +1,26 @@
 <template>
   <v-container>
     <v-hover v-slot="{ hover }">
-      <v-sheet outlined color="primary" rounded height="100%">
-        <v-card flat height="100%" class="d-flex flex-column">
+      <v-sheet outlined color="primary" rounded style="min-height: 35rem">
+        <v-card flat style="min-height: 35rem" class="d-flex flex-column">
           <v-card-title>{{ title }}</v-card-title>
-          <v-card-text>
-            <v-row justify="start" class="text--primary" fill-height dense>
-              <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
-              <v-col align="right" cols="6"> updated: {{ branchDate }}</v-col>
-            </v-row>
-          </v-card-text>
-          <v-divider class="mx-4"></v-divider>
-          <v-card-actions
-            style="margin-bottom: auto"
-            class="justify-center py-0"
-          >
-            <v-card flat width="80%" class="ma-0 pa-0 mx-auto">
-              <DoughnutChart :data="co2Values" :chartData="{}" />
-            </v-card>
-          </v-card-actions>
+          <loading-container :error="error" :loading="loading" @retry="retry" class="d-flex align-center">
+            <v-card-text>
+              <v-row justify="start" class="text--primary" fill-height dense>
+                <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
+                <v-col align="right" cols="6"> updated: {{ branchDate }}</v-col>
+              </v-row>
+            </v-card-text>
+            <v-divider class="mx-4"></v-divider>
+            <v-card-actions
+              style="margin-bottom: auto"
+              class="justify-center py-0"
+            >
+              <v-card flat width="80%" class="ma-0 pa-0 mx-auto">
+                <DoughnutChart :data="co2Values" :chartData="{}" />
+              </v-card>
+            </v-card-actions>
+          </loading-container>
           <v-expand-transition>
             <v-card
               v-if="hover"
@@ -35,40 +37,59 @@
 </template>
 <script lang="ts">
 import { ChartData } from "@/models/chart";
-import { StreamFolder } from "@/models/landing";
+import {
+  instanceOfStreamFolder,
+  StreamFolder,
+  StreamFolderLoading,
+} from "@/models/landing";
+import { instanceOfProject } from "@/models/project";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import DoughnutChart from "../charts/DoughnutChart.vue";
+import LoadingContainer from "../shared/LoadingContainer.vue";
 
 @Component({
-  components: { DoughnutChart },
+  components: { DoughnutChart, LoadingContainer },
 })
 export default class ProjectFolderCard extends Vue {
-  @Prop() stream!: StreamFolder;
+  @Prop() stream!: StreamFolder | StreamFolderLoading;
+  @Prop() loading!: boolean;
+
+  error = false;
+  retry() {
+    return;
+  }
 
   get title() {
     return this.stream.streamName;
   }
 
   get project() {
-    return this.stream.mainProject;
+    if (instanceOfStreamFolder(this.stream)) return this.stream.mainProject;
+    else return {};
   }
 
   get branchDate() {
-    const branchDate = new Date(Date.parse(this.project.projectDate));
-    const enGBFormatter = new Intl.DateTimeFormat("en-GB");
-    const branchDateFormatted = enGBFormatter.format(branchDate);
-    return branchDateFormatted;
+    if (instanceOfProject(this.project)) {
+      const branchDate = new Date(Date.parse(this.project.projectDate));
+      const enGBFormatter = new Intl.DateTimeFormat("en-GB");
+      const branchDateFormatted = enGBFormatter.format(branchDate);
+      return branchDateFormatted;
+    } else return "";
   }
   get co2Total() {
-    return this.project.totalCO2e;
+    if (instanceOfProject(this.project))
+      return this.project.totalCO2e;
+    else return 0;
   }
   get co2Values(): ChartData[] {
-    return this.project.co2Values.map((c) => ({
-      label: c.label,
-      value: this.convertKgToTonnes(c.value),
-      color: c.color,
-    }));
+    if (instanceOfProject(this.project)) {
+      return this.project.co2Values.map((c) => ({
+        label: c.label,
+        value: this.convertKgToTonnes(c.value),
+        color: c.color,
+      }));
+    } return [];
   }
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp

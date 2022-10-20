@@ -41,6 +41,7 @@
                   <project-folder-card
                     v-else-if="projectError(item)"
                     :stream="item"
+                    :loading="cardsLoading"
                     @openStream="openStream"
                   />
                   <landing-error
@@ -97,9 +98,11 @@ import {
   StreamFolder,
   instanceOfBranchData,
   instanceOfStreamFolder,
+  instanceOfStreamFolderLoading,
   BranchDataError,
   StreamFolderError,
   AllStreams,
+  StreamFolderLoading
 } from "@/models/landing";
 
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -112,7 +115,7 @@ import DiagnosticsDialog from "@/components/landing/DiagnosticsDialog.vue";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
-type ProjectFolder = StreamFolder | StreamFolderError;
+type ProjectFolder = StreamFolder | StreamFolderError | StreamFolderLoading;
 
 @Component({
   components: {
@@ -139,10 +142,12 @@ export default class Landing extends Vue {
   diagnosticsStreamid = "";
   diagnosticKey = 0;
 
+  cardsLoading = true;
+
   async mounted() {
     this.token = this.$store.state.token.token;
     this.test_loadStreams();
-    this.loadStreams();
+    // this.loadStreams();
   }
 
   async test_loadStreams() {
@@ -150,6 +155,11 @@ export default class Landing extends Vue {
     const filteredStreams = allStreams.data.streams.items.filter(s => s.actBranch && s.actBranch.commits.items.length > 0);
     console.log("allStreams:", allStreams);
     console.log("filteredStreams:", filteredStreams);
+    this.projects = filteredStreams.map((fs): StreamFolderLoading => {
+      return { streamName: fs.name, streamId: fs.id }
+    });
+    console.log("this.projects:", this.projects);
+    this.loading = false;
     // ready to display cards at this point, just no graph
     const reports = await Promise.all(filteredStreams.map(async (s) => {
       if (s.actBranch) {
@@ -186,6 +196,9 @@ export default class Landing extends Vue {
       } else return null;
     }));
     console.log("reports:", reports);
+
+    this.projects = reports as ProjectFolder[];
+    this.cardsLoading = false;
   }
 
   newAssessment() {
@@ -193,7 +206,7 @@ export default class Landing extends Vue {
   }
 
   projectError(item: ProjectFolder) {
-    return instanceOfStreamFolder(item);
+    return instanceOfStreamFolder(item) || instanceOfStreamFolderLoading(item);
   }
 
   get numberOfPages() {

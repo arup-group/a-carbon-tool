@@ -4,12 +4,21 @@
       <v-sheet outlined color="primary" rounded style="min-height: 35rem">
         <v-card flat style="min-height: 35rem" class="d-flex flex-column">
           <v-card-title>{{ title }}</v-card-title>
-          <loading-container :error="error" :loading="loading" @retry="retry" class="d-flex align-center" style="width: 100%">
+          <loading-container
+            :error="error"
+            :loading="loading"
+            :line="true"
+            @retry="retry"
+            class="d-flex align-center"
+            style="width: 100%"
+          >
             <template style="width: 100%">
               <v-card-text>
                 <v-row justify="start" class="text--primary" fill-height dense>
                   <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
-                  <v-col align="right" cols="6"> updated: {{ branchDate }}</v-col>
+                  <v-col align="right" cols="6">
+                    updated: {{ branchDate }}</v-col
+                  >
                 </v-row>
               </v-card-text>
               <v-divider class="mx-4"></v-divider>
@@ -80,8 +89,7 @@ export default class ProjectFolderCard extends Vue {
     } else return "";
   }
   get co2Total() {
-    if (instanceOfProject(this.project))
-      return this.project.totalCO2e;
+    if (instanceOfProject(this.project)) return this.project.totalCO2e;
     else return 0;
   }
   get co2Values(): ChartData[] {
@@ -91,7 +99,8 @@ export default class ProjectFolderCard extends Vue {
         value: this.convertKgToTonnes(c.value),
         color: c.color,
       }));
-    } return [];
+    }
+    return [];
   }
   convertKgToTonnes(value: number) {
     // converts kg to tonnes and rounds to 2 dp

@@ -1,9 +1,9 @@
 <template>
   <v-main class="mr-7 ml-7 pb-4">
     <landing-header />
-    <loading-container :error="error" :loading="loading" @retry="loadStreams">
+    <!-- <loading-container :error="error" :loading="loading" @retry="loadStreams">
       <template v-slot="{ loaded }">
-        <v-container v-if="loaded">
+        <v-container v-if="loaded"> -->
           <v-data-iterator
             :items="projectData"
             :items-per-page.sync="itemsPerPage"
@@ -38,6 +38,7 @@
                     v-if="item.title === 'New Assessment'"
                     @newAssessment="newAssessment"
                   />
+                  <loading-spinner v-else-if="item.title === 'loading'" />
                   <project-folder-card
                     v-else-if="projectError(item)"
                     :stream="item"
@@ -64,9 +65,9 @@
               />
             </template>
           </v-data-iterator>
-        </v-container>
+        <!-- </v-container>
       </template>
-    </loading-container>
+    </loading-container> -->
     <error-info-dialog
       :dialog="errorInfoDialog"
       @close="closeErrorInfoDialog"
@@ -115,6 +116,7 @@ import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
 import LandingError from "@/components/landing/LandingError.vue";
 import ErrorInfoDialog from "@/components/landing/ErrorInfoDialog.vue";
 import DiagnosticsDialog from "@/components/landing/DiagnosticsDialog.vue";
+import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 
@@ -130,6 +132,7 @@ type ProjectFolder = StreamFolder | StreamFolderError | StreamFolderLoading;
     LandingError,
     ErrorInfoDialog,
     DiagnosticsDialog,
+    LoadingSpinner,
   },
 })
 export default class Landing extends Vue {
@@ -173,13 +176,14 @@ export default class Landing extends Vue {
     );
     console.log("reports:", reports);
 
-    this.projects = reports.filter(this.instaceOfProjectFolder);
+    this.projects = reports;
     this.cardsLoading = false;
   }
 
   async loadProjectFolder(
     s: LandingUserStreamFull
-  ): Promise<ProjectFolder | undefined> {
+  ): Promise<ProjectFolder> {
+    try {
       // update available
       const newMainAvailable = this.loadNewMainDate(s);
 
@@ -201,6 +205,15 @@ export default class Landing extends Vue {
         },
       };
       return returnObj;
+    } catch(err) {
+      console.error(err);
+      return {
+        streamId: s.id,
+        streamName: s.name,
+        createdAt: s.actBranch.commits.items[0].createdAt,
+        loading: false,
+      }
+    }
   }
 
   loadNewMainDate(s: LandingUserStreamFull) {
@@ -237,7 +250,8 @@ export default class Landing extends Vue {
   }
 
   get projectData() {
-    return [{ title: "New Assessment" }, ...this.projects];
+    if (this.projects.length > 0) return [{ title: "New Assessment" }, ...this.projects];
+    else return [{ title: "New Assessment" }, { title: "loading" }];
   }
 
   runDiagnostics(streamid: string) {

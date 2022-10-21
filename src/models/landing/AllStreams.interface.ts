@@ -1,17 +1,30 @@
-export interface AllStreams {
+export interface LandingUserStreams {
   data: {
     streams: {
-      items: {
-        actBranch?: Branch;
-        mainBranch: Branch;
-        name: string;
-        id: string;
-      }[];
+      items: (LandingUserStream | LandingUserStreamFull)[];
     };
   };
 }
 
-interface Branch {
+export interface LandingUserStream {
+  actBranch?: LandingUserStreamsBranch;
+  mainBranch: LandingUserStreamsBranch;
+  name: string;
+  id: string;
+}
+
+export interface LandingUserStreamFull {
+  actBranch: LandingUserStreamsBranch;
+  mainBranch: LandingUserStreamsBranch;
+  name: string;
+  id: string;
+}
+
+export function instanceOfLandingUserStreamFull(object: any): object is LandingUserStreamFull {
+  return "actBranch" in object && "mainBranch" in object;
+}
+
+export interface LandingUserStreamsBranch {
   id: string;
   name: string;
   commits: {

@@ -16,7 +16,7 @@ import * as queries from "./graphql/speckleQueries";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
 
 import { StreamName } from "@/models/graphql/StreamName.interface";
-import { AllStreams } from "@/models/landing";
+import { LandingUserStreams } from "@/models/landing";
 
 const APP_NAME = process.env.VUE_APP_SPECKLE_NAME;
 const CHALLENGE = `${APP_NAME}.Challenge`;
@@ -248,4 +248,4 @@ export const streamNameBranches = (
 
 export const carbonStreams = (
   context: any
-): Promise<AllStreams> => speckleFetch(queries.carbonStreams(), context);
+): Promise<LandingUserStreams> => speckleFetch(queries.carbonStreams(), context);

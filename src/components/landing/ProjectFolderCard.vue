@@ -50,8 +50,8 @@
 import { ChartData } from "@/models/chart";
 import {
   instanceOfStreamFolder,
-  StreamFolder,
-  StreamFolderLoading,
+  instanceOfStreamFolderLoading,
+  ProjectFolder,
 } from "@/models/landing";
 import { instanceOfProject } from "@/models/project";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
@@ -63,12 +63,15 @@ import LoadingContainer from "../shared/LoadingContainer.vue";
   components: { DoughnutChart, LoadingContainer },
 })
 export default class ProjectFolderCard extends Vue {
-  @Prop() stream!: StreamFolder | StreamFolderLoading;
-  @Prop() loading!: boolean;
+  @Prop() stream!: ProjectFolder;
 
   error = false;
   retry() {
     return;
+  }
+
+  get loading() {
+    return instanceOfStreamFolderLoading(this.stream);
   }
 
   get title() {

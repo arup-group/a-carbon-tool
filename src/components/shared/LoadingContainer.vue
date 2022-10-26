@@ -5,12 +5,12 @@
     </div>
     <loading-spinner v-else-if="loading && !error && !line" />
     <div v-else-if="line">
-        <v-progress-linear
-          :active="loading"
-          :indeterminate="loading"
-          absolute
-          color="primary"
-        ></v-progress-linear>
+      <v-progress-linear
+        :active="loading"
+        :indeterminate="loading"
+        absolute
+        color="primary"
+      ></v-progress-linear>
     </div>
     <error-retry v-else @retry="retry" />
   </div>

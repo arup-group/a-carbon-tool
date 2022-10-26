@@ -36,7 +36,7 @@
             <v-card
               v-if="hover"
               class="transition-fast-in-fast-out v-card--reveal d-flex justify-center align-center"
-              style="height: 100%"
+              style="height: 100%; z-index: 1"
             >
               <v-btn @click="openStream">Open Stream</v-btn>
             </v-card>

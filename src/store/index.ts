@@ -370,7 +370,7 @@ export default new Vuex.Store({
         `${context.state.speckleFolderName}/${branchName}`
       );
     },
-    async testLoadActReportData(context) {
+    async carbonStreams(context) {
       return await speckleUtil.carbonStreams(context);
     },
     async getObjectUrls(context, streamid: string) {

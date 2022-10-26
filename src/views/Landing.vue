@@ -80,8 +80,7 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 
-import { LoadActReportDataInput } from "@/store";
-import { LoadStreamOut } from "../views/utils/viewAssessmentUtils";
+import { loadStream } from "../views/utils/viewAssessmentUtils";
 import {
   StreamFolderError,
   LandingUserStreams,
@@ -143,7 +142,7 @@ export default class Landing extends Vue {
     this.projectFolderController.projectFolders = [];
     try {
       const allStreams: LandingUserStreams = await this.$store.dispatch(
-        "testLoadActReportData"
+        "carbonStreams"
       );
       const filteredStreams = allStreams.data.streams.items
         .filter(instanceOfLandingUserStreamFull)
@@ -201,18 +200,14 @@ export default class Landing extends Vue {
   loadNewMainDate(s: LandingUserStreamFull) {
     const mainDate = new Date(s.mainBranch.commits.items[0].createdAt);
     const reportDate = new Date(s.actBranch.commits.items[0].createdAt);
-    const newMainAvailable = mainDate > reportDate;
-    return newMainAvailable;
+    return mainDate > reportDate;
   }
 
   async loadReportData(s: LandingUserStreamFull) {
-    const loadActReportDataInput: LoadActReportDataInput = {
-      streamId: s.id,
-      branchName: "main",
-    };
-    const data: LoadStreamOut = await this.$store.dispatch(
-      "loadActReportData",
-      loadActReportDataInput
+    const data = await loadStream(
+      this.$store,
+      s.id,
+      `${this.$store.state.speckleFolderName}/main`
     );
     return data.data;
   }

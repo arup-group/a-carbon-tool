@@ -16,7 +16,7 @@
               icon
               color="primary"
               class="ml-1"
-              @click.stop="dialog = true"
+              @click.stop="declarationDialog = true"
             >
               <v-icon>mdi-information-outline</v-icon>
             </v-btn>
@@ -50,7 +50,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <declaration-dialog :dialog="dialog" @close="closeDialog" />
+    <declaration-dialog :dialog="declarationDialog" @close="closeDeclarationDialog" />
   </v-main>
 </template>
 
@@ -65,9 +65,9 @@ import DeclarationDialog from "@/components/login/DeclarationDialog.vue";
   components: { LoginCard, DeclarationDialog },
 })
 export default class Login extends Vue {
-  dialog = window.localStorage.getItem("hide-dialog") !== "true";
-  closeDialog() {
-    this.dialog = false;
+  declarationDialog = window.localStorage.getItem("hide-dialog") !== "true";
+  closeDeclarationDialog() {
+    this.declarationDialog = false;
     window.localStorage.setItem("hide-dialog", "true");
   }
 

@@ -13,7 +13,9 @@
           ></v-combobox>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn text color="primary" :disabled="!valid" @click="submit">Submit</v-btn>
+          <v-btn text color="primary" :disabled="!valid" @click="submit"
+            >Submit</v-btn
+          >
           <v-btn text color="primary" @click="close">Close</v-btn>
         </v-card-actions>
       </v-form>
@@ -21,17 +23,27 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { Server } from "@/models/auth";
+import { CustomServerStorage } from "@/models/auth";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
-type Rule = (value: string) => boolean | string
+type Rule = (value: string) => boolean | string;
 
 @Component
 export default class CustomServerDialog extends Vue {
   @Prop() dialog!: boolean;
 
-  server = "";
-  storedServers = [];
+  lastServer = localStorage.getItem(CustomServerStorage.LAST_SERVER);
+
+  server =  this.lastServer ? this.lastServer.slice(1,-1) : "";
+  get storedServers() {
+    const customServers = localStorage.getItem(
+      CustomServerStorage.CUSTOM_SERVERS
+    );
+    let customServersJson: string[]; // array of server urls
+    if (customServers) customServersJson = JSON.parse(customServers);
+    else customServersJson = [];
+    return customServersJson;
+  }
   valid = true;
 
   activeUrlRules: Rule[] = [];

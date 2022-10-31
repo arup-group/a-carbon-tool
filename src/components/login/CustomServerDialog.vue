@@ -4,9 +4,6 @@
       <v-card-title>Custom Server</v-card-title>
       <v-form v-model="valid">
         <v-card-text>
-          <div v-if="error">
-            <p style="{ color: red; }">Error logging into server</p>
-          </div>
           <v-combobox
             v-model="server"
             @input.native="onChange"
@@ -24,6 +21,7 @@
   </v-dialog>
 </template>
 <script lang="ts">
+import { Server } from "@/models/auth";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 type Rule = (value: string) => boolean | string
@@ -71,7 +69,7 @@ export default class CustomServerDialog extends Vue {
   @Emit("submit")
   emitSubmit() {
     console.log("submit:", this.server);
-    return this.server;;
+    return this.server;
   }
 }
 </script>

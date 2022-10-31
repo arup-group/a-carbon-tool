@@ -56,6 +56,7 @@
     />
     <custom-server-dialog
       :dialog="customServerDialog"
+      @submit="customLogin"
       @close="closeCustomServerDialog"
     />
   </v-main>
@@ -81,6 +82,12 @@ export default class Login extends Vue {
   }
 
   servers: Servers = this.$store.state.servers;
+
+  customLogin(server: string) {
+    const s = this.servers.custom;
+    s.url = server;
+    this.logIn(s);
+  }
 
   logIn(server: Server) {
     this.$store.dispatch("redirectToAuth", server);

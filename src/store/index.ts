@@ -46,6 +46,12 @@ export default new Vuex.Store({
         speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
       },
+      custom: {
+        region: "custom",
+        url: "",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_CUSTOM,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_CUSTOM,
+      }
     },
     selectedServer: {} as Server, // should be a server object
     token: {} as Token, // should be a Token object

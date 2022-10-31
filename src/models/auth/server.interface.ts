@@ -8,4 +8,5 @@ export interface Server {
 export interface Servers {
   arup: Server;
   xyz_server: Server;
+  custom: Server;
 }

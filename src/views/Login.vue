@@ -27,7 +27,7 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="9" class="d-flex justify-center align-center">
-        <LoginCard :servers="servers" @submit="logIn" />
+        <LoginCard :servers="servers" @submit="logIn" @openCustomServerDialog="openCustomServerDialog" />
       </v-col>
       <v-col cols="12">
         <v-card flat :color="this.$store.state.darkMode ? '#121212' : ''">
@@ -50,19 +50,28 @@
         </v-card>
       </v-col>
     </v-row>
-    <declaration-dialog :dialog="declarationDialog" @close="closeDeclarationDialog" />
+    <declaration-dialog
+      :dialog="declarationDialog"
+      @close="closeDeclarationDialog"
+    />
+    <custom-server-dialog
+      :dialog="customServerDialog"
+      @close="closeCustomServerDialog"
+    />
   </v-main>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 
-import { Server } from "@/models/auth/";
+import { Server, Servers } from "@/models/auth/";
+
 import LoginCard from "@/components/login/LoginCard.vue";
 import DeclarationDialog from "@/components/login/DeclarationDialog.vue";
+import CustomServerDialog from "@/components/login/CustomServerDialog.vue";
 
 @Component({
-  components: { LoginCard, DeclarationDialog },
+  components: { LoginCard, DeclarationDialog, CustomServerDialog },
 })
 export default class Login extends Vue {
   declarationDialog = window.localStorage.getItem("hide-dialog") !== "true";
@@ -71,10 +80,18 @@ export default class Login extends Vue {
     window.localStorage.setItem("hide-dialog", "true");
   }
 
-  servers: { arup: Server; xyz_server: Server } = this.$store.state.servers;
+  servers: Servers = this.$store.state.servers;
 
   logIn(server: Server) {
     this.$store.dispatch("redirectToAuth", server);
+  }
+
+  customServerDialog = false;
+  openCustomServerDialog() {
+    this.customServerDialog = true;
+  }
+  closeCustomServerDialog() {
+    this.customServerDialog = false;
   }
 }
 </script>

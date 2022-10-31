@@ -4,3 +4,8 @@ export interface Server {
   speckleId: string;
   speckleSecret: string;
 }
+
+export interface Servers {
+  arup: Server;
+  xyz_server: Server;
+}

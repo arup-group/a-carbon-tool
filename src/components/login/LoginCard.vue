@@ -26,11 +26,22 @@
             <v-btn
               outlined
               color="primary"
-              class="mb-4"
+              class="mb-2"
               type="submit"
               @click="signIn('arup')"
             >
               Arup Staff
+            </v-btn>
+          </v-col>
+          <v-col cols="12" align="center">
+            <v-btn
+              outlined
+              color="warning"
+              class="mb-4"
+              type="submit"
+              @click="openCustomServerDialog"
+            >
+              Custom server
             </v-btn>
           </v-col>
         </v-row>
@@ -40,12 +51,17 @@
 </template>
 
 <script lang="ts">
-import { Server } from "@/models/auth/";
+import { Server, Servers } from "@/models/auth/";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component({})
 export default class LoginCard extends Vue {
-  @Prop() servers!: { arup: Server; xyz_server: Server };
+  @Prop() servers!: Servers;
+
+  @Emit("openCustomServerDialog")
+  openCustomServerDialog() {
+    return;
+  }
 
   signIn(serverDestination: string) {
     if (serverDestination === "arup") {

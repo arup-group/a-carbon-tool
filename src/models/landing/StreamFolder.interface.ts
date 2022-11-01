@@ -46,13 +46,11 @@ export class ProjectFolderController {
   }
 
   updateSingle(folder: ProjectFolder) {
-    let updated = false;
     const arr = [...this.projectFolders]
 
     for (let i = 0; i < arr.length; i++) {
       if (arr[i].streamId === folder.streamId) {
         arr[i] = folder;
-        updated = true;
       }
     }
 

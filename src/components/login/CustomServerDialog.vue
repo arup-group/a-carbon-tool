@@ -76,12 +76,10 @@ export default class CustomServerDialog extends Vue {
   submit() {
     this.activeUrlRules = this.urlRules;
     if (this.isURL(this.server)) this.emitSubmit();
-    else console.log("not valid");
   }
 
   @Emit("submit")
   emitSubmit() {
-    console.log("submit:", this.server);
     return this.server;
   }
 }

@@ -181,7 +181,9 @@ export default class Comparison extends Vue {
         link: "",
         category: d.data.data.projectInfo.components,
         totalCO2e: d.data.data.projectInfo.totalCO2e * 1000,
-        projectDate: "",
+        projectDate: new Date(
+          d.data.data.projectInfo.reportDate
+        ).toDateString(),
         newMainAvailable: false,
         aValues: d.data.data.aBreakdown.levels.map((l) => ({
           value: l.tCO2e,

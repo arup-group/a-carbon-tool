@@ -14,9 +14,17 @@
           </v-row>
         </v-card-title>
         <v-card-text>
-          <v-row justify="start" class="text--primary" fill-height dense>
-            <v-col cols="6"> {{ co2Total }} tCO2e </v-col>
-          </v-row>
+          <v-col
+            justify="start"
+            class="text--primary pt-1 pb-1"
+            fill-height
+            dense
+          >
+            <v-col cols="6" class="pt-0 pb-0"> {{ co2Total }} tCO2e </v-col>
+            <v-col cols="6" class="pt-0 pb-0">
+              {{ branchDate }}
+            </v-col>
+          </v-col>
           <v-divider class="mb-4 mt-2"></v-divider>
           <v-row>
             <v-col cols="12" :lg="materialGraphLgCols" align="center">
@@ -83,6 +91,16 @@ export default class HistoryProjectCard extends Vue {
   }
   get category() {
     return this.project.category;
+  }
+
+  get branchDate() {
+    if (this.project.projectDate) {
+      const branchDate = new Date(Date.parse(this.project.projectDate));
+      const enGBFormatter = new Intl.DateTimeFormat("en-GB");
+      const branchDateFormatted = enGBFormatter.format(branchDate);
+      return branchDateFormatted;
+    }
+    return "N/A";
   }
 
   // filters getters

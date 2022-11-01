@@ -12,10 +12,20 @@
               <v-icon x-large color="red darken-1">mdi-alert</v-icon>
             </v-btn>
             <div class="justify-space-around pt-5">
-              <v-btn class="mr-3" @click="retry" outlined color="primary">
+              <v-btn
+                class="mr-3 mb-3 mt-3"
+                @click="retry"
+                outlined
+                color="primary"
+              >
                 Retry
               </v-btn>
-              <v-btn class="mr-3" @click="rerun" outlined color="primary">
+              <v-btn
+                class="mr-3 mb-3 mt-3"
+                @click="rerun"
+                outlined
+                color="primary"
+              >
                 Rerun report
               </v-btn>
               <v-btn @click="diagnostics" outlined color="primary">

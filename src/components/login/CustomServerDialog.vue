@@ -4,6 +4,7 @@
       <v-card-title>Custom Server</v-card-title>
       <v-form v-model="valid">
         <v-card-text>
+          <p>Please enter the url of your Speckle server. Note: this feature currently only works with Arup Speckle servers</p>
           <v-combobox
             v-model="server"
             @input.native="onChange"

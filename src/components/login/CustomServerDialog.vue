@@ -2,9 +2,12 @@
   <v-dialog v-model="dialog" max-width="640" persistent>
     <v-card>
       <v-card-title>Custom Server</v-card-title>
-      <v-form v-model="valid">
+      <v-form v-model="valid" @submit.prevent="submit">
         <v-card-text>
-          <p>Please enter the url of your Speckle server. Note: this feature currently only works with Arup Speckle servers</p>
+          <p>
+            Please enter the url of your Speckle server. Note: this feature
+            currently only works with Arup Speckle servers
+          </p>
           <v-combobox
             v-model="server"
             @input.native="onChange"
@@ -14,7 +17,7 @@
           ></v-combobox>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn text color="primary" :disabled="!valid" @click="submit"
+          <v-btn text color="primary" :disabled="!valid" type="submit"
             >Submit</v-btn
           >
           <v-btn text color="primary" @click="close">Close</v-btn>
@@ -35,7 +38,7 @@ export default class CustomServerDialog extends Vue {
 
   lastServer = localStorage.getItem(CustomServerStorage.LAST_SERVER);
 
-  server =  this.lastServer ? this.lastServer.slice(1,-1) : "";
+  server = this.lastServer ? this.lastServer.slice(1, -1) : "";
   get storedServers() {
     const customServers = localStorage.getItem(
       CustomServerStorage.CUSTOM_SERVERS
@@ -80,6 +83,7 @@ export default class CustomServerDialog extends Vue {
 
   @Emit("submit")
   emitSubmit() {
+    if (this.server.endsWith("/")) this.server = this.server.slice(0, -1);
     return this.server;
   }
 }

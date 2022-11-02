@@ -282,7 +282,7 @@ export default new Vuex.Store({
       return streams;
     },
     async deleteBranch(context, input: DeleteBranchInput) {
-      const branch = await speckleUtil.deleteBranch(
+      const branch: any = await speckleUtil.deleteBranch(
         context,
         input.streamid,
         input.branchid
@@ -369,6 +369,9 @@ export default new Vuex.Store({
         streamId,
         `${context.state.speckleFolderName}/${branchName}`
       );
+    },
+    async carbonStreams(context) {
+      return await speckleUtil.carbonStreams(context);
     },
     async getObjectUrls(context, streamid: string) {
       const objectIds = await speckleUtil.getStreamObjects(context, streamid);

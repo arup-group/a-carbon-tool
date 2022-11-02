@@ -215,3 +215,32 @@ export const streamNameBranches = (streamId: string) => `query {
     }
   }
 }`;
+
+export const carbonStreams = () => `query {
+  streams {
+    items {
+      name
+      id
+      mainBranch: branch(name: "main") {
+        name
+        id
+        commits(limit: 1) {
+          items {
+            referencedObject
+            createdAt
+          }
+        }
+      }
+      actBranch: branch(name: "actcarbonreport/main") {
+        name
+        id
+        commits(limit: 1) {
+          items {
+            referencedObject
+            createdAt
+          }
+        }
+      }
+    }
+  }
+}`;

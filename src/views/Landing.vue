@@ -33,14 +33,15 @@
               style="display: flex"
             >
               <new-assessment-card
-                v-if="item.title === 'New Assessment'"
+                v-if="isNewAssessment(item.title)"
+                :noProjects="noProjects"
                 @newAssessment="newAssessment"
               />
               <error-retry
-                v-else-if="item.title === 'error'"
+                v-else-if="isError(item.title)"
                 @retry="loadStreams"
               />
-              <loading-spinner v-else-if="item.title === 'loading'" />
+              <loading-spinner v-else-if="isLoading(item.title)" />
               <landing-error
                 v-else-if="projectError(item)"
                 :streamFolder="item"
@@ -92,6 +93,8 @@ import {
   ProjectFolder,
   ProjectFolderController,
   instanceOfStreamFolderError,
+  ProjectCardTypes,
+  ProjectData,
 } from "@/models/landing";
 
 import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
@@ -130,9 +133,23 @@ export default class Landing extends Vue {
   diagnosticsDialog = false;
   diagnosticsStreamid = "";
   diagnosticKey = 0;
+  loading = true;
+
+  isNewAssessment(item: ProjectCardTypes) {
+    return item === ProjectCardTypes.NEW_ASSESSMENT;
+  }
+  isError(item: ProjectCardTypes) {
+    return item === ProjectCardTypes.ERROR;
+  }
+  isLoading(item: ProjectCardTypes) {
+    return item === ProjectCardTypes.LOADING;
+  }
 
   get projects() {
     return this.projectFolderController.projectFolders;
+  }
+  get noProjects() {
+    return this.loading === false && this.projects.length === 0;
   }
 
   async mounted() {
@@ -141,6 +158,7 @@ export default class Landing extends Vue {
 
   async loadStreams() {
     this.error = false;
+    this.loading = true;
     this.projectFolderController.projectFolders = [];
     try {
       const allStreams: LandingUserStreams = await this.$store.dispatch(
@@ -149,6 +167,9 @@ export default class Landing extends Vue {
       const filteredStreams = allStreams.data.streams.items
         .filter(instanceOfLandingUserStreamFull)
         .filter((s) => s.actBranch && s.actBranch.commits.items.length > 0);
+
+      this.loading = false;
+
       this.projectFolderController.projectFolders = filteredStreams.map(
         (fs): StreamFolderLoading => {
           return { streamName: fs.name, streamId: fs.id };
@@ -228,11 +249,18 @@ export default class Landing extends Vue {
     return Math.ceil(items / this.itemsPerPage);
   }
 
-  get projectData() {
-    if (this.error) return [{ title: "New Assessment" }, { title: "error" }];
-    else if (this.projects.length > 0)
-      return [{ title: "New Assessment" }, ...this.projects];
-    else return [{ title: "New Assessment" }, { title: "loading" }];
+  get projectData(): ProjectData {
+    if (this.error)
+      return [
+        { title: ProjectCardTypes.NEW_ASSESSMENT },
+        { title: ProjectCardTypes.ERROR },
+      ];
+    else if (this.projects.length === 0 && this.loading === true)
+      return [
+        { title: ProjectCardTypes.NEW_ASSESSMENT },
+        { title: ProjectCardTypes.LOADING },
+      ];
+    else return [{ title: ProjectCardTypes.NEW_ASSESSMENT }, ...this.projects];
   }
 
   runDiagnostics(streamid: string) {

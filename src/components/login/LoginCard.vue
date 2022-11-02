@@ -36,7 +36,6 @@
           <v-col cols="12" align="center">
             <v-btn
               outlined
-              color="warning"
               class="mb-4"
               type="submit"
               @click="openCustomServerDialog"

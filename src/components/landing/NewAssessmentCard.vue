@@ -7,6 +7,7 @@
       class="d-flex align-center justify-center"
       height="100%"
       width="100%"
+      style="min-height: 35rem"
     >
       <v-card
         flat

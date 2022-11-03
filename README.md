@@ -14,7 +14,7 @@ At COP26, Arup committed to performing whole life carbon assessments on all buil
 5. Start app with `npm run serve`
 6. On the login screen, if your speckle app id and secret are correct/everything is working right, the xyz login button should allow you to log in
 
-To make the other login buttons work, fill in the other environment variables with different speckle app id's (or the same ones, but then the buttons would all do the same thing)
+To make the other login buttons work, fill in the other environment variables with different speckle app id/secret's (or the same ones, but then the buttons would all do the same thing)
 
 ## Project setup
 ```

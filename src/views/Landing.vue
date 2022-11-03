@@ -26,33 +26,21 @@
           <v-row class="d-flex align-stretch">
             <v-col
               v-for="item in props.items"
+              class="d-flex"
               :key="item.title"
               cols="12"
               md="6"
               lg="4"
-              style="display: flex"
             >
-              <new-assessment-card
-                v-if="isNewAssessment(item.title)"
+              <landing-card
+                :item="item"
                 :noProjects="noProjects"
-                @newAssessment="newAssessment"
-              />
-              <error-retry
-                v-else-if="isError(item.title)"
-                @retry="loadStreams"
-              />
-              <loading-spinner v-else-if="isLoading(item.title)" />
-              <landing-error
-                v-else-if="projectError(item)"
-                :streamFolder="item"
+                @diagnostics="runDiagnostics"
                 @rerun="landingErrorRerun"
                 @retry="landingErrorRetry"
                 @openErrorInfoDialog="openErrorInfoDialog"
-                @diagnostics="runDiagnostics"
-              />
-              <project-folder-card
-                v-else
-                :stream="item"
+                @newAssessment="newAssessment"
+                @fullRetry="loadStreams"
                 @openStream="openStream"
               />
             </v-col>
@@ -97,30 +85,22 @@ import {
   ProjectData,
 } from "@/models/landing";
 
-import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
-import LandingError from "@/components/landing/LandingError.vue";
 import ErrorInfoDialog from "@/components/landing/ErrorInfoDialog.vue";
-import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import DiagnosticsDialog from "@/components/landing/DiagnosticsDialog.vue";
-import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+import LandingCard from "@/components/landing/LandingCard.vue";
 
 @Component({
   components: {
-    NewAssessmentCard,
     LandingHeader,
     LandingFooter,
-    ProjectFolderCard,
     LoadingContainer,
-    LandingError,
     ErrorInfoDialog,
     DiagnosticsDialog,
-    LoadingSpinner,
-    ErrorRetry,
+    LandingCard,
   },
 })
 export default class Landing extends Vue {
@@ -134,16 +114,6 @@ export default class Landing extends Vue {
   diagnosticsStreamid = "";
   diagnosticKey = 0;
   loading = true;
-
-  isNewAssessment(item: ProjectCardTypes) {
-    return item === ProjectCardTypes.NEW_ASSESSMENT;
-  }
-  isError(item: ProjectCardTypes) {
-    return item === ProjectCardTypes.ERROR;
-  }
-  isLoading(item: ProjectCardTypes) {
-    return item === ProjectCardTypes.LOADING;
-  }
 
   get projects() {
     return this.projectFolderController.projectFolders;
@@ -249,7 +219,7 @@ export default class Landing extends Vue {
     return Math.ceil(items / this.itemsPerPage);
   }
 
-  get projectData(): ProjectData {
+  get projectData(): ProjectData[] {
     if (this.error)
       return [
         { title: ProjectCardTypes.NEW_ASSESSMENT },

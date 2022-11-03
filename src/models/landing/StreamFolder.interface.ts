@@ -23,8 +23,11 @@ export interface StreamFolderLoading {
 export interface ProjectDataShort {
   title: ProjectCardTypes;
 }
+export function instanceOfProjectDataShort(object: any): object is ProjectDataShort {
+  return "title" in object;
+}
 
-export type ProjectData = (ProjectDataShort | ProjectFolder)[];
+export type ProjectData = ProjectDataShort | ProjectFolder;
 
 export type ProjectFolder = StreamFolder | StreamFolderError | StreamFolderLoading;
 

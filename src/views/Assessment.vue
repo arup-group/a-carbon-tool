@@ -725,7 +725,7 @@ export default class Assessment extends Vue {
           color: material.material.color,
           id,
         });
-      } catch(err) { console.log("err:", id) }
+      } catch(err) { console.error("err:", id) }
     });
     this.materialsColors = this.colors;
 

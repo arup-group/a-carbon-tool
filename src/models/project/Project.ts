@@ -11,3 +11,7 @@ export interface Project {
   projectDate: string;
   newMainAvailable: boolean;
 }
+
+export function instanceOfProject(object: any): object is Project {
+  return "title" in object && "id" in object && "co2Values" in object;
+}

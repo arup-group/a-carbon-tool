@@ -38,11 +38,19 @@
     <v-spacer></v-spacer>
     <v-list dense style="position: absolute; bottom: 0; width: 100%">
       <v-list-item>
+        <v-list-item-icon><v-icon>mdi-server</v-icon></v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ server }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item>
         <v-list-item-icon>
           <v-icon>mdi-information-outline</v-icon>
         </v-list-item-icon>
         <v-list-item-title>
-          <i> version: {{ version() }}</i>
+          <i> version: {{ version }}</i>
         </v-list-item-title>
       </v-list-item>
       <v-list-item @click="logout">
@@ -76,6 +84,8 @@ export default class Sidebar extends Vue {
   @Prop() darkModeButtonText!: string;
   @Prop() darkModeState!: boolean;
   @Prop() drawer!: boolean;
+  @Prop() server!: string;
+  @Prop() version!: string;
 
   @Emit("toggleDarkMode")
   toggleDarkMode() {
@@ -98,10 +108,6 @@ export default class Sidebar extends Vue {
       this.toggleDrawer();
     }
     return;
-  }
-
-  version() {
-    return store.state.version;
   }
 
   items = [

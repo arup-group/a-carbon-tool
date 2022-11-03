@@ -6,8 +6,10 @@
       :darkModeButtonText="darkModeButtonText"
       :darkModeState="darkModeState"
       :drawer="drawer"
-      @update:drawer="drawer = $event"
       :clipped="clipped"
+      :server="server"
+      :version="version"
+      @update:drawer="drawer = $event"
       @toggleDarkMode="toggleDarkMode"
       @logout="logout"
       @toggleDrawer="toggleDrawer"
@@ -38,21 +40,12 @@ import Header from "./components/core/Header.vue";
 import Sidebar from "./components/core/Sidebar.vue";
 import Footer from "./components/core/Footer.vue";
 import VersionUpdateDialog from "./components/core/VersionUpdateDialog.vue";
-// ARC stuff
-// import "@arc-web/components/dist/themes/index.css";
-// import "@arc-web/components/dist/themes/light.css";
-// import "@arc-web/components/dist/themes/dark.css";
-// import "@arc-web/components/dist/components/container/arc-container.js";
-// import "@arc-web/components/dist/components/navbar/arc-navbar.js";
-// import { setBasePath } from "@arc-web/components/dist/utilities/base-path";
 
 // posthog
 import posthog from "posthog-js";
 posthog.init(process.env.VUE_APP_POSTHOG, {
   api_host: "https://posthog.insights.arup.com",
 });
-
-// setBasePath("/");
 
 import "@/assets/style.css";
 
@@ -88,6 +81,16 @@ export default class App extends Vue {
   }
   get version() {
     return this.$store.state.version;
+  }
+  get server() {
+    if (
+      this.$store.state.selectedServer &&
+      this.$store.state.selectedServer.url
+    )
+      return this.$store.state.selectedServer.url
+        .replace("https://", "")
+        .replace("http://", "");
+    else return "";
   }
   drawer = false;
   clipped = true;

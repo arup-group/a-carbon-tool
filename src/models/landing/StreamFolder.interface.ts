@@ -20,7 +20,22 @@ export interface StreamFolderLoading {
   streamName: string;
 }
 
+export interface ProjectDataShort {
+  title: ProjectCardTypes;
+}
+export function instanceOfProjectDataShort(object: any): object is ProjectDataShort {
+  return "title" in object;
+}
+
+export type ProjectData = ProjectDataShort | ProjectFolder;
+
 export type ProjectFolder = StreamFolder | StreamFolderError | StreamFolderLoading;
+
+export enum ProjectCardTypes {
+  NEW_ASSESSMENT,
+  ERROR,
+  LOADING
+}
 
 export function instanceOfStreamFolder(object: any): object is StreamFolder {
   return "mainProject" in object;

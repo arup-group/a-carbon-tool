@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
 import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
-import { Login, Server, AuthError, Token } from "@/models/auth/";
+import { Login, Server, AuthError, Token, ServerRegion, CustomServerStorage } from "@/models/auth/";
 import router from "@/router";
 import {
   materialCarbonFactors,
@@ -31,21 +31,27 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.8.0 \u00DF",
+    version: "0.8.2 \u00DF",
     speckleFolderName: "actcarbonreport",
     servers: {
       arup: {
-        region: "UKIMEA",
+        region: ServerRegion.UKIMEA,
         url: "https://v2.speckle.arup.com",
         speckleId: process.env.VUE_APP_SPECKLE_ID_ARUP,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_ARUP,
       },
       xyz_server: {
-        region: "PUBLIC",
+        region: ServerRegion.XYZ,
         url: "https://speckle.xyz",
         speckleId: process.env.VUE_APP_SPECKLE_ID_XYZ,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_XYZ,
       },
+      custom: {
+        region: ServerRegion.CUSTOM,
+        url: "",
+        speckleId: process.env.VUE_APP_SPECKLE_ID_CUSTOM,
+        speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_CUSTOM,
+      }
     },
     selectedServer: {} as Server, // should be a server object
     token: {} as Token, // should be a Token object
@@ -208,6 +214,16 @@ export default new Vuex.Store({
       state.token = data.token;
       state.selectedServer = data.server;
       state.authed = true;
+
+      if (data.server.region === ServerRegion.CUSTOM) {
+        localStorage.setItem(CustomServerStorage.LAST_SERVER, JSON.stringify(data.server.url));
+        const customServers = localStorage.getItem(CustomServerStorage.CUSTOM_SERVERS);
+        let customServersJson: string[]; // array of server urls
+        if (customServers) customServersJson = JSON.parse(customServers);
+        else customServersJson = [];
+        customServersJson.push(data.server.url);
+        localStorage.setItem(CustomServerStorage.CUSTOM_SERVERS, JSON.stringify(customServersJson));
+      }
     },
     setUser(state, user) {
       state.user = user;

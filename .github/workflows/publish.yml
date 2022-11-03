@@ -39,6 +39,8 @@ jobs:
         VUE_APP_SPECKLE_SECRET_ARUP: ${{ secrets.VUE_APP_SPECKLE_SECRET_ARUP }}
         VUE_APP_SPECKLE_ID_XYZ: 6f249d7a6f
         VUE_APP_SPECKLE_SECRET_XYZ: ${{ secrets.VUE_APP_SPECKLE_SECRET_XYZ }}
+        VUE_APP_SPECKLE_ID_CUSTOM: carbon
+        VUE_APP_SPECKLE_SECRET_CUSTOM: ${{ secrets.VUE_APP_SPECKLE_SECRET_CUSTOM }}
         VUE_APP_SPECKLE_NAME: A Carbon Tool
         VUE_APP_POSTHOG: ${{ secrets.VUE_APP_POSTHOG }}
     - run: npm run test:unit -- --passWithNoTests

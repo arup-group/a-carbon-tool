@@ -39,35 +39,12 @@ export default class VersionUpdateDialog extends Vue {
 
   features: { title: string; subtitle: string }[] = [
     {
-      title: "Report editing",
-      subtitle: `The "edit" button on reports now works!`,
+      title: "Custom Server Login",
+      subtitle: `Log in to any Arup owned/managed Speckle server through using the "Custom Login" button on the login page`,
     },
     {
-      title: "Multiple reports per speckle stream",
-      subtitle:
-        "Multiple reports can now be run and saved on the same speckle stream",
-    },
-    {
-      title: `"Quick report" feature`,
-      subtitle: `Select the "edit" button on a report and a popup with your report will appear for quick editing`,
-    },
-    {
-      title: "History view",
-      subtitle:
-        "View the history of your reports, track how the total carbon has changed over time",
-    },
-    {
-      title: "Comparison view",
-      subtitle:
-        "Compare different reports that you have run on the same building model",
-    },
-    {
-      title: "Custom grouping of materials",
-      subtitle: "You can now create your own groups on the assessment page",
-    },
-    {
-      title: "Filter objects",
-      subtitle: "On the 'Materials' tab when running an assessment, click the group name to see just those objects"
+      title: "Faster dashboard loading",
+      subtitle: `The loading time on the dashboard has been reduced`
     }
   ];
 

@@ -26,32 +26,21 @@
           <v-row class="d-flex align-stretch">
             <v-col
               v-for="item in props.items"
+              class="d-flex"
               :key="item.title"
               cols="12"
               md="6"
               lg="4"
-              style="display: flex"
             >
-              <new-assessment-card
-                v-if="item.title === 'New Assessment'"
-                @newAssessment="newAssessment"
-              />
-              <error-retry
-                v-else-if="item.title === 'error'"
-                @retry="loadStreams"
-              />
-              <loading-spinner v-else-if="item.title === 'loading'" />
-              <landing-error
-                v-else-if="projectError(item)"
-                :streamFolder="item"
+              <landing-card
+                :item="item"
+                :noProjects="noProjects"
+                @diagnostics="runDiagnostics"
                 @rerun="landingErrorRerun"
                 @retry="landingErrorRetry"
                 @openErrorInfoDialog="openErrorInfoDialog"
-                @diagnostics="runDiagnostics"
-              />
-              <project-folder-card
-                v-else
-                :stream="item"
+                @newAssessment="newAssessment"
+                @fullRetry="loadStreams"
                 @openStream="openStream"
               />
             </v-col>
@@ -92,32 +81,26 @@ import {
   ProjectFolder,
   ProjectFolderController,
   instanceOfStreamFolderError,
+  ProjectCardTypes,
+  ProjectData,
 } from "@/models/landing";
 
-import NewAssessmentCard from "@/components/landing/NewAssessmentCard.vue";
 import LandingHeader from "@/components/landing/LandingHeader.vue";
 import LandingFooter from "@/components/landing/LandingFooter.vue";
-import ProjectFolderCard from "@/components/landing/ProjectFolderCard.vue";
-import LandingError from "@/components/landing/LandingError.vue";
 import ErrorInfoDialog from "@/components/landing/ErrorInfoDialog.vue";
-import ErrorRetry from "@/components/shared/ErrorRetry.vue";
 import DiagnosticsDialog from "@/components/landing/DiagnosticsDialog.vue";
-import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+import LandingCard from "@/components/landing/LandingCard.vue";
 
 @Component({
   components: {
-    NewAssessmentCard,
     LandingHeader,
     LandingFooter,
-    ProjectFolderCard,
     LoadingContainer,
-    LandingError,
     ErrorInfoDialog,
     DiagnosticsDialog,
-    LoadingSpinner,
-    ErrorRetry,
+    LandingCard,
   },
 })
 export default class Landing extends Vue {
@@ -130,9 +113,13 @@ export default class Landing extends Vue {
   diagnosticsDialog = false;
   diagnosticsStreamid = "";
   diagnosticKey = 0;
+  loading = true;
 
   get projects() {
     return this.projectFolderController.projectFolders;
+  }
+  get noProjects() {
+    return this.loading === false && this.projects.length === 0;
   }
 
   async mounted() {
@@ -141,6 +128,7 @@ export default class Landing extends Vue {
 
   async loadStreams() {
     this.error = false;
+    this.loading = true;
     this.projectFolderController.projectFolders = [];
     try {
       const allStreams: LandingUserStreams = await this.$store.dispatch(
@@ -149,6 +137,9 @@ export default class Landing extends Vue {
       const filteredStreams = allStreams.data.streams.items
         .filter(instanceOfLandingUserStreamFull)
         .filter((s) => s.actBranch && s.actBranch.commits.items.length > 0);
+
+      this.loading = false;
+
       this.projectFolderController.projectFolders = filteredStreams.map(
         (fs): StreamFolderLoading => {
           return { streamName: fs.name, streamId: fs.id };
@@ -228,11 +219,18 @@ export default class Landing extends Vue {
     return Math.ceil(items / this.itemsPerPage);
   }
 
-  get projectData() {
-    if (this.error) return [{ title: "New Assessment" }, { title: "error" }];
-    else if (this.projects.length > 0)
-      return [{ title: "New Assessment" }, ...this.projects];
-    else return [{ title: "New Assessment" }, { title: "loading" }];
+  get projectData(): ProjectData[] {
+    if (this.error)
+      return [
+        { title: ProjectCardTypes.NEW_ASSESSMENT },
+        { title: ProjectCardTypes.ERROR },
+      ];
+    else if (this.projects.length === 0 && this.loading === true)
+      return [
+        { title: ProjectCardTypes.NEW_ASSESSMENT },
+        { title: ProjectCardTypes.LOADING },
+      ];
+    else return [{ title: ProjectCardTypes.NEW_ASSESSMENT }, ...this.projects];
   }
 
   runDiagnostics(streamid: string) {

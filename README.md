@@ -16,6 +16,8 @@ At COP26, Arup committed to performing whole life carbon assessments on all buil
 
 To make the other login buttons work, fill in the other environment variables with different __Speckle app id/secret__'s (or the same ones, but then the buttons would all do the same thing)
 
+If you have your own Speckle server that you wish to connect to your local version of act, update the `VUE_APP_SPECKLE_ID_CUSTOM` and `VUE_APP_SPECKLE_SECRET_CUSTOM` env vars to the __id__ and __secret__ of an act app on your server. Then on the login page, choose "CUSTOM SERVER" and enter in your server's url. Provided that no major breaking changes have been made to your server from the xyz Speckle server, act will work.
+
 ## Project setup
 ```
 npm install

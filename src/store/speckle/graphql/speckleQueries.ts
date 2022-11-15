@@ -151,7 +151,7 @@ export const mainStreamCommmitObjects = (id: string) => `query {
 // Gets all branches for a particular stream id including first commit date
 export const streamReferencedBranches = (id: string) => `query {
   stream(id: "${id}") {
-    branches {
+    branches(limit: 100) {
       items {
         id,
         name,
@@ -208,7 +208,7 @@ export const streamNameQuery = (streamId: string) => `query {
 export const streamNameBranches = (streamId: string) => `query {
   stream(id: "${streamId}") {
     name
-    branches {
+    branches(limit: 100) {
       items {
         name
       }

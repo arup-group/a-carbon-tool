@@ -31,7 +31,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.8.2 \u00DF",
+    version: "0.8.3 \u00DF",
     speckleFolderName: "actcarbonreport",
     servers: {
       arup: {

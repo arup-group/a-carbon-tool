@@ -1,6 +1,7 @@
 import { ProjectDataComplete } from "../newAssessment";
 import { CarbonA5 } from "../newAssessment/speckleObject.interface";
 import { SpeckleObjectComplete } from "../newAssessment";
+import { ChartData } from "../chart";
 
 export interface StreamData {
   data: {
@@ -39,4 +40,9 @@ export interface ParentSpeckleObjectData {
   totalChildrenCount: number;
   transportCarbonA4: number;
   volume: number;
+}
+
+export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectData {
+  version: "2.0.0";
+  materials: ChartData[];
 }

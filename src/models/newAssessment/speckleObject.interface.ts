@@ -1,5 +1,6 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { TransportType } from ".";
+import { ChartData } from "../chart";
 
 export interface SpeckleObject {
   id: string;
@@ -58,4 +59,5 @@ export interface CarbonA5 {
 export interface ReportTotals extends ReportData {
   totalCO2: number;
   volume: number;
+  materials: ChartData[];
 }

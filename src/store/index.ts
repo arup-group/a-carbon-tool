@@ -18,7 +18,7 @@ import {
 } from "@/models/newAssessment";
 
 import { BECName } from "@/models/shared";
-import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
+import { ParentSpeckleObjectData, ParentSpeckleObjectDataV2 } from "@/models/graphql/StreamData.interface";
 import { filterOnlyReportBranches } from "./utilities/filters";
 import {
   StreamNameBranches,
@@ -460,8 +460,9 @@ export default new Vuex.Store({
       const formData = new FormData();
       // below line means that some objects may be given duplicate strings and the report won't save properly
       const objectid = `${new Date().getTime().toString()}-act`;
-      const objectData: ParentSpeckleObjectData = {
+      const objectData: ParentSpeckleObjectDataV2 = {
         id: objectid,
+        version: "2.0.0",
         speckleType: "act-totals",
         speckle_type: "act-totals",
         transportCarbonA4: reportTotals.transportCarbonA4,
@@ -469,6 +470,7 @@ export default new Vuex.Store({
         constructionCarbonA5: reportTotals.constructionCarbonA5,
         totalCO2: reportTotals.totalCO2,
         volume: reportTotals.volume,
+        materials: reportTotals.materials,
         projectData,
         totalChildrenCount: 0,
       };

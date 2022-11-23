@@ -127,6 +127,7 @@ import {
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
+import { ChartData } from "@/models/chart";
 
 type ObjectsObj = { [id: string]: SpeckleObject };
 interface AvailableStream {
@@ -335,8 +336,7 @@ export default class Assessment extends Vue {
     if (material.type === this.filteredType) {
       this.filtered = false;
       this.selectedIds = [];
-    }
-    else {
+    } else {
       this.filtered = true;
       this.selectedIds = material.ids;
     }
@@ -475,9 +475,12 @@ export default class Assessment extends Vue {
 
   objectsSelected(objects: UserData[]) {
     if (this.step === Step.MATERIALS) {
-      const keys = Object.keys(this.objectsObj)
-      this.selectedObjects = objects.filter((o) => keys.includes(o.id)).map((o) => o.id);
-      this.invalidSelectedObjects = this.selectedObjects.length !== objects.length;
+      const keys = Object.keys(this.objectsObj);
+      this.selectedObjects = objects
+        .filter((o) => keys.includes(o.id))
+        .map((o) => o.id);
+      this.invalidSelectedObjects =
+        this.selectedObjects.length !== objects.length;
     }
   }
 
@@ -620,6 +623,9 @@ export default class Assessment extends Vue {
     let A5Site = 0;
     let A5Waste = 0;
     let A5Value = 0;
+    const materialsObj: {
+      [key: string]: { value: number; color: string };
+    } = {};
     reportObjs.forEach((o) => {
       const rd = o.reportData;
       A1A3 += rd.productStageCarbonA1A3;
@@ -627,8 +633,25 @@ export default class Assessment extends Vue {
       A5Site += rd.constructionCarbonA5.site;
       A5Waste += rd.constructionCarbonA5.waste;
       A5Value += rd.constructionCarbonA5.value;
+      const objTotal = A1A3 + A4 + A5Value;
+      const materialName = o.formData.material.name;
+      if (materialName in materialsObj) {
+        materialsObj[materialName].value += objTotal;
+      } else {
+        materialsObj[materialName] = {
+          value: objTotal,
+          color: o.formData.material.color,
+        };
+      }
     });
     let totalCO2 = A1A3 + A4 + A5Value;
+    const materials: ChartData[] = Object.entries(materialsObj).map((m) => ({
+      value: m[1].value,
+      label: m[0],
+      color: m[1].color,
+    }));
+
+    console.log("materials:", materials);
 
     return {
       transportCarbonA4: A4,
@@ -640,6 +663,7 @@ export default class Assessment extends Vue {
       },
       totalCO2,
       volume: this.totalVolume,
+      materials
     };
   }
 
@@ -725,7 +749,9 @@ export default class Assessment extends Vue {
           color: material.material.color,
           id,
         });
-      } catch(err) { console.error("err:", id) }
+      } catch (err) {
+        console.error("err:", id);
+      }
     });
     this.materialsColors = this.colors;
 

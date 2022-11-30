@@ -19,7 +19,20 @@ export interface ReportObj {
   };
 }
 
-export interface HTTPStreamDataParent extends ParentSpeckleObjectData {
+export type HTTPStreamDataParent = HTTPStreamDataParentV1 | HTTPStreamDataParentV2;
+
+export interface HTTPStreamDataParentV1 extends ParentSpeckleObjectDataV1 {
+  __closure: { [childId: string]: 1 };
+}
+
+export function instanceOfHttpStreamDataParentV1(object: any): object is HTTPStreamDataParentV1 {
+  return "__closure" in object && !("version" in object);
+}
+export function instanceOfHttpStreamDataParentV2(object: any): object is HTTPStreamDataParentV2 {
+  return "__closure" in object && "version" in object && object.version === "2.0.0";
+}
+
+export interface HTTPStreamDataParentV2 extends ParentSpeckleObjectDataV2 {
   __closure: { [childId: string]: 1 };
 }
 
@@ -29,7 +42,9 @@ export interface ChildSpeckleObjectData {
   act: SpeckleObjectComplete;
 }
 
-export interface ParentSpeckleObjectData {
+export type ParentSpeckleObjectData = ParentSpeckleObjectDataV1 | ParentSpeckleObjectDataV2;
+
+export interface ParentSpeckleObjectDataV1 {
   constructionCarbonA5: CarbonA5;
   id: string;
   productStageCarbonA1A3: number;
@@ -42,7 +57,7 @@ export interface ParentSpeckleObjectData {
   volume: number;
 }
 
-export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectData {
+export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectDataV1 {
   version: "2.0.0";
   materials: ChartData[];
 }

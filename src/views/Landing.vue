@@ -200,7 +200,8 @@ export default class Landing extends Vue {
     const data = await loadStream(
       this.$store,
       s.id,
-      `${this.$store.state.speckleFolderName}/main`
+      `${this.$store.state.speckleFolderName}/main`,
+      true
     );
     return data.data;
   }

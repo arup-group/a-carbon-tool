@@ -3,7 +3,7 @@ export {
   StreamReferenceBranches,
   BranchItem,
 } from "./StreamReferenceBranches.interface";
-export { StreamData, HTTPStreamDataParent } from "./StreamData.interface";
+export * from "./StreamData.interface";
 export { ActReportData } from "./ActReportData.interface";
 export { DeleteStreamData } from "./DeleteStreamData.interface";
 export { CheckContainsBranch } from "./CheckContainsBranch.interface";

@@ -554,7 +554,7 @@ export default new Vuex.Store({
         branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
           const fullBranchName = `${context.state.speckleFolderName}/${branch.name}`;
 
-          const data = await loadStream(context, streamid, fullBranchName);
+          const data = await loadStream(context, streamid, fullBranchName, true);
           return {
             branch,
             data,

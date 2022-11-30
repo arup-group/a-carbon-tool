@@ -1,7 +1,13 @@
 import { Level } from "@/models/assessment";
 import { ChartData } from "@/models/chart";
-import { HTTPStreamDataParent } from "@/models/graphql/";
-import { ChildSpeckleObjectData } from "@/models/graphql/StreamData.interface";
+import { ActReportData, HTTPStreamDataParent } from "@/models/graphql/";
+import {
+  ChildSpeckleObjectData,
+  HTTPStreamDataParentV1,
+  HTTPStreamDataParentV2,
+  instanceOfHttpStreamDataParentV1,
+  instanceOfHttpStreamDataParentV2,
+} from "@/models/graphql/StreamData.interface";
 import { ProjectComponent } from "@/models/newAssessment/projectData.interface";
 import { Color } from "@/models/renderer";
 import { getActReportBranchInfo } from "@/store/speckle/speckleUtil";
@@ -69,7 +75,10 @@ export function extractCo2Data(
         id: object.act.speckle_type,
       };
     }
-    colorsArr.push({ id: object.act.id, color: object.act.formData.material.color });
+    colorsArr.push({
+      id: object.act.id,
+      color: object.act.formData.material.color,
+    });
   });
   const co2Arr = Object.entries(co2Obj);
   const materials = co2Arr.map((obj) => {
@@ -135,7 +144,8 @@ export interface LoadStreamOut {
 export async function loadStream(
   context: any,
   streamId: string,
-  branchName: string
+  branchName: string,
+  quick?: boolean
 ): Promise<LoadStreamOut> {
   const actReportBranchInfo = await getActReportBranchInfo(
     context,
@@ -152,6 +162,62 @@ export async function loadStream(
     context.state.token.token
   );
 
+  if (instanceOfHttpStreamDataParentV1(branchData)) {
+    return calcV1(branchData, actReportBranchInfo, context, streamId);
+  } else if (instanceOfHttpStreamDataParentV2(branchData)) {
+    console.log(`${streamId} using v2`)
+    return calcV2(branchData, actReportBranchInfo, streamId, context, quick);
+  } else {
+    throw new Error("report object corrupted");
+  }
+}
+
+async function calcV2(branchData: HTTPStreamDataParentV2, actReportBranchInfo: ActReportData, streamId: string, context: any, quick?: boolean): Promise<LoadStreamOut> {
+  if (!quick) {
+    console.log("slow :(")
+    return calcV1(branchData, actReportBranchInfo, context, streamId);
+  }
+  console.log("quick!");
+  const projectInfoUpdated: IProjectInfo = {
+    name: branchData.projectData.name,
+    components: branchData.projectData.components,
+    reportDate: new Date(
+      actReportBranchInfo.data.stream.branch.commits.items[0].createdAt
+    ),
+    author: actReportBranchInfo.data.stream.branch.commits.items[0].authorName,
+    jobNumber: branchData.projectData.jobNumber,
+    cost: branchData.projectData.cost,
+    floorArea: branchData.projectData.floorArea,
+    notes: branchData.projectData.notes,
+    totalCO2e: Math.round((branchData.totalCO2 / 1000) * 100) / 100,
+    totalkgCO2e: Math.floor(branchData.totalCO2),
+    region: branchData.projectData.region,
+    volume: branchData.volume,
+  };
+
+  const colors: Color[] = branchData.materials.map(m => ({id: branchData.id, color: m.color}));
+
+  return {
+    ready: true,
+    colors,
+    data: {
+      streamId: streamId,
+      projectInfo: projectInfoUpdated,
+      materialBreakdown: {
+        materials: branchData.materials
+      },
+      aBreakdown: {} as IABreakdown,
+      children: [],
+    }
+  }
+}
+
+async function calcV1(
+  branchData: HTTPStreamDataParentV1,
+  actReportBranchInfo: ActReportData,
+  context: any,
+  streamId: string
+): Promise<LoadStreamOut> {
   const projectInfoUpdated: IProjectInfo = {
     name: branchData.projectData.name,
     components: branchData.projectData.components,

@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue, Watch } from "vue-property-decorator";
-import { Viewer } from "@speckle/viewer";
+import { DefaultViewerParams, SelectionEvent, Viewer, ViewerEvent } from "@speckle/viewer";
 
 import * as THREE from "three";
 import {
@@ -65,7 +65,7 @@ export default class extends Vue {
   domElement!: any;
   alertMessage!: string;
   showAlert = false;
-  viewer!: any;
+  viewer!: Viewer;
   selectedObjects: any[] = [];
 
   loading = 0;
@@ -91,22 +91,36 @@ export default class extends Vue {
     this.domElement.style.display = "inline-block";
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
-    this.viewer = new Viewer({ contained: renderDomElement, showStats: false });
+    this.viewer = new Viewer(renderDomElement, { ...DefaultViewerParams, showStats: false });
+    console.log("this.viewer:", this.viewer)
     objecturls.forEach(async (url) => {
       await this.viewer.loadObject(url, this.token);
 
       this.afterLoad();
     });
 
-    this.viewer.on("load-progress", (args: any) => {
+    this.viewer.on(ViewerEvent.LoadProgress, (args) => {
       this.loading = Math.ceil(args.progress * 100);
-      this.viewer.interactions.zoomExtents();
+      // this.viewer.interactions.zoomExtents();
     });
 
+    this.viewer.on(ViewerEvent.ObjectClicked, (selectionInfo: SelectionEvent) => {
+      if (selectionInfo) {
+        // Object was clicked. Focus in on it
+        this.viewer.zoom([selectionInfo.userData.id as string])
+      }
+      else {
+        // No object clicked. Restore focus to entire scene
+        this.viewer.zoom()	
+      }
+    })
     // no event for object deselection, so the below is a little weird (and will probably break at some point)
-    this.viewer.interactions.selectionHelper.on("object-clicked", () => {
-      this.objectsSelected(this.viewer.interactions.selectedObjectsUserData);
-    });
+    // this.viewer.on(ViewerEvent.ObjectClicked, (args: any) => {
+    //   console.log("args:", args)
+    // })
+    // this.viewer.interactions.selectionHelper.on("object-clicked", () => {
+    //   this.objectsSelected(this.viewer.interactions.selectedObjectsUserData);
+    // });
   }
 
   async setSelect() {

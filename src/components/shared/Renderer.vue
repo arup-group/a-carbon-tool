@@ -157,6 +157,9 @@ export default class extends Vue {
     }
   }
   afterLoad() {
+    this.viewer.setLightConfiguration({
+      castShadow: false
+    });
     const properties = this.findFilters();
     const allObjects = (this.viewer as any).speckleRenderer.allObjects as THREE.Group;
     const allObjectsChildren = allObjects.children;
@@ -225,20 +228,43 @@ export default class extends Vue {
   }
 
   async setColors(colors: Color[]) {
-    if (colors && colors.length > 0) {
-      const values: { [id: string]: string } = {};
-      colors.forEach((c) => {
-        Object.assign(values, { [c.id]: c.color });
-      });
-      await this.viewer.applyFilter({
-        colorBy: {
-          type: "category",
-          property: "id",
-          values,
-          default: "#636363",
-        },
-      });
-    }
+    // const groups = colors.map(c => ({ objectIds: [c.id], color: c.color ? c.color : "" }));
+    const colorGroups: { [color: string]: string[] } = {};
+    colors.forEach(c => {
+      if (c.color) {
+        if (c.color in colorGroups && colorGroups[c.color].length > 0) {
+          colorGroups[c.color].push(c.id);
+        } else {
+          colorGroups[c.color] = [c.id];
+        }
+      }
+    });
+    console.log("colorGroups:", colorGroups)
+    const groups = Object.entries(colorGroups).map(c => ([{ objectIds: c[1], color: c[0] }]));
+    console.log("groups:", groups);
+    groups.forEach(async (group) => {
+      const res = await this.viewer.setUserObjectColors(group as [{
+        objectIds: string[];
+        color: string;
+      }]);
+      console.log("res:", res);
+    })
+    // this.viewer.setUserObjectColors(groups);
+    // console.log("setColors, colors:", colors);
+    // if (colors && colors.length > 0) {
+    //   const values: { [id: string]: string } = {};
+    //   colors.forEach((c) => {
+    //     Object.assign(values, { [c.id]: c.color });
+    //   });
+    //   await this.viewer.applyFilter({
+    //     colorBy: {
+    //       type: "category",
+    //       property: "id",
+    //       values,
+    //       default: "#636363",
+    //     },
+    //   });
+    // }
   }
 
   resetColors() {

@@ -3,7 +3,7 @@ export interface SpeckleProperty<T> {
   maxValue: T;
   minValue: T;
   type: string;
-  uniqueValues: { [key: string]: number };
+  // uniqueValues: { [key: string]: number };
 }
 
 export interface Filter<T> {

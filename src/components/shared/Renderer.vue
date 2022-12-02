@@ -11,11 +11,12 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue, Watch } from "vue-property-decorator";
-import { DefaultViewerParams, SelectionEvent, Viewer, ViewerEvent } from "@speckle/viewer";
+import { DefaultViewerParams, NumericPropertyInfo, PropertyInfo, SelectionEvent, Viewer, ViewerEvent } from "@speckle/viewer";
 
 import * as THREE from "three";
 import {
   Color,
+  Filter,
   Filters,
   GradientColor,
   RendererLoaded,
@@ -23,6 +24,18 @@ import {
   SpeckleProperty,
   UserData,
 } from "@/models/renderer/";
+
+interface StringPropertyInfo extends PropertyInfo {
+  type: "string";
+  valueGroups: { value: string; ids: string[] }[];
+}
+
+function instanceOfNumericPropertyInfo(object: any): object is NumericPropertyInfo {
+  return "type" in object && object.type === "number" && "key" in object;
+}
+function instanceOfStringPropertyInfo(object: any): object is StringPropertyInfo {
+  return "type" in object && object.type === "string" && "key" in object;
+}
 
 @Component
 export default class extends Vue {
@@ -104,15 +117,23 @@ export default class extends Vue {
       // this.viewer.interactions.zoomExtents();
     });
 
-    this.viewer.on(ViewerEvent.ObjectClicked, (selectionInfo: SelectionEvent) => {
-      if (selectionInfo) {
-        // Object was clicked. Focus in on it
-        this.viewer.zoom([selectionInfo.userData.id as string])
+    this.viewer.on(ViewerEvent.ObjectClicked, (selectionInfo: SelectionEvent | null) => {
+      console.log("selectionInfo:", selectionInfo)
+      if (!selectionInfo) {
+        this.viewer.resetSelection()
+      } else {
+        // this.viewer.selectObjects(selectionInfo.hits.map(h => (h.object as any).id))
+        console.log("id:", (selectionInfo.hits[0].object as any).id)
+        this.viewer.selectObjects([(selectionInfo.hits[0].object as any).id])
       }
-      else {
-        // No object clicked. Restore focus to entire scene
-        this.viewer.zoom()	
-      }
+      // if (selectionInfo) {
+      //   // Object was clicked. Focus in on it
+      //   this.viewer.zoom([selectionInfo.userData.id as string])
+      // }
+      // else {
+      //   // No object clicked. Restore focus to entire scene
+      //   this.viewer.zoom()	
+      // }
     })
     // no event for object deselection, so the below is a little weird (and will probably break at some point)
     // this.viewer.on(ViewerEvent.ObjectClicked, (args: any) => {
@@ -137,8 +158,7 @@ export default class extends Vue {
   }
   afterLoad() {
     const properties = this.findFilters();
-    const allObjects = this.viewer.sceneManager.sceneObjects
-      .allObjects as THREE.Group;
+    const allObjects = (this.viewer as any).speckleRenderer.allObjects as THREE.Group;
     const allObjectsChildren = allObjects.children;
     const allMesh: THREE.Mesh[] = [];
     allObjectsChildren.forEach((oc) => {
@@ -157,17 +177,28 @@ export default class extends Vue {
   }
 
   findFilters() {
-    const properties = this.viewer.getObjectsProperties() as {
-      [key: string]: SpeckleProperty<number | string | boolean>;
-    };
+    const allProperties: PropertyInfo[] = this.viewer.getObjectProperties();
+    const stringProperties: StringPropertyInfo[] = allProperties.filter(instanceOfStringPropertyInfo);
+    const numericProperties: NumericPropertyInfo[] = allProperties.filter(instanceOfNumericPropertyInfo);
+    const properties = [...stringProperties, ...numericProperties];
+    // const properties: (NumericPropertyInfo | StringPropertyInfo)[] = allProperties.filter(p => instanceOfNumericPropertyInfo(p) || instanceOfStringPropertyInfo(p))
+    console.log("properties:", properties)
+    //  as {
+    //   [key: string]: SpeckleProperty<number | string | boolean>;
+    // };
     let keys = Object.keys(properties);
-    let cleanedProps: Filters = keys.map((k) => {
-      if (k.startsWith("parameters.")) {
-        if (k.endsWith(".value")) {
-          let name = properties[k.replace(".value", ".name")]
-            .allValues[0] as string;
-          let data = properties[k];
-          let rawName = k;
+    let cleanedProps: Filters = properties.map((p): Filter<string | number | boolean> => {
+      if (p.key.startsWith("parameters.")) {
+        if (p.key.endsWith(".value")) {
+          let name = p.key.split(".").slice(-1)[0];
+          let data: SpeckleProperty<string | number | boolean> = {
+            allValues: p.valueGroups.map(i => i.value),
+            maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
+            minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
+            type: p.type,
+
+          };
+          let rawName = p.key;
           return {
             name,
             rawName,
@@ -175,13 +206,21 @@ export default class extends Vue {
           };
         }
       }
-      let [rawName] = k.split(".").slice(-1);
+      let [rawName] = p.key.split(".").slice(-1);
+      let data: SpeckleProperty<string | number | boolean> = {
+            allValues: p.valueGroups.map(i => i.value),
+            maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
+            minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
+            type: p.type,
+
+          };
       return {
-        name: k,
+        name: rawName,
         rawName,
-        data: properties[k],
+        data,
       };
     });
+    console.log("cleanedProps:", cleanedProps)
     return cleanedProps;
   }
 

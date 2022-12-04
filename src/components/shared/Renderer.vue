@@ -158,7 +158,9 @@ export default class extends Vue {
   }
   afterLoad() {
     this.viewer.setLightConfiguration({
-      castShadow: false
+      castShadow: false,
+      enabled: true,
+      indirectLightIntensity: 1
     });
     const properties = this.findFilters();
     const allObjects = (this.viewer as any).speckleRenderer.allObjects as THREE.Group;
@@ -240,15 +242,17 @@ export default class extends Vue {
       }
     });
     console.log("colorGroups:", colorGroups)
-    const groups = Object.entries(colorGroups).map(c => ([{ objectIds: c[1], color: c[0] }]));
-    console.log("groups:", groups);
-    groups.forEach(async (group) => {
-      const res = await this.viewer.setUserObjectColors(group as [{
-        objectIds: string[];
-        color: string;
-      }]);
-      console.log("res:", res);
-    })
+    const groups = Object.entries(colorGroups).map(c => ({ objectIds: c[1], color: c[0] }));
+    const res = await this.viewer.setUserObjectColors(groups as [{ objectIds: string[]; color: string; }]);
+    console.log("res:", res);
+    // console.log("groups:", groups);
+    // groups.forEach(async (group) => {
+    //   const res = await this.viewer.setUserObjectColors(group as [{
+    //     objectIds: string[];
+    //     color: string;
+    //   }]);
+    //   console.log("res:", res);
+    // })
     // this.viewer.setUserObjectColors(groups);
     // console.log("setColors, colors:", colors);
     // if (colors && colors.length > 0) {

@@ -11,7 +11,14 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue, Watch } from "vue-property-decorator";
-import { DefaultViewerParams, NumericPropertyInfo, PropertyInfo, SelectionEvent, Viewer, ViewerEvent } from "@speckle/viewer";
+import {
+  DefaultViewerParams,
+  NumericPropertyInfo,
+  PropertyInfo,
+  SelectionEvent,
+  Viewer,
+  ViewerEvent,
+} from "@speckle/viewer";
 
 import * as THREE from "three";
 import {
@@ -30,10 +37,14 @@ interface StringPropertyInfo extends PropertyInfo {
   valueGroups: { value: string; ids: string[] }[];
 }
 
-function instanceOfNumericPropertyInfo(object: any): object is NumericPropertyInfo {
+function instanceOfNumericPropertyInfo(
+  object: any
+): object is NumericPropertyInfo {
   return "type" in object && object.type === "number" && "key" in object;
 }
-function instanceOfStringPropertyInfo(object: any): object is StringPropertyInfo {
+function instanceOfStringPropertyInfo(
+  object: any
+): object is StringPropertyInfo {
   return "type" in object && object.type === "string" && "key" in object;
 }
 
@@ -104,8 +115,11 @@ export default class extends Vue {
     this.domElement.style.display = "inline-block";
     (this.$refs.rendererparent as any).appendChild(renderDomElement);
 
-    this.viewer = new Viewer(renderDomElement, { ...DefaultViewerParams, showStats: false });
-    console.log("this.viewer:", this.viewer)
+    this.viewer = new Viewer(renderDomElement, {
+      ...DefaultViewerParams,
+      showStats: false,
+    });
+    console.log("this.viewer:", this.viewer);
     objecturls.forEach(async (url) => {
       await this.viewer.loadObject(url, this.token);
 
@@ -117,24 +131,27 @@ export default class extends Vue {
       // this.viewer.interactions.zoomExtents();
     });
 
-    this.viewer.on(ViewerEvent.ObjectClicked, (selectionInfo: SelectionEvent | null) => {
-      console.log("selectionInfo:", selectionInfo)
-      if (!selectionInfo) {
-        this.viewer.resetSelection()
-      } else {
-        // this.viewer.selectObjects(selectionInfo.hits.map(h => (h.object as any).id))
-        console.log("id:", (selectionInfo.hits[0].object as any).id)
-        this.viewer.selectObjects([(selectionInfo.hits[0].object as any).id])
+    this.viewer.on(
+      ViewerEvent.ObjectClicked,
+      (selectionInfo: SelectionEvent | null) => {
+        console.log("selectionInfo:", selectionInfo);
+        if (!selectionInfo) {
+          this.viewer.resetSelection();
+        } else {
+          // this.viewer.selectObjects(selectionInfo.hits.map(h => (h.object as any).id))
+          console.log("id:", (selectionInfo.hits[0].object as any).id);
+          this.viewer.selectObjects([(selectionInfo.hits[0].object as any).id]);
+        }
+        // if (selectionInfo) {
+        //   // Object was clicked. Focus in on it
+        //   this.viewer.zoom([selectionInfo.userData.id as string])
+        // }
+        // else {
+        //   // No object clicked. Restore focus to entire scene
+        //   this.viewer.zoom()
+        // }
       }
-      // if (selectionInfo) {
-      //   // Object was clicked. Focus in on it
-      //   this.viewer.zoom([selectionInfo.userData.id as string])
-      // }
-      // else {
-      //   // No object clicked. Restore focus to entire scene
-      //   this.viewer.zoom()	
-      // }
-    })
+    );
     // no event for object deselection, so the below is a little weird (and will probably break at some point)
     // this.viewer.on(ViewerEvent.ObjectClicked, (args: any) => {
     //   console.log("args:", args)
@@ -148,8 +165,8 @@ export default class extends Vue {
     if (this.filtered === true) {
       await this.viewer.applyFilter({
         filterBy: {
-          id: this.selectedIds
-        }
+          id: this.selectedIds,
+        },
       });
     } else {
       await this.viewer.applyFilter(null);
@@ -160,10 +177,11 @@ export default class extends Vue {
     this.viewer.setLightConfiguration({
       castShadow: false,
       enabled: true,
-      indirectLightIntensity: 1
+      indirectLightIntensity: 1,
     });
     const properties = this.findFilters();
-    const allObjects = (this.viewer as any).speckleRenderer.allObjects as THREE.Group;
+    const allObjects = (this.viewer as any).speckleRenderer
+      .allObjects as THREE.Group;
     const allObjectsChildren = allObjects.children;
     const allMesh: THREE.Mesh[] = [];
     allObjectsChildren.forEach((oc) => {
@@ -183,56 +201,100 @@ export default class extends Vue {
 
   findFilters() {
     const allProperties: PropertyInfo[] = this.viewer.getObjectProperties();
-    const stringProperties: StringPropertyInfo[] = allProperties.filter(instanceOfStringPropertyInfo);
-    const numericProperties: NumericPropertyInfo[] = allProperties.filter(instanceOfNumericPropertyInfo);
-    const properties = [...stringProperties, ...numericProperties];
+    const stringProperties: StringPropertyInfo[] = allProperties.filter(
+      instanceOfStringPropertyInfo
+    );
+    const numericProperties: NumericPropertyInfo[] = allProperties.filter(
+      instanceOfNumericPropertyInfo
+    );
+    const propertiesArr = [...stringProperties, ...numericProperties];
+    const properties: {
+      [key: string]: StringPropertyInfo | NumericPropertyInfo;
+    } = {};
+    propertiesArr.forEach((pa) => {
+      properties[pa.key] = pa;
+    });
     // const properties: (NumericPropertyInfo | StringPropertyInfo)[] = allProperties.filter(p => instanceOfNumericPropertyInfo(p) || instanceOfStringPropertyInfo(p))
-    console.log("properties:", properties)
+    console.log("properties:", properties);
     //  as {
     //   [key: string]: SpeckleProperty<number | string | boolean>;
     // };
     let keys = Object.keys(properties);
-    let cleanedProps: Filters = properties.map((p): Filter<string | number | boolean> => {
-      if (p.key.startsWith("parameters.")) {
-        if (p.key.endsWith(".value")) {
-          let name = p.key.split(".").slice(-1)[0];
-          let data: SpeckleProperty<string | number | boolean> = {
-            allValues: p.valueGroups.map(i => i.value),
-            maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
-            minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
-            type: p.type,
-
-          };
-          let rawName = p.key;
+    let cleanedProps: Filters = keys.map((k) => {
+      if (k.startsWith("parameters.")) {
+        if (k.endsWith(".value")) {
+          let name = properties[k.replace(".value", ".name")].valueGroups[0]
+            .value as string;
+          let data = properties[k];
+          let rawName = k;
           return {
             name,
             rawName,
-            data,
+            data: {
+              allValues: data.valueGroups.map((vg) => vg.value),
+              maxValue: instanceOfNumericPropertyInfo(data) ? data.max : "",
+              minValue: instanceOfNumericPropertyInfo(data) ? data.min : "",
+              type: data.type,
+            },
           };
         }
       }
-      let [rawName] = p.key.split(".").slice(-1);
-      let data: SpeckleProperty<string | number | boolean> = {
-            allValues: p.valueGroups.map(i => i.value),
-            maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
-            minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
-            type: p.type,
-
-          };
+      let [rawName] = k.split(".").slice(-1);
+      let data = properties[k];
       return {
-        name: rawName,
+        name: k,
         rawName,
-        data,
+        data: {
+          allValues: data.valueGroups.map((vg) => vg.value),
+          maxValue: instanceOfNumericPropertyInfo(data) ? data.max : "",
+          minValue: instanceOfNumericPropertyInfo(data) ? data.min : "",
+          type: data.type,
+        },
       };
     });
-    console.log("cleanedProps:", cleanedProps)
     return cleanedProps;
+    // let keys = Object.keys(properties);
+    // let cleanedProps: Filters = properties.map((p): Filter<string | number | boolean> => {
+    //   if (p.key.startsWith("parameters.")) {
+    //     if (p.key.endsWith(".value")) {
+    //       let name = p.key.split(".").slice(-1)[0];
+    //       let data: SpeckleProperty<string | number | boolean> = {
+    //         allValues: p.valueGroups.map(i => i.value),
+    //         maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
+    //         minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
+    //         type: p.type,
+
+    //       };
+    //       let rawName = p.key;
+    //       return {
+    //         name,
+    //         rawName,
+    //         data,
+    //       };
+    //     }
+    //   }
+    //   let [rawName] = p.key.split(".").slice(-1);
+    //   let data: SpeckleProperty<string | number | boolean> = {
+    //         allValues: p.valueGroups.map(i => i.value),
+    //         maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
+    //         minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
+    //         type: p.type,
+
+    //       };
+    //   return {
+    //     name: p.key,
+    //     rawName,
+    //     data,
+    //   };
+    // });
+    // console.log("cleanedProps:", cleanedProps)
+    // return cleanedProps;
   }
 
   async setColors(colors: Color[]) {
     // const groups = colors.map(c => ({ objectIds: [c.id], color: c.color ? c.color : "" }));
     const colorGroups: { [color: string]: string[] } = {};
-    colors.forEach(c => {
+    colors.forEach((c) => {
       if (c.color) {
         if (c.color in colorGroups && colorGroups[c.color].length > 0) {
           colorGroups[c.color].push(c.id);
@@ -241,9 +303,14 @@ export default class extends Vue {
         }
       }
     });
-    console.log("colorGroups:", colorGroups)
-    const groups = Object.entries(colorGroups).map(c => ({ objectIds: c[1], color: c[0] }));
-    const res = await this.viewer.setUserObjectColors(groups as [{ objectIds: string[]; color: string; }]);
+    console.log("colorGroups:", colorGroups);
+    const groups = Object.entries(colorGroups).map((c) => ({
+      objectIds: c[1],
+      color: c[0],
+    }));
+    const res = await this.viewer.setUserObjectColors(
+      groups as [{ objectIds: string[]; color: string }]
+    );
     console.log("res:", res);
     // console.log("groups:", groups);
     // groups.forEach(async (group) => {

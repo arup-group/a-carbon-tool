@@ -19,6 +19,7 @@
         :display="!modal"
         :selectedIds="selectedIds"
         :filtered="filtered"
+        :allIds="allIds"
       />
       <div :style="modal ? 'width: 100%;' : 'width: 35%;'">
         <AssessmentStepper
@@ -163,6 +164,7 @@ export default class Assessment extends Vue {
   allMesh: THREE.Mesh[] = [];
   projectData!: ProjectDataComplete;
   projectDataPassdown: ProjectDataComplete | null = null;
+  allIds: string[] = [];
 
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
@@ -393,6 +395,7 @@ export default class Assessment extends Vue {
       }
 
       this.types = this.findTypes(this.objectsObj);
+      this.allIds = this.types.map(t => t.ids).flat();
       this.totalVolume = totalVol;
 
       this.updateVolumeGradient();

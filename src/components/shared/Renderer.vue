@@ -1,10 +1,55 @@
 <template>
   <div>
+    <!-- COME BACK TO THIS LATER!!!! -->
+    <!-- <v-card style="z-index: 1">
+      <v-card-text>
+        <div class="d-flex align-center">
+          <span class="mr-5">Sun shadows</span>
+          <v-switch v-model="config.enabled" inset :label="``" />
+        </div>
+        <v-slider
+          v-model="config.intensity"
+          step="0"
+          max="10"
+          min="1"
+          :thumb-size="24"
+          label="Sun intensity"
+          :disabled="!config.enabled"
+        />
+        <v-slider
+          v-model="config.elevation"
+          step="0"
+          :min="0"
+          :max="Math.PI"
+          :thumb-size="24"
+          label="Sun elevation"
+          :disabled="!config.enabled"
+        />
+        <v-slider
+          v-model="config.azimuth"
+          step="0"
+          :min="-Math.PI * 0.5"
+          :max="Math.PI * 0.5"
+          :thumb-size="24"
+          label="Sun azimuth"
+          :disabled="!config.enabled"
+        />
+        <v-slider
+          v-model="config.indirectLightIntensity"
+          step="0"
+          min="0.0"
+          max="5.0"
+          :thumb-size="24"
+          label="Indirect light"
+        />
+      </v-card-text>
+    </v-card> -->
     <div
       ref="rendererparent"
       id="rendererparent"
       style="height: 700px; width: 100%"
     ></div>
+    
     <p v-if="loading !== 100">{{ loading }}</p>
   </div>
 </template>
@@ -12,6 +57,7 @@
 <script lang="ts">
 import { Component, Emit, Prop, Vue, Watch } from "vue-property-decorator";
 import {
+  DefaultLightConfiguration,
   DefaultViewerParams,
   NumericPropertyInfo,
   PropertyInfo,
@@ -31,6 +77,7 @@ import {
   SpeckleProperty,
   UserData,
 } from "@/models/renderer/";
+import { watch } from "vue";
 
 interface StringPropertyInfo extends PropertyInfo {
   type: "string";
@@ -57,8 +104,22 @@ export default class extends Vue {
   @Prop() display!: boolean;
   @Prop() selectedIds!: string[];
   @Prop() filtered!: boolean;
+  @Prop() allIds!: string[];
 
   currentColors: Color[] = [];
+  config = { ...DefaultLightConfiguration };
+  visibleObjects: string[] = []; // all the id's that are currently visible
+  selectedObjects: UserData[] = [];
+  @Watch("config", { deep: true })
+  updateConfig() {
+    this.viewer.setLightConfiguration(this.config);
+  }
+
+  @Watch("allIds")
+  updateAllIds() {
+    this.visibleObjects = this.allIds;
+    console.log("visibleObjects:", this.visibleObjects);
+  }
 
   @Watch("colors")
   onObjectColorChanged(value: Color[]) {
@@ -74,15 +135,10 @@ export default class extends Vue {
   @Watch("gradientColorProperty")
   async onGradientChange(value: GradientColor) {
     if (value) {
-      await this.viewer.applyFilter({
-        colorBy: {
-          type: "gradient",
-          property: value.property,
-          minValue: value.minValue,
-          maxValue: value.maxValue,
-          gradientColors: value.colors,
-        },
-      });
+      const propertyData = this.viewer.getObjectProperties();
+      const data = propertyData.find((v) => v.key === value.property );
+      if (data) this.viewer.setColorFilter(data);
+      else console.log("no data :(", data, "value:", value);
     }
   }
 
@@ -90,7 +146,7 @@ export default class extends Vue {
   alertMessage!: string;
   showAlert = false;
   viewer!: Viewer;
-  selectedObjects: any[] = [];
+  // selectedObjects: any[] = [];
 
   loading = 0;
   failed = false;
@@ -134,51 +190,48 @@ export default class extends Vue {
     this.viewer.on(
       ViewerEvent.ObjectClicked,
       (selectionInfo: SelectionEvent | null) => {
-        console.log("selectionInfo:", selectionInfo);
         if (!selectionInfo) {
           this.viewer.resetSelection();
+          this.selectedObjects = [];
         } else {
-          // this.viewer.selectObjects(selectionInfo.hits.map(h => (h.object as any).id))
-          console.log("id:", (selectionInfo.hits[0].object as any).id);
-          this.viewer.selectObjects([(selectionInfo.hits[0].object as any).id]);
+          let objectWasSelected = false;
+          if (!selectionInfo.multiple) this.selectedObjects = [];
+          selectionInfo.hits.forEach(async (si) => {
+            const isSelected = this.selectedObjects.find(so => so.id === (si.object as any).id);
+            if (!isSelected) {
+              const isIn = this.visibleObjects.find(vo => vo === (si.object as any).id);
+              if (isIn && objectWasSelected == false) {
+                objectWasSelected = true
+                this.selectedObjects.push(si.object as any)
+                await this.viewer.selectObjects(this.selectedObjects.map(so => so.id));
+              }
+            } else objectWasSelected = true;
+          });
+          if (!objectWasSelected) {
+            this.viewer.resetSelection();
+            this.selectedObjects = [];
+          }
         }
-        // if (selectionInfo) {
-        //   // Object was clicked. Focus in on it
-        //   this.viewer.zoom([selectionInfo.userData.id as string])
-        // }
-        // else {
-        //   // No object clicked. Restore focus to entire scene
-        //   this.viewer.zoom()
-        // }
+        this.objectsSelected(this.selectedObjects)
       }
     );
-    // no event for object deselection, so the below is a little weird (and will probably break at some point)
-    // this.viewer.on(ViewerEvent.ObjectClicked, (args: any) => {
-    //   console.log("args:", args)
-    // })
-    // this.viewer.interactions.selectionHelper.on("object-clicked", () => {
-    //   this.objectsSelected(this.viewer.interactions.selectedObjectsUserData);
-    // });
   }
 
   async setSelect() {
     if (this.filtered === true) {
-      await this.viewer.applyFilter({
-        filterBy: {
-          id: this.selectedIds,
-        },
-      });
+      this.visibleObjects = this.selectedIds;
+      await this.viewer.isolateObjects(this.selectedIds);
     } else {
-      await this.viewer.applyFilter(null);
+      // await this.viewer.applyFilter(null);
+      await this.viewer.resetFilters();
       this.setColors(this.colors);
+      this.updateAllIds();
     }
   }
   afterLoad() {
-    this.viewer.setLightConfiguration({
-      castShadow: false,
-      enabled: true,
-      indirectLightIntensity: 1,
-    });
+    console.log("defaultLightConfiguration:", DefaultLightConfiguration);
+
+    console.log("viewer:", this.viewer);
     const properties = this.findFilters();
     const allObjects = (this.viewer as any).speckleRenderer
       .allObjects as THREE.Group;
@@ -353,6 +406,7 @@ export default class extends Vue {
 
   @Emit("objectsSelected")
   objectsSelected(objects: UserData[]) {
+    console.log("selectedObjects:", objects)
     return objects;
   }
 }

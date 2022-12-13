@@ -4,6 +4,7 @@
     rounded
     color="primary"
     class="d-flex justify-center align-center"
+    style="z-index: 10"
   >
     <v-card style="width: 100%">
       <v-card-title style="height: 50px" class="d-flex justify-space-between">

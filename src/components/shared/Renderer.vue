@@ -1,56 +1,94 @@
 <template>
-  <div>
-    <!-- COME BACK TO THIS LATER!!!! -->
-    <!-- <v-card style="z-index: 1">
-      <v-card-text>
-        <div class="d-flex align-center">
-          <span class="mr-5">Sun shadows</span>
-          <v-switch v-model="config.enabled" inset :label="``" />
-        </div>
-        <v-slider
-          v-model="config.intensity"
-          step="0"
-          max="10"
-          min="1"
-          :thumb-size="24"
-          label="Sun intensity"
-          :disabled="!config.enabled"
-        />
-        <v-slider
-          v-model="config.elevation"
-          step="0"
-          :min="0"
-          :max="Math.PI"
-          :thumb-size="24"
-          label="Sun elevation"
-          :disabled="!config.enabled"
-        />
-        <v-slider
-          v-model="config.azimuth"
-          step="0"
-          :min="-Math.PI * 0.5"
-          :max="Math.PI * 0.5"
-          :thumb-size="24"
-          label="Sun azimuth"
-          :disabled="!config.enabled"
-        />
-        <v-slider
-          v-model="config.indirectLightIntensity"
-          step="0"
-          min="0.0"
-          max="5.0"
-          :thumb-size="24"
-          label="Indirect light"
-        />
-      </v-card-text>
-    </v-card> -->
+  <div style="width: 100%; height: 100%" class="d-flex justify-center flex-column align-center">
     <div
       ref="rendererparent"
       id="rendererparent"
       style="height: 700px; width: 100%"
-    ></div>
-    
-    <p v-if="loading !== 100">{{ loading }}</p>
+      class="d-flex flex-column justify-center align-center"
+    >
+    <v-progress-linear
+        v-if="loading < 100"
+        v-model="loading"
+        height="4"
+        rounded
+        class="vertical-center elevation-10"
+        style="width: 45%"
+      ></v-progress-linear>
+    </div>
+    <v-card
+      class="elevation-5 rounded-xl pl-3 py-0 d-flex align-center justify-center"
+      height="44"
+      style="max-width: 10vw; overflow-x: auto; overflow-y: hidden"
+    >
+    <v-menu
+      :close-on-content-click="false"
+      origin="center"
+      rounded="lg"
+      open-on-hover
+      top
+      offset-y
+      close-delay="400"
+      nudge-top="10"
+      nudge-left="100"
+      nudge-width="200"
+    >
+      <template #activator="{ on, attrs }">
+        <v-btn
+          :small="small"
+          rounded
+          icon
+          class="mr-2"
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon small>mdi-white-balance-sunny</v-icon>
+        </v-btn>
+      </template>
+      <v-card >
+        <v-card-text>
+          <div class="d-flex align-center">
+            <span class="mr-5">Sun shadows</span>
+            <v-switch v-model="config.enabled" inset :label="``" />
+          </div>
+          <v-slider
+            v-model="config.intensity"
+            step="0"
+            max="10"
+            min="1"
+            :thumb-size="24"
+            label="Sun intensity"
+            :disabled="!config.enabled"
+          />
+          <v-slider
+            v-model="config.elevation"
+            step="0"
+            :min="0"
+            :max="Math.PI"
+            :thumb-size="24"
+            label="Sun elevation"
+            :disabled="!config.enabled"
+          />
+          <v-slider
+            v-model="config.azimuth"
+            step="0"
+            :min="-Math.PI * 0.5"
+            :max="Math.PI * 0.5"
+            :thumb-size="24"
+            label="Sun azimuth"
+            :disabled="!config.enabled"
+          />
+          <v-slider
+            v-model="config.indirectLightIntensity"
+            step="0"
+            min="0.0"
+            max="5.0"
+            :thumb-size="24"
+            label="Indirect light"
+          />
+        </v-card-text>
+      </v-card>
+    </v-menu>
+    </v-card>
   </div>
 </template>
 
@@ -106,6 +144,7 @@ export default class extends Vue {
   @Prop() filtered!: boolean;
   @Prop() allIds!: string[];
 
+  small = false;
   currentColors: Color[] = [];
   config = { ...DefaultLightConfiguration };
   visibleObjects: string[] = []; // all the id's that are currently visible
@@ -136,7 +175,7 @@ export default class extends Vue {
   async onGradientChange(value: GradientColor) {
     if (value) {
       const propertyData = this.viewer.getObjectProperties();
-      const data = propertyData.find((v) => v.key === value.property );
+      const data = propertyData.find((v) => v.key === value.property);
       if (data) this.viewer.setColorFilter(data);
       else console.log("no data :(", data, "value:", value);
     }
@@ -197,13 +236,19 @@ export default class extends Vue {
           let objectWasSelected = false;
           if (!selectionInfo.multiple) this.selectedObjects = [];
           selectionInfo.hits.forEach(async (si) => {
-            const isSelected = this.selectedObjects.find(so => so.id === (si.object as any).id);
+            const isSelected = this.selectedObjects.find(
+              (so) => so.id === (si.object as any).id
+            );
             if (!isSelected) {
-              const isIn = this.visibleObjects.find(vo => vo === (si.object as any).id);
+              const isIn = this.visibleObjects.find(
+                (vo) => vo === (si.object as any).id
+              );
               if (isIn && objectWasSelected == false) {
-                objectWasSelected = true
-                this.selectedObjects.push(si.object as any)
-                await this.viewer.selectObjects(this.selectedObjects.map(so => so.id));
+                objectWasSelected = true;
+                this.selectedObjects.push(si.object as any);
+                await this.viewer.selectObjects(
+                  this.selectedObjects.map((so) => so.id)
+                );
               }
             } else objectWasSelected = true;
           });
@@ -212,7 +257,7 @@ export default class extends Vue {
             this.selectedObjects = [];
           }
         }
-        this.objectsSelected(this.selectedObjects)
+        this.objectsSelected(this.selectedObjects);
       }
     );
   }
@@ -406,7 +451,7 @@ export default class extends Vue {
 
   @Emit("objectsSelected")
   objectsSelected(objects: UserData[]) {
-    console.log("selectedObjects:", objects)
+    console.log("selectedObjects:", objects);
     return objects;
   }
 }

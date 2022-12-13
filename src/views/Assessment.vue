@@ -7,23 +7,9 @@
       class="d-flex justify-flex-start flex-row"
       style="margin: 10px; padding: 10px; width: 100%"
     >
-      <Renderer
-        class="justify-flex-end"
-        v-if="objectURLs.length !== 0"
-        @loaded="rendererLoaded"
-        @objectsSelected="objectsSelected"
-        :objecturls="objectURLs"
-        :token="token"
-        :colors="colors"
-        :gradientColorProperty="volumeGradientPassdown"
-        :display="!modal"
-        :selectedIds="selectedIds"
-        :filtered="filtered"
-        :allIds="allIds"
-      />
       <div :style="modal ? 'width: 100%;' : 'width: 35%;'">
         <AssessmentStepper
-          style="z-index: 1"
+          style="z-index: 10"
           v-if="availableStreams.length !== 0"
           @loadStream="loadStream"
           @materialUpdated="materialUpdated"
@@ -54,6 +40,21 @@
           :invalidSelectedObjects="invalidSelectedObjects"
         />
       </div>
+      <Renderer
+        class="justify-flex-end"
+        style="max-width: 75vw"
+        v-if="objectURLs.length !== 0"
+        @loaded="rendererLoaded"
+        @objectsSelected="objectsSelected"
+        :objecturls="objectURLs"
+        :token="token"
+        :colors="colors"
+        :gradientColorProperty="volumeGradientPassdown"
+        :display="!modal"
+        :selectedIds="selectedIds"
+        :filtered="filtered"
+        :allIds="allIds"
+      />
     </v-container>
     <new-branch-dialog
       :dialog="newBranchDialog"

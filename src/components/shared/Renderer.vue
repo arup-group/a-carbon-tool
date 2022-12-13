@@ -107,15 +107,11 @@ import {
 import * as THREE from "three";
 import {
   Color,
-  Filter,
   Filters,
   GradientColor,
   RendererLoaded,
-  SelectObject,
-  SpeckleProperty,
   UserData,
 } from "@/models/renderer/";
-import { watch } from "vue";
 
 interface StringPropertyInfo extends PropertyInfo {
   type: "string";
@@ -157,7 +153,6 @@ export default class extends Vue {
   @Watch("allIds")
   updateAllIds() {
     this.visibleObjects = this.allIds;
-    console.log("visibleObjects:", this.visibleObjects);
   }
 
   @Watch("colors")
@@ -177,7 +172,6 @@ export default class extends Vue {
       const propertyData = this.viewer.getObjectProperties();
       const data = propertyData.find((v) => v.key === value.property);
       if (data) this.viewer.setColorFilter(data);
-      else console.log("no data :(", data, "value:", value);
     }
   }
 
@@ -185,7 +179,6 @@ export default class extends Vue {
   alertMessage!: string;
   showAlert = false;
   viewer!: Viewer;
-  // selectedObjects: any[] = [];
 
   loading = 0;
   failed = false;
@@ -214,7 +207,6 @@ export default class extends Vue {
       ...DefaultViewerParams,
       showStats: false,
     });
-    console.log("this.viewer:", this.viewer);
     objecturls.forEach(async (url) => {
       await this.viewer.loadObject(url, this.token);
 
@@ -223,7 +215,6 @@ export default class extends Vue {
 
     this.viewer.on(ViewerEvent.LoadProgress, (args) => {
       this.loading = Math.ceil(args.progress * 100);
-      // this.viewer.interactions.zoomExtents();
     });
 
     this.viewer.on(
@@ -267,16 +258,12 @@ export default class extends Vue {
       this.visibleObjects = this.selectedIds;
       await this.viewer.isolateObjects(this.selectedIds);
     } else {
-      // await this.viewer.applyFilter(null);
       await this.viewer.resetFilters();
       this.setColors(this.colors);
       this.updateAllIds();
     }
   }
   afterLoad() {
-    console.log("defaultLightConfiguration:", DefaultLightConfiguration);
-
-    console.log("viewer:", this.viewer);
     const properties = this.findFilters();
     const allObjects = (this.viewer as any).speckleRenderer
       .allObjects as THREE.Group;
@@ -312,11 +299,6 @@ export default class extends Vue {
     propertiesArr.forEach((pa) => {
       properties[pa.key] = pa;
     });
-    // const properties: (NumericPropertyInfo | StringPropertyInfo)[] = allProperties.filter(p => instanceOfNumericPropertyInfo(p) || instanceOfStringPropertyInfo(p))
-    console.log("properties:", properties);
-    //  as {
-    //   [key: string]: SpeckleProperty<number | string | boolean>;
-    // };
     let keys = Object.keys(properties);
     let cleanedProps: Filters = keys.map((k) => {
       if (k.startsWith("parameters.")) {
@@ -351,46 +333,9 @@ export default class extends Vue {
       };
     });
     return cleanedProps;
-    // let keys = Object.keys(properties);
-    // let cleanedProps: Filters = properties.map((p): Filter<string | number | boolean> => {
-    //   if (p.key.startsWith("parameters.")) {
-    //     if (p.key.endsWith(".value")) {
-    //       let name = p.key.split(".").slice(-1)[0];
-    //       let data: SpeckleProperty<string | number | boolean> = {
-    //         allValues: p.valueGroups.map(i => i.value),
-    //         maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
-    //         minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
-    //         type: p.type,
-
-    //       };
-    //       let rawName = p.key;
-    //       return {
-    //         name,
-    //         rawName,
-    //         data,
-    //       };
-    //     }
-    //   }
-    //   let [rawName] = p.key.split(".").slice(-1);
-    //   let data: SpeckleProperty<string | number | boolean> = {
-    //         allValues: p.valueGroups.map(i => i.value),
-    //         maxValue: instanceOfStringPropertyInfo(p) ? "" : p.max,
-    //         minValue: instanceOfStringPropertyInfo(p) ? "" : p.min,
-    //         type: p.type,
-
-    //       };
-    //   return {
-    //     name: p.key,
-    //     rawName,
-    //     data,
-    //   };
-    // });
-    // console.log("cleanedProps:", cleanedProps)
-    // return cleanedProps;
   }
 
   async setColors(colors: Color[]) {
-    // const groups = colors.map(c => ({ objectIds: [c.id], color: c.color ? c.color : "" }));
     const colorGroups: { [color: string]: string[] } = {};
     colors.forEach((c) => {
       if (c.color) {
@@ -401,7 +346,6 @@ export default class extends Vue {
         }
       }
     });
-    console.log("colorGroups:", colorGroups);
     const groups = Object.entries(colorGroups).map((c) => ({
       objectIds: c[1],
       color: c[0],
@@ -409,31 +353,6 @@ export default class extends Vue {
     const res = await this.viewer.setUserObjectColors(
       groups as [{ objectIds: string[]; color: string }]
     );
-    console.log("res:", res);
-    // console.log("groups:", groups);
-    // groups.forEach(async (group) => {
-    //   const res = await this.viewer.setUserObjectColors(group as [{
-    //     objectIds: string[];
-    //     color: string;
-    //   }]);
-    //   console.log("res:", res);
-    // })
-    // this.viewer.setUserObjectColors(groups);
-    // console.log("setColors, colors:", colors);
-    // if (colors && colors.length > 0) {
-    //   const values: { [id: string]: string } = {};
-    //   colors.forEach((c) => {
-    //     Object.assign(values, { [c.id]: c.color });
-    //   });
-    //   await this.viewer.applyFilter({
-    //     colorBy: {
-    //       type: "category",
-    //       property: "id",
-    //       values,
-    //       default: "#636363",
-    //     },
-    //   });
-    // }
   }
 
   resetColors() {
@@ -451,7 +370,6 @@ export default class extends Vue {
 
   @Emit("objectsSelected")
   objectsSelected(objects: UserData[]) {
-    console.log("selectedObjects:", objects);
     return objects;
   }
 }

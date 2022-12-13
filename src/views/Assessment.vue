@@ -347,7 +347,6 @@ export default class Assessment extends Vue {
   }
 
   async rendererLoaded({ properties, allMesh }: RendererLoaded) {
-    console.log("properties:", properties, "\nallMesh:", allMesh)
     this.allMesh = allMesh;
     if (!this.update) {
       const res: ObjectDetails[] = await this.$store.dispatch(

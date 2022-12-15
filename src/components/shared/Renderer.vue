@@ -147,16 +147,7 @@ export default class extends Vue {
   @Prop() allIds!: string[];
 
   small = false;
-  config = {
-    enabled: true,
-    castShadow: true,
-    intensity: 5,
-    color: 16777215,
-    elevation: 1.33,
-    azimuth: 0.75,
-    radius: 0,
-    indirectLightIntensity: 1.2,
-  };
+  config = { ...DefaultLightConfiguration };
   visibleObjects: string[] = []; // all the id's that are currently visible
   selectedObjects: UserData[] = [];
   @Watch("config", { deep: true })
@@ -297,6 +288,7 @@ export default class extends Vue {
     this.viewer.resize();
     if (this.colors) this.setColors(this.colors);
     this.viewer.setLightConfiguration(this.config);
+    this.viewer.setView("3D");
 
     this.afterLoad();
   }

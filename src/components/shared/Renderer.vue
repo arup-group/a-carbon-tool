@@ -1,12 +1,15 @@
 <template>
-  <div style="width: 100%; height: 100%" class="d-flex justify-center flex-column align-center">
+  <div
+    style="width: 100%; height: 100%"
+    class="d-flex justify-center flex-column align-center"
+  >
     <div
       ref="rendererparent"
       id="rendererparent"
       style="height: 700px; width: 100%"
       class="d-flex flex-column justify-center align-center"
     >
-    <v-progress-linear
+      <v-progress-linear
         v-if="loading < 100"
         v-model="loading"
         height="4"
@@ -20,74 +23,74 @@
       height="44"
       style="max-width: 10vw; overflow-x: auto; overflow-y: hidden"
     >
-    <v-menu
-      :close-on-content-click="false"
-      origin="center"
-      rounded="lg"
-      open-on-hover
-      top
-      offset-y
-      close-delay="400"
-      nudge-top="10"
-      nudge-left="100"
-      nudge-width="200"
-    >
-      <template #activator="{ on, attrs }">
-        <v-btn
-          :small="small"
-          rounded
-          icon
-          class="mr-2"
-          v-bind="attrs"
-          v-on="on"
-        >
-          <v-icon small>mdi-white-balance-sunny</v-icon>
-        </v-btn>
-      </template>
-      <v-card >
-        <v-card-text>
-          <div class="d-flex align-center">
-            <span class="mr-5">Sun shadows</span>
-            <v-switch v-model="config.enabled" inset :label="``" />
-          </div>
-          <v-slider
-            v-model="config.intensity"
-            step="0"
-            max="10"
-            min="1"
-            :thumb-size="24"
-            label="Sun intensity"
-            :disabled="!config.enabled"
-          />
-          <v-slider
-            v-model="config.elevation"
-            step="0"
-            :min="0"
-            :max="Math.PI"
-            :thumb-size="24"
-            label="Sun elevation"
-            :disabled="!config.enabled"
-          />
-          <v-slider
-            v-model="config.azimuth"
-            step="0"
-            :min="-Math.PI * 0.5"
-            :max="Math.PI * 0.5"
-            :thumb-size="24"
-            label="Sun azimuth"
-            :disabled="!config.enabled"
-          />
-          <v-slider
-            v-model="config.indirectLightIntensity"
-            step="0"
-            min="0.0"
-            max="5.0"
-            :thumb-size="24"
-            label="Indirect light"
-          />
-        </v-card-text>
-      </v-card>
-    </v-menu>
+      <v-menu
+        :close-on-content-click="false"
+        origin="center"
+        rounded="lg"
+        open-on-hover
+        top
+        offset-y
+        close-delay="400"
+        nudge-top="10"
+        nudge-left="100"
+        nudge-width="200"
+      >
+        <template #activator="{ on, attrs }">
+          <v-btn
+            :small="small"
+            rounded
+            icon
+            class="mr-2"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon small>mdi-white-balance-sunny</v-icon>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-text>
+            <div class="d-flex align-center">
+              <span class="mr-5">Sun shadows</span>
+              <v-switch v-model="config.enabled" inset :label="``" />
+            </div>
+            <v-slider
+              v-model="config.intensity"
+              step="0"
+              max="10"
+              min="1"
+              :thumb-size="24"
+              label="Sun intensity"
+              :disabled="!config.enabled"
+            />
+            <v-slider
+              v-model="config.elevation"
+              step="0"
+              :min="0"
+              :max="Math.PI"
+              :thumb-size="24"
+              label="Sun elevation"
+              :disabled="!config.enabled"
+            />
+            <v-slider
+              v-model="config.azimuth"
+              step="0"
+              :min="-Math.PI * 0.5"
+              :max="Math.PI * 0.5"
+              :thumb-size="24"
+              label="Sun azimuth"
+              :disabled="!config.enabled"
+            />
+            <v-slider
+              v-model="config.indirectLightIntensity"
+              step="0"
+              min="0.0"
+              max="5.0"
+              :thumb-size="24"
+              label="Indirect light"
+            />
+          </v-card-text>
+        </v-card>
+      </v-menu>
     </v-card>
   </div>
 </template>
@@ -112,6 +115,9 @@ import {
   RendererLoaded,
   UserData,
 } from "@/models/renderer/";
+import { Assets } from "@speckle/viewer/dist/modules/Assets";
+import { Texture } from "three";
+import { GeometryType } from "@speckle/viewer/dist/modules/batching/Batch";
 
 interface StringPropertyInfo extends PropertyInfo {
   type: "string";
@@ -141,8 +147,16 @@ export default class extends Vue {
   @Prop() allIds!: string[];
 
   small = false;
-  currentColors: Color[] = [];
-  config = { ...DefaultLightConfiguration };
+  config = {
+    enabled: true,
+    castShadow: true,
+    intensity: 5,
+    color: 16777215,
+    elevation: 1.33,
+    azimuth: 0.75,
+    radius: 0,
+    indirectLightIntensity: 1.2,
+  };
   visibleObjects: string[] = []; // all the id's that are currently visible
   selectedObjects: UserData[] = [];
   @Watch("config", { deep: true })
@@ -182,36 +196,63 @@ export default class extends Vue {
 
   loading = 0;
   failed = false;
-  mounted() {
+  async mounted() {
     this.renderStream(this.objecturls);
   }
+  async beforeDestroy() {
+    this.config = {
+      enabled: true,
+      castShadow: true,
+      intensity: 5,
+      color: 16777215,
+      elevation: 1.33,
+      azimuth: 0.75,
+      radius: 0,
+      indirectLightIntensity: 1.2,
+    };
+    this.viewer.setLightConfiguration(this.config);
+
+    await this.viewer.cancelLoad(this.objecturls[0], true);
+    await this.viewer.unloadAll();
+  }
   @Watch("objecturls")
-  urlsChanged(newVal: string[]) {
+  async urlsChanged(newVal: string[]) {
     document.getElementById("renderer")?.remove();
+    await this.viewer.unloadAll();
     this.renderStream(newVal);
   }
 
-  renderStream(objecturls: string[]) {
-    let renderDomElement = document.getElementById("renderer");
+  async renderStream(objecturls: string[]) {
+    if (this.$store.state.speckleViewer.viewer) {
+      this.viewer = this.$store.state.speckleViewer.viewer;
 
-    if (!renderDomElement) {
-      renderDomElement = document.createElement("div");
-      renderDomElement.id = "renderer";
+      this.domElement = this.$store.state.speckleViewer.container;
+
+      (this.$refs.rendererparent as any).appendChild(this.domElement);
+    } else {
+      let renderDomElement = document.getElementById("renderer");
+
+      if (!renderDomElement) {
+        renderDomElement = document.createElement("div");
+        renderDomElement.id = "renderer";
+      }
+
+      this.domElement = renderDomElement;
+      this.domElement.style.display = "inline-block";
+      (this.$refs.rendererparent as any).appendChild(renderDomElement);
+
+      this.viewer = new Viewer(renderDomElement, {
+        ...DefaultViewerParams,
+        showStats: false,
+      });
+
+      this.$store.commit("setSpeckleViewer", {
+        viewer: this.viewer,
+        container: this.domElement,
+      });
+
+      await this.viewer.init();
     }
-
-    this.domElement = renderDomElement;
-    this.domElement.style.display = "inline-block";
-    (this.$refs.rendererparent as any).appendChild(renderDomElement);
-
-    this.viewer = new Viewer(renderDomElement, {
-      ...DefaultViewerParams,
-      showStats: false,
-    });
-    objecturls.forEach(async (url) => {
-      await this.viewer.loadObject(url, this.token);
-
-      this.afterLoad();
-    });
 
     this.viewer.on(ViewerEvent.LoadProgress, (args) => {
       this.loading = Math.ceil(args.progress * 100);
@@ -251,6 +292,13 @@ export default class extends Vue {
         this.objectsSelected(this.selectedObjects);
       }
     );
+
+    await this.viewer.loadObject(objecturls[0], this.token);
+    this.viewer.resize();
+    if (this.colors) this.setColors(this.colors);
+    this.viewer.setLightConfiguration(this.config);
+
+    this.afterLoad();
   }
 
   async setSelect() {
@@ -375,6 +423,12 @@ export default class extends Vue {
 }
 </script>
 <style>
+#rendererparent {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 80vh;
+}
 #renderer {
   position: absolute;
   top: 0;

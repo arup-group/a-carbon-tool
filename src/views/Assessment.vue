@@ -43,7 +43,7 @@
       <Renderer
         class="justify-flex-end"
         style="max-width: 75vw"
-        v-if="objectURLs.length !== 0"
+        v-if="objectURLs.length !== 0 && !finished"
         @loaded="rendererLoaded"
         @objectsSelected="objectsSelected"
         :objecturls="objectURLs"
@@ -201,6 +201,8 @@ export default class Assessment extends Vue {
   selectedObjects: string[] = []; // contains the id's of each selected object
   invalidSelectedObjects = false;
 
+  finished = false;
+
   @Emit("close")
   close() {
     return;
@@ -327,6 +329,7 @@ export default class Assessment extends Vue {
       await this.$store.dispatch("uploadReport", uploadReportInput);
       this.loading = false;
       this.saveSnack = true;
+      this.finished = true;
       this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
     }
   }
@@ -396,6 +399,7 @@ export default class Assessment extends Vue {
 
       this.types = this.findTypes(this.objectsObj);
       this.allIds = this.types.map(t => t.ids).flat();
+      console.log("Assessment.vue allIds:", this.allIds)
       this.totalVolume = totalVol;
 
       this.updateVolumeGradient();

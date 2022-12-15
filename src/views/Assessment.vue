@@ -42,7 +42,7 @@
       </div>
       <Renderer
         class="justify-flex-end"
-        style="max-width: 75vw"
+        style="max-width: 75vw; max-height: 75vh"
         v-if="objectURLs.length !== 0 && !finished"
         @loaded="rendererLoaded"
         @objectsSelected="objectsSelected"

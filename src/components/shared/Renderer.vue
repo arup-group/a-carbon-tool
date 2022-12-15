@@ -191,18 +191,6 @@ export default class extends Vue {
     this.renderStream(this.objecturls);
   }
   async beforeDestroy() {
-    this.config = {
-      enabled: true,
-      castShadow: true,
-      intensity: 5,
-      color: 16777215,
-      elevation: 1.33,
-      azimuth: 0.75,
-      radius: 0,
-      indirectLightIntensity: 1.2,
-    };
-    this.viewer.setLightConfiguration(this.config);
-
     await this.viewer.cancelLoad(this.objecturls[0], true);
     await this.viewer.unloadAll();
   }

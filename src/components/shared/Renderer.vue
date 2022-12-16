@@ -296,19 +296,10 @@ export default class extends Vue {
   }
   afterLoad() {
     const properties = this.findFilters();
-    const allObjects = (this.viewer as any).speckleRenderer
-      .allObjects as THREE.Group;
-    const allObjectsChildren = allObjects.children;
-    const allMesh: THREE.Mesh[] = [];
-    allObjectsChildren.forEach((oc) => {
-      const meshChildren = oc.children.filter(
-        (c) => c.type === "Mesh"
-      ) as THREE.Mesh[];
-
-      allMesh.push(...meshChildren);
-    });
+    const allMesh: THREE.Mesh[] = []; // NEEDED FOR AUTOMATIC VOLUME CALC, REMOVING FOR NOW
     // set initial colors if needed
     if (this.colors) {
+      console.log("setting some colours:", this.colors);
       this.setColors(this.colors);
     }
 

@@ -56,15 +56,21 @@ export default class VersionUpdateDialog extends Vue {
   @Prop() dialog!: boolean;
   @Prop() version!: string;
 
-  features: { title: string; subtitle: string }[] = [];
+  features: { title: string; subtitle: string }[] = [
+    {
+      title: "Updated Speckle Viewer",
+      subtitle: `Updated the Speckle Viewer to include some of the latest features.
+    Also has sped up the assessment and allows for running assessments on larger models`,
+    },
+  ];
 
   fixes: { title: string; subtitle: string }[] = [
     {
       title: "Bug on stream with large number of branches",
       subtitle: `A bug causing issues with streams that have a large number of branches has been fixed.
-                NOTE: if you're stream has more than 100 branches then issues may occur`
-    }
-  ]
+                NOTE: if you're stream has more than 100 branches then issues may occur`,
+    },
+  ];
 
   @Emit("close")
   close() {

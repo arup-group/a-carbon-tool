@@ -9,7 +9,6 @@
     >
       <div :style="modal ? 'width: 100%;' : 'width: 35%;'">
         <AssessmentStepper
-          style="z-index: 10"
           v-if="availableStreams.length !== 0"
           @loadStream="loadStream"
           @materialUpdated="materialUpdated"

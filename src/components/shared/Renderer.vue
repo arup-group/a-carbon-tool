@@ -272,11 +272,6 @@ export default class extends Vue {
       }
     );
 
-    this.viewer.on(ViewerEvent.LoadComplete, () => {
-      console.log("load complete?");
-      this.loading = 101;
-    })
-
     this.viewer.resize();
     this.viewer.cameraHandler.onWindowResize()
     await this.viewer.loadObject(objecturls[0], this.token);
@@ -284,6 +279,8 @@ export default class extends Vue {
     this.viewer.setLightConfiguration(this.config);
     this.viewer.setView("3D");
 
+    console.log("load complete?");
+    this.loading = 101;
     this.afterLoad();
   }
 

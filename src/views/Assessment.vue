@@ -65,6 +65,12 @@
       @newBranch="newBranchSelect"
       @updateBranch="updateBranchSelect"
     />
+    <v-overlay :value="loadingModel">
+      <loading-spinner
+        indeterminate
+        :text="loadingModelText"
+      />
+    </v-overlay>
     <SESnackBar
       @close="saveSnackClose"
       :success="saveSuccess"
@@ -151,6 +157,8 @@ export default class Assessment extends Vue {
   @Prop() modalBranchName!: string;
 
   loading = false;
+  loadingModel = false;
+  loadingModelText = "";
   saveSuccess = true;
   saveSnack = false;
   availableStreams: AvailableStream[] = [];
@@ -350,6 +358,7 @@ export default class Assessment extends Vue {
   }
 
   async rendererLoaded({ properties, allMesh }: RendererLoaded) {
+    this.loadingModelText = "Loading data from model...";
     this.allMesh = allMesh;
     if (!this.update) {
       const res: ObjectDetails[] = await this.$store.dispatch(
@@ -403,6 +412,8 @@ export default class Assessment extends Vue {
       this.totalVolume = totalVol;
 
       this.updateVolumeGradient();
+
+      this.loadingModel = false;
     }
   }
   findVolume(
@@ -695,6 +706,8 @@ export default class Assessment extends Vue {
   }
 
   async loadStream(id: string) {
+    this.loadingModel = true;
+    this.loadingModelText = "Loading model...";
     this.streamId = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];

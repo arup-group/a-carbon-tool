@@ -47,49 +47,7 @@
             <v-icon small>mdi-white-balance-sunny</v-icon>
           </v-btn>
         </template>
-        <v-card>
-          <v-card-text>
-            <div class="d-flex align-center">
-              <span class="mr-5">Sun shadows</span>
-              <v-switch v-model="config.enabled" inset :label="``" />
-            </div>
-            <v-slider
-              v-model="config.intensity"
-              step="0"
-              max="10"
-              min="1"
-              :thumb-size="24"
-              label="Sun intensity"
-              :disabled="!config.enabled"
-            />
-            <v-slider
-              v-model="config.elevation"
-              step="0"
-              :min="0"
-              :max="Math.PI"
-              :thumb-size="24"
-              label="Sun elevation"
-              :disabled="!config.enabled"
-            />
-            <v-slider
-              v-model="config.azimuth"
-              step="0"
-              :min="-Math.PI * 0.5"
-              :max="Math.PI * 0.5"
-              :thumb-size="24"
-              label="Sun azimuth"
-              :disabled="!config.enabled"
-            />
-            <v-slider
-              v-model="config.indirectLightIntensity"
-              step="0"
-              min="0.0"
-              max="5.0"
-              :thumb-size="24"
-              label="Indirect light"
-            />
-          </v-card-text>
-        </v-card>
+        <renderer-lighting-options v-model="config" />
       </v-menu>
     </v-card>
   </div>
@@ -115,9 +73,8 @@ import {
   RendererLoaded,
   UserData,
 } from "@/models/renderer/";
-import { Assets } from "@speckle/viewer/dist/modules/Assets";
-import { Texture } from "three";
-import { GeometryType } from "@speckle/viewer/dist/modules/batching/Batch";
+
+import RendererLightingOptions from "./RendererLightingOptions.vue";
 
 interface StringPropertyInfo extends PropertyInfo {
   type: "string";
@@ -135,7 +92,9 @@ function instanceOfStringPropertyInfo(
   return "type" in object && object.type === "string" && "key" in object;
 }
 
-@Component
+@Component({
+  components: { RendererLightingOptions }
+})
 export default class extends Vue {
   @Prop() objecturls!: string[];
   @Prop() token!: string;

@@ -29,7 +29,6 @@ export default class Menu3 extends Vue {
 
   @Emit("transportSelected")
   transportSelected(selected: TransportSelected) {
-    console.log("emitting transportSelected for some reason?????")
     return selected;
   }
 }

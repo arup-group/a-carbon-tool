@@ -273,13 +273,12 @@ export default class extends Vue {
     );
 
     this.viewer.resize();
-    this.viewer.cameraHandler.onWindowResize()
+    this.viewer.cameraHandler.onWindowResize();
     await this.viewer.loadObject(objecturls[0], this.token);
     if (this.colors) this.setColors(this.colors);
     this.viewer.setLightConfiguration(this.config);
     this.viewer.setView("3D");
 
-    console.log("load complete?");
     this.loading = 101;
     this.afterLoad();
   }
@@ -299,7 +298,6 @@ export default class extends Vue {
     const allMesh: THREE.Mesh[] = []; // NEEDED FOR AUTOMATIC VOLUME CALC, REMOVING FOR NOW
     // set initial colors if needed
     if (this.colors) {
-      console.log("setting some colours:", this.colors);
       this.setColors(this.colors);
     }
 

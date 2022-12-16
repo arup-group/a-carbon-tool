@@ -66,10 +66,7 @@
       @updateBranch="updateBranchSelect"
     />
     <v-overlay :value="loadingModel">
-      <loading-spinner
-        indeterminate
-        :text="loadingModelText"
-      />
+      <loading-spinner indeterminate :text="loadingModelText" />
     </v-overlay>
     <SESnackBar
       @close="saveSnackClose"
@@ -349,8 +346,7 @@ export default class Assessment extends Vue {
     if (material.type === this.filteredType) {
       this.filtered = false;
       this.selectedIds = [];
-    }
-    else {
+    } else {
       this.filtered = true;
       this.selectedIds = material.ids;
     }
@@ -362,9 +358,9 @@ export default class Assessment extends Vue {
     this.allMesh = allMesh;
 
     const volumeFilter = properties.find(
-        (p) => p.name.toLowerCase() === "volume"
-      );
-      this.volProp = volumeFilter ? volumeFilter.rawName : "";
+      (p) => p.name.toLowerCase() === "volume"
+    );
+    this.volProp = volumeFilter ? volumeFilter.rawName : "";
     if (!this.update) {
       const res: ObjectDetails[] = await this.$store.dispatch(
         "getObjectDetails",
@@ -408,8 +404,7 @@ export default class Assessment extends Vue {
       }
 
       this.types = this.findTypes(this.objectsObj);
-      this.allIds = this.types.map(t => t.ids).flat();
-      console.log("Assessment.vue allIds:", this.allIds)
+      this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
     }
 
@@ -464,26 +459,17 @@ export default class Assessment extends Vue {
         break;
       case Step.MATERIALS:
         this.resetColors();
-        console.log("materials?")
         this.colors = this.materialsColors;
         break;
       case Step.TRANSPORT:
         this.resetColors();
-        console.log("transport?")
         this.colors = this.transportColors;
         this.groupMaterials();
         break;
       case Step.QUANTITIES:
         this.resetColors();
-        if (this.volumeGradient && this.speckleVol) {
-          console.log("this.volumeGradient:", this.volumeGradient)
+        if (this.volumeGradient && this.speckleVol)
           this.volumeGradientPassdown = this.volumeGradient;
-        }
-        else {
-          console.log("nope")
-          console.log("this.volumeGradient:", this.volumeGradient)
-          console.log("this.speckleVol:", this.speckleVol)
-        }
         break;
       case Step.REVIEW:
         this.resetColors();
@@ -504,9 +490,12 @@ export default class Assessment extends Vue {
 
   objectsSelected(objects: UserData[]) {
     if (this.step === Step.MATERIALS) {
-      const keys = Object.keys(this.objectsObj)
-      this.selectedObjects = objects.filter((o) => keys.includes(o.id)).map((o) => o.id);
-      this.invalidSelectedObjects = this.selectedObjects.length !== objects.length;
+      const keys = Object.keys(this.objectsObj);
+      this.selectedObjects = objects
+        .filter((o) => keys.includes(o.id))
+        .map((o) => o.id);
+      this.invalidSelectedObjects =
+        this.selectedObjects.length !== objects.length;
     }
   }
 
@@ -724,7 +713,6 @@ export default class Assessment extends Vue {
   }
 
   transportSelected(selected: TransportSelected) {
-    console.log("transportSelected")
     const ids = selected.material.objects;
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
@@ -748,7 +736,6 @@ export default class Assessment extends Vue {
   }
 
   materialUpdated(material: MaterialUpdateOut) {
-    console.log("materialUpdated")
     const ids = material.type.ids;
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
@@ -758,7 +745,9 @@ export default class Assessment extends Vue {
           color: material.material.color,
           id,
         });
-      } catch(err) { console.error("err:", id) }
+      } catch (err) {
+        console.error("err:", id);
+      }
     });
     this.materialsColors = this.colors;
 

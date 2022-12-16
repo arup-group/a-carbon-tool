@@ -272,8 +272,9 @@ export default class extends Vue {
       }
     );
 
-    await this.viewer.loadObject(objecturls[0], this.token);
     this.viewer.resize();
+    this.viewer.cameraHandler.onWindowResize()
+    await this.viewer.loadObject(objecturls[0], this.token);
     if (this.colors) this.setColors(this.colors);
     this.viewer.setLightConfiguration(this.config);
     this.viewer.setView("3D");

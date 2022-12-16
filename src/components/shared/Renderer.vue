@@ -386,8 +386,9 @@ export default class extends Vue {
     );
   }
 
-  resetColors() {
-    this.viewer.applyFilter(null);
+  async resetColors() {
+    await this.viewer.resetFilters();
+    this.viewer.requestRender();
   }
 
   instanceOfObjectColor(object: any): object is Color {

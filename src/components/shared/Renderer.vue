@@ -10,7 +10,7 @@
       class="d-flex flex-column justify-center align-center"
     >
       <v-progress-linear
-        v-if="loading < 100"
+        v-if="loading <= 100"
         v-model="loading"
         height="4"
         rounded
@@ -271,6 +271,11 @@ export default class extends Vue {
         this.objectsSelected(this.selectedObjects);
       }
     );
+
+    this.viewer.on(ViewerEvent.LoadComplete, () => {
+      console.log("load complete?");
+      this.loading = 101;
+    })
 
     this.viewer.resize();
     this.viewer.cameraHandler.onWindowResize()

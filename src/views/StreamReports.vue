@@ -27,6 +27,7 @@
                 ></v-text-field>
                 <v-btn @click="openComparison" class="ml-4">Open comparison</v-btn>
                 <v-btn @click="openHistory" class="ml-4">Open history</v-btn>
+                <v-btn @click="openAddData" class="ml-4">Add custom data</v-btn>
               </v-toolbar>
             </template>
             <template v-slot:default="props">
@@ -84,6 +85,7 @@
       textError="Something went wrong, please retry"
       textSuccess="Report deleted!"
     />
+    <excel-import-dialog :dialog="excelImportDialog" @close="closeAddData" />
   </v-main>
 </template>
 <script lang="ts">
@@ -104,6 +106,7 @@ import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 import BackButton from "@/components/shared/BackButton.vue";
+import ExcelImportDialog from "@/components/shared/ExcelImportDialog.vue";
 
 @Component({
   components: {
@@ -114,7 +117,8 @@ import BackButton from "@/components/shared/BackButton.vue";
     SESnackBar,
     QuickReport,
     LoadingContainer,
-    BackButton
+    BackButton,
+    ExcelImportDialog
   },
 })
 export default class StreamReports extends Vue {
@@ -135,6 +139,7 @@ export default class StreamReports extends Vue {
   deleteSnack = false;
   streamid = "";
   streamName = "";
+  excelImportDialog = false;
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -145,6 +150,13 @@ export default class StreamReports extends Vue {
       .then((res: StreamName) => (this.streamName = res.data.stream.name));
 
     if (this.streamid) this.loadStreams();
+  }
+
+  openAddData() {
+    this.excelImportDialog = true;
+  }
+  closeAddData() {
+    this.excelImportDialog = false;
   }
 
   openHistory() {

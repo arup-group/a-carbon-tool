@@ -10,7 +10,7 @@
       class="d-flex flex-column justify-center align-center"
     >
       <v-progress-linear
-        v-if="loading <= 100"
+        v-if="loading <= 100 && showLoadingBar"
         v-model="loading"
         height="4"
         rounded
@@ -104,11 +104,17 @@ export default class extends Vue {
   @Prop() selectedIds!: string[];
   @Prop() filtered!: boolean;
   @Prop() allIds!: string[];
+  @Prop() loadingBar!: boolean;
 
   small = false;
   config = { ...DefaultLightConfiguration };
   visibleObjects: string[] = []; // all the id's that are currently visible
   selectedObjects: UserData[] = [];
+
+  get showLoadingBar() {
+    return this.loadingBar !== undefined ? this.loadingBar : true;
+  }
+
   @Watch("config", { deep: true })
   updateConfig() {
     this.viewer.setLightConfiguration(this.config);

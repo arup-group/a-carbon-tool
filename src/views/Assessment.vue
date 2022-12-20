@@ -53,6 +53,7 @@
         :selectedIds="selectedIds"
         :filtered="filtered"
         :allIds="allIds"
+        :loadingBar="false"
       />
     </v-container>
     <new-branch-dialog

@@ -85,7 +85,7 @@
       textError="Something went wrong, please retry"
       textSuccess="Report deleted!"
     />
-    <excel-import-dialog :dialog="excelImportDialog" @close="closeAddData" />
+    <excel-import-dialog :dialog="excelImportDialog" :streamId="streamid" @close="closeAddData" />
   </v-main>
 </template>
 <script lang="ts">

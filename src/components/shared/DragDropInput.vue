@@ -26,6 +26,7 @@
       />
     </div>
     <p v-if="fileTypeError" style="color: red">File must be of type .xlsx</p>
+    <p v-if="!excelFileValid" style="color: red">Sheet must follow specified format</p>
     <v-list-item v-if="file.name">
       <v-list-item-content>
         <v-list-item-title>
@@ -49,6 +50,7 @@ import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 export default class DragDropInput extends Vue {
   @Prop() value!: File;
   @Prop() darkMode!: boolean;
+  @Prop() excelFileValid!: boolean;
 
   @Watch("value", { deep: true })
   valueChange() {

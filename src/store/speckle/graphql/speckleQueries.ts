@@ -99,12 +99,13 @@ export const uploadObjectsMutation = (
 
 export const createBranchMutation = (
   streamid: string,
-  branchName: string
+  branchName: string,
+  description: string
 ) => `mutation {
   branchCreate(branch: {
     streamId: "${streamid}",
     name: "${branchName}",
-    description: "A Carbon Tool carbon report"
+    description: "${description}"
   })
 }`;
 

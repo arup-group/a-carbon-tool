@@ -235,6 +235,9 @@ export default new Vuex.Store({
       localStorage.setItem("darkMode", `${!state.darkMode}`);
       state.darkMode = !state.darkMode;
     },
+    addRegion(state, region: string) {
+      state.availableRegions.push(region);
+    },
     setRegion(state, region) {
       state.selectedRegion = region;
     },
@@ -492,7 +495,7 @@ export default new Vuex.Store({
       });
       // TODO: DELETE BRANCH FIRST TO ENSURE THE BRANCH ONLY CONTAINS OBJECTS FROM MOST RECENT REPORT
       const createBranch: SpeckleBranchRes =
-        await speckleUtil.createReportBranch(context, streamid, branchName);
+        await speckleUtil.createBranch(context, streamid, branchName, "A Carbon Tool carbon report");
 
       const totalChildrenCount = uploadObjectsRes.data.objectCreate.length;
 
@@ -579,9 +582,59 @@ export default new Vuex.Store({
         branches,
       };
     },
+    async saveNewRegion(context, { name, streamid, data }: SaveNewRegionInput) {
+      console.log("saveNewRegion, name:", name, "\ndata:", data);
+      const branchName = `actcarbonreport/data/${name}`;
+      const createBranchRes = await speckleUtil.createBranch(context, streamid, branchName, "Custom data");
+      console.log("createBranchRes:", createBranchRes);
+      const objToSave: {[key: string]: RegionMaterialCarbonFactors } = { };
+      objToSave[name] = data;
+      const id = `${new Date().getTime().toString()}-act`;
+      const objectData: SavedCustomRegion = {
+        id,
+        speckleType: "Base",
+        materials: objToSave
+      }
+      const formData = new FormData();
+      formData.append("batch1", new Blob([
+        JSON.stringify([{ ...objectData }])
+      ]));
+
+      await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${context.state.token.token}`,
+        },
+        body: formData,
+      });
+
+      const createCommitRes: CreateCommitRes = await speckleUtil.createCommit(
+        context,
+        streamid,
+        id,
+        0,
+        branchName
+      );
+
+      console.log("commit:", createCommitRes);
+    }
   },
   modules: {},
 });
+
+export interface SavedCustomRegion {
+  id: string;
+  speckleType: string;
+  materials: {
+      [key: string]: RegionMaterialCarbonFactors;
+  };
+}
+
+export interface SaveNewRegionInput {
+  name: string;
+  streamid: string;
+  data: RegionMaterialCarbonFactors;
+}
 
 export interface GetStreamNameReportBranchesOutput {
   streamName: string;

@@ -19,10 +19,10 @@ export interface ExcelData {
 }
 
 export function excelToJson(e: ProgressEvent<FileReader>) {
-    let data = new Uint8Array(e.target?.result as ArrayBuffer);
-    let workbook = XLSX.read(data, { type: 'array' });
-    let sheetName = workbook.SheetNames[0]
-    return workbook.Sheets[sheetName];
+  let data = new Uint8Array(e.target?.result as ArrayBuffer);
+  let workbook = XLSX.read(data, { type: "array" });
+  let sheetName = workbook.SheetNames[0];
+  return workbook.Sheets[sheetName];
 }
 
 export function instanceOfExcelData(object: any): object is ExcelData {
@@ -36,8 +36,20 @@ export function instanceOfExcelData(object: any): object is ExcelData {
 }
 
 export function verify(data: any[]) {
+  console.log("data:", data);
   const filtered = data.filter(instanceOfExcelData);
+  console.log("filtered:", filtered);
   return filtered.length === data.length ? filtered : undefined;
+}
+
+export function exportToMaterials(data: ExcelData[]): Material[] {
+  return data.map((d) => ({
+    productStageCarbonA1A3: d["Product Stage Carbon A1-A3"],
+    density: d.Density,
+    wastage: d.Wastage,
+    units: d.Units,
+    source: "custom",
+  }));
 }
 
 export function convertToStateMaterial(

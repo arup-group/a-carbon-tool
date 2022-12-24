@@ -2,13 +2,21 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
 import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
-import { Login, Server, AuthError, Token, ServerRegion, CustomServerStorage } from "@/models/auth/";
+import {
+  Login,
+  Server,
+  AuthError,
+  Token,
+  ServerRegion,
+  CustomServerStorage,
+} from "@/models/auth/";
 import router from "@/router";
 import {
   materialCarbonFactors,
   MaterialFull,
   RegionMaterialCarbonFactors,
   AllMaterialCarbonFactors,
+  Material,
 } from "./utilities/material-carbon-factors";
 import {
   ProjectDataComplete,
@@ -26,6 +34,7 @@ import {
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
+import { ExcelData } from "@/views/utils/ExcelImportUtils";
 
 Vue.use(Vuex);
 
@@ -51,7 +60,7 @@ export default new Vuex.Store({
         url: "",
         speckleId: process.env.VUE_APP_SPECKLE_ID_CUSTOM,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_CUSTOM,
-      }
+      },
     },
     selectedServer: {} as Server, // should be a server object
     token: {} as Token, // should be a Token object
@@ -216,13 +225,21 @@ export default new Vuex.Store({
       state.authed = true;
 
       if (data.server.region === ServerRegion.CUSTOM) {
-        localStorage.setItem(CustomServerStorage.LAST_SERVER, JSON.stringify(data.server.url));
-        const customServers = localStorage.getItem(CustomServerStorage.CUSTOM_SERVERS);
+        localStorage.setItem(
+          CustomServerStorage.LAST_SERVER,
+          JSON.stringify(data.server.url)
+        );
+        const customServers = localStorage.getItem(
+          CustomServerStorage.CUSTOM_SERVERS
+        );
         let customServersJson: string[]; // array of server urls
         if (customServers) customServersJson = JSON.parse(customServers);
         else customServersJson = [];
         customServersJson.push(data.server.url);
-        localStorage.setItem(CustomServerStorage.CUSTOM_SERVERS, JSON.stringify(customServersJson));
+        localStorage.setItem(
+          CustomServerStorage.CUSTOM_SERVERS,
+          JSON.stringify(customServersJson)
+        );
       }
     },
     setUser(state, user) {
@@ -494,8 +511,12 @@ export default new Vuex.Store({
         body: formData,
       });
       // TODO: DELETE BRANCH FIRST TO ENSURE THE BRANCH ONLY CONTAINS OBJECTS FROM MOST RECENT REPORT
-      const createBranch: SpeckleBranchRes =
-        await speckleUtil.createBranch(context, streamid, branchName, "A Carbon Tool carbon report");
+      const createBranch: SpeckleBranchRes = await speckleUtil.createBranch(
+        context,
+        streamid,
+        branchName,
+        "A Carbon Tool carbon report"
+      );
 
       const totalChildrenCount = uploadObjectsRes.data.objectCreate.length;
 
@@ -520,7 +541,7 @@ export default new Vuex.Store({
       context,
       { streamid, branchName }: CheckContainsChlidReportInput
     ) {
-      const queryRes = await speckleUtil.checkContainsBranch(
+      const queryRes: any = await speckleUtil.checkContainsBranch(
         context,
         streamid,
         `${context.state.speckleFolderName}/${branchName}`
@@ -584,21 +605,43 @@ export default new Vuex.Store({
     },
     async saveNewRegion(context, { name, streamid, data }: SaveNewRegionInput) {
       console.log("saveNewRegion, name:", name, "\ndata:", data);
-      const branchName = `actcarbonreport/data/${name}`;
-      const createBranchRes = await speckleUtil.createBranch(context, streamid, branchName, "Custom data");
+      const branchName = `actcarbonreportdata/${name}`;
+      const parentId = `${new Date().getTime().toString()}-act`;
+
+      const createBranchRes = await speckleUtil.createBranch(
+        context,
+        streamid,
+        branchName,
+        "Custom data"
+      );
       console.log("createBranchRes:", createBranchRes);
-      const objToSave: {[key: string]: RegionMaterialCarbonFactors } = { };
-      objToSave[name] = data;
-      const id = `${new Date().getTime().toString()}-act`;
-      const objectData: SavedCustomRegion = {
-        id,
+
+      const childObjects: ExcelDataSpeckleChild[] = data.map(d => ({
+        ...d,
+        speckle_type: "Base"
+      }));
+
+      const uploadObjectsRes: UploadObjectsRes = await speckleUtil.uploadObjectsGeneric(context, streamid, childObjects);
+      const childObjectIds = uploadObjectsRes.data.objectCreate;
+      const closure = Object.fromEntries(childObjectIds.map((c) => [c, 1]))
+
+      const parentObject: ExcelDataSpeckleParent = {
+        id: parentId,
         speckleType: "Base",
-        materials: objToSave
+        __closure: closure,
+        "@material": childObjectIds.map(id => ({
+          speckle_type: "reference",
+          referencedId: id
+        }))
       }
+
+      console.log("parentObject:", parentObject)
+
       const formData = new FormData();
-      formData.append("batch1", new Blob([
-        JSON.stringify([{ ...objectData }])
-      ]));
+      formData.append(
+        "batch1",
+        new Blob([JSON.stringify([{ ...parentObject }])])
+      );
 
       await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
         method: "POST",
@@ -611,29 +654,38 @@ export default new Vuex.Store({
       const createCommitRes: CreateCommitRes = await speckleUtil.createCommit(
         context,
         streamid,
-        id,
-        0,
+        parentId,
+        childObjectIds.length,
         branchName
       );
 
       console.log("commit:", createCommitRes);
-    }
+
+      return;
+    },
   },
   modules: {},
 });
 
-export interface SavedCustomRegion {
+
+export interface ExcelDataSpeckleChild extends Material {
+  speckle_type: "Base";
+}
+
+export interface ExcelDataSpeckleParent {
   id: string;
-  speckleType: string;
-  materials: {
-      [key: string]: RegionMaterialCarbonFactors;
-  };
+  speckleType: "Base";
+  __closure: { [key: string]: number };
+  "@material": {
+    referencedId: string,
+    speckle_type: "reference"
+  }[]
 }
 
 export interface SaveNewRegionInput {
   name: string;
   streamid: string;
-  data: RegionMaterialCarbonFactors;
+  data: Material[];
 }
 
 export interface GetStreamNameReportBranchesOutput {

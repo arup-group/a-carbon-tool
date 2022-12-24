@@ -20,6 +20,19 @@
           <v-btn @click="close" :disabled="loading">Close</v-btn>
         </v-card-actions>
       </v-form>
+      <v-overlay
+        absolute
+        :value="overlay"
+        opacity="0.9"
+      >
+        <div class="d-flex flex-column justify-center align-center">
+          <p>Success!</p>
+          <div class="d-flex justify-space-around">
+            <v-btn @click="removeOverlay" class="mr-4">Got it!</v-btn>
+            <v-btn @click="close">Close</v-btn>
+          </div>
+        </div>
+      </v-overlay>
     </v-card>
   </v-dialog>
 </template>
@@ -46,10 +59,15 @@ export default class ExcelImportDialog extends Vue {
   saveToSpeckle = true;
   excelFileValid = true;
   loading = false;
+  overlay = false;
 
   nameRules = [
     (n: string) => n != "" || "Must include a name"
   ];
+
+  removeOverlay() {
+    if (this.dialog && this.overlay) this.overlay = false;
+  }
 
   submit() {
     console.log("submit");
@@ -71,12 +89,15 @@ export default class ExcelImportDialog extends Vue {
             const input: SaveNewRegionInput = {
               name: regionName,
               streamid: vm.streamId,
-              data: formatted
+              data: ExcelImportUtils.exportToMaterials(excelData)
             }
 
             await vm.$store.dispatch("saveNewRegion", input);
           }
+          vm.overlay = true;
           vm.loading = false;
+
+          // vm.close();
         } else {
           vm.excelFileValid = false;
         }

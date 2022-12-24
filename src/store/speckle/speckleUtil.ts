@@ -147,6 +147,12 @@ export const uploadObjects = (
   objects: SpeckleObjectComplete[]
 ) => speckleFetch(queries.uploadObjectsMutation(streamid, objects), context);
 
+export const uploadObjectsGeneric = (
+  context: any,
+  streamid: string,
+  objects: any[]
+) => speckleFetch(queries.uploadObjectsGenericMutation(streamid, objects), context);
+
 export const createBranch = (
   context: any,
   streamid: string,

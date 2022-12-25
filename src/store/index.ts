@@ -627,6 +627,7 @@ export default new Vuex.Store({
 
       const parentObject: ExcelDataSpeckleParent = {
         id: parentId,
+        name,
         speckleType: "Base",
         __closure: closure,
         "@material": childObjectIds.map(id => ({
@@ -674,6 +675,7 @@ export interface ExcelDataSpeckleChild extends Material {
 
 export interface ExcelDataSpeckleParent {
   id: string;
+  name: string;
   speckleType: "Base";
   __closure: { [key: string]: number };
   "@material": {

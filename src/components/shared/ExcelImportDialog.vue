@@ -81,8 +81,8 @@ export default class ExcelImportDialog extends Vue {
         let worksheet = ExcelImportUtils.excelToJson(e);
         let excelData = ExcelImportUtils.verify(XLSX.utils.sheet_to_json(worksheet));
         if (excelData) {
-          let formatted = ExcelImportUtils.convertToStateMaterial(excelData);
           let regionName = `${vm.name} (${vm.streamId})`;
+          let formatted = ExcelImportUtils.convertToStateMaterial(excelData, regionName);
           materialCarbonFactors[regionName] = formatted;
           vm.$store.commit("addRegion", regionName);
           if (vm.saveToSpeckle) {
@@ -96,8 +96,6 @@ export default class ExcelImportDialog extends Vue {
           }
           vm.overlay = true;
           vm.loading = false;
-
-          // vm.close();
         } else {
           vm.excelFileValid = false;
         }

@@ -19,13 +19,24 @@
         label="Job number"
         required
       ></v-text-field>
-      <v-select
-        v-model="form.region"
-        :items="availableRegions()"
-        :rules="selectionRules"
-        label="Region"
-        required
-      ></v-select>
+      <v-row>
+        <v-col cols="9">
+          <v-select
+            v-model="form.region"
+            :items="availableRegions()"
+            :rules="selectionRules"
+            label="Region"
+            required
+          ></v-select>
+        </v-col>
+        <v-col cols="3" class="d-flex align-center">
+          <v-btn fab small @click="addRegion">
+            <v-icon>
+              mdi-plus
+            </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
       <v-select
         v-model="form.components"
         :items="becs"
@@ -56,6 +67,8 @@
         required
       ></v-text-field>
     </v-card-text>
+
+    <excel-import-dialog :dialog="excelImportDialog" :streamId="streamId" @close="closeAddData" />
   </v-form>
 </template>
 
@@ -69,13 +82,19 @@ import {
 } from "@/models/newAssessment";
 import store from "@/store";
 
-@Component({})
+import ExcelImportDialog from "@/components/shared/ExcelImportDialog.vue";
+
+@Component({
+  components: { ExcelImportDialog }
+})
 export default class Menu1b extends Vue {
   @Prop() streams!: StreamObject[];
   @Prop() step!: Step;
   @Prop() becs!: string[];
   @Prop() form!: ProjectDataTemp;
   @Prop() streamId!: string;
+
+  excelImportDialog = false;
 
   speckleStream: StreamObject | null = this.defaultSpeckleStream();
   defaultSpeckleStream() {
@@ -133,6 +152,13 @@ export default class Menu1b extends Vue {
       jobNumber: this.form.jobNumber ? this.form.jobNumber : "",
       notes: this.form.notes ? this.form.notes : "",
     };
+  }
+
+  addRegion() {
+    this.excelImportDialog = true;
+  }
+  closeAddData() {
+    this.excelImportDialog = false;
   }
 }
 </script>

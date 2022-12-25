@@ -25,6 +25,11 @@ export function excelToJson(e: ProgressEvent<FileReader>) {
   return workbook.Sheets[sheetName];
 }
 
+/**
+ * Checks whether object is an instance of ExcelData
+ * @param object object to check
+ * @returns whether the object is an instance of ExcelData
+ */
 export function instanceOfExcelData(object: any): object is ExcelData {
   return (
     "Density" in object &&
@@ -35,13 +40,21 @@ export function instanceOfExcelData(object: any): object is ExcelData {
   );
 }
 
+/**
+ * Verifies that the imported data is valid (ie, it is all instances of ExcelData)
+ * @param data The data to verify
+ * @returns The data as ExcelData instances, or undefined
+ */
 export function verify(data: any[]) {
-  console.log("data:", data);
   const filtered = data.filter(instanceOfExcelData);
-  console.log("filtered:", filtered);
   return filtered.length === data.length ? filtered : undefined;
 }
 
+/**
+ * Converts an array of ExcelData object to an array of Material objects
+ * @param data The ExcelData objects
+ * @returns An array of Material objects
+ */
 export function exportToMaterials(data: ExcelData[]): Material[] {
   return data.map((d) => ({
     productStageCarbonA1A3: d["Product Stage Carbon A1-A3"],
@@ -52,8 +65,14 @@ export function exportToMaterials(data: ExcelData[]): Material[] {
   }));
 }
 
+/**
+ * Converts an array of ExcelData objects to RegionMaterialCarbonFactors so the the excel data can be added to the regions
+ * @param data The ExcelData objects
+ * @returns A RegionmaterialCarbonFactors object
+ */
 export function convertToStateMaterial(
-  data: ExcelData[]
+  data: ExcelData[],
+  name: string,
 ): RegionMaterialCarbonFactors {
   const materialObj: { [key: string]: Material } = {};
   data.forEach((d) => {
@@ -65,5 +84,7 @@ export function convertToStateMaterial(
       source: "custom",
     };
   });
-  return { "": materialObj };
+  const returnObj: { [k0: string]: { [k1: string]: Material } } = {}
+  returnObj[name] = materialObj;
+  return returnObj;
 }

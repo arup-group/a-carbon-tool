@@ -11,3 +11,4 @@ export { CreateReportBranch } from "./CreateReportBranch.interface";
 export { GetObjectInfo } from "./GetObjectInfo.interface";
 export { StreamName } from "./StreamName.interface";
 export { StreamNameBranches } from "./StreamNameBranches.interface";
+export { GetUserStreams } from "./GetUserStreams.interface";

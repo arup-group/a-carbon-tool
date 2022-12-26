@@ -89,7 +89,7 @@ export default class ExcelImportDialog extends Vue {
             const input: SaveNewRegionInput = {
               name: regionName,
               streamid: vm.streamId,
-              data: ExcelImportUtils.exportToMaterials(excelData)
+              data: excelData
             }
 
             await vm.$store.dispatch("saveNewRegion", input);

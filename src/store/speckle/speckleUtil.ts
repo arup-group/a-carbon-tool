@@ -10,6 +10,7 @@ import {
   CreateReportBranch,
   GetObjectInfo,
   StreamNameBranches,
+  GetUserStreams,
 } from "@/models/graphql";
 
 import * as queries from "./graphql/speckleQueries";
@@ -138,7 +139,7 @@ export const getStreamObjects = (
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(queries.streamReferencedObjects(streamid), context);
 
-export const getUserStreams = (context: any) =>
+export const getUserStreams = (context: any): Promise<GetUserStreams> =>
   speckleFetch(queries.streamsQuery(), context);
 
 export const uploadObjects = (

@@ -58,6 +58,7 @@ export default class App extends Vue {
     // update = true if the version has updated since the user last came to the site and they have visited the site before
     const storedVersion = window.localStorage.getItem("version");
     this.update = storedVersion !== this.$store.state.version;
+    this.$store.dispatch("getCustomRegions");
   }
 
   get name(): string {

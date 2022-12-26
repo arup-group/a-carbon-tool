@@ -56,13 +56,22 @@ export function verify(data: any[]) {
  * @returns An array of Material objects
  */
 export function exportToMaterials(data: ExcelData[]): Material[] {
-  return data.map((d) => ({
-    productStageCarbonA1A3: d["Product Stage Carbon A1-A3"],
-    density: d.Density,
-    wastage: d.Wastage,
-    units: d.Units,
+  return data.map((d) => exportToMaterial(d));
+}
+
+/**
+ * Converts an ExcelData object to a Material object
+ * @param data The ExcelData object
+ * @returns A Material object
+ */
+export function exportToMaterial(data: ExcelData): Material {
+  return {
+    productStageCarbonA1A3: data["Product Stage Carbon A1-A3"],
+    density: data.Density,
+    wastage: data.Wastage,
+    units: data.Units,
     source: "custom",
-  }));
+  }
 }
 
 /**

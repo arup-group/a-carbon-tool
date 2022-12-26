@@ -1,7 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
-import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
+import {
+  loadStream,
+  LoadStreamOut,
+  loadParent,
+  getChildren,
+} from "@/views/utils/viewAssessmentUtils";
 import {
   Login,
   Server,
@@ -34,7 +39,7 @@ import {
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
-import { ExcelData } from "@/views/utils/ExcelImportUtils";
+import { ExcelData, exportToMaterial } from "@/views/utils/ExcelImportUtils";
 
 Vue.use(Vuex);
 
@@ -616,27 +621,29 @@ export default new Vuex.Store({
       );
       console.log("createBranchRes:", createBranchRes);
 
-      const childObjects: ExcelDataSpeckleChild[] = data.map(d => ({
-        ...d,
-        speckle_type: "Base"
+      const childObjects: ExcelDataSpeckleChild[] = data.map((d) => ({
+        ...exportToMaterial(d),
+        name: d.Material,
+        speckle_type: "Base",
       }));
 
-      const uploadObjectsRes: UploadObjectsRes = await speckleUtil.uploadObjectsGeneric(context, streamid, childObjects);
+      const uploadObjectsRes: UploadObjectsRes =
+        await speckleUtil.uploadObjectsGeneric(context, streamid, childObjects);
       const childObjectIds = uploadObjectsRes.data.objectCreate;
-      const closure = Object.fromEntries(childObjectIds.map((c) => [c, 1]))
+      const closure: { [childId: string]: 1 } = Object.fromEntries(childObjectIds.map((c) => [c, 1]));
 
       const parentObject: ExcelDataSpeckleParent = {
         id: parentId,
         name,
         speckleType: "Base",
         __closure: closure,
-        "@material": childObjectIds.map(id => ({
+        "@material": childObjectIds.map((id) => ({
           speckle_type: "reference",
-          referencedId: id
-        }))
-      }
+          referencedId: id,
+        })),
+      };
 
-      console.log("parentObject:", parentObject)
+      console.log("parentObject:", parentObject);
 
       const formData = new FormData();
       formData.append(
@@ -664,30 +671,87 @@ export default new Vuex.Store({
 
       return;
     },
+    async getCustomRegions(
+      context
+    ) {
+      const streamIdsRes = await speckleUtil.getUserStreams(context);
+      const streams = streamIdsRes.data.user.streams.items;
+      await Promise.all(
+        streams.map(async (stream) => {
+          // pull in all branches from all streams
+          const branchesRes: StreamReferenceBranches =
+            await speckleUtil.getStreamBranches(context, stream.id);
+          const branches = branchesRes.data.stream.branches.items;
+
+          // check those branches for "actcarbonreportdata" branches
+          const regionBranches = branches.filter((b) =>
+            b.name.startsWith("actcarbonreportdata")
+          );
+          if (regionBranches.length === 0) return;
+
+          // for those branches, pull down the data (including the child objects) from the latest commit and add it to the materials list
+          await Promise.all(
+            regionBranches.map(async (branch) => {
+              const parentId = branch.commits.items[0].referencedObject;
+              const branchData = await loadParent<ExcelDataSpeckleParent>(
+                context.state.selectedServer.url,
+                stream.id,
+                parentId,
+                context.state.token.token
+              );
+
+              const children = await getChildren<ExcelDataSpeckleChild>(
+                context.state.selectedServer.url,
+                context.state.token.token,
+                stream.id,
+                branchData
+              );
+
+              const materialObj: { [key: string]: Material } = {};
+              children.forEach((c) => {
+                materialObj[c.name] = c;
+              });
+              let carbonFactor: { [k0: string]: { [k1: string]: Material } } = {};
+              carbonFactor[branch.name] = materialObj;
+
+              materialCarbonFactors[branch.name] = carbonFactor;
+              context.commit("addRegion", branch.name);
+            })
+          );
+        })
+      );
+
+      console.log("done");
+    },
   },
   modules: {},
 });
 
+export interface ExcelDataCombined {
+  parentName: string;
+  children: ExcelDataSpeckleChild[];
+}
 
 export interface ExcelDataSpeckleChild extends Material {
   speckle_type: "Base";
+  name: string;
 }
 
 export interface ExcelDataSpeckleParent {
   id: string;
   name: string;
   speckleType: "Base";
-  __closure: { [key: string]: number };
+  __closure: { [childId: string]: 1 };
   "@material": {
-    referencedId: string,
-    speckle_type: "reference"
-  }[]
+    referencedId: string;
+    speckle_type: "reference";
+  }[];
 }
 
 export interface SaveNewRegionInput {
   name: string;
   streamid: string;
-  data: Material[];
+  data: ExcelData[];
 }
 
 export interface GetStreamNameReportBranchesOutput {

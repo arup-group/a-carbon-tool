@@ -609,7 +609,6 @@ export default new Vuex.Store({
       };
     },
     async saveNewRegion(context, { name, streamid, data }: SaveNewRegionInput) {
-      console.log("saveNewRegion, name:", name, "\ndata:", data);
       const branchName = `actcarbonreportdata/${name}`;
       const parentId = `${new Date().getTime().toString()}-act`;
 
@@ -619,7 +618,6 @@ export default new Vuex.Store({
         branchName,
         "Custom data"
       );
-      console.log("createBranchRes:", createBranchRes);
 
       const childObjects: ExcelDataSpeckleChild[] = data.map((d) => ({
         ...exportToMaterial(d),
@@ -630,7 +628,9 @@ export default new Vuex.Store({
       const uploadObjectsRes: UploadObjectsRes =
         await speckleUtil.uploadObjectsGeneric(context, streamid, childObjects);
       const childObjectIds = uploadObjectsRes.data.objectCreate;
-      const closure: { [childId: string]: 1 } = Object.fromEntries(childObjectIds.map((c) => [c, 1]));
+      const closure: { [childId: string]: 1 } = Object.fromEntries(
+        childObjectIds.map((c) => [c, 1])
+      );
 
       const parentObject: ExcelDataSpeckleParent = {
         id: parentId,
@@ -642,8 +642,6 @@ export default new Vuex.Store({
           referencedId: id,
         })),
       };
-
-      console.log("parentObject:", parentObject);
 
       const formData = new FormData();
       formData.append(
@@ -667,13 +665,9 @@ export default new Vuex.Store({
         branchName
       );
 
-      console.log("commit:", createCommitRes);
-
       return;
     },
-    async getCustomRegions(
-      context
-    ) {
+    async getCustomRegions(context) {
       const streamIdsRes = await speckleUtil.getUserStreams(context);
       const streams = streamIdsRes.data.user.streams.items;
       await Promise.all(
@@ -711,17 +705,17 @@ export default new Vuex.Store({
               children.forEach((c) => {
                 materialObj[c.name] = c;
               });
-              let carbonFactor: { [k0: string]: { [k1: string]: Material } } = {};
-              carbonFactor[branch.name] = materialObj;
+              let carbonFactor: { [k0: string]: { [k1: string]: Material } } =
+                {};
+              const branchName = branch.name.slice(20);
+              carbonFactor[branchName] = materialObj;
 
-              materialCarbonFactors[branch.name] = carbonFactor;
-              context.commit("addRegion", branch.name);
+              materialCarbonFactors[branchName] = carbonFactor;
+              context.commit("addRegion", branchName);
             })
           );
         })
       );
-
-      console.log("done");
     },
   },
   modules: {},

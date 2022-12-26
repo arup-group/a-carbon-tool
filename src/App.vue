@@ -31,6 +31,27 @@
       :version="version"
       @close="closeDialog"
     />
+
+    <v-snackbar
+      v-model="customRegionLoadingSnack"
+      :timeout="snackBarTimeout"
+      color="blue"
+      right
+    >
+      <v-icon>
+        mdi-information
+      </v-icon>
+      <span class="ml-2">{{ customRegionLoadingSnackText }}</span>
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          text
+          v-bind="attrs"
+          @click="closeCustomRegionSnack"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -54,11 +75,30 @@ import "@/assets/style.css";
 })
 export default class App extends Vue {
   update = false;
+  customRegionLoadingSnack = false;
+  snackBarTimeout = 3000;
+  customRegionLoadingSnackText = "";
+  alertCustomRegionLoading = false;
   mounted() {
     // update = true if the version has updated since the user last came to the site and they have visited the site before
     const storedVersion = window.localStorage.getItem("version");
     this.update = storedVersion !== this.$store.state.version;
-    this.$store.dispatch("getCustomRegions");
+    if (this.$route.name === "NewAssessment" || this.$route.name === "UpdateAssessment" || this.$route.name === "UpdateAssessmentBranch") {
+      this.customRegionLoadingSnackText = "Loading custom regions...";
+      this.alertCustomRegionLoading = true;
+      this.customRegionLoadingSnack = true;
+    }
+    // using .then to avoid holding anything else up
+    this.$store.dispatch("getCustomRegions").then(() => {
+      if (this.alertCustomRegionLoading || this.$route.name === "NewAssessment") {
+        this.customRegionLoadingSnackText = "Finished loading custom regions";
+        this.customRegionLoadingSnack = true;
+      }
+    })
+  }
+
+  closeCustomRegionSnack() {
+    this.customRegionLoadingSnack = false;
   }
 
   get name(): string {

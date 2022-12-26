@@ -70,7 +70,6 @@ export default class ExcelImportDialog extends Vue {
   }
 
   submit() {
-    console.log("submit");
     if ((this.$refs.form as any).validate() && this.file.name) {
       this.loading = true;
       var reader = new FileReader();
@@ -103,8 +102,6 @@ export default class ExcelImportDialog extends Vue {
         return excelData;
       };
       reader.readAsArrayBuffer(this.file);
-    } else {
-      console.log("invalid")
     }
   }
 

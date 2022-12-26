@@ -25,9 +25,9 @@
                   prepend-inner-icon="mdi-magnify"
                   label="Search"
                 ></v-text-field>
-                <v-btn @click="openComparison" class="ml-4">Open comparison</v-btn>
-                <v-btn @click="openHistory" class="ml-4">Open history</v-btn>
-                <v-btn @click="openAddData" class="ml-4">Add custom data</v-btn>
+                <v-btn @click="openComparison" class="ml-4">Comparison</v-btn>
+                <v-btn @click="openHistory" class="ml-4">History</v-btn>
+                <v-btn @click="openAddData" class="ml-4">Add data</v-btn>
               </v-toolbar>
             </template>
             <template v-slot:default="props">

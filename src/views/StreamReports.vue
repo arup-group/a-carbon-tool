@@ -11,24 +11,13 @@
             hide-default-footer
           >
             <template v-slot:header>
-              <v-toolbar flat rounded outlined class="my-4">
-                <back-button />
-                <v-toolbar-title class="mr-4 ml-2">
-                  {{ streamName }}
-                </v-toolbar-title>
-                <v-text-field
-                  v-model="search"
-                  clearable
-                  flat
-                  solo
-                  hide-details
-                  prepend-inner-icon="mdi-magnify"
-                  label="Search"
-                ></v-text-field>
-                <v-btn @click="openComparison" class="ml-4">Comparison</v-btn>
-                <v-btn @click="openHistory" class="ml-4">History</v-btn>
-                <v-btn @click="openAddData" class="ml-4">Add data</v-btn>
-              </v-toolbar>
+              <stream-reports-header
+                :streamName="streamName"
+                v-model="search"
+                @openComparison="openComparison"
+                @openHistory="openHistory"
+                @openAddData="openAddData"
+              />
             </template>
             <template v-slot:default="props">
               <v-row class="d-flex align-stretch">
@@ -85,7 +74,11 @@
       textError="Something went wrong, please retry"
       textSuccess="Report deleted!"
     />
-    <excel-import-dialog :dialog="excelImportDialog" :streamId="streamid" @close="closeAddData" />
+    <excel-import-dialog
+      :dialog="excelImportDialog"
+      :streamId="streamid"
+      @close="closeAddData"
+    />
   </v-main>
 </template>
 <script lang="ts">
@@ -105,8 +98,10 @@ import QuickReport from "@/components/landing/QuickReport.vue";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
-import BackButton from "@/components/shared/BackButton.vue";
+
 import ExcelImportDialog from "@/components/shared/ExcelImportDialog.vue";
+
+import StreamReportsHeader from "@/components/streamReports/StreamReportsHeader.vue";
 
 @Component({
   components: {
@@ -117,8 +112,8 @@ import ExcelImportDialog from "@/components/shared/ExcelImportDialog.vue";
     SESnackBar,
     QuickReport,
     LoadingContainer,
-    BackButton,
-    ExcelImportDialog
+    ExcelImportDialog,
+    StreamReportsHeader,
   },
 })
 export default class StreamReports extends Vue {
@@ -160,10 +155,16 @@ export default class StreamReports extends Vue {
   }
 
   openHistory() {
-    this.$router.push({ name: "AssessmentHistory", params: { streamId: this.streamid }});
+    this.$router.push({
+      name: "AssessmentHistory",
+      params: { streamId: this.streamid },
+    });
   }
   openComparison() {
-    this.$router.push({ name: "Comparison", params: { streamId: this.streamid }});
+    this.$router.push({
+      name: "Comparison",
+      params: { streamId: this.streamid },
+    });
   }
 
   edit(branchName: string) {

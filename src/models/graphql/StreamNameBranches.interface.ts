@@ -3,6 +3,8 @@ export interface StreamNameBranches {
     stream: {
       name: string;
       branches: {
+        cursor: string;
+        totalCount: number;
         items: {
           name: string;
         }[];

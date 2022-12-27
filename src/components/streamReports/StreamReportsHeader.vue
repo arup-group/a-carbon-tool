@@ -15,7 +15,7 @@
     ></v-text-field>
     <v-menu offset-y rounded="lg">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn v-bind="attrs" v-on="on" class="ml-4">More options</v-btn>
+        <v-btn v-bind="attrs" v-on="on" class="ml-4">More</v-btn>
       </template>
       <v-list>
         <v-list-item link @click="openComparison">

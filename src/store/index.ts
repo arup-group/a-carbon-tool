@@ -473,6 +473,10 @@ export default new Vuex.Store({
         materials: reportTotals.materials,
         projectData,
         totalChildrenCount: 0,
+        "@children": children.map(child => ({
+          speckle_type: "reference",
+          referencedId: child
+        }))
       };
       formData.append(
         "batch1",

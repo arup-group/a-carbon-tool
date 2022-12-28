@@ -60,4 +60,8 @@ export interface ParentSpeckleObjectDataV1 {
 export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectDataV1 {
   version: "2.0.0";
   materials: ChartData[];
+  "@children": {
+    referencedId: string;
+    speckle_type: "reference";
+  }[]
 }

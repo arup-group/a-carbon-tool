@@ -209,10 +209,6 @@ async function calcV2(
     volume: branchData.volume,
   };
 
-  // const colors: Color[] = branchData.materials.map((m) => ({
-  //   id: branchData.id,
-  //   color: m.color,
-  // }));
   const floorArea = branchData.projectData.floorArea;
   let children: ChildSpeckleObjectData[] = [];
 

@@ -3,7 +3,6 @@
     <v-card>
       <v-card-title> Upload Excel data </v-card-title>
       <v-card-subtitle>
-        <!-- TODO: Add spreadsheet download to this section -->
         Upload a new sheet of data. Structure the data in <a href="assets\excel\test input spreadsheet.xlsx">this format</a>.
       </v-card-subtitle>
       <v-form ref="form" @submit.prevent="submit">

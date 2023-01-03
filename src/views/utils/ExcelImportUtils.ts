@@ -4,12 +4,6 @@ import {
 } from "@/store/utilities/material-carbon-factors";
 import * as XLSX from "xlsx";
 
-// productStageCarbonA1A3: number;
-// density: number;
-// wastage: number;
-// units: string;
-// source: string;
-
 export interface ExcelData {
   Density: number;
   Material: string;

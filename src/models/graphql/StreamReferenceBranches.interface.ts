@@ -2,6 +2,8 @@ export interface StreamReferenceBranches {
   data: {
     stream: {
       branches: {
+        cursor: string;
+        totalCount: number;
         items: BranchItem[];
       };
     };

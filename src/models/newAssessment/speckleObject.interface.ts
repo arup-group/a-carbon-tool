@@ -1,6 +1,8 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { TransportType } from ".";
 import { ChartData } from "../chart";
+import { IABreakdown } from "@/views/utils/viewAssessmentUtils";
+import { Color } from "../renderer";
 
 export interface SpeckleObject {
   id: string;
@@ -60,4 +62,6 @@ export interface ReportTotals extends ReportData {
   totalCO2: number;
   volume: number;
   materials: ChartData[];
+  materialsColors: Color[];
+  transportColors: Color[];
 }

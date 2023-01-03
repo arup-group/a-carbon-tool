@@ -378,12 +378,13 @@ export default new Vuex.Store({
     },
     async loadActReportData(
       context,
-      { streamId, branchName }: LoadActReportDataInput
+      { streamId, branchName, loadChildren }: LoadActReportDataInput
     ) {
       return await loadStream(
         context,
         streamId,
-        `${context.state.speckleFolderName}/${branchName}`
+        `${context.state.speckleFolderName}/${branchName}`,
+        loadChildren
       );
     },
     async carbonStreams(context) {
@@ -471,6 +472,8 @@ export default new Vuex.Store({
         totalCO2: reportTotals.totalCO2,
         volume: reportTotals.volume,
         materials: reportTotals.materials,
+        materialsColors: reportTotals.materialsColors,
+        transportColors: reportTotals.transportColors,
         projectData,
         totalChildrenCount: 0,
         "@children": children.map(child => ({
@@ -478,6 +481,8 @@ export default new Vuex.Store({
           referencedId: child
         }))
       };
+      console.log("reportTotals:", reportTotals);
+      console.log("objectData:", objectData);
       formData.append(
         "batch1",
         new Blob([
@@ -558,7 +563,7 @@ export default new Vuex.Store({
         branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
           const fullBranchName = `${context.state.speckleFolderName}/${branch.name}`;
 
-          const data = await loadStream(context, streamid, fullBranchName, true);
+          const data = await loadStream(context, streamid, fullBranchName, false);
           return {
             branch,
             data,
@@ -629,6 +634,7 @@ export interface GetActReportBranchInfoInput {
 export interface LoadActReportDataInput {
   streamId: string;
   branchName: string;
+  loadChildren?: boolean;
 }
 
 export interface CheckContainsChlidReportInput {

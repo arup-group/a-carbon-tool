@@ -2,6 +2,8 @@ import { ProjectDataComplete } from "../newAssessment";
 import { CarbonA5 } from "../newAssessment/speckleObject.interface";
 import { SpeckleObjectComplete } from "../newAssessment";
 import { ChartData } from "../chart";
+import { IABreakdown } from "@/views/utils/viewAssessmentUtils";
+import { Color } from "../renderer";
 
 export interface StreamData {
   data: {
@@ -60,6 +62,8 @@ export interface ParentSpeckleObjectDataV1 {
 export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectDataV1 {
   version: "2.0.0";
   materials: ChartData[];
+  materialsColors: Color[];
+  transportColors: Color[];
   "@children": {
     referencedId: string;
     speckle_type: "reference";

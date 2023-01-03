@@ -145,7 +145,7 @@ export async function loadStream(
   context: any,
   streamId: string,
   branchName: string,
-  quick?: boolean
+  includeChildren?: boolean
 ): Promise<LoadStreamOut> {
   const actReportBranchInfo = await getActReportBranchInfo(
     context,
@@ -165,19 +165,33 @@ export async function loadStream(
   if (instanceOfHttpStreamDataParentV1(branchData)) {
     return calcV1(branchData, actReportBranchInfo, context, streamId);
   } else if (instanceOfHttpStreamDataParentV2(branchData)) {
-    console.log(`${streamId} using v2`)
-    return calcV2(branchData, actReportBranchInfo, streamId, context, quick);
+    console.log(`${streamId} using v2`);
+    return calcV2(
+      branchData,
+      actReportBranchInfo,
+      streamId,
+      context,
+      includeChildren
+    );
   } else {
     throw new Error("report object corrupted");
   }
 }
 
-async function calcV2(branchData: HTTPStreamDataParentV2, actReportBranchInfo: ActReportData, streamId: string, context: any, quick?: boolean): Promise<LoadStreamOut> {
-  if (!quick) {
-    console.log("slow :(")
-    return calcV1(branchData, actReportBranchInfo, context, streamId);
-  }
-  console.log("quick!");
+async function calcV2(
+  branchData: HTTPStreamDataParentV2,
+  actReportBranchInfo: ActReportData,
+  streamId: string,
+  context: any,
+  includeChildren?: boolean
+): Promise<LoadStreamOut> {
+  // if (!quick) {
+  //   console.log("slow :(")
+  //   return calcV1(branchData, actReportBranchInfo, context, streamId);
+  // }
+  // const old = await calcV1(branchData, actReportBranchInfo, context, streamId);
+  // console.log("v1 branchData:", old);
+  console.log("branchData:", branchData);
   const projectInfoUpdated: IProjectInfo = {
     name: branchData.projectData.name,
     components: branchData.projectData.components,
@@ -195,21 +209,60 @@ async function calcV2(branchData: HTTPStreamDataParentV2, actReportBranchInfo: A
     volume: branchData.volume,
   };
 
-  const colors: Color[] = branchData.materials.map(m => ({id: branchData.id, color: m.color}));
+  // const colors: Color[] = branchData.materials.map((m) => ({
+  //   id: branchData.id,
+  //   color: m.color,
+  // }));
+  const floorArea = branchData.projectData.floorArea;
+  let children: ChildSpeckleObjectData[] = [];
+
+  console.log("includeChildren?", includeChildren);
+  if (includeChildren)
+    children = await getChildren(
+      context.state.selectedServer.url,
+      context.state.token.token,
+      streamId,
+      branchData
+    );
 
   return {
     ready: true,
-    colors,
+    colors: branchData.materialsColors,
     data: {
       streamId: streamId,
       projectInfo: projectInfoUpdated,
       materialBreakdown: {
-        materials: branchData.materials
+        materials: branchData.materials,
       },
-      aBreakdown: {} as IABreakdown,
-      children: [],
-    }
-  }
+      aBreakdown: {
+        levels: [
+          {
+            name: "A1-A3",
+            tCO2e:
+              Math.ceil((branchData.productStageCarbonA1A3 / 1000) * 100) / 100,
+            kgCO2eperm2: Math.ceil(
+              branchData.productStageCarbonA1A3 / floorArea
+            ),
+          },
+          {
+            name: "A4",
+            tCO2e: Math.ceil((branchData.transportCarbonA4 / 1000) * 100) / 100,
+            kgCO2eperm2: Math.ceil(branchData.transportCarbonA4 / floorArea),
+          },
+          {
+            name: "A5",
+            tCO2e:
+              Math.ceil((branchData.constructionCarbonA5.value / 1000) * 100) /
+              100,
+            kgCO2eperm2: Math.ceil(
+              branchData.constructionCarbonA5.value / floorArea
+            ),
+          },
+        ],
+      },
+      children,
+    },
+  };
 }
 
 async function calcV1(

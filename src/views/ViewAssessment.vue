@@ -91,11 +91,12 @@ export default class ViewAssessment extends Vue {
     this.error = false;
     try {
       const { streamId, branchName } = this.$route.params;
-      const input: LoadActReportDataInput = { streamId, branchName };
+      const input: LoadActReportDataInput = { streamId, branchName, loadChildren: false };
       const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
         "loadActReportData",
         input
       );
+      console.log("assessmentViewData:", assessmentViewData)
       this.assessment = assessmentViewData.data;
       this.colors = assessmentViewData.colors;
       this.chartDataReady = assessmentViewData.ready;

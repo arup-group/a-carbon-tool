@@ -663,7 +663,9 @@ export default class Assessment extends Vue {
       },
       totalCO2,
       volume: this.totalVolume,
-      materials
+      materials,
+      materialsColors: this.materialsColors,
+      transportColors: this.transportColors,
     };
   }
 

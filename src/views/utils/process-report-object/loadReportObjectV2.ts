@@ -13,7 +13,6 @@ export async function calcV2(
   context: any,
   includeChildren?: boolean
 ): Promise<LoadStreamOut> {
-  console.log("branchData:", branchData);
   const projectInfoUpdated: IProjectInfo = {
     name: branchData.projectData.name,
     components: branchData.projectData.components,
@@ -34,7 +33,6 @@ export async function calcV2(
   const floorArea = branchData.projectData.floorArea;
   let children: ChildSpeckleObjectData[] = [];
 
-  console.log("includeChildren?", includeChildren);
   if (includeChildren)
     children = await getChildren(
       context.state.selectedServer.url,

@@ -43,7 +43,7 @@ import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
 import { Color } from "@/models/renderer";
 import { LoadActReportDataInput } from "@/store";
-import { ILoadStreamData, LoadStreamOut } from "./utils/viewAssessmentUtils";
+import { ILoadStreamData, LoadStreamOut } from "./utils/process-report-object";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 import BackButton from "@/components/shared/BackButton.vue";
@@ -96,7 +96,6 @@ export default class ViewAssessment extends Vue {
         "loadActReportData",
         input
       );
-      console.log("assessmentViewData:", assessmentViewData)
       this.assessment = assessmentViewData.data;
       this.colors = assessmentViewData.colors;
       this.chartDataReady = assessmentViewData.ready;

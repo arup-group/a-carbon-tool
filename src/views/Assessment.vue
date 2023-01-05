@@ -125,7 +125,7 @@ import {
   UploadReportInput,
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
-import { LoadStreamOut } from "./utils/viewAssessmentUtils";
+import { LoadStreamOut } from "./utils/process-report-object";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 import { ChartData } from "@/models/chart";
 
@@ -650,8 +650,6 @@ export default class Assessment extends Vue {
       label: m[0],
       color: m[1].color,
     }));
-
-    console.log("materials:", materials);
 
     return {
       transportCarbonA4: A4,

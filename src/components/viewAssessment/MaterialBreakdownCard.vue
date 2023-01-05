@@ -8,7 +8,7 @@
 </template>
 <script lang="ts">
 import { ChartData } from "@/models/chart";
-import { IMaterialBreakdown } from "@/views/utils/viewAssessmentUtils";
+import { IMaterialBreakdown } from "@/views/utils/process-report-object";
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 import DoughtnutChart from "../charts/DoughnutChart.vue";

@@ -482,8 +482,6 @@ export default new Vuex.Store({
           referencedId: child
         }))
       };
-      console.log("reportTotals:", reportTotals);
-      console.log("objectData:", objectData);
       formData.append(
         "batch1",
         new Blob([

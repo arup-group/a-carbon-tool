@@ -45,7 +45,6 @@ export async function loadStream(
   if (instanceOfHttpStreamDataParentV1(branchData)) {
     return calcV1(branchData, actReportBranchInfo, context, streamId);
   } else if (instanceOfHttpStreamDataParentV2(branchData)) {
-    console.log(`${streamId} using v2`);
     return calcV2(
       branchData,
       actReportBranchInfo,

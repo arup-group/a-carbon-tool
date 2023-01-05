@@ -1,7 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
-import { loadStream, LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
+import { LoadStreamOut } from "@/views/utils/process-report-object";
+import { loadStream } from "@/views/utils/viewAssessmentUtils";
 import { Login, Server, AuthError, Token, ServerRegion, CustomServerStorage } from "@/models/auth/";
 import router from "@/router";
 import {

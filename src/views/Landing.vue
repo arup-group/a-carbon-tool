@@ -201,7 +201,7 @@ export default class Landing extends Vue {
       this.$store,
       s.id,
       `${this.$store.state.speckleFolderName}/main`,
-      true
+      false
     );
     return data.data;
   }

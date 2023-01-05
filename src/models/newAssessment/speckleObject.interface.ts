@@ -1,7 +1,7 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { TransportType } from ".";
 import { ChartData } from "../chart";
-import { IABreakdown } from "@/views/utils/viewAssessmentUtils";
+import { IABreakdown } from "@/views/utils/process-report-object";
 import { Color } from "../renderer";
 
 export interface SpeckleObject {

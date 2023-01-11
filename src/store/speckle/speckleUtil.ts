@@ -195,11 +195,11 @@ export const getMainStreamCommit = (
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(queries.mainStreamCommmitObjects(streamid), context);
 
-export const getStreamBranches = (
+export const getStreamBranches = async (
   context: any,
   streamid: string
 ): Promise<StreamReferenceBranches> =>
-  speckleFetch(queries.streamReferencedBranches(streamid), context);
+  getBranches(context, streamid, queries.streamReferencedBranches);
 
 export const getBranchData = (
   context: any,
@@ -244,8 +244,50 @@ export const streamNameBranches = (
   context: any,
   streamid: string
 ): Promise<StreamNameBranches> =>
-  speckleFetch(queries.streamNameBranches(streamid), context);
+  getBranches(context, streamid, queries.streamNameBranches);
 
-export const carbonStreams = (
-  context: any
-): Promise<LandingUserStreams> => speckleFetch(queries.carbonStreams(), context);
+export const carbonStreams = (context: any): Promise<LandingUserStreams> =>
+  speckleFetch(queries.carbonStreams(), context);
+
+interface Prop {
+  data: {
+    stream: {
+      branches: {
+        cursor: string;
+        totalCount: number;
+        items: any[];
+      };
+    };
+  };
+}
+
+async function getBranches<T extends Prop>(
+  context: any,
+  streamid: string,
+  f: (streamid: string, limit: number, cursor: string) => string
+): Promise<T> {
+  const limit = 100; // 100 is as high as the limit can go
+
+  let cursor = "";
+  let res: T = await speckleFetch(f(streamid, limit, cursor), context);
+
+  const branches = res.data.stream.branches.items;
+
+  while (res.data.stream.branches.totalCount > branches.length) {
+    cursor = res.data.stream.branches.cursor;
+    res = await speckleFetch(
+      queries.streamReferencedBranches(streamid, limit, cursor),
+      context
+    );
+    branches.push(
+      ...res.data.stream.branches.items.splice(
+        1,
+        res.data.stream.branches.items.length
+      )
+    );
+  }
+
+  res.data.stream.branches.items = branches;
+
+  return res;
+}

@@ -149,9 +149,11 @@ export const mainStreamCommmitObjects = (id: string) => `query {
   }`;
 
 // Gets all branches for a particular stream id including first commit date
-export const streamReferencedBranches = (id: string) => `query {
+export const streamReferencedBranches = (id: string, limit: number, cursor: string) => `query {
   stream(id: "${id}") {
-    branches(limit: 100) {
+    branches(limit: ${limit}, cursor: "${cursor}") {
+      cursor
+      totalCount
       items {
         id,
         name,
@@ -205,10 +207,12 @@ export const streamNameQuery = (streamId: string) => `query {
 }`;
 
 // gets the stream name and all the branch names, used in Comparison.vue
-export const streamNameBranches = (streamId: string) => `query {
+export const streamNameBranches = (streamId: string, limit: number, cursor: string) => `query {
   stream(id: "${streamId}") {
     name
-    branches(limit: 100) {
+    branches(limit: ${limit}, cursor: "${cursor}") {
+      cursor
+      totalCount
       items {
         name
       }

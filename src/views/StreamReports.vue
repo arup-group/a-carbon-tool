@@ -155,9 +155,14 @@ export default class StreamReports extends Vue {
   }
 
   edit(branchName: string) {
-    this.quickStreamid = this.streamid;
-    this.quickBranchName = branchName;
-    this.quickReport = true;
+    // REMOVING QUICK REPORT FOR NOW, NEEDS MORE WORK BEFORE IT'S FIT FOR PURPOSE
+    // this.quickStreamid = this.streamid;
+    // this.quickBranchName = branchName;
+    // this.quickReport = true;
+    // this.$router.push({ name: "UpdateAssessmentBranch"})
+    this.$router.push(
+      `assessment/${this.streamid}/${branchName}`
+    );
   }
   quickReportClose() {
     this.quickReport = false;

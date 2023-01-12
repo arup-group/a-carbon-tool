@@ -7,22 +7,8 @@
       class="d-flex justify-flex-start flex-row"
       style="margin: 10px; padding: 10px; width: 100%"
     >
-      <Renderer
-        class="justify-flex-end"
-        v-if="objectURLs.length !== 0"
-        @loaded="rendererLoaded"
-        @objectsSelected="objectsSelected"
-        :objecturls="objectURLs"
-        :token="token"
-        :colors="colors"
-        :gradientColorProperty="volumeGradientPassdown"
-        :display="!modal"
-        :selectedIds="selectedIds"
-        :filtered="filtered"
-      />
       <div :style="modal ? 'width: 100%;' : 'width: 35%;'">
         <AssessmentStepper
-          style="z-index: 1"
           v-if="availableStreams.length !== 0"
           @loadStream="loadStream"
           @materialUpdated="materialUpdated"
@@ -53,6 +39,22 @@
           :invalidSelectedObjects="invalidSelectedObjects"
         />
       </div>
+      <Renderer
+        class="justify-flex-end"
+        style="max-width: 75vw; max-height: 75vh"
+        v-if="objectURLs.length !== 0 && !finished"
+        @loaded="rendererLoaded"
+        @objectsSelected="objectsSelected"
+        :objecturls="objectURLs"
+        :token="token"
+        :colors="colors"
+        :gradientColorProperty="volumeGradientPassdown"
+        :display="!modal"
+        :selectedIds="selectedIds"
+        :filtered="filtered"
+        :allIds="allIds"
+        :loadingBar="false"
+      />
     </v-container>
     <new-branch-dialog
       :dialog="newBranchDialog"
@@ -63,6 +65,9 @@
       @newBranch="newBranchSelect"
       @updateBranch="updateBranchSelect"
     />
+    <v-overlay :value="loadingModel">
+      <loading-spinner indeterminate :text="loadingModelText" />
+    </v-overlay>
     <SESnackBar
       @close="saveSnackClose"
       :success="saveSuccess"
@@ -149,6 +154,8 @@ export default class Assessment extends Vue {
   @Prop() modalBranchName!: string;
 
   loading = false;
+  loadingModel = false;
+  loadingModelText = "";
   saveSuccess = true;
   saveSnack = false;
   availableStreams: AvailableStream[] = [];
@@ -163,6 +170,7 @@ export default class Assessment extends Vue {
   allMesh: THREE.Mesh[] = [];
   projectData!: ProjectDataComplete;
   projectDataPassdown: ProjectDataComplete | null = null;
+  allIds: string[] = [];
 
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
@@ -197,6 +205,8 @@ export default class Assessment extends Vue {
   step: Step = 1;
   selectedObjects: string[] = []; // contains the id's of each selected object
   invalidSelectedObjects = false;
+
+  finished = false;
 
   @Emit("close")
   close() {
@@ -324,6 +334,7 @@ export default class Assessment extends Vue {
       await this.$store.dispatch("uploadReport", uploadReportInput);
       this.loading = false;
       this.saveSnack = true;
+      this.finished = true;
       this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
     }
   }
@@ -335,8 +346,7 @@ export default class Assessment extends Vue {
     if (material.type === this.filteredType) {
       this.filtered = false;
       this.selectedIds = [];
-    }
-    else {
+    } else {
       this.filtered = true;
       this.selectedIds = material.ids;
     }
@@ -344,7 +354,13 @@ export default class Assessment extends Vue {
   }
 
   async rendererLoaded({ properties, allMesh }: RendererLoaded) {
+    this.loadingModelText = "Loading data from model...";
     this.allMesh = allMesh;
+
+    const volumeFilter = properties.find(
+      (p) => p.name.toLowerCase() === "volume"
+    );
+    this.volProp = volumeFilter ? volumeFilter.rawName : "";
     if (!this.update) {
       const res: ObjectDetails[] = await this.$store.dispatch(
         "getObjectDetails",
@@ -361,10 +377,6 @@ export default class Assessment extends Vue {
           r.speckle_type !== "Objects.Geometry.Mesh"
       );
 
-      const volumeFilter = properties.find(
-        (p) => p.name.toLowerCase() === "volume"
-      );
-      this.volProp = volumeFilter ? volumeFilter.rawName : "";
       if (volumeFilter) {
         this.speckleVol = true;
         filteredRes.forEach((r) => {
@@ -392,10 +404,13 @@ export default class Assessment extends Vue {
       }
 
       this.types = this.findTypes(this.objectsObj);
+      this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
-
-      this.updateVolumeGradient();
     }
+
+    this.updateVolumeGradient();
+    this.resetColors();
+    this.loadingModel = false;
   }
   findVolume(
     object: ObjectDetails,
@@ -475,9 +490,12 @@ export default class Assessment extends Vue {
 
   objectsSelected(objects: UserData[]) {
     if (this.step === Step.MATERIALS) {
-      const keys = Object.keys(this.objectsObj)
-      this.selectedObjects = objects.filter((o) => keys.includes(o.id)).map((o) => o.id);
-      this.invalidSelectedObjects = this.selectedObjects.length !== objects.length;
+      const keys = Object.keys(this.objectsObj);
+      this.selectedObjects = objects
+        .filter((o) => keys.includes(o.id))
+        .map((o) => o.id);
+      this.invalidSelectedObjects =
+        this.selectedObjects.length !== objects.length;
     }
   }
 
@@ -687,6 +705,8 @@ export default class Assessment extends Vue {
   }
 
   async loadStream(id: string) {
+    this.loadingModel = true;
+    this.loadingModelText = "Loading model...";
     this.streamId = id;
     const tmpurls: string[] = await this.$store.dispatch("getObjectUrls", id);
     this.objectURLs = [tmpurls[0]];
@@ -725,7 +745,9 @@ export default class Assessment extends Vue {
           color: material.material.color,
           id,
         });
-      } catch(err) { console.error("err:", id) }
+      } catch (err) {
+        console.error("err:", id);
+      }
     });
     this.materialsColors = this.colors;
 

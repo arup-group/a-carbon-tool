@@ -45,8 +45,12 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.8.3 \u00DF",
+    version: "0.8.4 \u00DF",
     speckleFolderName: "actcarbonreport",
+    speckleViewer: {
+      viewer: undefined,
+      container: undefined
+    },
     servers: {
       arup: {
         region: ServerRegion.UKIMEA,
@@ -246,6 +250,9 @@ export default new Vuex.Store({
           JSON.stringify(customServersJson)
         );
       }
+    },
+    setSpeckleViewer(state, viewer) {
+      state.speckleViewer = viewer;
     },
     setUser(state, user) {
       state.user = user;

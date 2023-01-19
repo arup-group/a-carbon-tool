@@ -61,7 +61,11 @@ export default class VersionUpdateDialog extends Vue {
       title: "Updated Speckle Viewer",
       subtitle: `Updated the Speckle Viewer to include some of the latest features.
       It also speeds up the assessment and allows for running assessments on larger models.`,
-    },
+    }, {
+      title: "Excel data import",
+      subtitle: `Import your own materials data for use in your reports.
+      Click the "+" icon when making a new assessment or click "More" on the stream reports page.`
+    }
   ];
 
   fixes: { title: string; subtitle: string }[] = [];

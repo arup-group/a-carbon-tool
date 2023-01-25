@@ -54,7 +54,7 @@
               m<sup>2</sup>
             </div>
           </div>
-          <div class="d-flex justify-space between">
+          <div class="d-flex justify-space-between">
             <div style="padding-right: 2px">Notes:</div>
             <div>{{ notes }}</div>
           </div>

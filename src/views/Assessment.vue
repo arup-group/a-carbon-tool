@@ -371,12 +371,16 @@ export default class Assessment extends Vue {
         }
       );
 
+      console.log("res:", res)
+
       let totalVol = 0;
       const filteredRes = res.filter(
         (r) =>
           r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
           r.speckle_type !== "Objects.Geometry.Mesh"
       );
+      console.log("filteredRes:", filteredRes);
+      const childObjects: ObjectDetails[] = [];
 
       if (volumeFilter) {
         this.speckleVol = true;
@@ -390,6 +394,7 @@ export default class Assessment extends Vue {
                 volume: volume,
               },
             };
+            childObjects.push(r);
             // also find total volume here to avoid needing to loop through objects again
             totalVol += volume;
           }
@@ -403,6 +408,8 @@ export default class Assessment extends Vue {
           };
         });
       }
+      console.log("this.objectsObj:", Object.entries(this.objectsObj))
+      console.log("childObjects:", childObjects)
 
       this.types = this.findTypes(this.objectsObj);
       this.allIds = this.types.map((t) => t.ids).flat();

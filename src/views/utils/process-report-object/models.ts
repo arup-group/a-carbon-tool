@@ -32,6 +32,7 @@ export interface ILoadStreamData {
   materialBreakdown: IMaterialBreakdown;
   aBreakdown: IABreakdown;
   children: ChildSpeckleObjectData[];
+  modelId: string;
 }
 
 export interface LoadStreamOut {

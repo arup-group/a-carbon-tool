@@ -32,20 +32,25 @@ export async function calcV2(
 
   const floorArea = branchData.projectData.floorArea;
   let children: ChildSpeckleObjectData[] = [];
+  const modelId = branchData["@model"][0].referencedId;
 
-  if (includeChildren)
+  if (includeChildren) {
     children = await getChildren(
       context.state.selectedServer.url,
       context.state.token.token,
       streamId,
       branchData
     );
+      children = children.filter(c => c.id != modelId);
+      console.log("children:", children);
+  }
 
   return {
     ready: true,
     colors: branchData.materialsColors,
     data: {
       streamId: streamId,
+      modelId,
       projectInfo: projectInfoUpdated,
       materialBreakdown: {
         materials: branchData.materials,

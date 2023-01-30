@@ -66,5 +66,9 @@ export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectDataV1 {
   "@children": {
     referencedId: string;
     speckle_type: "reference";
-  }[]
+  }[];
+  "@model": {
+    referencedId: string;
+    speckle_type: "reference";
+  }[];
 }

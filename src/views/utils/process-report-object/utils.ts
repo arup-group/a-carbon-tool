@@ -30,6 +30,7 @@ export async function getChildren(
     })
   ).then((data) => {
     const arr: ChildSpeckleObjectData[] = [];
+    console.log("data:", data);
     data.forEach((d) => {
       arr.push(...d);
     });

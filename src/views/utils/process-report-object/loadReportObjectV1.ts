@@ -11,6 +11,7 @@ import {
   LoadStreamOut,
 } from "./models";
 import { getChildren } from "./utils";
+import * as speckleUtil from "../../../store/speckle/speckleUtil";
 
 export async function calcV1(
   branchData: HTTPStreamDataParentV1,
@@ -66,11 +67,15 @@ export async function calcV1(
   levelsUpdated.levels[2].tCO2e =
     Math.ceil(levelsUpdated.levels[2].tCO2e * 100) / 100;
 
+  const objectIds = await speckleUtil.getStreamObjects(context, streamId);
+  const modelId = objectIds.data.stream.branch.commits.items[0].referencedObject;
+
   return {
     ready: true,
     colors: co2Data.colors,
     data: {
       streamId: streamId,
+      modelId,
       projectInfo: projectInfoUpdated,
       materialBreakdown: materialBreakdownUpdated,
       aBreakdown: levelsUpdated,

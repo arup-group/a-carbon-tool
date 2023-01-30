@@ -462,6 +462,9 @@ export default new Vuex.Store({
     ) {
       branchName = `${context.state.speckleFolderName}/${branchName}`;
 
+      const objectIds = await speckleUtil.getStreamObjects(context, streamid);
+      const modelId = objectIds.data.stream.branch.commits.items[0].referencedObject;
+
       // TODO: ADD ERROR HANDLING
       const uploadObjectsRes: UploadObjectsRes =
         await speckleUtil.uploadObjects(context, streamid, objects);
@@ -487,8 +490,13 @@ export default new Vuex.Store({
         "@children": children.map(child => ({
           speckle_type: "reference",
           referencedId: child
-        }))
+        })),
+        "@model": [{
+          speckle_type: "reference",
+          referencedId: modelId
+        }]
       };
+      children.push(modelId); // add model id to children array so it gets added to __closure properly
       formData.append(
         "batch1",
         new Blob([

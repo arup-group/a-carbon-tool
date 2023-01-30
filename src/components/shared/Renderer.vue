@@ -153,6 +153,7 @@ export default class extends Vue {
   loading = 0;
   failed = false;
   async mounted() {
+    console.log("objecturls:", this.objecturls)
     this.renderStream(this.objecturls);
   }
   async beforeDestroy() {

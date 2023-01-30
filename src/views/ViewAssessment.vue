@@ -69,11 +69,11 @@ export default class ViewAssessment extends Vue {
   streamId = this.$route.params.streamId;
 
   mounted() {
-    this.$store
-      .dispatch("getObjectUrls", this.streamId)
-      .then((res: string[]) => {
-        this.objectUrls = [res[0]];
-      });
+    // this.$store
+    //   .dispatch("getObjectUrls", this.streamId)
+    //   .then((res: string[]) => {
+    //     this.objectUrls = [res[0]];
+    //   });
 
     this.token = this.$store.state.token.token;
   }
@@ -91,11 +91,13 @@ export default class ViewAssessment extends Vue {
     this.error = false;
     try {
       const { streamId, branchName } = this.$route.params;
-      const input: LoadActReportDataInput = { streamId, branchName, loadChildren: false };
+      const input: LoadActReportDataInput = { streamId, branchName, loadChildren: true };
       const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
         "loadActReportData",
         input
       );
+      this.objectUrls = [`${this.$store.state.selectedServer.url}/streams/${streamId}/objects/${assessmentViewData.data.modelId}`]
+      console.log("objectUrls:", this.objectUrls);
       this.assessment = assessmentViewData.data;
       this.colors = assessmentViewData.colors;
       this.chartDataReady = assessmentViewData.ready;

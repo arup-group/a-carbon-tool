@@ -2,7 +2,8 @@ export { StreamObject } from "./streamObject.interface";
 export {
   SpeckleObject,
   ObjectFormData,
-  ReportData,
+  ReportDataBase,
+  ReportDataChild,
   SpeckleObjectFormComplete,
   ObjectFormDataComplete,
   SpeckleObjectComplete,

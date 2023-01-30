@@ -8,7 +8,7 @@ export interface SpeckleObject {
   id: string;
   speckle_type: string;
   formData?: ObjectFormData;
-  reportData?: ReportData;
+  reportData?: ReportDataChild;
 }
 
 export interface ObjectFormData {
@@ -22,7 +22,7 @@ export interface SpeckleObjectFormComplete {
   id: string;
   speckle_type: string;
   formData: ObjectFormDataComplete;
-  reportData?: ReportData;
+  reportData?: ReportDataChild;
 }
 
 export interface ObjectFormDataComplete {
@@ -36,7 +36,7 @@ export interface SpeckleObjectComplete {
   id: string;
   speckle_type: string;
   formData: ObjectFormDataComplete;
-  reportData: ReportData;
+  reportData: ReportDataChild;
 }
 
 export interface ReportProp {
@@ -46,10 +46,14 @@ export interface ReportProp {
 
 export type ReportPassdown = ReportProp | false;
 
-export interface ReportData {
+export interface ReportDataBase {
   transportCarbonA4: number;
   productStageCarbonA1A3: number;
   constructionCarbonA5: CarbonA5;
+}
+
+export interface ReportDataChild extends ReportDataBase {
+  totalCarbon: number;
 }
 
 export interface CarbonA5 {
@@ -58,7 +62,7 @@ export interface CarbonA5 {
   site: number;
 }
 
-export interface ReportTotals extends ReportData {
+export interface ReportTotals extends ReportDataBase {
   totalCO2: number;
   volume: number;
   materials: ChartData[];

@@ -628,6 +628,7 @@ export default class Assessment extends Vue {
             waste: A5Waste,
             site: A5Site,
           },
+          totalCarbon: A4 + A1A3 + A5Value
         },
       };
     });

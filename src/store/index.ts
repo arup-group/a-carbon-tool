@@ -82,8 +82,8 @@ export default new Vuex.Store({
       : window.matchMedia("(prefers-color-scheme: dark)").matches,
 
     // Carbon data
-    selectedRegion: "UK",
-    availableRegions: ["India", "Netherlands", "UK"],
+    selectedRegion: { key: "UK", name: "UK"} as Region,
+    availableRegions: [{ key: "India", name: "India"}, { key: "Netherlands", name: "Netherlands" }, { key: "UK", name: "UK"}] as Region[],
     becs: [
       {
         name: "Superstructure" as BECName,
@@ -187,7 +187,7 @@ export default new Vuex.Store({
     // needs updating to cover region selection
     materialsArr: (state): MaterialFull[] => {
       const region: keyof AllMaterialCarbonFactors =
-        state.selectedRegion as keyof AllMaterialCarbonFactors;
+        state.selectedRegion.key as keyof AllMaterialCarbonFactors;
       const tmparr = (
         Object.keys(materialCarbonFactors[region]) as Array<
           keyof RegionMaterialCarbonFactors
@@ -264,7 +264,7 @@ export default new Vuex.Store({
       localStorage.setItem("darkMode", `${!state.darkMode}`);
       state.darkMode = !state.darkMode;
     },
-    addRegion(state, region: string) {
+    addRegion(state, region: Region) {
       state.availableRegions.push(region);
     },
     setRegion(state, region) {
@@ -718,7 +718,8 @@ export default new Vuex.Store({
               carbonFactor[branchName] = materialObj;
 
               materialCarbonFactors[branchName] = carbonFactor;
-              context.commit("addRegion", branchName);
+              const region: Region = { key: branchName, name: branchName.split(" ").slice(0, -1).join(" ") };
+              context.commit("addRegion", region);
             })
           );
         })
@@ -727,6 +728,11 @@ export default new Vuex.Store({
   },
   modules: {},
 });
+
+export interface Region {
+  key: string;
+  name: string;
+}
 
 export interface ExcelDataCombined {
   parentName: string;

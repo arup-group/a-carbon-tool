@@ -124,7 +124,7 @@ export default class Menu1b extends Vue {
   isFormValid = false;
 
   availableRegions() {
-    return store.state.availableRegions;
+    return store.state.availableRegions.map(ar => ar.name);
   }
 
   multipleSelectionRules = [(v: string[]) => !!v.length || "Input is required"];

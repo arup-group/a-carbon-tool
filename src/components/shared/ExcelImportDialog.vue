@@ -43,7 +43,7 @@ import DragDropInput from "./DragDropInput.vue";
 import * as XLSX from "xlsx";
 import * as ExcelImportUtils from "@/views/utils/ExcelImportUtils";
 import { materialCarbonFactors } from "@/store/utilities/material-carbon-factors";
-import { SaveNewRegionInput } from "@/store";
+import { SaveNewRegionInput, Region } from "@/store";
 
 @Component({
   components: { DragDropInput },
@@ -82,7 +82,9 @@ export default class ExcelImportDialog extends Vue {
           let regionName = `${vm.name} (${vm.streamId})`;
           let formatted = ExcelImportUtils.convertToStateMaterial(excelData, regionName);
           materialCarbonFactors[regionName] = formatted;
-          vm.$store.commit("addRegion", regionName);
+          // TODO: update below line
+          const region: Region = { key: regionName, name: regionName.split(" ").slice(0, -1).join(" ") };
+          vm.$store.commit("addRegion", region);
           if (vm.saveToSpeckle) {
             const input: SaveNewRegionInput = {
               name: regionName,

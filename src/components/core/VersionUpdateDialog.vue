@@ -68,7 +68,13 @@ export default class VersionUpdateDialog extends Vue {
     }
   ];
 
-  fixes: { title: string; subtitle: string }[] = [];
+  fixes: { title: string; subtitle: string }[] = [
+    {
+      title: "Login bug",
+      subtitle: `Fixed a bug with login in leading to non-logged in users not being
+      properly redirected to the login page and instead seeing an error.`
+    }
+  ];
 
   @Emit("close")
   close() {

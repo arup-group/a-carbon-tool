@@ -306,6 +306,9 @@ export default new Vuex.Store({
         ) {
           const server = speckleUtil.getServer(context);
           const token = speckleUtil.getToken();
+          if (server == null || token.token == null) {
+            throw new Error(AuthError.NOT_SIGNED_IN);
+          }
           context.commit("login", {
             token,
             server,
@@ -315,9 +318,9 @@ export default new Vuex.Store({
         const data = json.data;
         context.commit("setUser", data.user);
         context.commit("setServerInfo", data.serverInfo);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
-        if (err === AuthError.NOT_SIGNED_IN)
+        if (err === AuthError.NOT_SIGNED_IN || err.message === AuthError.NOT_SIGNED_IN)
           throw new Error(AuthError.NOT_SIGNED_IN);
       }
     },

@@ -35,7 +35,7 @@ export async function calcV2(
   const modelId = branchData["@model"][0].referencedId;
 
   if (includeChildren) {
-    children = await getChildren(
+    children = await getChildren<ChildSpeckleObjectData>(
       context.state.selectedServer.url,
       context.state.token.token,
       streamId,

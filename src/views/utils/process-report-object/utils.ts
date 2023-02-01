@@ -1,12 +1,17 @@
 import { HTTPStreamDataParent } from "@/models/graphql/";
-import { ChildSpeckleObjectData } from "@/models/graphql/StreamData.interface";
 
-export async function getChildren(
+interface ParentObj {
+  __closure: {
+    [keys: string]: number;
+  }
+}
+
+export async function getChildren<T>(
   url: string,
   token: string,
   streamId: string,
-  parent: HTTPStreamDataParent
-): Promise<ChildSpeckleObjectData[]> {
+  parent: ParentObj
+): Promise<T[]> {
   // get the id's of the children objects
   const children: string[] = Object.keys(parent.__closure);
 
@@ -29,7 +34,7 @@ export async function getChildren(
       }).then((res) => res.json());
     })
   ).then((data) => {
-    const arr: ChildSpeckleObjectData[] = [];
+    const arr: T[] = [];
     console.log("data:", data);
     data.forEach((d) => {
       arr.push(...d);

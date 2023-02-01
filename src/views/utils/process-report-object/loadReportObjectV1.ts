@@ -36,7 +36,7 @@ export async function calcV1(
     volume: branchData.volume,
   };
 
-  const childrenData = await getChildren(
+  const childrenData = await getChildren<ChildSpeckleObjectData>(
     context.state.selectedServer.url,
     context.state.token.token,
     streamId,

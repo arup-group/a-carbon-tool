@@ -68,7 +68,7 @@
       ></v-text-field>
     </v-card-text>
 
-    <excel-import-dialog :dialog="excelImportDialog" :streamId="streamId" @close="closeAddData" />
+    <excel-import-dialog :key="excelImportKey" :dialog="excelImportDialog" :streamId="streamId" @close="closeAddData" />
   </v-form>
 </template>
 
@@ -95,6 +95,7 @@ export default class Menu1b extends Vue {
   @Prop() streamId!: string;
 
   excelImportDialog = false;
+  excelImportKey = 1;
 
   speckleStream: StreamObject | null = this.defaultSpeckleStream();
   defaultSpeckleStream() {
@@ -158,6 +159,7 @@ export default class Menu1b extends Vue {
     this.excelImportDialog = true;
   }
   closeAddData() {
+    this.excelImportKey++;
     this.excelImportDialog = false;
   }
 }

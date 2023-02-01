@@ -96,6 +96,9 @@ export default class ExcelImportDialog extends Vue {
           }
           vm.overlay = true;
           vm.loading = false;
+          vm.name = "";
+          vm.file = {} as File;
+          (vm.$refs.form as any).resetValidation()
         } else {
           vm.excelFileValid = false;
           vm.loading = false;

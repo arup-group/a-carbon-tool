@@ -75,6 +75,7 @@
       textSuccess="Report deleted!"
     />
     <excel-import-dialog
+      :key="excelImportKey"
       :dialog="excelImportDialog"
       :streamId="streamid"
       @close="closeAddData"
@@ -135,6 +136,7 @@ export default class StreamReports extends Vue {
   streamid = "";
   streamName = "";
   excelImportDialog = false;
+  excelImportKey = 1; // used to force refresh the modal
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -151,6 +153,7 @@ export default class StreamReports extends Vue {
     this.excelImportDialog = true;
   }
   closeAddData() {
+    this.excelImportKey++;
     this.excelImportDialog = false;
   }
 

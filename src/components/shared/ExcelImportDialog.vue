@@ -96,6 +96,7 @@ export default class ExcelImportDialog extends Vue {
           vm.loading = false;
         } else {
           vm.excelFileValid = false;
+          vm.loading = false;
         }
 
         return excelData;

@@ -80,6 +80,7 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
+import * as AddParams from "./utils/add-params/addParams";
 
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
@@ -216,6 +217,7 @@ export default class Assessment extends Vue {
 
   async mounted() {
     this.token = this.$store.state.token.token;
+    AddParams.testRun("https://v2.speckle.arup.com", this.token);
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
     let { streamId, branchName } = this.$route.params;

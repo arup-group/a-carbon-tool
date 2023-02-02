@@ -54,10 +54,61 @@ interface Param {
   applicationInternalName: string;
 }
 
-function isReferenceObject(
-    object: any
-  ): object is ReferenceObject {
-    return "referencedId" in object && "speckle_type" in object;
+export async function testRun(url: string,
+  token: string) {
+    const streamid = "465e7157fe";
+    const parentObjId = "6607c6f15e6057fee92585125a9d015a";
+    const parent: IParamsParent = await fetch(`${url}/objects/${streamid}/${parentObjId}/single`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((d) => d.json());
+    console.log("parent:", parent)
+    const childToUpdate = "1ec63ad9d49783c1aa8a59b369084d33";
+
+    const params: ParamAdd[] = [{
+      parentid: childToUpdate,
+      name: "totalCarbon",
+      param: {
+        id: "string",
+        name: "string",
+        units: null,
+        value: "string",
+        isShared: false,
+        isReadOnly: false,
+        speckle_type: "Objects.BuiltElements.Revit.Parameter",
+        applicationId: null,
+        applicationUnit: null,
+        isTypeParameter: false,
+        totalChildrenCount: 0,
+        applicationUnitType: "string",
+        applicationInternalName: "string",
+      }
+    }];
+
+    const res = await addParams(parent, params, url, token, streamid);
+
+    const updatedChild = res.children.filter(c => c.id.split("-")[0] == childToUpdate);
+    console.log("updatedChild", updatedChild);
+    console.log("res", res);
+
+    const formData = new FormData();
+    formData.append(
+      "batch1",
+      new Blob([
+        JSON.stringify([res.parent, ...res.children])
+      ])
+    );
+    console.log("formData:", formData)
+    await fetch(`${url}/objects/${streamid}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
   }
 
 export async function addParams(
@@ -77,6 +128,8 @@ export async function addParams(
   childIds.forEach((id) => {
     idMapper[id] = `${id}-${new Date().getTime().toString()}-act`;
   });
+  console.log("childIds:", childIds)
+  console.log("idMapper:", idMapper);
   const newParentId = `${parent.id}-${new Date().getTime().toString()}-act`;
 
   // 2. get all the child objects (full objects, not just reference id's)
@@ -86,14 +139,17 @@ export async function addParams(
     streamId,
     parent
   );
+  console.log("childObjects:", childObjects)
 
   // 3. go through each child object, updating id's and adding new params where they should be added
   const newChildObjects: IChildObject[] = childObjects.map((child) => {
+    // console.log("1", child)
     // update id to new id
     const returnObj: IChildObject = {
       ...child,
       id: idMapper[child.id],
     };
+    // console.log("2")
 
     // add new parameters if needed
     params.forEach((p) => {
@@ -104,20 +160,26 @@ export async function addParams(
         };
       }
     });
+    // console.log("3")
 
     // update closure to new id's
     const newClosure: { [key: string]: number } = {};
-    Object.entries(returnObj.__closure).forEach(([key, value]) => {
-      if (idMapper[key]) {
-        newClosure[idMapper[key]] = value;
-      } else {
-        newClosure[key] = value;
-      }
-    });
+    if (returnObj.__closure) {
+      Object.entries(returnObj.__closure).forEach(([key, value]) => {
+        if (idMapper[key]) {
+          newClosure[idMapper[key]] = value;
+        } else {
+          newClosure[key] = value;
+        }
+      });
+    }
+    // console.log("4")
     returnObj.__closure = newClosure;
+    // console.log("5")
 
     return returnObj;
   });
+  console.log("newChildObjects:", newChildObjects)
 
   // 4. create and update new parent object
   // add new id
@@ -151,4 +213,8 @@ export async function addParams(
 
   console.log("new parent:", newParentObj);
   console.log("new children:", newChildObjects);
+  return {
+    parent: newParentObj,
+    children: newChildObjects
+  }
 }

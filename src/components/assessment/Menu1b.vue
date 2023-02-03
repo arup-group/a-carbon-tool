@@ -24,6 +24,8 @@
           <v-select
             v-model="form.region"
             :items="availableRegions()"
+            item-text="name"
+            item-value="key"
             :rules="selectionRules"
             label="Region"
             required
@@ -125,7 +127,7 @@ export default class Menu1b extends Vue {
   isFormValid = false;
 
   availableRegions() {
-    return store.state.availableRegions.map(ar => ar.name);
+    return store.state.availableRegions;
   }
 
   multipleSelectionRules = [(v: string[]) => !!v.length || "Input is required"];

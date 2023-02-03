@@ -272,7 +272,8 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    changeRegion(context, region) {
+    changeRegion(context, key) {
+      const region = context.state.availableRegions.find(r => r.key === key);
       context.commit("setRegion", region);
     },
 

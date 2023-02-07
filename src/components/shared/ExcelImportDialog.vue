@@ -80,7 +80,7 @@ export default class ExcelImportDialog extends Vue {
         let excelData = ExcelImportUtils.verify(XLSX.utils.sheet_to_json(worksheet));
         if (excelData) {
           let regionName = `${vm.name} (${vm.streamId})`;
-          let formatted = ExcelImportUtils.convertToStateMaterial(excelData, regionName);
+          let formatted = ExcelImportUtils.convertToStateMaterial(excelData);
           materialCarbonFactors[regionName] = formatted;
           // TODO: update below line
           const region: Region = { key: regionName, name: regionName.split(" ").slice(0, -1).join(" ") };

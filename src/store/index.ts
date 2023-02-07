@@ -197,10 +197,10 @@ export default new Vuex.Store({
         Object.keys(materialCarbonFactors[region][type]).forEach((t) => {
           const material = materialCarbonFactors[region][type][t];
           const toPush: MaterialFull = {
+            ...material,
             name: `${type} - ${t} (${
               Math.round(100 * material.productStageCarbonA1A3) / 100
             } kgCO2e/kg)`,
-            ...material,
             color:
               "#" +
               (
@@ -633,6 +633,7 @@ export default new Vuex.Store({
       const childObjects: ExcelDataSpeckleChild[] = data.map((d) => ({
         ...exportToMaterial(d),
         name: d.Material,
+        group: d.Group,
         speckle_type: "Base",
       }));
 
@@ -712,16 +713,22 @@ export default new Vuex.Store({
                 branchData
               );
 
-              const materialObj: { [key: string]: Material } = {};
+              const groups: RegionMaterialCarbonFactors = {};
               children.forEach((c) => {
-                materialObj[c.name] = c;
+                if (!groups[c.group]) groups[c.group] = {};
+                groups[c.group][c.name] = c;
               });
-              let carbonFactor: { [k0: string]: { [k1: string]: Material } } =
-                {};
-              const branchName = branch.name.slice(20);
-              carbonFactor[branchName] = materialObj;
 
-              materialCarbonFactors[branchName] = carbonFactor;
+              // const materialObj: { [key: string]: Material } = {};
+              // children.forEach((c) => {
+              //   materialObj[c.name] = c;
+              // });
+              // let carbonFactor: { [k0: string]: { [k1: string]: Material } } =
+              //   {};
+              const branchName = branch.name.slice(20);
+              // carbonFactor[branchName] = groups;
+
+              materialCarbonFactors[branchName] = groups;
               const region: Region = { key: branchName, name: branchName.split(" ").slice(0, -1).join(" ") };
               context.commit("addRegion", region);
             })
@@ -746,6 +753,7 @@ export interface ExcelDataCombined {
 export interface ExcelDataSpeckleChild extends Material {
   speckle_type: "Base";
   name: string;
+  group: string;
 }
 
 export interface ExcelDataSpeckleParent {

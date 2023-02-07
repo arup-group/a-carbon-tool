@@ -5,6 +5,7 @@ import {
 import * as XLSX from "xlsx";
 
 export interface ExcelData {
+  Group: string;
   Density: number;
   Material: string;
   "Product Stage Carbon A1-A3": number;
@@ -26,6 +27,7 @@ export function excelToJson(e: ProgressEvent<FileReader>) {
  */
 export function instanceOfExcelData(object: any): object is ExcelData {
   return (
+    "Group" in object &&
     "Density" in object &&
     "Material" in object &&
     "Product Stage Carbon A1-A3" in object &&
@@ -75,11 +77,11 @@ export function exportToMaterial(data: ExcelData): Material {
  */
 export function convertToStateMaterial(
   data: ExcelData[],
-  name: string,
 ): RegionMaterialCarbonFactors {
-  const materialObj: { [key: string]: Material } = {};
+  const groups: RegionMaterialCarbonFactors = {};
   data.forEach((d) => {
-    materialObj[d.Material] = {
+    if (!groups[d.Group]) groups[d.Group] = {};
+    groups[d.Group][d.Material] = {
       productStageCarbonA1A3: d["Product Stage Carbon A1-A3"],
       density: d.Density,
       wastage: d.Wastage,
@@ -87,7 +89,5 @@ export function convertToStateMaterial(
       source: "custom",
     };
   });
-  const returnObj: { [k0: string]: { [k1: string]: Material } } = {}
-  returnObj[name] = materialObj;
-  return returnObj;
+  return groups;
 }

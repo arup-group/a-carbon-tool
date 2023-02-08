@@ -30,6 +30,19 @@ interface IChildObject {
   parameters: {
     [key: string]: Param;
   };
+  displayValue?: ReferenceObject[] | ReferenceObject;
+  materialQuantities?: {
+    material: {
+      id: string;
+    }
+  }[];
+  faces?: ReferenceObject[];
+  vertices?: ReferenceObject[];
+  elements?: ReferenceObject[];
+}
+
+function instanceOfReferenceObject(object: any): object is ReferenceObject {
+  return "referencedId" in object && "speckle_type" in object && object.speckle_type === "reference"
 }
 
 interface ParamAdd {
@@ -150,6 +163,74 @@ export async function addParams(
       id: idMapper[child.id],
     };
     // console.log("2")
+
+    if (child.displayValue) {
+      console.log("pre child.displayValue:", child.displayValue)
+      if (Array.isArray(child.displayValue)) {
+        returnObj.displayValue = child.displayValue.map(dv => ({
+          ...dv,
+          referencedId: idMapper[dv.referencedId]
+        }));
+      } else {
+        returnObj.displayValue = {
+          ...child.displayValue,
+          referencedId: child.displayValue.referencedId
+        }
+      }
+      console.log("post child.displayValue:", returnObj.displayValue)
+    }
+    if (child.materialQuantities) {
+      returnObj.materialQuantities = child.materialQuantities.map(mq => ({
+        ...mq,
+        material: {
+          ...mq.material,
+          id: idMapper[mq.material.id]
+        }
+      }));
+    }
+    if (child.vertices) {
+      returnObj.vertices = child.vertices.map(v => ({
+        ...v,
+        referencedId: idMapper[v.referencedId]
+      }));
+    }
+    if (child.faces) {
+      returnObj.faces = child.faces.map(f => ({
+        ...f,
+        referencedId: idMapper[f.referencedId]
+      }));
+    }
+    if (child.elements) {
+      returnObj.elements = child.elements.map(e => ({
+        ...e,
+        referencedId: idMapper[e.referencedId]
+      }))
+    }
+
+    const testChild: any = child;
+    Object.keys(testChild).forEach(key => {
+      let firstVal = {};
+      let isArr = false;
+      firstVal = testChild[key];
+      if (Array.isArray(testChild[key])) {
+        isArr = true;
+        firstVal = testChild[key][0];
+      }
+      if (firstVal instanceof Object && instanceOfReferenceObject(firstVal)) {
+        console.log("found sommint", key)
+        if (isArr) {
+          (returnObj as any)[key] = testChild[key].map((v: ReferenceObject) => ({
+            ...v,
+            referencedId: idMapper[v.referencedId]
+          }));
+        } else {
+          (returnObj as any)[key] = {
+            referencedId: idMapper[testChild[key].referencedId],
+            speckle_type: "reference"
+          }
+        }
+      }
+    });
 
     // add new parameters if needed
     params.forEach((p) => {

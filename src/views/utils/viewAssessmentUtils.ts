@@ -83,12 +83,12 @@ export function extractCo2Data(
   return { levels, materials, colors };
 }
 
-export async function loadParent(
+export async function loadParent<T>(
   url: string,
   streamId: string,
   parentId: string,
   token: string
-): Promise<HTTPStreamDataParent> {
+): Promise<T> {
   return await fetch(`${url}/objects/${streamId}/${parentId}/single`, {
     method: "GET",
     headers: {
@@ -145,7 +145,7 @@ export async function loadStream(
   const parentId =
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
 
-  const branchData = await loadParent(
+  const branchData = await loadParent<HTTPStreamDataParent>(
     context.state.selectedServer.url,
     streamId,
     parentId,
@@ -169,7 +169,7 @@ export async function loadStream(
     volume: branchData.volume,
   };
 
-  const childrenData = await getChildren(
+  const childrenData = await getChildren<ChildSpeckleObjectData>(
     context.state.selectedServer.url,
     context.state.token.token,
     streamId,
@@ -213,12 +213,16 @@ export async function loadStream(
   };
 }
 
-export async function getChildren(
+export interface ParentProp {
+  __closure: { [childId: string]: 1 }
+}
+
+export async function getChildren<T>(
   url: string,
   token: string,
   streamId: string,
-  parent: HTTPStreamDataParent
-): Promise<ChildSpeckleObjectData[]> {
+  parent: ParentProp
+): Promise<T[]> {
   // get the id's of the children objects
   const children: string[] = Object.keys(parent.__closure);
 
@@ -241,7 +245,7 @@ export async function getChildren(
       }).then((res) => res.json());
     })
   ).then((data) => {
-    const arr: ChildSpeckleObjectData[] = [];
+    const arr: T[] = [];
     data.forEach((d) => {
       arr.push(...d);
     });

@@ -12,15 +12,23 @@ interface IParamsParent {
   __closure: {
     [keys: string]: number;
   };
-  [key: string]: ReferenceObject[] | string | {
-    [keys: string]: number;
-  }
+  [key: string]:
+    | ReferenceObject[]
+    | string
+    | {
+        [keys: string]: number;
+      };
 }
 
 interface ReferenceObject {
-    referencedId: string;
-    speckle_type: "reference";
-  }
+  referencedId: string;
+  speckle_type: "reference";
+}
+
+interface Topology {
+  restraint: ReferenceObject;
+  constraintAxis: ReferenceObject;
+}
 
 interface IChildObject {
   id: string;
@@ -34,15 +42,20 @@ interface IChildObject {
   materialQuantities?: {
     material: {
       id: string;
-    }
+    };
   }[];
   faces?: ReferenceObject[];
   vertices?: ReferenceObject[];
   elements?: ReferenceObject[];
+  topology?: Topology[];
 }
 
 function instanceOfReferenceObject(object: any): object is ReferenceObject {
-  return "referencedId" in object && "speckle_type" in object && object.speckle_type === "reference"
+  return (
+    "referencedId" in object &&
+    "speckle_type" in object &&
+    object.speckle_type === "reference"
+  );
 }
 
 interface ParamAdd {
@@ -55,7 +68,7 @@ interface Param {
   id: string;
   name: string;
   units: string | null;
-  value: string;
+  value: any;
   isShared: boolean;
   isReadOnly: boolean;
   speckle_type: "Objects.BuiltElements.Revit.Parameter";
@@ -67,62 +80,88 @@ interface Param {
   applicationInternalName: string;
 }
 
-export async function testRun(url: string,
-  token: string) {
-    const streamid = "465e7157fe";
-    const parentObjId = "6607c6f15e6057fee92585125a9d015a";
-    const parent: IParamsParent = await fetch(`${url}/objects/${streamid}/${parentObjId}/single`, {
+export async function testRun(url: string, token: string) {
+  const streamid = "465e7157fe";
+  const parentObjId = "6607c6f15e6057fee92585125a9d015a";
+  const parent: IParamsParent = await fetch(
+    `${url}/objects/${streamid}/${parentObjId}/single`,
+    {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then((d) => d.json());
-    console.log("parent:", parent)
-    const childToUpdate = "1ec63ad9d49783c1aa8a59b369084d33";
+    }
+  ).then((d) => d.json());
+  console.log("parent:", parent);
+  const childrenToUpdate = [
+    "1ec63ad9d49783c1aa8a59b369084d33",
+    "6965daf3991deabb9b6476c964038aae",
+    "15b3901d47cf1acc0caa7a857f581b04",
+    "2514262e4b43a762e94d8349becc5bcd",
+  ];
 
-    const params: ParamAdd[] = [{
-      parentid: childToUpdate,
+  // const params: ParamAdd[] = [{
+  //   parentid: childToUpdate,
+  //   name: "totalCarbon",
+  //   param: {
+  //     id: "1234567890",
+  //     name: "totalCarbon",
+  //     units: null,
+  //     value: "string",
+  //     isShared: false,
+  //     isReadOnly: false,
+  //     speckle_type: "Objects.BuiltElements.Revit.Parameter",
+  //     applicationId: null,
+  //     applicationUnit: null,
+  //     isTypeParameter: false,
+  //     totalChildrenCount: 0,
+  //     applicationUnitType: "string",
+  //     applicationInternalName: "string",
+  //   }
+  // }];
+  const params: ParamAdd[] = childrenToUpdate.map((c) => ({
+    parentid: c,
+    name: "totalCarbon",
+    param: {
+      id: Math.floor(Math.random() * 100000).toString(),
       name: "totalCarbon",
-      param: {
-        id: "string",
-        name: "string",
-        units: null,
-        value: "string",
-        isShared: false,
-        isReadOnly: false,
-        speckle_type: "Objects.BuiltElements.Revit.Parameter",
-        applicationId: null,
-        applicationUnit: null,
-        isTypeParameter: false,
-        totalChildrenCount: 0,
-        applicationUnitType: "string",
-        applicationInternalName: "string",
-      }
-    }];
+      units: "kgCO2e/kg",
+      value: Math.floor(Math.random() * 100),
+      isShared: false,
+      isReadOnly: false,
+      speckle_type: "Objects.BuiltElements.Revit.Parameter",
+      applicationId: null,
+      applicationUnit: null,
+      isTypeParameter: false,
+      totalChildrenCount: 0,
+      applicationUnitType: "string",
+      applicationInternalName: "string",
+    },
+  }));
 
-    const res = await addParams(parent, params, url, token, streamid);
+  const res = await addParams(parent, params, url, token, streamid);
 
-    const updatedChild = res.children.filter(c => c.id.split("-")[0] == childToUpdate);
-    console.log("updatedChild", updatedChild);
-    console.log("res", res);
+  // const updatedChild = res.children.filter(
+  //   (c) => c.id.split("-")[0] == childToUpdate
+  // );
+  // console.log("updatedChild", updatedChild);
+  console.log("res", res);
 
-    const formData = new FormData();
-    formData.append(
-      "batch1",
-      new Blob([
-        JSON.stringify([res.parent, ...res.children])
-      ])
-    );
-    console.log("formData:", formData)
-    await fetch(`${url}/objects/${streamid}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-  }
+  const formData = new FormData();
+  formData.append(
+    "batch1",
+    new Blob([JSON.stringify([res.parent, ...res.children])])
+  );
+  console.log("formData:", formData);
+  await fetch(`${url}/objects/${streamid}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+}
 
 export async function addParams(
   parent: IParamsParent,
@@ -141,7 +180,7 @@ export async function addParams(
   childIds.forEach((id) => {
     idMapper[id] = `${id}-${new Date().getTime().toString()}-act`;
   });
-  console.log("childIds:", childIds)
+  console.log("childIds:", childIds);
   console.log("idMapper:", idMapper);
   const newParentId = `${parent.id}-${new Date().getTime().toString()}-act`;
 
@@ -152,7 +191,7 @@ export async function addParams(
     streamId,
     parent
   );
-  console.log("childObjects:", childObjects)
+  console.log("childObjects:", childObjects);
 
   // 3. go through each child object, updating id's and adding new params where they should be added
   const newChildObjects: IChildObject[] = childObjects.map((child) => {
@@ -165,50 +204,65 @@ export async function addParams(
     // console.log("2")
 
     if (child.displayValue) {
-      console.log("pre child.displayValue:", child.displayValue)
+      console.log("pre child.displayValue:", child.displayValue);
       if (Array.isArray(child.displayValue)) {
-        returnObj.displayValue = child.displayValue.map(dv => ({
+        returnObj.displayValue = child.displayValue.map((dv) => ({
           ...dv,
-          referencedId: idMapper[dv.referencedId]
+          referencedId: idMapper[dv.referencedId],
         }));
       } else {
         returnObj.displayValue = {
           ...child.displayValue,
-          referencedId: child.displayValue.referencedId
-        }
+          referencedId: child.displayValue.referencedId,
+        };
       }
-      console.log("post child.displayValue:", returnObj.displayValue)
+      console.log("post child.displayValue:", returnObj.displayValue);
     }
     if (child.materialQuantities) {
-      returnObj.materialQuantities = child.materialQuantities.map(mq => ({
+      returnObj.materialQuantities = child.materialQuantities.map((mq) => ({
         ...mq,
         material: {
           ...mq.material,
-          id: idMapper[mq.material.id]
-        }
+          id: idMapper[mq.material.id],
+        },
       }));
     }
     if (child.vertices) {
-      returnObj.vertices = child.vertices.map(v => ({
+      returnObj.vertices = child.vertices.map((v) => ({
         ...v,
-        referencedId: idMapper[v.referencedId]
+        referencedId: idMapper[v.referencedId],
       }));
     }
     if (child.faces) {
-      returnObj.faces = child.faces.map(f => ({
+      returnObj.faces = child.faces.map((f) => ({
         ...f,
-        referencedId: idMapper[f.referencedId]
+        referencedId: idMapper[f.referencedId],
       }));
     }
     if (child.elements) {
-      returnObj.elements = child.elements.map(e => ({
+      returnObj.elements = child.elements.map((e) => ({
         ...e,
-        referencedId: idMapper[e.referencedId]
-      }))
+        referencedId: idMapper[e.referencedId],
+      }));
+    }
+    if (child.topology) {
+      console.log("topology:", child.topology);
+      const returnTop: Topology[] = child.topology.map((t) => ({
+        ...t,
+        restraint: {
+          speckle_type: "reference",
+          referencedId: idMapper[t.restraint.referencedId],
+        },
+        constraintAxis: {
+          speckle_type: "reference",
+          referencedId: idMapper[t.constraintAxis.referencedId],
+        },
+      }));
+      returnObj.topology = returnTop;
     }
 
     const testChild: any = child;
-    Object.keys(testChild).forEach(key => {
+    Object.keys(testChild).forEach((key) => {
       let firstVal = {};
       let isArr = false;
       firstVal = testChild[key];
@@ -217,17 +271,19 @@ export async function addParams(
         firstVal = testChild[key][0];
       }
       if (firstVal instanceof Object && instanceOfReferenceObject(firstVal)) {
-        console.log("found sommint", key)
+        console.log("found sommint", key);
         if (isArr) {
-          (returnObj as any)[key] = testChild[key].map((v: ReferenceObject) => ({
-            ...v,
-            referencedId: idMapper[v.referencedId]
-          }));
+          (returnObj as any)[key] = testChild[key].map(
+            (v: ReferenceObject) => ({
+              ...v,
+              referencedId: idMapper[v.referencedId],
+            })
+          );
         } else {
           (returnObj as any)[key] = {
             referencedId: idMapper[testChild[key].referencedId],
-            speckle_type: "reference"
-          }
+            speckle_type: "reference",
+          };
         }
       }
     });
@@ -260,35 +316,35 @@ export async function addParams(
 
     return returnObj;
   });
-  console.log("newChildObjects:", newChildObjects)
+  console.log("newChildObjects:", newChildObjects);
 
   // 4. create and update new parent object
   // add new id
   const newParentObj: IParamsParent = {
     ...parent,
-    id: newParentId
+    id: newParentId,
   };
 
   // update __closure to new child id's
   const newClosure: { [key: string]: number } = {};
   Object.entries(newParentObj.__closure).forEach(([key, value]) => {
     if (idMapper[key]) {
-        newClosure[idMapper[key]] = value;
+      newClosure[idMapper[key]] = value;
     } else {
-        newClosure[key] = value;
+      newClosure[key] = value;
     }
   });
   newParentObj.__closure = newClosure;
 
   // update all reference fields (fields that start with an @)
-  Object.keys(newParentObj).forEach(key => {
+  Object.keys(newParentObj).forEach((key) => {
     if (key.startsWith("@")) {
-        const records = newParentObj[key] as ReferenceObject[];
-        const newRecords = records.map(r => ({
-            ...r,
-            referencedId: idMapper[r.referencedId]
-        }));
-        newParentObj[key] = newRecords;
+      const records = newParentObj[key] as ReferenceObject[];
+      const newRecords = records.map((r) => ({
+        ...r,
+        referencedId: idMapper[r.referencedId],
+      }));
+      newParentObj[key] = newRecords;
     }
   });
 
@@ -296,6 +352,6 @@ export async function addParams(
   console.log("new children:", newChildObjects);
   return {
     parent: newParentObj,
-    children: newChildObjects
-  }
+    children: newChildObjects,
+  };
 }

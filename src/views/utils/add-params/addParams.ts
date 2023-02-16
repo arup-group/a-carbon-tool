@@ -58,6 +58,10 @@ function instanceOfReferenceObject(object: any): object is ReferenceObject {
   );
 }
 
+interface IdMapper {
+  [oldId: string]: string;
+}
+
 interface ParamAdd {
   parentid: string;
   name: string;
@@ -101,25 +105,6 @@ export async function testRun(url: string, token: string) {
     "2514262e4b43a762e94d8349becc5bcd",
   ];
 
-  // const params: ParamAdd[] = [{
-  //   parentid: childToUpdate,
-  //   name: "totalCarbon",
-  //   param: {
-  //     id: "1234567890",
-  //     name: "totalCarbon",
-  //     units: null,
-  //     value: "string",
-  //     isShared: false,
-  //     isReadOnly: false,
-  //     speckle_type: "Objects.BuiltElements.Revit.Parameter",
-  //     applicationId: null,
-  //     applicationUnit: null,
-  //     isTypeParameter: false,
-  //     totalChildrenCount: 0,
-  //     applicationUnitType: "string",
-  //     applicationInternalName: "string",
-  //   }
-  // }];
   const params: ParamAdd[] = childrenToUpdate.map((c) => ({
     parentid: c,
     name: "totalCarbon",
@@ -142,10 +127,6 @@ export async function testRun(url: string, token: string) {
 
   const res = await addParams(parent, params, url, token, streamid);
 
-  // const updatedChild = res.children.filter(
-  //   (c) => c.id.split("-")[0] == childToUpdate
-  // );
-  // console.log("updatedChild", updatedChild);
   console.log("res", res);
 
   const formData = new FormData();
@@ -175,7 +156,7 @@ export async function addParams(
   // 2. dictionary of id's and the params to add to those id's
 
   // 1. loop through all child id's and generate new id and dictionary to convert
-  const idMapper: { [oldId: string]: string } = {}; // key = oldId, value = new id
+  const idMapper: IdMapper = {}; // key = oldId, value = new id
   const childIds = Object.keys(parent.__closure);
   childIds.forEach((id) => {
     idMapper[id] = `${id}-${new Date().getTime().toString()}-act`;
@@ -195,102 +176,21 @@ export async function addParams(
 
   // 3. go through each child object, updating id's and adding new params where they should be added
   const newChildObjects: IChildObject[] = childObjects.map((child) => {
-    // console.log("1", child)
-    // update id to new id
-    const returnObj: IChildObject = {
-      ...child,
-      id: idMapper[child.id],
-    };
-    // console.log("2")
 
-    if (child.displayValue) {
-      console.log("pre child.displayValue:", child.displayValue);
-      if (Array.isArray(child.displayValue)) {
-        returnObj.displayValue = child.displayValue.map((dv) => ({
-          ...dv,
-          referencedId: idMapper[dv.referencedId],
-        }));
-      } else {
-        returnObj.displayValue = {
-          ...child.displayValue,
-          referencedId: child.displayValue.referencedId,
-        };
-      }
-      console.log("post child.displayValue:", returnObj.displayValue);
+    const initialChildId = child.id;
+    let returnObj: IChildObject;
+    console.log("closure:", child.__closure)
+    // if an object has no values in __closure (or the property doesn't exist) then don't need to convert object as there will be no chlidren
+    if (child.__closure !== undefined && Object.keys(child.__closure).length > 0) {
+      returnObj = convertObj(child, idMapper);
+    } else {
+      returnObj = child;
     }
-    if (child.materialQuantities) {
-      returnObj.materialQuantities = child.materialQuantities.map((mq) => ({
-        ...mq,
-        material: {
-          ...mq.material,
-          id: idMapper[mq.material.id],
-        },
-      }));
-    }
-    if (child.vertices) {
-      returnObj.vertices = child.vertices.map((v) => ({
-        ...v,
-        referencedId: idMapper[v.referencedId],
-      }));
-    }
-    if (child.faces) {
-      returnObj.faces = child.faces.map((f) => ({
-        ...f,
-        referencedId: idMapper[f.referencedId],
-      }));
-    }
-    if (child.elements) {
-      returnObj.elements = child.elements.map((e) => ({
-        ...e,
-        referencedId: idMapper[e.referencedId],
-      }));
-    }
-    if (child.topology) {
-      console.log("topology:", child.topology);
-      const returnTop: Topology[] = child.topology.map((t) => ({
-        ...t,
-        restraint: {
-          speckle_type: "reference",
-          referencedId: idMapper[t.restraint.referencedId],
-        },
-        constraintAxis: {
-          speckle_type: "reference",
-          referencedId: idMapper[t.constraintAxis.referencedId],
-        },
-      }));
-      returnObj.topology = returnTop;
-    }
-
-    const testChild: any = child;
-    Object.keys(testChild).forEach((key) => {
-      let firstVal = {};
-      let isArr = false;
-      firstVal = testChild[key];
-      if (Array.isArray(testChild[key])) {
-        isArr = true;
-        firstVal = testChild[key][0];
-      }
-      if (firstVal instanceof Object && instanceOfReferenceObject(firstVal)) {
-        console.log("found sommint", key);
-        if (isArr) {
-          (returnObj as any)[key] = testChild[key].map(
-            (v: ReferenceObject) => ({
-              ...v,
-              referencedId: idMapper[v.referencedId],
-            })
-          );
-        } else {
-          (returnObj as any)[key] = {
-            referencedId: idMapper[testChild[key].referencedId],
-            speckle_type: "reference",
-          };
-        }
-      }
-    });
+    returnObj.id = idMapper[initialChildId];
 
     // add new parameters if needed
     params.forEach((p) => {
-      if (p.parentid === child.id) {
+      if (p.parentid === initialChildId) {
         returnObj.parameters = {
           ...returnObj.parameters,
           [p.name]: p.param,
@@ -354,4 +254,39 @@ export async function addParams(
     parent: newParentObj,
     children: newChildObjects,
   };
+}
+
+function convertObj(obj: any, idMapper: IdMapper) {
+  if (instanceOfReferenceObject(obj))
+    return {
+      ...obj,
+      referencedId: idMapper[obj.referencedId],
+    };
+  else if (Array.isArray(obj)) {
+    // do some stuff
+    return handleArray(obj, idMapper);
+  } else if (typeof obj === "object") {
+    // do some different stuff
+    Object.keys(obj).forEach((k) => {
+      if (Array.isArray(obj[k])) {
+        // do same stuff as above
+        obj[k] = handleArray(obj[k], idMapper);
+      } else if (typeof obj[k] === "object" && obj[k] !== null) {
+        obj[k] = convertObj(obj[k], idMapper);
+      }
+    });
+    return obj;
+  } else {
+    return obj;
+  }
+}
+
+function handleArray(arr: any[], idMapper: IdMapper) {
+  return arr.map((a) => {
+    if (Array.isArray(a)) a = handleArray(a, idMapper);
+    else if (typeof a === "object") {
+      a = convertObj(a, idMapper);
+    }
+    return a;
+  });
 }

@@ -129,6 +129,7 @@ import {
   GetAllReportBranchesOutput,
   LoadActReportDataInput,
   UploadReportInput,
+  GetObjectDetailsOut
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/process-report-object";
@@ -177,6 +178,9 @@ export default class Assessment extends Vue {
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
+  addParams: AddParams.ParamAdd[] = [];
+  allChildObjs: AddParams.IChildObject[] = [];
+  parentObj: AddParams.IParamsParent | null = null;
   streamId = "";
 
   colors: Color[] = [];
@@ -217,7 +221,7 @@ export default class Assessment extends Vue {
 
   async mounted() {
     this.token = this.$store.state.token.token;
-    AddParams.testRun("https://v2.speckle.arup.com", this.token);
+    // AddParams.testRun("https://v2.speckle.arup.com", this.token);
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
     let { streamId, branchName } = this.$route.params;
@@ -326,12 +330,21 @@ export default class Assessment extends Vue {
   }
   async uploadReport(branchName: string) {
     if (this.report && this.report.reportObjs.length > 0) {
+      // TODO: add some check to make sure that model is a revit check here
+      let newModel: AddParams.AddParamsModel | undefined;
+      if (this.parentObj) {
+        console.log("starting adding params")
+        newModel = await AddParams.addParams(this.parentObj, this.addParams, this.$store.state.selectedServer.url, this.token, this.streamId, this.allChildObjs)
+        console.log("finished adding params")
+      }
+
       const uploadReportInput: UploadReportInput = {
         streamid: this.streamId,
         objects: this.report.reportObjs,
         reportTotals: this.report.totals,
         projectData: this.projectData,
         branchName,
+        newModel
       };
       this.loading = true;
       await this.$store.dispatch("uploadReport", uploadReportInput);
@@ -365,7 +378,7 @@ export default class Assessment extends Vue {
     );
     this.volProp = volumeFilter ? volumeFilter.rawName : "";
     if (!this.update) {
-      const res: ObjectDetails[] = await this.$store.dispatch(
+      const res: GetObjectDetailsOut = await this.$store.dispatch(
         "getObjectDetails",
         {
           streamid: this.streamId,
@@ -373,10 +386,13 @@ export default class Assessment extends Vue {
         }
       );
 
-      console.log("res:", res)
+      this.allChildObjs = res.children;
+      this.parentObj = res.parent;
+
+      console.log("objectDetails res:", res)
 
       let totalVol = 0;
-      const filteredRes = res.filter(
+      const filteredRes = this.allChildObjs.filter(
         (r) =>
           r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
           r.speckle_type !== "Objects.Geometry.Mesh"
@@ -610,6 +626,7 @@ export default class Assessment extends Vue {
   carbonCalc() {
     // convert objects from SpeckleObject to SpeckleObjectFormComplete
     const objs = this.convertToFormComplete();
+    this.addParams = [];
 
     const reportObjs = objs.map((o): SpeckleObjectComplete => {
       const A1A3 = productStageCarbonA1A3(o);
@@ -620,6 +637,105 @@ export default class Assessment extends Vue {
         site: A5Site,
         waste: A5Waste,
       });
+
+      // make parameter update object
+      this.addParams.push({
+        parentid: o.id,
+        name: "Total Carbon",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Total Carbon",
+          units: "kgCO2e/kg",
+          value: A4 + A1A3 + A5Value,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        }
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Product Stage Carbon A1-A3",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Product Stage Carbon A1-A3",
+          units: "kgCO2e/kg",
+          value: A1A3,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        }
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Transport Carbon A4",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Transport Carbon A4",
+          units: "kgCO2e/kg",
+          value: A4,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        }
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Transport Carbon A4",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Transport Carbon A4",
+          units: "kgCO2e/kg",
+          value: A4,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        }
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Construction Carbon A5",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Construction Carbon A5",
+          units: "kgCO2e/kg",
+          value: A5Value,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        }
+      });
+      // end parameter update
+
       return {
         ...o,
         reportData: {
@@ -634,6 +750,9 @@ export default class Assessment extends Vue {
         },
       };
     });
+
+    console.log("addParams:", this.addParams);
+    // AddParams.testRun("https://v2.speckle.arup.com", this.token, addParameters);
 
     const totals = this.calcTotals(reportObjs);
 

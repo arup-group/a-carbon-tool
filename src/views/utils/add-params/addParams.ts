@@ -7,7 +7,7 @@ interface IReferences {
   }[];
 }
 
-interface IParamsParent {
+export interface IParamsParent {
   id: string;
   __closure: {
     [keys: string]: number;
@@ -30,8 +30,9 @@ interface Topology {
   constraintAxis: ReferenceObject;
 }
 
-interface IChildObject {
+export interface IChildObject {
   id: string;
+  speckle_type: string;
   __closure: {
     [key: string]: number;
   };
@@ -62,7 +63,7 @@ interface IdMapper {
   [oldId: string]: string;
 }
 
-interface ParamAdd {
+export interface ParamAdd {
   parentid: string;
   name: string;
   param: Param;
@@ -84,7 +85,12 @@ interface Param {
   applicationInternalName: string;
 }
 
-export async function testRun(url: string, token: string) {
+export interface AddParamsModel {
+  parent: IParamsParent;
+  children: IChildObject[];
+}
+
+export async function testRun(url: string, token: string, params: ParamAdd[]) {
   const streamid = "465e7157fe";
   const parentObjId = "6607c6f15e6057fee92585125a9d015a";
   const parent: IParamsParent = await fetch(
@@ -98,32 +104,32 @@ export async function testRun(url: string, token: string) {
     }
   ).then((d) => d.json());
   console.log("parent:", parent);
-  const childrenToUpdate = [
-    "1ec63ad9d49783c1aa8a59b369084d33",
-    "6965daf3991deabb9b6476c964038aae",
-    "15b3901d47cf1acc0caa7a857f581b04",
-    "2514262e4b43a762e94d8349becc5bcd",
-  ];
+  // const childrenToUpdate = [
+  //   "1ec63ad9d49783c1aa8a59b369084d33",
+  //   "6965daf3991deabb9b6476c964038aae",
+  //   "15b3901d47cf1acc0caa7a857f581b04",
+  //   "2514262e4b43a762e94d8349becc5bcd",
+  // ];
 
-  const params: ParamAdd[] = childrenToUpdate.map((c) => ({
-    parentid: c,
-    name: "totalCarbon",
-    param: {
-      id: Math.floor(Math.random() * 100000).toString(),
-      name: "totalCarbon",
-      units: "kgCO2e/kg",
-      value: Math.floor(Math.random() * 100),
-      isShared: false,
-      isReadOnly: false,
-      speckle_type: "Objects.BuiltElements.Revit.Parameter",
-      applicationId: null,
-      applicationUnit: null,
-      isTypeParameter: false,
-      totalChildrenCount: 0,
-      applicationUnitType: "string",
-      applicationInternalName: "string",
-    },
-  }));
+  // const params: ParamAdd[] = childrenToUpdate.map((c) => ({
+  //   parentid: c,
+  //   name: "totalCarbon",
+  //   param: {
+  //     id: Math.floor(Math.random() * 100000).toString(),
+  //     name: "totalCarbon",
+  //     units: "kgCO2e/kg",
+  //     value: Math.floor(Math.random() * 100),
+  //     isShared: false,
+  //     isReadOnly: false,
+  //     speckle_type: "Objects.BuiltElements.Revit.Parameter",
+  //     applicationId: null,
+  //     applicationUnit: null,
+  //     isTypeParameter: false,
+  //     totalChildrenCount: 0,
+  //     applicationUnitType: "string",
+  //     applicationInternalName: "string",
+  //   },
+  // }));
 
   const res = await addParams(parent, params, url, token, streamid);
 
@@ -149,8 +155,9 @@ export async function addParams(
   params: ParamAdd[],
   url: string,
   token: string,
-  streamId: string
-) {
+  streamId: string,
+  childObjects?: IChildObject[]
+): Promise<AddParamsModel> {
   // inputs:
   // 1. parent object
   // 2. dictionary of id's and the params to add to those id's
@@ -166,12 +173,14 @@ export async function addParams(
   const newParentId = `${parent.id}-${new Date().getTime().toString()}-act`;
 
   // 2. get all the child objects (full objects, not just reference id's)
-  const childObjects = await getChildren<IChildObject>(
-    url,
-    token,
-    streamId,
-    parent
-  );
+  if (!childObjects) {
+    childObjects = await getChildren<IChildObject>(
+      url,
+      token,
+      streamId,
+      parent
+    );
+  }
   console.log("childObjects:", childObjects);
 
   // 3. go through each child object, updating id's and adding new params where they should be added

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
-import { LoadStreamOut } from "@/views/utils/process-report-object";
+import { getChildren, LoadStreamOut } from "@/views/utils/process-report-object";
 import { loadStream } from "@/views/utils/viewAssessmentUtils";
 import { Login, Server, AuthError, Token, ServerRegion, CustomServerStorage } from "@/models/auth/";
 import router from "@/router";
@@ -27,6 +27,7 @@ import {
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
+import { AddParamsModel, IChildObject, IParamsParent } from "@/views/utils/add-params/addParams";
 
 Vue.use(Vuex);
 
@@ -413,42 +414,31 @@ export default new Vuex.Store({
     async getObjectDetails(
       context,
       { streamid, objecturl }: ObjectDetailsInput
-    ) {
+    ): Promise<GetObjectDetailsOut> {
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
-      const response = await fetch(
+      const parent: IParamsParent = await fetch(
         `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`,
         {
-          headers: {
-            Accept: "text/plain",
-            Authorization: `Bearer ${context.state.token.token}`,
-          },
-        }
-      );
-      const rawObj = await response.text();
-      const rootObj = JSON.parse(rawObj);
-
-      const childrenIds = Object.keys(rootObj.__closure).sort(
-        (a, b) => rootObj.__closure[a] - rootObj.__closure[b]
-      );
-
-      const childrenObjects = await fetch(
-        `${context.state.selectedServer.url}/api/getobjects/${streamid}`,
-        {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${context.state.token.token}`,
           },
-          body: JSON.stringify({ objects: JSON.stringify(childrenIds) }),
         }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          return data;
-        });
+      ).then((d) => d.json());
 
-      return childrenObjects;
+      const children = await getChildren<IChildObject>(
+        context.state.selectedServer.url,
+        context.state.token.token,
+        streamid,
+        parent
+      );
+
+      return {
+        parent,
+        children
+      };
     },
     async uploadReport(
       context,
@@ -458,12 +448,31 @@ export default new Vuex.Store({
         reportTotals,
         projectData,
         branchName,
+        newModel
       }: UploadReportInput
     ) {
+      if (newModel) {
+        console.log("starting uploading new model")
+        const formData = new FormData();
+        formData.append(
+          "batch1",
+          new Blob([JSON.stringify([newModel.parent, ...newModel.children])])
+        );
+        console.log("formData:", formData);
+        await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${context.state.token.token}`,
+          },
+          body: formData,
+        });
+        console.log("finished uploading new model")
+      }
+
       branchName = `${context.state.speckleFolderName}/${branchName}`;
 
       const objectIds = await speckleUtil.getStreamObjects(context, streamid);
-      const modelId = objectIds.data.stream.branch.commits.items[0].referencedObject;
+      const modelId = newModel ? newModel.parent.id : objectIds.data.stream.branch.commits.items[0].referencedObject;
 
       // TODO: ADD ERROR HANDLING
       const uploadObjectsRes: UploadObjectsRes =
@@ -608,6 +617,11 @@ export default new Vuex.Store({
   modules: {},
 });
 
+export interface GetObjectDetailsOut {
+  parent: IParamsParent,
+  children: IChildObject[]
+}
+
 export interface GetStreamNameReportBranchesOutput {
   streamName: string;
   branches: string[];
@@ -714,6 +728,7 @@ export interface UploadReportInput {
   reportTotals: ReportTotals;
   projectData: ProjectDataComplete;
   branchName: string;
+  newModel: AddParamsModel | undefined
 }
 
 interface ObjectDetailsInput {

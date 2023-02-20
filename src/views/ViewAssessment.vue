@@ -13,9 +13,11 @@
           </div>
           <Renderer
             v-if="urlsLoaded && chartDataReady"
+            @loaded="rendererLoaded"
             :objecturls="objectUrls"
             :token="token"
             :colors="colors"
+            :gradientColorProperty="gradientColorProperty"
             class="renderer"
           />
           <div
@@ -41,7 +43,7 @@ import Renderer from "@/components/shared/Renderer.vue";
 import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
-import { Color } from "@/models/renderer";
+import { Color, GradientColor } from "@/models/renderer";
 import { LoadActReportDataInput } from "@/store";
 import { ILoadStreamData, LoadStreamOut } from "./utils/process-report-object";
 
@@ -63,6 +65,7 @@ export default class ViewAssessment extends Vue {
   token!: string;
   chartDataReady = false;
   colors: Color[] = [];
+  gradientColorProperty: GradientColor = {} as GradientColor;
   assessment!: ILoadStreamData;
   loading = true;
   error = false;
@@ -76,6 +79,12 @@ export default class ViewAssessment extends Vue {
     //   });
 
     this.token = this.$store.state.token.token;
+  }
+
+  rendererLoaded() {
+    this.gradientColorProperty = {
+      property: "parameters.Total Carbon.value"
+    }
   }
 
   back() {

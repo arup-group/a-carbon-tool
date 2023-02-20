@@ -138,9 +138,11 @@ export default class extends Vue {
 
   @Watch("gradientColorProperty")
   async onGradientChange(value: GradientColor) {
+    console.log("gradient time", value)
     if (value) {
       const propertyData = this.viewer.getObjectProperties();
       const data = propertyData.find((v) => v.key === value.property);
+      console.log("found the prop?", data)
       if (data) this.viewer.setColorFilter(data);
     }
   }

@@ -18,9 +18,7 @@ export interface RegionMaterialCarbonFactors {
 }
 
 export interface AllMaterialCarbonFactors {
-  India: RegionMaterialCarbonFactors;
-  Netherlands: RegionMaterialCarbonFactors;
-  UK: RegionMaterialCarbonFactors;
+  [key: string]: RegionMaterialCarbonFactors;
 }
 
 export const materialCarbonFactors: AllMaterialCarbonFactors = {

@@ -97,14 +97,26 @@ export const uploadObjectsMutation = (
 }
 `;
 
+export const uploadObjectsGenericMutation = (
+  streamid: string,
+  objects: any[]
+) => `mutation {
+  objectCreate(objectInput: {
+    streamId: "${streamid}",
+    objects: ${JSON.stringify(objects).replace(/"([^"]+)":/g, "$1:")}
+  })
+}
+`;
+
 export const createBranchMutation = (
   streamid: string,
-  branchName: string
+  branchName: string,
+  description: string
 ) => `mutation {
   branchCreate(branch: {
     streamId: "${streamid}",
     name: "${branchName}",
-    description: "A Carbon Tool carbon report"
+    description: "${description}"
   })
 }`;
 

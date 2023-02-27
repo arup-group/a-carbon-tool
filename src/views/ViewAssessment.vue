@@ -10,6 +10,7 @@
         >
           <div class="d-flex flex-column justify-space-between card-container">
             <project-info-card class="card" :projectInfo="projectInfo" />
+            <renderer-cotnrols-card class="card" @selectChanged="selectChanged" />
           </div>
           <Renderer
             v-if="urlsLoaded && chartDataReady"
@@ -43,6 +44,8 @@ import Renderer from "@/components/shared/Renderer.vue";
 import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
+import RendererCotnrolsCard from "@/components/viewAssessment/RendererControlsCard.vue";
+
 import { Color, GradientColor } from "@/models/renderer";
 import { LoadActReportDataInput } from "@/store";
 import { ILoadStreamData, LoadStreamOut } from "./utils/process-report-object";
@@ -58,6 +61,7 @@ import BackButton from "@/components/shared/BackButton.vue";
     MaterialBreakdownCard,
     LoadingContainer,
     BackButton,
+    RendererCotnrolsCard,
   },
 })
 export default class ViewAssessment extends Vue {
@@ -79,6 +83,12 @@ export default class ViewAssessment extends Vue {
     //   });
 
     this.token = this.$store.state.token.token;
+  }
+
+  selectChanged(property: string) {
+    this.gradientColorProperty = {
+      property
+    }
   }
 
   rendererLoaded() {

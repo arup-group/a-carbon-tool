@@ -616,9 +616,6 @@ export default class Assessment extends Vue {
 
     this.volumeGradient = {
       property: this.volProp,
-      minValue: minVol,
-      maxValue: maxVol,
-      colors: ["#4f7bff", "#ff4f84"],
     };
   }
 

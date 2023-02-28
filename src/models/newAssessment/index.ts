@@ -1,15 +1,5 @@
 export { StreamObject } from "./streamObject.interface";
-export {
-  SpeckleObject,
-  ObjectFormData,
-  ReportData,
-  SpeckleObjectFormComplete,
-  ObjectFormDataComplete,
-  SpeckleObjectComplete,
-  ReportTotals,
-  ReportProp,
-  ReportPassdown,
-} from "./speckleObject.interface";
+export * from "./speckleObject.interface";
 export { SpeckleType } from "./speckleType.interface";
 export { MaterialUpdateOut } from "./materialUpdateOut.interface";
 export { TransportType, TransportValues } from "./transportType.interface";
@@ -20,3 +10,4 @@ export { EmptyProps, EmptyPropsPassdown } from "./emptyProps.interface";
 export { ObjectDetails } from "./objectDetails.interface";
 export { GroupedMaterial } from "./groupedMaterial.interface";
 export { SelectedMaterialEmit } from "./selectedMaterialEmit.interface";
+export * from "./stringPropertyGroups.interface";

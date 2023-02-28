@@ -85,6 +85,8 @@ import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
 
+import { flattenObject, findStringProps } from "./utils/propertyFiltering";
+
 import Renderer from "@/components/shared/Renderer.vue";
 import {
   Color,
@@ -112,6 +114,8 @@ import {
   ObjectDetails,
   GroupedMaterial,
   SelectedMaterialEmit,
+  ObjectsObj,
+  StringPropertyGroups,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -132,8 +136,9 @@ import {
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
+import { PropertyInfo } from "@speckle/viewer";
 
-type ObjectsObj = { [id: string]: SpeckleObject };
+
 interface AvailableStream {
   label: string;
   value: string;
@@ -192,6 +197,8 @@ export default class Assessment extends Vue {
   speckleVol = false; // whether the volume can be got from speckle props
   defaultBranchName = "main";
 
+  groupingProps: StringPropertyGroups[] = [];
+  groupOptions: string[] = [];
   groupedMaterials: GroupedMaterial[] = [];
 
   update = false;
@@ -377,11 +384,14 @@ export default class Assessment extends Vue {
           r.speckle_type !== "Objects.Geometry.Mesh"
       );
 
+      const speckleObjsPropsSearch: any[] = [];
+
       if (volumeFilter) {
         this.speckleVol = true;
         filteredRes.forEach((r) => {
           const volume = this.findVolume(r, volumeFilter);
           if (volume) {
+            speckleObjsPropsSearch.push(r);
             this.objectsObj[r.id] = {
               id: r.id,
               speckle_type: r.speckle_type,
@@ -402,6 +412,9 @@ export default class Assessment extends Vue {
           };
         });
       }
+
+      this.groupingProps = findStringProps(speckleObjsPropsSearch, this.objectsObj);
+      this.groupOptions = this.groupingProps.map(gp => gp.name);
 
       this.types = this.findTypes(this.objectsObj);
       this.allIds = this.types.map((t) => t.ids).flat();

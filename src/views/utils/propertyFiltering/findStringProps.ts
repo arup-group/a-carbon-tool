@@ -2,6 +2,7 @@ import { PropertyInfo } from "@speckle/viewer";
 import { flattenObject } from "./";
 import { ObjectsObj, StringPropertyGroups } from "@/models/newAssessment";
 
+// PRETTY MUCH ALL OF THIS CODE IS FROM THE SPECKLE VIEWER/FRONTEND, REPO HERE: https://github.com/specklesystems/speckle-server
 export function findStringProps(
   speckleObjsPropsSearch: any[],
   objectsObj: ObjectsObj

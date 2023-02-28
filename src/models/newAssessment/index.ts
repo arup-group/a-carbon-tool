@@ -1,6 +1,6 @@
 export { StreamObject } from "./streamObject.interface";
 export * from "./speckleObject.interface";
-export { SpeckleType } from "./speckleType.interface";
+export * from "./materialGrouping.interface";
 export { MaterialUpdateOut } from "./materialUpdateOut.interface";
 export { TransportType, TransportValues } from "./transportType.interface";
 export { Step } from "./step.enum";

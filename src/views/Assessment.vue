@@ -21,6 +21,7 @@
           @close="close"
           @openFullView="openFullView"
           @createNewGroup="createNewObjectGroup"
+          @groupSelected="materialGroupSelected"
           :modal="modal"
           :streams="availableStreams"
           :types="types"
@@ -37,6 +38,7 @@
           :projectData="projectDataPassdown"
           :selectedObjects="selectedObjects"
           :invalidSelectedObjects="invalidSelectedObjects"
+          :objectGroups="objectGroups"
         />
       </div>
       <Renderer
@@ -85,7 +87,7 @@ import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
 
-import { flattenObject, findStringProps } from "./utils/propertyFiltering";
+import { findStringProps } from "./utils/propertyFiltering";
 
 import Renderer from "@/components/shared/Renderer.vue";
 import {
@@ -101,7 +103,7 @@ import {
   ProjectDataComplete,
   MaterialUpdateOut,
   SpeckleObject,
-  SpeckleType,
+  MaterialGrouping,
   Step,
   TransportSelected,
   TransportType,
@@ -166,7 +168,7 @@ export default class Assessment extends Vue {
   availableStreams: AvailableStream[] = [];
   objectURLs: string[] = [];
   token = "";
-  types: SpeckleType[] = [];
+  types: MaterialGrouping[] = [];
   objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
@@ -198,7 +200,7 @@ export default class Assessment extends Vue {
   defaultBranchName = "main";
 
   groupingProps: StringPropertyGroups[] = [];
-  groupOptions: string[] = [];
+  objectGroups: string[] = [];
   groupedMaterials: GroupedMaterial[] = [];
 
   update = false;
@@ -247,6 +249,13 @@ export default class Assessment extends Vue {
     );
   }
 
+  materialGroupSelected(objectGroup: string) {
+    console.log("material group selected:", objectGroup);
+    this.types = this.findTypes(this.groupingProps, objectGroup);
+    // not sure if the materials actually get reset when the grouping changes, but safest to just say that it does
+    this.resetColors();
+  }
+
   async newBranchSelect(name: string) {
     const input: CheckContainsChlidReportInput = {
       streamid: this.streamId,
@@ -285,7 +294,7 @@ export default class Assessment extends Vue {
       };
     });
 
-    this.types = this.findTypes(this.objectsObj);
+    // this.types = this.findTypes(this.objectsObj);
     this.materialsColors = Object.values(this.objectsObj).map((o) => ({
       id: o.id,
       color: o.formData?.material?.color as string,
@@ -414,9 +423,9 @@ export default class Assessment extends Vue {
       }
 
       this.groupingProps = findStringProps(speckleObjsPropsSearch, this.objectsObj);
-      this.groupOptions = this.groupingProps.map(gp => gp.name);
+      this.objectGroups = this.groupingProps.map(gp => gp.name);
 
-      this.types = this.findTypes(this.objectsObj);
+      this.types = this.findTypes(this.groupingProps, "Object Type");
       this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
     }
@@ -575,7 +584,15 @@ export default class Assessment extends Vue {
       }
     );
 
-    this.groupedMaterials = materialsArr;
+    // const group = this.groupingProps.find(gp => gp.name === groupName);
+    // if (group) {
+    //   const materialsArr: GroupedMaterial[] = group.data.valueGroups.map(vg => ({
+    //     material: "",
+    //     objects: [],
+    //     speckle_types: [],
+    //   }))
+    //   this.groupedMaterials = materialsArr;
+    // }
   }
 
   resetColors() {
@@ -777,25 +794,39 @@ export default class Assessment extends Vue {
     });
   }
 
-  findTypes(objects: ObjectsObj): SpeckleType[] {
-    let types: SpeckleType[] = [];
+  // types = material groups, cuz legacy
+  findTypes(propertyGroups: StringPropertyGroups[], selectedGroup: string): MaterialGrouping[] {
+    // let types: MaterialGrouping[] = [];
 
-    Object.values(objects).forEach((o) => {
-      let typeIndex = -1;
-      types.forEach((t, i) => {
-        if (t.type === o.speckle_type) typeIndex = i;
-      });
-      if (typeIndex !== -1) types[typeIndex].ids.push(o.id);
-      else
-        types.push({
-          type: o.speckle_type,
-          ids: [o.id],
-          material: o.formData?.material,
-          transport: o.formData?.transport,
-        });
-    });
+    // Object.values(objects).forEach((o) => {
+    //   let typeIndex = -1;
+    //   types.forEach((t, i) => {
+    //     if (t.type === o.speckle_type) typeIndex = i;
+    //   });
+    //   if (typeIndex !== -1) types[typeIndex].ids.push(o.id);
+    //   else
+    //     types.push({
+    //       type: o.speckle_type,
+    //       ids: [o.id],
+    //       material: o.formData?.material,
+    //       transport: o.formData?.transport,
+    //     });
+    // });
 
-    return types;
+    const group = propertyGroups.find(pg => pg.name === selectedGroup);
+    if (group) {
+      const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(vg => ({
+        type: vg.value,
+        ids: vg.ids
+      }));
+      return materialGrouping;
+    }
+    return [];
+
+    // return propertyGroups.map(pg => ({
+    //   type: pg.name,
+    //   ids:
+    // }));
   }
 
   uploadData(data: ProjectDataComplete) {

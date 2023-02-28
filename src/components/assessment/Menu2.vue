@@ -1,7 +1,14 @@
 <template>
   <div>
     <v-form>
-      <strong>Objects by speckle type</strong>
+      <div class="d-flex">
+        <strong>Objects grouped by:</strong>
+        <v-combobox
+          v-model="objectGroup"
+          :items="objectGroups"
+          @change="groupSelected"
+        ></v-combobox>
+      </div>
       <div v-for="type in loadedTypes" :key="type.type" style="width: 100%">
         <material-type
           :materials="materials"
@@ -21,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
+import { SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
@@ -32,10 +39,13 @@ import CustomGroup from "./CustomGroup.vue";
   components: { MaterialType, CustomGroup },
 })
 export default class Menu2 extends Vue {
-  @Prop() types!: SpeckleType[];
+  @Prop() types!: MaterialGrouping[];
   @Prop() materials!: MaterialFull[];
   @Prop() selectedObjects!: string[];
   @Prop() invalidObjects!: boolean;
+  @Prop() objectGroups!: string[];
+
+  objectGroup = "Object Type";
 
   get loadedTypes() {
     return this.types ? this.types : [];
@@ -54,6 +64,11 @@ export default class Menu2 extends Vue {
   @Emit("selectMaterial")
   selectMaterial(selectedMaterial: SelectedMaterialEmit) {
     return selectedMaterial;
+  }
+
+  @Emit("groupSelected")
+  groupSelected() {
+    return this.objectGroup;
   }
 }
 </script>

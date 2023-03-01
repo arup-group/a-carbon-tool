@@ -55,6 +55,7 @@
             :selectedObjects="selectedObjects"
             :invalidObjects="invalidSelectedObjects"
             :objectGroups="objectGroups"
+            :defaultGroup="defaultGroup"
             @materialUpdated="materialUpdated"
             @createNewGroup="createNewGroup"
             @selectMaterial="selectMaterial"
@@ -230,6 +231,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() invalidSelectedObjects!: boolean;
 
   @Prop() objectGroups!: string[];
+  @Prop() defaultGroup!: string;
 
   form: ProjectDataTemp = this.update
     ? this.projectData

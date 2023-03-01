@@ -485,6 +485,7 @@ export default new Vuex.Store({
         reportTotals,
         projectData,
         branchName,
+        selectedObjectGroup,
       }: UploadReportInput
     ) {
       branchName = `${context.state.speckleFolderName}/${branchName}`;
@@ -507,6 +508,7 @@ export default new Vuex.Store({
         volume: reportTotals.volume,
         projectData,
         totalChildrenCount: 0,
+        selectedObjectGroup
       };
       formData.append(
         "batch1",
@@ -878,6 +880,7 @@ export interface UploadReportInput {
   reportTotals: ReportTotals;
   projectData: ProjectDataComplete;
   branchName: string;
+  selectedObjectGroup: string;
 }
 
 interface ObjectDetailsInput {

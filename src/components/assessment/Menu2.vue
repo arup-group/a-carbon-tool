@@ -30,7 +30,7 @@
 <script lang="ts">
 import { SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 
 import MaterialType from "./MaterialType.vue";
 import CustomGroup from "./CustomGroup.vue";
@@ -44,8 +44,20 @@ export default class Menu2 extends Vue {
   @Prop() selectedObjects!: string[];
   @Prop() invalidObjects!: boolean;
   @Prop() objectGroups!: string[];
+  @Prop() defaultGroup!: string;
 
-  objectGroup = "Object Type";
+  defaultGroupSet = false;
+  objectGroup = this.defaultGroup ? this.defaultGroup : "Object Type";
+  @Watch("defaultGroup")
+  defaultGroupChange() {
+    console.log("changing group")
+    this.objectGroup = this.defaultGroup;
+    // if (!this.defaultGroupSet) {
+    //   console.log("changing group")
+    //   this.defaultGroupSet = true;
+    //   this.objectGroup = this.defaultGroup;
+    // }
+  }
 
   get loadedTypes() {
     return this.types ? this.types : [];

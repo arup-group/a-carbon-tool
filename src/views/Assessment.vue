@@ -39,6 +39,7 @@
           :selectedObjects="selectedObjects"
           :invalidSelectedObjects="invalidSelectedObjects"
           :objectGroups="objectGroups"
+          :defaultGroup="selectedObjectGroup"
         />
       </div>
       <Renderer
@@ -202,6 +203,7 @@ export default class Assessment extends Vue {
   groupingProps: StringPropertyGroups[] = [];
   objectGroups: string[] = [];
   groupedMaterials: GroupedMaterial[] = [];
+  selectedObjectGroup = "Object Type"
 
   update = false;
 
@@ -252,6 +254,7 @@ export default class Assessment extends Vue {
   materialGroupSelected(objectGroup: string) {
     console.log("material group selected:", objectGroup);
     this.types = this.findTypes(this.groupingProps, objectGroup);
+    this.selectedObjectGroup = objectGroup;
     // not sure if the materials actually get reset when the grouping changes, but safest to just say that it does
     this.resetColors();
   }
@@ -277,6 +280,7 @@ export default class Assessment extends Vue {
   }
 
   async updateStream(streamId: string, branchName: string) {
+    console.log("updating stream?")
     this.streamId = streamId;
     this.update = true;
     await this.loadStream(streamId);
@@ -285,6 +289,9 @@ export default class Assessment extends Vue {
       "loadActReportData",
       input
     );
+    console.log("got assessmentViewData?", assessmentViewData)
+    this.selectedObjectGroup = assessmentViewData.data.selectedObjectGroup;
+    console.log("selectedObjectGroup:", this.selectedObjectGroup)
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -345,6 +352,7 @@ export default class Assessment extends Vue {
         reportTotals: this.report.totals,
         projectData: this.projectData,
         branchName,
+        selectedObjectGroup: this.selectedObjectGroup
       };
       this.loading = true;
       await this.$store.dispatch("uploadReport", uploadReportInput);
@@ -377,7 +385,7 @@ export default class Assessment extends Vue {
       (p) => p.name.toLowerCase() === "volume"
     );
     this.volProp = volumeFilter ? volumeFilter.rawName : "";
-    if (!this.update) {
+    // if (!this.update) {
       const res: ObjectDetails[] = await this.$store.dispatch(
         "getObjectDetails",
         {
@@ -401,6 +409,7 @@ export default class Assessment extends Vue {
           const volume = this.findVolume(r, volumeFilter);
           if (volume) {
             speckleObjsPropsSearch.push(r);
+            if (!this.update) {
             this.objectsObj[r.id] = {
               id: r.id,
               speckle_type: r.speckle_type,
@@ -408,6 +417,7 @@ export default class Assessment extends Vue {
                 volume: volume,
               },
             };
+            }
             // also find total volume here to avoid needing to loop through objects again
             totalVol += volume;
           }
@@ -415,20 +425,26 @@ export default class Assessment extends Vue {
       } else {
         this.speckleVol = false;
         filteredRes.forEach((r) => {
+          if (!this.update) {
           this.objectsObj[r.id] = {
             id: r.id,
             speckle_type: r.speckle_type,
           };
+          }
         });
       }
+      console.log("speckleObjsPropsSearch:", speckleObjsPropsSearch);
 
       this.groupingProps = findStringProps(speckleObjsPropsSearch, this.objectsObj);
       this.objectGroups = this.groupingProps.map(gp => gp.name);
+      // this.selectedObjectGroup = "Object Type";
 
-      this.types = this.findTypes(this.groupingProps, "Object Type");
+      this.types = this.findTypes(this.groupingProps, this.selectedObjectGroup);
+      if (!this.update) {
       this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
-    }
+      }
+    // }
 
     this.updateVolumeGradient();
     this.resetColors();
@@ -583,6 +599,8 @@ export default class Assessment extends Vue {
         };
       }
     );
+
+    this.groupedMaterials = materialsArr;
 
     // const group = this.groupingProps.find(gp => gp.name === groupName);
     // if (group) {
@@ -770,7 +788,7 @@ export default class Assessment extends Vue {
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
       try {
-        this.objectsObj[id].speckle_type = material.type.type;
+        // this.objectsObj[id].speckle_type = material.type.type;
         this.colors.push({
           color: material.material.color,
           id,
@@ -792,6 +810,7 @@ export default class Assessment extends Vue {
         },
       };
     });
+    console.log("objectsObj:", this.objectsObj)
   }
 
   // types = material groups, cuz legacy
@@ -815,9 +834,12 @@ export default class Assessment extends Vue {
 
     const group = propertyGroups.find(pg => pg.name === selectedGroup);
     if (group) {
+      // we're assuming that if this.update=true then objectsObj will already be filled by this point
       const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(vg => ({
         type: vg.value,
-        ids: vg.ids
+        ids: vg.ids,
+        material: this.update ? this.objectsObj[vg.ids[0]].formData?.material : undefined,
+        transport: this.update ? this.objectsObj[vg.ids[0]].formData?.transport : undefined
       }));
       return materialGrouping;
     }

@@ -260,7 +260,6 @@ export default class extends Vue {
   }
   afterLoad() {
     const properties = this.findFilters();
-    console.log("props:", this.viewer.getObjectProperties());
     const allMesh: THREE.Mesh[] = []; // NEEDED FOR AUTOMATIC VOLUME CALC, REMOVING FOR NOW
     // set initial colors if needed
     if (this.colors) {

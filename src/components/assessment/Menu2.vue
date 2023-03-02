@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-form>
-      <div class="d-flex">
-        <strong>Objects grouped by:</strong>
+      <div class="d-flex align-center">
+        <strong class="mr-3">Objects grouped by:</strong>
         <v-combobox
           v-model="objectGroup"
           :items="objectGroups"
@@ -50,13 +50,7 @@ export default class Menu2 extends Vue {
   objectGroup = this.defaultGroup ? this.defaultGroup : "Object Type";
   @Watch("defaultGroup")
   defaultGroupChange() {
-    console.log("changing group")
     this.objectGroup = this.defaultGroup;
-    // if (!this.defaultGroupSet) {
-    //   console.log("changing group")
-    //   this.defaultGroupSet = true;
-    //   this.objectGroup = this.defaultGroup;
-    // }
   }
 
   get loadedTypes() {

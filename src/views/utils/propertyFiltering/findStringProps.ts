@@ -2,7 +2,7 @@ import { PropertyInfo } from "@speckle/viewer";
 import { flattenObject } from "./";
 import { ObjectsObj, StringPropertyGroups } from "@/models/newAssessment";
 
-// PRETTY MUCH ALL OF THIS CODE IS FROM THE SPECKLE VIEWER/FRONTEND, REPO HERE: https://github.com/specklesystems/speckle-server
+// PRETTY MUCH ALL OF THIS CODE (AND SOME OF THE COMMENTS) IS FROM THE SPECKLE VIEWER/FRONTEND, REPO HERE: https://github.com/specklesystems/speckle-server
 export function findStringProps(
   speckleObjsPropsSearch: any[],
   objectsObj: ObjectsObj
@@ -16,7 +16,6 @@ export function findStringProps(
       propValues[key].push({ value: flattened[key], id: flattened.id });
     }
   });
-  console.log("propValues:", propValues);
   const allPropInfos: PropertyInfo[] = [];
 
   for (const propKey in propValues) {
@@ -55,23 +54,18 @@ export function findStringProps(
       numProp.valueGroups = propValuesArr.sort(
         (a: any, b: any) => a.value - b.value
       );
-      // const sorted = propValuesArr.sort((a, b) => a.value - b.value)
-      // propInfo.sortedValues = sorted.map(s => s.value)
-      // propInfo.sortedIds = sorted.map(s => s.value) // tl;dr: not worth it
     }
     allPropInfos.push(propInfo as PropertyInfo);
   }
-  console.log("allPropInfos:", allPropInfos);
 
   const filters = [];
   for (const rawFilter of allPropInfos) {
     const filter: any = {};
     filter.data = rawFilter;
     const key = rawFilter.key;
-    // Handle revit params (a wee bit of FML moment)
+    // Handle revit params
     if (key.startsWith("parameters.")) {
       if (key.endsWith(".value")) {
-        // filter.name = this.props[key.replace('.value', '.name')].allValues[0]
         const nameProp: any = allPropInfos.find(
           (f) => f.key === key.replace(".value", ".name")
         );
@@ -123,18 +117,13 @@ export function findStringProps(
 
     filter.name = key;
     filter.targetKey = key;
-    // filters.data.valueGroups
     filters.push(filter);
   }
-  console.log("filters:", filters);
   const stringFilters = filters.filter(
     (f) =>
       f.data.type === "string" &&
       f.data.objectCount === Object.keys(objectsObj).length
   );
-  console.log("string filters:", stringFilters);
-
-  console.log("objectsObj arr:", Object.entries(objectsObj));
 
   return stringFilters;
 }

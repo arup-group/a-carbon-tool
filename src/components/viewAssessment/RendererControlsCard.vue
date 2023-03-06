@@ -38,13 +38,13 @@ export default class RendererControlsCard extends Vue {
     name: "Construction Carbon A5",
     value: "parameters.Construction Carbon A5.value"
   },
-  // {
-  //   name: "Materials",
-  //   value: "materials"
-  // }, {
-  //   name: "None",
-  //   value: "none"
-  // }
+  {
+    name: "Materials",
+    value: "materials"
+  }, {
+    name: "None",
+    value: "none"
+  }
   ];
 
   select = "parameters.Total Carbon.value";

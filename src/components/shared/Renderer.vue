@@ -126,9 +126,13 @@ export default class extends Vue {
   }
 
   @Watch("colors")
-  onObjectColorChanged(value: Color[]) {
+  async onObjectColorChanged(value: Color[]) {
+    console.log("changing colors? value.length:", value.length, "gradientColorProperty:", this.gradientColorProperty)
     if (value.length === 0 || this.gradientColorProperty) this.resetColors();
-    else this.setColors(value);
+    else {
+      await this.resetColors();
+      this.setColors(value);
+    }
   }
 
   @Watch("selectedIds")
@@ -329,6 +333,7 @@ export default class extends Vue {
   }
 
   async setColors(colors: Color[]) {
+    console.log("setting some colors?")
     const colorGroups: { [color: string]: string[] } = {};
     colors.forEach((c) => {
       if (c.color) {
@@ -346,9 +351,11 @@ export default class extends Vue {
     const res = await this.viewer.setUserObjectColors(
       groups as [{ objectIds: string[]; color: string }]
     );
+    console.log("res:", res)
   }
 
   async resetColors() {
+    console.log("resetting?")
     await this.viewer.resetFilters();
     this.viewer.requestRender();
   }

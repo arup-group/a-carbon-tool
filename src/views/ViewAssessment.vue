@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <back-button style="z-index: 1;" :overrideRoute="true" @back="back" />
+    <back-button style="z-index: 1" :overrideRoute="true" @back="back" />
     <loading-container :error="error" :loading="loading" @retry="loadReport">
       <template v-slot="{ loaded }">
         <v-container
@@ -10,7 +10,10 @@
         >
           <div class="d-flex flex-column justify-space-between card-container">
             <project-info-card class="card" :projectInfo="projectInfo" />
-            <renderer-cotnrols-card class="card" @selectChanged="selectChanged" />
+            <renderer-cotnrols-card
+              class="card"
+              @selectChanged="selectChanged"
+            />
           </div>
           <Renderer
             v-if="urlsLoaded && chartDataReady"
@@ -69,7 +72,8 @@ export default class ViewAssessment extends Vue {
   token!: string;
   chartDataReady = false;
   colors: Color[] = [];
-  gradientColorProperty: GradientColor = {} as GradientColor;
+  materialColors: Color[] = [];
+  gradientColorProperty: GradientColor | null = null;
   assessment!: ILoadStreamData;
   loading = true;
   error = false;
@@ -86,15 +90,26 @@ export default class ViewAssessment extends Vue {
   }
 
   selectChanged(property: string) {
-    this.gradientColorProperty = {
-      property
+    if (property === "materials") {
+      console.log("materials", this.materialColors)
+      // const placeholder = this.colors;
+      this.gradientColorProperty = null;
+      this.colors = [];
+      this.colors = this.materialColors;
+    } else if (property === "none") {
+      this.colors = [];
+    } else {
+      this.colors = [];
+      this.gradientColorProperty = {
+        property,
+      };
     }
   }
 
   rendererLoaded() {
     this.gradientColorProperty = {
-      property: "parameters.Total Carbon.value"
-    }
+      property: "parameters.Total Carbon.value",
+    };
   }
 
   back() {
@@ -110,15 +125,21 @@ export default class ViewAssessment extends Vue {
     this.error = false;
     try {
       const { streamId, branchName } = this.$route.params;
-      const input: LoadActReportDataInput = { streamId, branchName, loadChildren: true };
+      const input: LoadActReportDataInput = {
+        streamId,
+        branchName,
+        loadChildren: true,
+      };
       const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
         "loadActReportData",
         input
       );
-      this.objectUrls = [`${this.$store.state.selectedServer.url}/streams/${streamId}/objects/${assessmentViewData.data.modelId}`]
+      this.objectUrls = [
+        `${this.$store.state.selectedServer.url}/streams/${streamId}/objects/${assessmentViewData.data.modelId}`,
+      ];
       console.log("objectUrls:", this.objectUrls);
       this.assessment = assessmentViewData.data;
-      this.colors = assessmentViewData.colors;
+      this.materialColors = assessmentViewData.colors;
       this.chartDataReady = assessmentViewData.ready;
       this.loading = false;
     } catch (err) {

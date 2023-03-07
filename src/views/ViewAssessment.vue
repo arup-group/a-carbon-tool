@@ -139,7 +139,10 @@ export default class ViewAssessment extends Vue {
       ];
       console.log("objectUrls:", this.objectUrls);
       this.assessment = assessmentViewData.data;
-      this.materialColors = assessmentViewData.colors;
+      this.materialColors = assessmentViewData.colors.map(c => ({
+        ...c,
+        id: assessmentViewData.data.idMapper[c.id]
+      }));
       this.chartDataReady = assessmentViewData.ready;
       this.loading = false;
     } catch (err) {

@@ -59,7 +59,7 @@ function instanceOfReferenceObject(object: any): object is ReferenceObject {
   );
 }
 
-interface IdMapper {
+export interface IdMapper {
   [oldId: string]: string;
 }
 
@@ -88,6 +88,7 @@ interface Param {
 export interface AddParamsModel {
   parent: IParamsParent;
   children: IChildObject[];
+  idMapper: IdMapper;
 }
 
 export async function testRun(url: string, token: string, params: ParamAdd[]) {
@@ -262,6 +263,7 @@ export async function addParams(
   return {
     parent: newParentObj,
     children: newChildObjects,
+    idMapper: idMapper,
   };
 }
 

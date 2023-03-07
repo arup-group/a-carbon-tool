@@ -5,6 +5,7 @@ import {
 } from "@/models/graphql/StreamData.interface";
 import { ProjectComponent } from "@/models/newAssessment/projectData.interface";
 import { Color } from "@/models/renderer";
+import { IdMapper } from "../add-params/addParams";
 
 export interface IProjectInfo {
   name: string;
@@ -33,6 +34,7 @@ export interface ILoadStreamData {
   aBreakdown: IABreakdown;
   children: ChildSpeckleObjectData[];
   modelId: string;
+  idMapper: IdMapper;
 }
 
 export interface LoadStreamOut {

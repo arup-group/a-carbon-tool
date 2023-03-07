@@ -3,6 +3,7 @@ import { CarbonA5 } from "../newAssessment/speckleObject.interface";
 import { SpeckleObjectComplete } from "../newAssessment";
 import { ChartData } from "../chart";
 import { Color } from "../renderer";
+import { IdMapper } from "../../views/utils/add-params/addParams";
 
 export interface StreamData {
   data: {
@@ -63,6 +64,7 @@ export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectDataV1 {
   materials: ChartData[];
   materialsColors: Color[];
   transportColors: Color[];
+  idMapper: IdMapper;
   "@children": {
     referencedId: string;
     speckle_type: "reference";

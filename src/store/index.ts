@@ -27,7 +27,7 @@ import {
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
-import { AddParamsModel, IChildObject, IParamsParent } from "@/views/utils/add-params/addParams";
+import { AddParamsModel, IChildObject, IdMapper, IParamsParent } from "@/views/utils/add-params/addParams";
 
 Vue.use(Vuex);
 
@@ -448,7 +448,7 @@ export default new Vuex.Store({
         reportTotals,
         projectData,
         branchName,
-        newModel
+        newModel,
       }: UploadReportInput
     ) {
       if (newModel) {
@@ -496,6 +496,7 @@ export default new Vuex.Store({
         transportColors: reportTotals.transportColors,
         projectData,
         totalChildrenCount: 0,
+        idMapper: newModel ? newModel.idMapper : {} as IdMapper,
         "@children": children.map(child => ({
           speckle_type: "reference",
           referencedId: child
@@ -728,7 +729,7 @@ export interface UploadReportInput {
   reportTotals: ReportTotals;
   projectData: ProjectDataComplete;
   branchName: string;
-  newModel: AddParamsModel | undefined
+  newModel: AddParamsModel | undefined;
 }
 
 interface ObjectDetailsInput {

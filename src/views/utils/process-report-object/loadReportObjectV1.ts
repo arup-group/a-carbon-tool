@@ -12,6 +12,7 @@ import {
 } from "./models";
 import { getChildren } from "./utils";
 import * as speckleUtil from "../../../store/speckle/speckleUtil";
+import { IdMapper } from "../add-params/addParams";
 
 export async function calcV1(
   branchData: HTTPStreamDataParentV1,
@@ -80,6 +81,7 @@ export async function calcV1(
       materialBreakdown: materialBreakdownUpdated,
       aBreakdown: levelsUpdated,
       children: childrenData,
+      idMapper: {} as IdMapper
     },
   };
 }

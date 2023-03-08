@@ -74,6 +74,7 @@ export async function calcV1(
   return {
     ready: true,
     colors: co2Data.colors,
+    version: "v1",
     data: {
       streamId: streamId,
       modelId,

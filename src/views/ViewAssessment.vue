@@ -11,6 +11,7 @@
           <div class="d-flex flex-column justify-space-between card-container">
             <project-info-card class="card" :projectInfo="projectInfo" />
             <renderer-cotnrols-card
+              v-if="!isV1"
               class="card"
               @selectChanged="selectChanged"
             />
@@ -78,6 +79,7 @@ export default class ViewAssessment extends Vue {
   loading = true;
   error = false;
   streamId = this.$route.params.streamId;
+  isV1 = false;
 
   mounted() {
     // this.$store
@@ -134,15 +136,25 @@ export default class ViewAssessment extends Vue {
         "loadActReportData",
         input
       );
-      this.objectUrls = [
-        `${this.$store.state.selectedServer.url}/streams/${streamId}/objects/${assessmentViewData.data.modelId}`,
-      ];
+      if (assessmentViewData.version === "v1") {
+        this.isV1 = true;
+        this.$store
+          .dispatch("getObjectUrls", this.streamId)
+          .then((res: string[]) => {
+            this.objectUrls = [res[0]];
+            this.colors = assessmentViewData.colors;
+          });
+      } else {
+        this.objectUrls = [
+          `${this.$store.state.selectedServer.url}/streams/${streamId}/objects/${assessmentViewData.data.modelId}`,
+        ];
+        this.materialColors = assessmentViewData.colors.map(c => ({
+          ...c,
+          id: assessmentViewData.data.idMapper[c.id]
+        }));
+      }
       console.log("objectUrls:", this.objectUrls);
       this.assessment = assessmentViewData.data;
-      this.materialColors = assessmentViewData.colors.map(c => ({
-        ...c,
-        id: assessmentViewData.data.idMapper[c.id]
-      }));
       this.chartDataReady = assessmentViewData.ready;
       this.loading = false;
     } catch (err) {

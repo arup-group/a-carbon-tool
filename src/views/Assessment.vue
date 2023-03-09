@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <loading-spinner v-if="loading" />
+    <loading-spinner v-if="loading" :text="loadingSpinnerText" />
     <v-container
       v-else
       fluid
@@ -158,6 +158,7 @@ export default class Assessment extends Vue {
   @Prop() modalBranchName!: string;
 
   loading = false;
+  loadingSpinnerText = "";
   loadingModel = false;
   loadingModelText = "";
   saveSuccess = true;
@@ -347,6 +348,7 @@ export default class Assessment extends Vue {
   }
   async uploadReport(branchName: string) {
     if (this.report && this.report.reportObjs.length > 0) {
+      this.loadingSpinnerText = "DO NOT REFRESH. Saving report"
       // TODO: add some check to make sure that model is a revit check here
       let newModel: AddParams.AddParamsModel | undefined;
       if (this.parentObj) {

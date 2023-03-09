@@ -477,13 +477,11 @@ export default new Vuex.Store({
       }: UploadReportInput
     ) {
       if (newModel) {
-        console.log("starting uploading new model");
         const formData = new FormData();
         formData.append(
           "batch1",
           new Blob([JSON.stringify([newModel.parent, ...newModel.children])])
         );
-        console.log("formData:", formData);
         await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
           method: "POST",
           headers: {
@@ -491,7 +489,6 @@ export default new Vuex.Store({
           },
           body: formData,
         });
-        console.log("finished uploading new model");
       }
 
       branchName = `${context.state.speckleFolderName}/${branchName}`;

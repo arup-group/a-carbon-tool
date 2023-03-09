@@ -4,14 +4,23 @@
       <span class="text-h7">Viewer controls</span>
     </v-card-title>
     <v-card-text>
-        These are some controls...
+        Model showing:
         <v-select
           v-model="select"
           :items="displayOptions"
           item-text="name"
           item-value="value"
         />
-        {{ select }}
+        <div v-if="showHeatmapKey">
+          <div class="d-flex align-center">
+            <div style="width: 1rem; height: 1rem; background-color: #3F5EFB;" class="mr-2"></div>
+            = low
+          </div>
+          <div class="d-flex align-center">
+            <div style="width: 1rem; height: 1rem; background-color: #F9466D;" class="mr-2"></div>
+            = high
+          </div>
+        </div>
     </v-card-text>
   </v-card>
 </template>
@@ -48,11 +57,25 @@ export default class RendererControlsCard extends Vue {
   ];
 
   select = "parameters.Total Carbon.value";
+  get showHeatmapKey() {
+    if (
+      this.select === "parameters.Total Carbon.value" ||
+      this.select === "parameters.Product Stage Carbon A1-A3.value" ||
+      this.select === "parameters.Transport Carbon A4.value" ||
+      this.select === "parameters.Construction Carbon A5.value"
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @Watch("select")
   @Emit("selectChanged")
   selectChanged() {
     return this.select;
   }
+
+
 }
 </script>

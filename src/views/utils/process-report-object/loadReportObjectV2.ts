@@ -41,8 +41,7 @@ export async function calcV2(
       streamId,
       branchData
     );
-      children = children.filter(c => c.id != modelId);
-      console.log("children:", children);
+    children = children.filter((c) => c.id != modelId);
   }
 
   return {
@@ -84,7 +83,7 @@ export async function calcV2(
         ],
       },
       children,
-      idMapper: branchData.idMapper
+      idMapper: branchData.idMapper,
     },
   };
 }

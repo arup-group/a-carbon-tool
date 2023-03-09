@@ -130,7 +130,7 @@ import {
   LoadActReportDataInput,
   UploadReportInput,
   GetObjectDetailsOut,
-  ObjectDetailsInput
+  ObjectDetailsInput,
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/process-report-object";
@@ -272,7 +272,11 @@ export default class Assessment extends Vue {
     this.streamId = streamId;
     this.update = true;
     await this.loadStream(streamId);
-    const input: LoadActReportDataInput = { streamId, branchName, loadChildren: true };
+    const input: LoadActReportDataInput = {
+      streamId,
+      branchName,
+      loadChildren: true,
+    };
     const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
       "loadActReportData",
       input
@@ -280,13 +284,15 @@ export default class Assessment extends Vue {
 
     const objectDetailsInput: ObjectDetailsInput = {
       streamid: streamId,
-      objecturl: this.objectURLs[0]
+      objecturl: this.objectURLs[0],
     };
-    this.$store.dispatch("getObjectDetails", objectDetailsInput).then((res: GetObjectDetailsOut) => {
-      // in a .then to not hold up the rest of the func
-      this.parentObj = res.parent;
-      this.allChildObjs = res.children;
-    });
+    this.$store
+      .dispatch("getObjectDetails", objectDetailsInput)
+      .then((res: GetObjectDetailsOut) => {
+        // in a .then to not hold up the rest of the func
+        this.parentObj = res.parent;
+        this.allChildObjs = res.children;
+      });
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -295,8 +301,6 @@ export default class Assessment extends Vue {
         reportData: c.act.reportData,
       };
     });
-    console.log("this.objectsObj:", this.objectsObj)
-    console.log("assessmentViewData:", assessmentViewData)
 
     this.types = this.findTypes(this.objectsObj);
     this.materialsColors = Object.values(this.objectsObj).map((o) => ({
@@ -346,9 +350,14 @@ export default class Assessment extends Vue {
       // TODO: add some check to make sure that model is a revit check here
       let newModel: AddParams.AddParamsModel | undefined;
       if (this.parentObj) {
-        console.log("starting adding params")
-        newModel = await AddParams.addParams(this.parentObj, this.addParams, this.$store.state.selectedServer.url, this.token, this.streamId, this.allChildObjs)
-        console.log("finished adding params")
+        newModel = await AddParams.addParams(
+          this.parentObj,
+          this.addParams,
+          this.$store.state.selectedServer.url,
+          this.token,
+          this.streamId,
+          this.allChildObjs
+        );
       }
 
       const uploadReportInput: UploadReportInput = {
@@ -357,7 +366,7 @@ export default class Assessment extends Vue {
         reportTotals: this.report.totals,
         projectData: this.projectData,
         branchName,
-        newModel
+        newModel,
       };
       this.loading = true;
       await this.$store.dispatch("uploadReport", uploadReportInput);
@@ -402,15 +411,12 @@ export default class Assessment extends Vue {
       this.allChildObjs = res.children;
       this.parentObj = res.parent;
 
-      console.log("objectDetails res:", res)
-
       let totalVol = 0;
       const filteredRes = this.allChildObjs.filter(
         (r) =>
           r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
           r.speckle_type !== "Objects.Geometry.Mesh"
       );
-      console.log("filteredRes:", filteredRes);
       const childObjects: ObjectDetails[] = [];
 
       if (volumeFilter) {
@@ -439,8 +445,6 @@ export default class Assessment extends Vue {
           };
         });
       }
-      console.log("this.objectsObj:", Object.entries(this.objectsObj))
-      console.log("childObjects:", childObjects)
 
       this.types = this.findTypes(this.objectsObj);
       this.allIds = this.types.map((t) => t.ids).flat();
@@ -666,7 +670,7 @@ export default class Assessment extends Vue {
           totalChildrenCount: 0,
           applicationUnitType: "string",
           applicationInternalName: "string",
-        }
+        },
       });
       this.addParams.push({
         parentid: o.id,
@@ -685,7 +689,7 @@ export default class Assessment extends Vue {
           totalChildrenCount: 0,
           applicationUnitType: "string",
           applicationInternalName: "string",
-        }
+        },
       });
       this.addParams.push({
         parentid: o.id,
@@ -704,7 +708,7 @@ export default class Assessment extends Vue {
           totalChildrenCount: 0,
           applicationUnitType: "string",
           applicationInternalName: "string",
-        }
+        },
       });
       this.addParams.push({
         parentid: o.id,
@@ -723,7 +727,7 @@ export default class Assessment extends Vue {
           totalChildrenCount: 0,
           applicationUnitType: "string",
           applicationInternalName: "string",
-        }
+        },
       });
       this.addParams.push({
         parentid: o.id,
@@ -742,7 +746,7 @@ export default class Assessment extends Vue {
           totalChildrenCount: 0,
           applicationUnitType: "string",
           applicationInternalName: "string",
-        }
+        },
       });
       // end parameter update
 
@@ -756,13 +760,10 @@ export default class Assessment extends Vue {
             waste: A5Waste,
             site: A5Site,
           },
-          totalCarbon: A4 + A1A3 + A5Value
+          totalCarbon: A4 + A1A3 + A5Value,
         },
       };
     });
-
-    console.log("addParams:", this.addParams);
-    // AddParams.testRun("https://v2.speckle.arup.com", this.token, addParameters);
 
     const totals = this.calcTotals(reportObjs);
 

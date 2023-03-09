@@ -82,19 +82,11 @@ export default class ViewAssessment extends Vue {
   isV1 = false;
 
   mounted() {
-    // this.$store
-    //   .dispatch("getObjectUrls", this.streamId)
-    //   .then((res: string[]) => {
-    //     this.objectUrls = [res[0]];
-    //   });
-
     this.token = this.$store.state.token.token;
   }
 
   selectChanged(property: string) {
     if (property === "materials") {
-      console.log("materials", this.materialColors)
-      // const placeholder = this.colors;
       this.gradientColorProperty = null;
       this.colors = [];
       this.colors = this.materialColors;
@@ -148,12 +140,11 @@ export default class ViewAssessment extends Vue {
         this.objectUrls = [
           `${this.$store.state.selectedServer.url}/streams/${streamId}/objects/${assessmentViewData.data.modelId}`,
         ];
-        this.materialColors = assessmentViewData.colors.map(c => ({
+        this.materialColors = assessmentViewData.colors.map((c) => ({
           ...c,
-          id: assessmentViewData.data.idMapper[c.id]
+          id: assessmentViewData.data.idMapper[c.id],
         }));
       }
-      console.log("objectUrls:", this.objectUrls);
       this.assessment = assessmentViewData.data;
       this.chartDataReady = assessmentViewData.ready;
       this.loading = false;

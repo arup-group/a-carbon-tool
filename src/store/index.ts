@@ -1,9 +1,19 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
-import { getChildren, LoadStreamOut } from "@/views/utils/process-report-object";
+import {
+  getChildren,
+  LoadStreamOut,
+} from "@/views/utils/process-report-object";
 import { loadStream } from "@/views/utils/viewAssessmentUtils";
-import { Login, Server, AuthError, Token, ServerRegion, CustomServerStorage } from "@/models/auth/";
+import {
+  Login,
+  Server,
+  AuthError,
+  Token,
+  ServerRegion,
+  CustomServerStorage,
+} from "@/models/auth/";
 import router from "@/router";
 import {
   materialCarbonFactors,
@@ -19,7 +29,10 @@ import {
 } from "@/models/newAssessment";
 
 import { BECName } from "@/models/shared";
-import { ParentSpeckleObjectData, ParentSpeckleObjectDataV2 } from "@/models/graphql/StreamData.interface";
+import {
+  ParentSpeckleObjectData,
+  ParentSpeckleObjectDataV2,
+} from "@/models/graphql/StreamData.interface";
 import { filterOnlyReportBranches } from "./utilities/filters";
 import {
   StreamNameBranches,
@@ -27,7 +40,12 @@ import {
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
-import { AddParamsModel, IChildObject, IdMapper, IParamsParent } from "@/views/utils/add-params/addParams";
+import {
+  AddParamsModel,
+  IChildObject,
+  IdMapper,
+  IParamsParent,
+} from "@/views/utils/add-params/addParams";
 
 Vue.use(Vuex);
 
@@ -37,7 +55,7 @@ export default new Vuex.Store({
     speckleFolderName: "actcarbonreport",
     speckleViewer: {
       viewer: undefined,
-      container: undefined
+      container: undefined,
     },
     servers: {
       arup: {
@@ -57,7 +75,7 @@ export default new Vuex.Store({
         url: "",
         speckleId: process.env.VUE_APP_SPECKLE_ID_CUSTOM,
         speckleSecret: process.env.VUE_APP_SPECKLE_SECRET_CUSTOM,
-      }
+      },
     },
     selectedServer: {} as Server, // should be a server object
     token: {} as Token, // should be a Token object
@@ -222,13 +240,21 @@ export default new Vuex.Store({
       state.authed = true;
 
       if (data.server.region === ServerRegion.CUSTOM) {
-        localStorage.setItem(CustomServerStorage.LAST_SERVER, JSON.stringify(data.server.url));
-        const customServers = localStorage.getItem(CustomServerStorage.CUSTOM_SERVERS);
+        localStorage.setItem(
+          CustomServerStorage.LAST_SERVER,
+          JSON.stringify(data.server.url)
+        );
+        const customServers = localStorage.getItem(
+          CustomServerStorage.CUSTOM_SERVERS
+        );
         let customServersJson: string[]; // array of server urls
         if (customServers) customServersJson = JSON.parse(customServers);
         else customServersJson = [];
         customServersJson.push(data.server.url);
-        localStorage.setItem(CustomServerStorage.CUSTOM_SERVERS, JSON.stringify(customServersJson));
+        localStorage.setItem(
+          CustomServerStorage.CUSTOM_SERVERS,
+          JSON.stringify(customServersJson)
+        );
       }
     },
     setSpeckleViewer(state, viewer) {
@@ -436,7 +462,7 @@ export default new Vuex.Store({
 
       return {
         parent,
-        children
+        children,
       };
     },
     async uploadReport(
@@ -451,7 +477,7 @@ export default new Vuex.Store({
       }: UploadReportInput
     ) {
       if (newModel) {
-        console.log("starting uploading new model")
+        console.log("starting uploading new model");
         const formData = new FormData();
         formData.append(
           "batch1",
@@ -465,13 +491,15 @@ export default new Vuex.Store({
           },
           body: formData,
         });
-        console.log("finished uploading new model")
+        console.log("finished uploading new model");
       }
 
       branchName = `${context.state.speckleFolderName}/${branchName}`;
 
       const objectIds = await speckleUtil.getStreamObjects(context, streamid);
-      const modelId = newModel ? newModel.parent.id : objectIds.data.stream.branch.commits.items[0].referencedObject;
+      const modelId = newModel
+        ? newModel.parent.id
+        : objectIds.data.stream.branch.commits.items[0].referencedObject;
 
       // TODO: ADD ERROR HANDLING
       const uploadObjectsRes: UploadObjectsRes =
@@ -495,15 +523,17 @@ export default new Vuex.Store({
         transportColors: reportTotals.transportColors,
         projectData,
         totalChildrenCount: 0,
-        idMapper: newModel ? newModel.idMapper : {} as IdMapper,
-        "@children": children.map(child => ({
+        idMapper: newModel ? newModel.idMapper : ({} as IdMapper),
+        "@children": children.map((child) => ({
           speckle_type: "reference",
-          referencedId: child
+          referencedId: child,
         })),
-        "@model": [{
-          speckle_type: "reference",
-          referencedId: modelId
-        }]
+        "@model": [
+          {
+            speckle_type: "reference",
+            referencedId: modelId,
+          },
+        ],
       };
       children.push(modelId); // add model id to children array so it gets added to __closure properly
       formData.append(
@@ -586,7 +616,12 @@ export default new Vuex.Store({
         branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
           const fullBranchName = `${context.state.speckleFolderName}/${branch.name}`;
 
-          const data = await loadStream(context, streamid, fullBranchName, false);
+          const data = await loadStream(
+            context,
+            streamid,
+            fullBranchName,
+            false
+          );
           return {
             branch,
             data,
@@ -623,8 +658,8 @@ export interface GetParentObjectInput {
 }
 
 export interface GetObjectDetailsOut {
-  parent: IParamsParent,
-  children: IChildObject[]
+  parent: IParamsParent;
+  children: IChildObject[];
 }
 
 export interface GetStreamNameReportBranchesOutput {

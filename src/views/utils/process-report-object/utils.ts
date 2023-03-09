@@ -3,7 +3,7 @@ import { HTTPStreamDataParent } from "@/models/graphql/";
 interface ParentObj {
   __closure: {
     [keys: string]: number;
-  }
+  };
 }
 
 export async function getChildren<T>(
@@ -35,7 +35,6 @@ export async function getChildren<T>(
     })
   ).then((data) => {
     const arr: T[] = [];
-    console.log("data:", data);
     data.forEach((d) => {
       arr.push(...d);
     });

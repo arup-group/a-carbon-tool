@@ -93,7 +93,7 @@ function instanceOfStringPropertyInfo(
 }
 
 @Component({
-  components: { RendererLightingOptions }
+  components: { RendererLightingOptions },
 })
 export default class extends Vue {
   @Prop() objecturls!: string[];
@@ -127,7 +127,6 @@ export default class extends Vue {
 
   @Watch("colors")
   async onObjectColorChanged(value: Color[]) {
-    console.log("changing colors? value.length:", value.length, "gradientColorProperty:", this.gradientColorProperty)
     if (value.length === 0 || this.gradientColorProperty) this.resetColors();
     else {
       await this.resetColors();
@@ -142,16 +141,11 @@ export default class extends Vue {
 
   @Watch("gradientColorProperty", { deep: true })
   async onGradientChange(value: GradientColor) {
-    console.log("gradient time", value)
     if (value) {
       const propertyData = this.viewer.getObjectProperties();
-      console.log("propertyData:", propertyData);
       const data = propertyData.find((v) => v.key === value.property);
-      console.log("found the prop?", data)
       if (data) {
-        console.log("changing...")
         await this.viewer.setColorFilter(data);
-        console.log("done")
       }
     }
   }
@@ -164,7 +158,6 @@ export default class extends Vue {
   loading = 0;
   failed = false;
   async mounted() {
-    console.log("objecturls:", this.objecturls)
     this.renderStream(this.objecturls);
   }
   async beforeDestroy() {
@@ -333,7 +326,6 @@ export default class extends Vue {
   }
 
   async setColors(colors: Color[]) {
-    console.log("setting some colors?")
     const colorGroups: { [color: string]: string[] } = {};
     colors.forEach((c) => {
       if (c.color) {
@@ -348,14 +340,12 @@ export default class extends Vue {
       objectIds: c[1],
       color: c[0],
     }));
-    const res = await this.viewer.setUserObjectColors(
+    await this.viewer.setUserObjectColors(
       groups as [{ objectIds: string[]; color: string }]
     );
-    console.log("res:", res)
   }
 
   async resetColors() {
-    console.log("resetting?")
     await this.viewer.resetFilters();
     this.viewer.requestRender();
   }

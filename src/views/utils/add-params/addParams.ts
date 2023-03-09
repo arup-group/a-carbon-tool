@@ -104,44 +104,14 @@ export async function testRun(url: string, token: string, params: ParamAdd[]) {
       },
     }
   ).then((d) => d.json());
-  console.log("parent:", parent);
-  // const childrenToUpdate = [
-  //   "1ec63ad9d49783c1aa8a59b369084d33",
-  //   "6965daf3991deabb9b6476c964038aae",
-  //   "15b3901d47cf1acc0caa7a857f581b04",
-  //   "2514262e4b43a762e94d8349becc5bcd",
-  // ];
-
-  // const params: ParamAdd[] = childrenToUpdate.map((c) => ({
-  //   parentid: c,
-  //   name: "totalCarbon",
-  //   param: {
-  //     id: Math.floor(Math.random() * 100000).toString(),
-  //     name: "totalCarbon",
-  //     units: "kgCO2e/kg",
-  //     value: Math.floor(Math.random() * 100),
-  //     isShared: false,
-  //     isReadOnly: false,
-  //     speckle_type: "Objects.BuiltElements.Revit.Parameter",
-  //     applicationId: null,
-  //     applicationUnit: null,
-  //     isTypeParameter: false,
-  //     totalChildrenCount: 0,
-  //     applicationUnitType: "string",
-  //     applicationInternalName: "string",
-  //   },
-  // }));
 
   const res = await addParams(parent, params, url, token, streamid);
-
-  console.log("res", res);
 
   const formData = new FormData();
   formData.append(
     "batch1",
     new Blob([JSON.stringify([res.parent, ...res.children])])
   );
-  console.log("formData:", formData);
   await fetch(`${url}/objects/${streamid}`, {
     method: "POST",
     headers: {
@@ -169,8 +139,6 @@ export async function addParams(
   childIds.forEach((id) => {
     idMapper[id] = `${id}-${new Date().getTime().toString()}-act`;
   });
-  console.log("childIds:", childIds);
-  console.log("idMapper:", idMapper);
   const newParentId = `${parent.id}-${new Date().getTime().toString()}-act`;
 
   // 2. get all the child objects (full objects, not just reference id's)
@@ -182,16 +150,16 @@ export async function addParams(
       parent
     );
   }
-  console.log("childObjects:", childObjects);
 
   // 3. go through each child object, updating id's and adding new params where they should be added
   const newChildObjects: IChildObject[] = childObjects.map((child) => {
-
     const initialChildId = child.id;
     let returnObj: IChildObject;
-    console.log("closure:", child.__closure)
     // if an object has no values in __closure (or the property doesn't exist) then don't need to convert object as there will be no chlidren
-    if (child.__closure !== undefined && Object.keys(child.__closure).length > 0) {
+    if (
+      child.__closure !== undefined &&
+      Object.keys(child.__closure).length > 0
+    ) {
       returnObj = convertObj(child, idMapper);
     } else {
       returnObj = child;
@@ -207,7 +175,6 @@ export async function addParams(
         };
       }
     });
-    // console.log("3")
 
     // update closure to new id's
     const newClosure: { [key: string]: number } = {};
@@ -220,13 +187,10 @@ export async function addParams(
         }
       });
     }
-    // console.log("4")
     returnObj.__closure = newClosure;
-    // console.log("5")
 
     return returnObj;
   });
-  console.log("newChildObjects:", newChildObjects);
 
   // 4. create and update new parent object
   // add new id
@@ -258,8 +222,6 @@ export async function addParams(
     }
   });
 
-  console.log("new parent:", newParentObj);
-  console.log("new children:", newChildObjects);
   return {
     parent: newParentObj,
     children: newChildObjects,

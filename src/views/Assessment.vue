@@ -129,7 +129,8 @@ import {
   GetAllReportBranchesOutput,
   LoadActReportDataInput,
   UploadReportInput,
-  GetObjectDetailsOut
+  GetObjectDetailsOut,
+  ObjectDetailsInput
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/process-report-object";
@@ -271,11 +272,21 @@ export default class Assessment extends Vue {
     this.streamId = streamId;
     this.update = true;
     await this.loadStream(streamId);
-    const input: LoadActReportDataInput = { streamId, branchName };
+    const input: LoadActReportDataInput = { streamId, branchName, loadChildren: true };
     const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
       "loadActReportData",
       input
     );
+
+    const objectDetailsInput: ObjectDetailsInput = {
+      streamid: streamId,
+      objecturl: this.objectURLs[0]
+    };
+    this.$store.dispatch("getObjectDetails", objectDetailsInput).then((res: GetObjectDetailsOut) => {
+      // in a .then to not hold up the rest of the func
+      this.parentObj = res.parent;
+      this.allChildObjs = res.children;
+    });
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -284,6 +295,8 @@ export default class Assessment extends Vue {
         reportData: c.act.reportData,
       };
     });
+    console.log("this.objectsObj:", this.objectsObj)
+    console.log("assessmentViewData:", assessmentViewData)
 
     this.types = this.findTypes(this.objectsObj);
     this.materialsColors = Object.values(this.objectsObj).map((o) => ({

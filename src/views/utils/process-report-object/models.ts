@@ -39,6 +39,7 @@ export interface ILoadStreamData {
 
 export interface LoadStreamOut {
   version: "v1" | "v2";
+  parentId: string;
   ready: boolean;
   colors: Color[];
   data: ILoadStreamData;

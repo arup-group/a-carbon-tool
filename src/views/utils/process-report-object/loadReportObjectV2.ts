@@ -49,6 +49,7 @@ export async function calcV2(
     ready: true,
     colors: branchData.materialsColors,
     version: "v2",
+    parentId: branchData.id,
     data: {
       streamId: streamId,
       modelId,

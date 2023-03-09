@@ -410,7 +410,6 @@ export default new Vuex.Store({
     setDarkMode({ commit }) {
       commit("setDarkMode");
     },
-
     async getObjectDetails(
       context,
       { streamid, objecturl }: ObjectDetailsInput
@@ -618,6 +617,11 @@ export default new Vuex.Store({
   modules: {},
 });
 
+export interface GetParentObjectInput {
+  streamid: string;
+  objecturl: string;
+}
+
 export interface GetObjectDetailsOut {
   parent: IParamsParent,
   children: IChildObject[]
@@ -732,7 +736,7 @@ export interface UploadReportInput {
   newModel: AddParamsModel | undefined;
 }
 
-interface ObjectDetailsInput {
+export interface ObjectDetailsInput {
   streamid: string;
   objecturl: string;
 }

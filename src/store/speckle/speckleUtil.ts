@@ -10,6 +10,7 @@ import {
   CreateReportBranch,
   GetObjectInfo,
   StreamNameBranches,
+  GetUserStreams,
 } from "@/models/graphql";
 
 import * as queries from "./graphql/speckleQueries";
@@ -104,7 +105,7 @@ export async function convOldReport(
 ) {
   const mainReportBranchName = `${context.state.speckleFolderName}/main`;
 
-  const res = await createReportBranch(context, streamid, mainReportBranchName);
+  const res = await createBranch(context, streamid, mainReportBranchName, "A Carbon Tool carbon report");
   const reportObjId = oldBranch.commits.items[0].referencedObject;
 
   const objectInfo = await getObjectInfo(context, streamid, reportObjId);
@@ -138,7 +139,7 @@ export const getStreamObjects = (
 ): Promise<StreamReferenceObjects> =>
   speckleFetch(queries.streamReferencedObjects(streamid), context);
 
-export const getUserStreams = (context: any) =>
+export const getUserStreams = (context: any): Promise<GetUserStreams> =>
   speckleFetch(queries.streamsQuery(), context);
 
 export const uploadObjects = (
@@ -147,12 +148,19 @@ export const uploadObjects = (
   objects: SpeckleObjectComplete[]
 ) => speckleFetch(queries.uploadObjectsMutation(streamid, objects), context);
 
-export const createReportBranch = (
+export const uploadObjectsGeneric = (
   context: any,
   streamid: string,
-  branchName: string
+  objects: any[]
+) => speckleFetch(queries.uploadObjectsGenericMutation(streamid, objects), context);
+
+export const createBranch = (
+  context: any,
+  streamid: string,
+  branchName: string,
+  description: string
 ): Promise<CreateReportBranch> =>
-  speckleFetch(queries.createBranchMutation(streamid, branchName), context);
+  speckleFetch(queries.createBranchMutation(streamid, branchName, description), context);
 
 export const uploadObjectWithChildren = (
   context: any,

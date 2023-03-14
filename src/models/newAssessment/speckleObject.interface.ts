@@ -4,6 +4,8 @@ import { ChartData } from "../chart";
 import { IABreakdown } from "@/views/utils/process-report-object";
 import { Color } from "../renderer";
 
+export type ObjectsObj = { [id: string]: SpeckleObject };
+
 export interface SpeckleObject {
   id: string;
   speckle_type: string;

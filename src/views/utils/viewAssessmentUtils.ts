@@ -6,12 +6,12 @@ import {
 import { getActReportBranchInfo } from "@/store/speckle/speckleUtil";
 import { calcV1, calcV2, LoadStreamOut } from "./process-report-object";
 
-export async function loadParent(
+export async function loadParent<T>(
   url: string,
   streamId: string,
   parentId: string,
   token: string
-): Promise<HTTPStreamDataParent> {
+): Promise<T> {
   return await fetch(`${url}/objects/${streamId}/${parentId}/single`, {
     method: "GET",
     headers: {
@@ -35,7 +35,7 @@ export async function loadStream(
   const parentId =
     actReportBranchInfo.data.stream.branch.commits.items[0].referencedObject;
 
-  const branchData = await loadParent(
+  const branchData = await loadParent<HTTPStreamDataParent>(
     context.state.selectedServer.url,
     streamId,
     parentId,
@@ -56,5 +56,3 @@ export async function loadStream(
     throw new Error("report object corrupted");
   }
 }
-
-

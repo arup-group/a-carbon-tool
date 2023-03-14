@@ -58,10 +58,9 @@ export default class VersionUpdateDialog extends Vue {
 
   features: { title: string; subtitle: string }[] = [
     {
-      title: "Updated Speckle Viewer",
-      subtitle: `Updated the Speckle Viewer to include some of the latest features.
-      It also speeds up the assessment and allows for running assessments on larger models.`,
-    },
+      title: "Object parameter grouping",
+      subtitle: `You can now group your objects for material selection by any parameter on your model.`,
+    }
   ];
 
   fixes: { title: string; subtitle: string }[] = [];

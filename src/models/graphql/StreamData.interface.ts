@@ -57,6 +57,7 @@ export interface ParentSpeckleObjectDataV1 {
   totalChildrenCount: number;
   transportCarbonA4: number;
   volume: number;
+  selectedObjectGroup: string;
 }
 
 export interface ParentSpeckleObjectDataV2 extends ParentSpeckleObjectDataV1 {

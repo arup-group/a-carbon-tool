@@ -1,6 +1,6 @@
 /**
  * TAKEN FROM THE SPECKLE VIEWER PACKAGE
- * Flattens a speckle object. It will ignore arrays, null and undefined valuesm, as well as various 'safe to ignore' speckle properties, such as
+ * Flattens a speckle object. It will ignore arrays, null and undefined values, as well as various 'safe to ignore' speckle properties, such as
  * bbox, __closure, __parents, totalChildrenCount.
  * @param obj object to flatten
  * @returns an object with all its props flattened into `prop.subprop.subsubprop`.

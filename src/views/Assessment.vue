@@ -251,7 +251,6 @@ export default class Assessment extends Vue {
   materialGroupSelected(objectGroup: string) {
     this.types = this.findTypes(this.groupingProps, objectGroup);
     this.selectedObjectGroup = objectGroup;
-    // not sure if the materials actually get reset when the grouping changes, but safest to just say that it does
     this.resetColors();
   }
 

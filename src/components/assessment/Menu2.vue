@@ -20,6 +20,7 @@
     </v-form>
     <v-divider class="pb-4 mt-4"></v-divider>
     <custom-group
+      :key="groupKey"
       :invalidObjects="invalidObjects"
       :selectedObjects="selectedObjects"
       @createNewGroup="createNewGroup"
@@ -46,6 +47,7 @@ export default class Menu2 extends Vue {
   @Prop() objectGroups!: string[];
   @Prop() defaultGroup!: string;
 
+  groupKey = 0;
   defaultGroupSet = false;
   objectGroup = this.defaultGroup ? this.defaultGroup : "Object Type";
   @Watch("defaultGroup")
@@ -74,6 +76,7 @@ export default class Menu2 extends Vue {
 
   @Emit("groupSelected")
   groupSelected() {
+    this.groupKey++;
     return this.objectGroup;
   }
 }

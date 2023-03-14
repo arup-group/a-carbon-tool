@@ -45,7 +45,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.9.0 \u00DF",
+    version: "0.10.0 \u00DF",
     speckleFolderName: "actcarbonreport",
     speckleViewer: {
       viewer: undefined,
@@ -485,6 +485,7 @@ export default new Vuex.Store({
         reportTotals,
         projectData,
         branchName,
+        selectedObjectGroup,
       }: UploadReportInput
     ) {
       branchName = `${context.state.speckleFolderName}/${branchName}`;
@@ -507,6 +508,7 @@ export default new Vuex.Store({
         volume: reportTotals.volume,
         projectData,
         totalChildrenCount: 0,
+        selectedObjectGroup
       };
       formData.append(
         "batch1",
@@ -878,6 +880,7 @@ export interface UploadReportInput {
   reportTotals: ReportTotals;
   projectData: ProjectDataComplete;
   branchName: string;
+  selectedObjectGroup: string;
 }
 
 interface ObjectDetailsInput {

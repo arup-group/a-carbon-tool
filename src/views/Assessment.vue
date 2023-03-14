@@ -21,6 +21,7 @@
           @close="close"
           @openFullView="openFullView"
           @createNewGroup="createNewObjectGroup"
+          @groupSelected="materialGroupSelected"
           :modal="modal"
           :streams="availableStreams"
           :types="types"
@@ -37,6 +38,8 @@
           :projectData="projectDataPassdown"
           :selectedObjects="selectedObjects"
           :invalidSelectedObjects="invalidSelectedObjects"
+          :objectGroups="objectGroups"
+          :defaultGroup="selectedObjectGroup"
         />
       </div>
       <Renderer
@@ -85,6 +88,8 @@ import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
 
+import { findStringProps } from "./utils/propertyFiltering";
+
 import Renderer from "@/components/shared/Renderer.vue";
 import {
   Color,
@@ -98,8 +103,7 @@ import {
 import {
   ProjectDataComplete,
   MaterialUpdateOut,
-  SpeckleObject,
-  SpeckleType,
+  MaterialGrouping,
   Step,
   TransportSelected,
   TransportType,
@@ -112,6 +116,8 @@ import {
   ObjectDetails,
   GroupedMaterial,
   SelectedMaterialEmit,
+  ObjectsObj,
+  StringPropertyGroups,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -133,7 +139,6 @@ import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/viewAssessmentUtils";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 
-type ObjectsObj = { [id: string]: SpeckleObject };
 interface AvailableStream {
   label: string;
   value: string;
@@ -161,7 +166,7 @@ export default class Assessment extends Vue {
   availableStreams: AvailableStream[] = [];
   objectURLs: string[] = [];
   token = "";
-  types: SpeckleType[] = [];
+  types: MaterialGrouping[] = [];
   objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
@@ -192,7 +197,10 @@ export default class Assessment extends Vue {
   speckleVol = false; // whether the volume can be got from speckle props
   defaultBranchName = "main";
 
+  groupingProps: StringPropertyGroups[] = [];
+  objectGroups: string[] = [];
   groupedMaterials: GroupedMaterial[] = [];
+  selectedObjectGroup = "Object Type";
 
   update = false;
 
@@ -240,6 +248,12 @@ export default class Assessment extends Vue {
     );
   }
 
+  materialGroupSelected(objectGroup: string) {
+    this.types = this.findTypes(this.groupingProps, objectGroup);
+    this.selectedObjectGroup = objectGroup;
+    this.resetColors();
+  }
+
   async newBranchSelect(name: string) {
     const input: CheckContainsChlidReportInput = {
       streamid: this.streamId,
@@ -269,6 +283,7 @@ export default class Assessment extends Vue {
       "loadActReportData",
       input
     );
+    this.selectedObjectGroup = assessmentViewData.data.selectedObjectGroup;
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -278,7 +293,6 @@ export default class Assessment extends Vue {
       };
     });
 
-    this.types = this.findTypes(this.objectsObj);
     this.materialsColors = Object.values(this.objectsObj).map((o) => ({
       id: o.id,
       color: o.formData?.material?.color as string,
@@ -329,6 +343,7 @@ export default class Assessment extends Vue {
         reportTotals: this.report.totals,
         projectData: this.projectData,
         branchName,
+        selectedObjectGroup: this.selectedObjectGroup,
       };
       this.loading = true;
       await this.$store.dispatch("uploadReport", uploadReportInput);
@@ -361,27 +376,30 @@ export default class Assessment extends Vue {
       (p) => p.name.toLowerCase() === "volume"
     );
     this.volProp = volumeFilter ? volumeFilter.rawName : "";
-    if (!this.update) {
-      const res: ObjectDetails[] = await this.$store.dispatch(
-        "getObjectDetails",
-        {
-          streamid: this.streamId,
-          objecturl: this.objectURLs[0],
-        }
-      );
+    const res: ObjectDetails[] = await this.$store.dispatch(
+      "getObjectDetails",
+      {
+        streamid: this.streamId,
+        objecturl: this.objectURLs[0],
+      }
+    );
 
-      let totalVol = 0;
-      const filteredRes = res.filter(
-        (r) =>
-          r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
-          r.speckle_type !== "Objects.Geometry.Mesh"
-      );
+    let totalVol = 0;
+    const filteredRes = res.filter(
+      (r) =>
+        r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
+        r.speckle_type !== "Objects.Geometry.Mesh"
+    );
 
-      if (volumeFilter) {
-        this.speckleVol = true;
-        filteredRes.forEach((r) => {
-          const volume = this.findVolume(r, volumeFilter);
-          if (volume) {
+    const speckleObjsPropsSearch: any[] = [];
+
+    if (volumeFilter) {
+      this.speckleVol = true;
+      filteredRes.forEach((r) => {
+        const volume = this.findVolume(r, volumeFilter);
+        if (volume) {
+          speckleObjsPropsSearch.push(r);
+          if (!this.update) {
             this.objectsObj[r.id] = {
               id: r.id,
               speckle_type: r.speckle_type,
@@ -389,21 +407,31 @@ export default class Assessment extends Vue {
                 volume: volume,
               },
             };
-            // also find total volume here to avoid needing to loop through objects again
-            totalVol += volume;
           }
-        });
-      } else {
-        this.speckleVol = false;
-        filteredRes.forEach((r) => {
+          // also find total volume here to avoid needing to loop through objects again
+          totalVol += volume;
+        }
+      });
+    } else {
+      this.speckleVol = false;
+      filteredRes.forEach((r) => {
+        if (!this.update) {
           this.objectsObj[r.id] = {
             id: r.id,
             speckle_type: r.speckle_type,
           };
-        });
-      }
+        }
+      });
+    }
 
-      this.types = this.findTypes(this.objectsObj);
+    this.groupingProps = findStringProps(
+      speckleObjsPropsSearch,
+      this.objectsObj
+    );
+    this.objectGroups = this.groupingProps.map((gp) => gp.name);
+
+    this.types = this.findTypes(this.groupingProps, this.selectedObjectGroup);
+    if (!this.update) {
       this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
     }
@@ -740,7 +768,6 @@ export default class Assessment extends Vue {
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
       try {
-        this.objectsObj[id].speckle_type = material.type.type;
         this.colors.push({
           color: material.material.color,
           id,
@@ -764,25 +791,29 @@ export default class Assessment extends Vue {
     });
   }
 
-  findTypes(objects: ObjectsObj): SpeckleType[] {
-    let types: SpeckleType[] = [];
-
-    Object.values(objects).forEach((o) => {
-      let typeIndex = -1;
-      types.forEach((t, i) => {
-        if (t.type === o.speckle_type) typeIndex = i;
-      });
-      if (typeIndex !== -1) types[typeIndex].ids.push(o.id);
-      else
-        types.push({
-          type: o.speckle_type,
-          ids: [o.id],
-          material: o.formData?.material,
-          transport: o.formData?.transport,
-        });
-    });
-
-    return types;
+  // types = material groups, cuz legacy
+  findTypes(
+    propertyGroups: StringPropertyGroups[],
+    selectedGroup: string
+  ): MaterialGrouping[] {
+    const group = propertyGroups.find((pg) => pg.name === selectedGroup);
+    if (group) {
+      // we're assuming that if this.update=true then objectsObj will already be filled by this point
+      const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(
+        (vg) => ({
+          type: vg.value,
+          ids: vg.ids,
+          material: this.update
+            ? this.objectsObj[vg.ids[0]].formData?.material
+            : undefined,
+          transport: this.update
+            ? this.objectsObj[vg.ids[0]].formData?.transport
+            : undefined,
+        })
+      );
+      return materialGrouping;
+    }
+    return [];
   }
 
   uploadData(data: ProjectDataComplete) {

@@ -1,7 +1,7 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
-import { SpeckleType } from ".";
+import { MaterialGrouping } from ".";
 
 export interface MaterialUpdateOut {
   material: MaterialFull;
-  type: SpeckleType;
+  type: MaterialGrouping;
 }

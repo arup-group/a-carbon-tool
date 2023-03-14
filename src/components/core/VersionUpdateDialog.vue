@@ -58,23 +58,12 @@ export default class VersionUpdateDialog extends Vue {
 
   features: { title: string; subtitle: string }[] = [
     {
-      title: "Updated Speckle Viewer",
-      subtitle: `Updated the Speckle Viewer to include some of the latest features.
-      It also speeds up the assessment and allows for running assessments on larger models.`,
-    }, {
-      title: "Excel data import",
-      subtitle: `Import your own materials data for use in your reports.
-      Click the "+" icon when making a new assessment or click "More" on the stream reports page.`
+      title: "Object parameter grouping",
+      subtitle: `You can now group your objects for material selection by any parameter on your model.`,
     }
   ];
 
-  fixes: { title: string; subtitle: string }[] = [
-    {
-      title: "Login bug",
-      subtitle: `Fixed a bug with login in leading to non-logged in users not being
-      properly redirected to the login page and instead seeing an error.`
-    }
-  ];
+  fixes: { title: string; subtitle: string }[] = [];
 
   @Emit("close")
   close() {

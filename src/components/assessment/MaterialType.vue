@@ -41,14 +41,14 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MaterialUpdateOut, SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
+import { MaterialUpdateOut, SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component
 export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
-  @Prop() type!: SpeckleType;
+  @Prop() type!: MaterialGrouping;
 
   currentMaterial = this.type && this.type.material ? this.type.material : null;
   filtered = true;

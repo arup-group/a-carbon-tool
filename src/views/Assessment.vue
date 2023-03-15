@@ -231,7 +231,6 @@ export default class Assessment extends Vue {
 
   async mounted() {
     this.token = this.$store.state.token.token;
-    // AddParams.testRun("https://v2.speckle.arup.com", this.token);
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
     let { streamId, branchName } = this.$route.params;
@@ -308,7 +307,8 @@ export default class Assessment extends Vue {
         this.parentObj = res.parent;
         this.allChildObjs = res.children;
       });
-    this.selectedObjectGroup = assessmentViewData.data.selectedObjectGroup;
+    const objGroup = assessmentViewData.data.selectedObjectGroup
+    this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -363,7 +363,7 @@ export default class Assessment extends Vue {
   async uploadReport(branchName: string) {
     if (this.report && this.report.reportObjs.length > 0) {
       this.loadingSpinnerText = "DO NOT REFRESH. Saving report"
-      // TODO: add some check to make sure that model is a revit check here
+      // TODO: check to see if this only works for Revit models
       let newModel: AddParams.AddParamsModel | undefined;
       if (this.parentObj) {
         newModel = await AddParams.addParams(
@@ -416,26 +416,7 @@ export default class Assessment extends Vue {
       (p) => p.name.toLowerCase() === "volume"
     );
     this.volProp = volumeFilter ? volumeFilter.rawName : "";
-    // if (!this.update) {
-    //   const res: GetObjectDetailsOut = await this.$store.dispatch(
-    //     "getObjectDetails",
-    //     {
-    //       streamid: this.streamId,
-    //       objecturl: this.objectURLs[0],
-    //     }
-    //   );
 
-    //   this.allChildObjs = res.children;
-    //   this.parentObj = res.parent;
-
-    //   let totalVol = 0;
-    //   const filteredRes = this.allChildObjs.filter(
-    //     (r) =>
-    //       r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
-    //       r.speckle_type !== "Objects.Geometry.Mesh"
-    //   );
-    
-    // }
     const res: GetObjectDetailsOut = await this.$store.dispatch(
       "getObjectDetails",
       {
@@ -707,6 +688,7 @@ export default class Assessment extends Vue {
       });
 
       // make parameter update object
+      // TODO: make this work for Rhino models and clean up a bit
       this.addParams.push({
         parentid: o.id,
         name: "Total Carbon",

@@ -1,5 +1,4 @@
 export { StreamObject } from "./streamObject.interface";
-// export { SpeckleType } from "./speckleType.interface";
 export * from "./speckleObject.interface";
 export * from "./materialGrouping.interface";
 export { MaterialUpdateOut } from "./materialUpdateOut.interface";

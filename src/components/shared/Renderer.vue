@@ -144,9 +144,7 @@ export default class extends Vue {
     if (value) {
       const propertyData = this.viewer.getObjectProperties();
       const data = propertyData.find((v) => v.key === value.property);
-      if (data) {
-        await this.viewer.setColorFilter(data);
-      }
+      if (data) await this.viewer.setColorFilter(data);
     }
   }
 

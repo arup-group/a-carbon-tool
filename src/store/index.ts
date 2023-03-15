@@ -2,7 +2,6 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
 import { LoadStreamOut, getChildren } from "@/views/utils/process-report-object";
-// import { getChildren } from "@/views/utils/"
 import {
   loadParent,
   loadStream,

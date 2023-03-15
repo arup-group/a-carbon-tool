@@ -130,8 +130,8 @@ export async function addParams(
   childObjects?: IChildObject[]
 ): Promise<AddParamsModel> {
   // inputs:
-  // 1. parent object
-  // 2. dictionary of id's and the params to add to those id's
+  // parent. parent object
+  // params. array of id's and the params to add to those id's
 
   // 1. loop through all child id's and generate new id and dictionary to convert
   const idMapper: IdMapper = {}; // key = oldId, value = new id

@@ -124,6 +124,7 @@ export interface ILoadStreamData {
   materialBreakdown: IMaterialBreakdown;
   aBreakdown: IABreakdown;
   children: ChildSpeckleObjectData[];
+  selectedObjectGroup: string;
 }
 
 export interface LoadStreamOut {
@@ -209,6 +210,7 @@ export async function loadStream(
       materialBreakdown: materialBreakdownUpdated,
       aBreakdown: levelsUpdated,
       children: childrenData,
+      selectedObjectGroup: branchData.selectedObjectGroup
     },
   };
 }

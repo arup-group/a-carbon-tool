@@ -84,6 +84,7 @@ export async function calcV2(
       },
       children,
       idMapper: branchData.idMapper,
+      selectedObjectGroup: branchData.selectedObjectGroup
     },
   };
 }

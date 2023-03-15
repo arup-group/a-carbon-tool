@@ -35,6 +35,7 @@ export interface ILoadStreamData {
   children: ChildSpeckleObjectData[];
   modelId: string;
   idMapper: IdMapper;
+  selectedObjectGroup: string;
 }
 
 export interface LoadStreamOut {

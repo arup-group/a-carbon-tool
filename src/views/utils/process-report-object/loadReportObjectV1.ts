@@ -83,7 +83,8 @@ export async function calcV1(
       materialBreakdown: materialBreakdownUpdated,
       aBreakdown: levelsUpdated,
       children: childrenData,
-      idMapper: {} as IdMapper
+      idMapper: {} as IdMapper,
+      selectedObjectGroup: branchData.selectedObjectGroup
     },
   };
 }

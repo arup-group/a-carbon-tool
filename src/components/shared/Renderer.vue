@@ -159,7 +159,6 @@ export default class extends Vue {
     this.renderStream(this.objecturls);
   }
   async beforeDestroy() {
-    await this.viewer.cancelLoad(this.objecturls[0], true);
     await this.viewer.unloadAll();
   }
   @Watch("objecturls")
@@ -172,6 +171,7 @@ export default class extends Vue {
   async renderStream(objecturls: string[]) {
     if (this.$store.state.speckleViewer.viewer) {
       this.viewer = this.$store.state.speckleViewer.viewer;
+      await this.viewer.unloadAll();
 
       this.domElement = this.$store.state.speckleViewer.container;
 
@@ -192,6 +192,8 @@ export default class extends Vue {
         ...DefaultViewerParams,
         showStats: false,
       });
+
+      await this.viewer.unloadAll();
 
       this.$store.commit("setSpeckleViewer", {
         viewer: this.viewer,

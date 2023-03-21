@@ -182,6 +182,8 @@ export default class Assessment extends Vue {
   projectDataPassdown: ProjectDataComplete | null = null;
   allIds: string[] = [];
 
+  beenToTransport = false; // var to keep track of whether the user has been to the transport page, otherwise transport colors can be applied on data tab
+
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
@@ -300,13 +302,6 @@ export default class Assessment extends Vue {
       streamid: streamId,
       objecturl: this.objectURLs[0],
     };
-    this.$store
-      .dispatch("getObjectDetails", objectDetailsInput)
-      .then((res: GetObjectDetailsOut) => {
-        // in a .then to not hold up the rest of the func
-        this.parentObj = res.parent;
-        this.allChildObjs = res.children;
-      });
     const objGroup = assessmentViewData.data.selectedObjectGroup
     this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
     assessmentViewData.data.children.forEach((c) => {
@@ -334,6 +329,8 @@ export default class Assessment extends Vue {
 
     this.totalVolume = assessmentViewData.data.projectInfo.volume;
     this.speckleVol = true;
+
+    this.resetColors();
   }
 
   async checkSave() {
@@ -363,7 +360,6 @@ export default class Assessment extends Vue {
   async uploadReport(branchName: string) {
     if (this.report && this.report.reportObjs.length > 0) {
       this.loadingSpinnerText = "DO NOT REFRESH. Saving report"
-      // TODO: check to see if this only works for Revit models
       let newModel: AddParams.AddParamsModel | undefined;
       if (this.parentObj) {
         newModel = await AddParams.addParams(
@@ -425,10 +421,10 @@ export default class Assessment extends Vue {
       }
     );
 
-    if (!this.update) {
+    // if (!this.update) {
       this.allChildObjs = res.children;
       this.parentObj = res.parent;
-    }
+    // }
 
     let totalVol = 0;
     const filteredRes = this.allChildObjs.filter(
@@ -473,7 +469,6 @@ export default class Assessment extends Vue {
         }
       });
     }
-
     this.groupingProps = findStringProps(
       speckleObjsPropsSearch,
       this.objectsObj
@@ -540,6 +535,7 @@ export default class Assessment extends Vue {
         this.colors = this.materialsColors;
         break;
       case Step.TRANSPORT:
+        this.beenToTransport = true;
         this.resetColors();
         this.colors = this.transportColors;
         this.groupMaterials();
@@ -688,7 +684,6 @@ export default class Assessment extends Vue {
       });
 
       // make parameter update object
-      // TODO: make this work for Rhino models and clean up a bit
       this.addParams.push({
         parentid: o.id,
         name: "Total Carbon",
@@ -911,26 +906,28 @@ export default class Assessment extends Vue {
   }
 
   transportSelected(selected: TransportSelected) {
-    const ids = selected.material.objects;
-    this.colors = this.colors.filter((c) => !ids.includes(c.id));
-    ids.forEach((id) => {
-      this.colors.push({
-        color: selected.transportType.color,
-        id,
+    if (this.beenToTransport) {
+      const ids = selected.material.objects;
+      this.colors = this.colors.filter((c) => !ids.includes(c.id));
+      ids.forEach((id) => {
+        this.colors.push({
+          color: selected.transportType.color,
+          id,
+        });
       });
-    });
-    this.transportColors = this.colors;
+      this.transportColors = this.colors;
 
-    selected.material.objects.forEach((i) => {
-      const oldObj = this.objectsObj[i];
-      this.objectsObj[i] = {
-        ...oldObj,
-        formData: {
-          ...oldObj.formData,
-          transport: selected.transportType,
-        },
-      };
-    });
+      selected.material.objects.forEach((i) => {
+        const oldObj = this.objectsObj[i];
+        this.objectsObj[i] = {
+          ...oldObj,
+          formData: {
+            ...oldObj.formData,
+            transport: selected.transportType,
+          },
+        };
+      });
+    }
   }
 
   materialUpdated(material: MaterialUpdateOut) {

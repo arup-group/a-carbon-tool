@@ -136,7 +136,6 @@ import {
   LoadActReportDataInput,
   UploadReportInput,
   GetObjectDetailsOut,
-  ObjectDetailsInput,
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/process-report-object";
@@ -298,10 +297,6 @@ export default class Assessment extends Vue {
       input
     );
 
-    const objectDetailsInput: ObjectDetailsInput = {
-      streamid: streamId,
-      objecturl: this.objectURLs[0],
-    };
     const objGroup = assessmentViewData.data.selectedObjectGroup
     this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
     assessmentViewData.data.children.forEach((c) => {

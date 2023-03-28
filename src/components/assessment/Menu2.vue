@@ -3,8 +3,6 @@
     <v-form>
       <div class="d-flex align-center">
         <strong class="mr-3">Objects grouped by:</strong>
-        <!-- {{ defaultGroup }}
-        {{ readDefaultGroup }} -->
         <v-combobox
           v-model="objectGroup"
           :items="objectGroups"

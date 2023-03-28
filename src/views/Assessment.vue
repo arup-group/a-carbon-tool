@@ -297,7 +297,7 @@ export default class Assessment extends Vue {
       input
     );
 
-    const objGroup = assessmentViewData.data.selectedObjectGroup
+    const objGroup = assessmentViewData.data.selectedObjectGroup;
     this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
@@ -354,7 +354,7 @@ export default class Assessment extends Vue {
   }
   async uploadReport(branchName: string) {
     if (this.report && this.report.reportObjs.length > 0) {
-      this.loadingSpinnerText = "DO NOT REFRESH. Saving report"
+      this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
       let newModel: AddParams.AddParamsModel | undefined;
       if (this.parentObj) {
         newModel = await AddParams.addParams(
@@ -416,10 +416,8 @@ export default class Assessment extends Vue {
       }
     );
 
-    // if (!this.update) {
-      this.allChildObjs = res.children;
-      this.parentObj = res.parent;
-    // }
+    this.allChildObjs = res.children;
+    this.parentObj = res.parent;
 
     let totalVol = 0;
     const filteredRes = this.allChildObjs.filter(

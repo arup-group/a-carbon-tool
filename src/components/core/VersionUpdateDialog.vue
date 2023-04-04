@@ -59,7 +59,7 @@ export default class VersionUpdateDialog extends Vue {
   features: { title: string; subtitle: string }[] = [
     {
       title: "Report Object v2",
-      subtitle: `The way that we store your carbon reports has now changed. The updates allow for faster loading, carbon heat maps, and makes it easier to access your data.`,
+      subtitle: `The way that we store your carbon reports has now changed. The updates allow for faster loading, carbon heat maps, and gives you easier to access your data.`,
     }, {
       title: "Carbon Heat Map",
       subtitle: `View a carbon heat map of your model after running a new report`

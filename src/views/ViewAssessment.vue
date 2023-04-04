@@ -101,9 +101,10 @@ export default class ViewAssessment extends Vue {
   }
 
   rendererLoaded() {
-    this.gradientColorProperty = {
-      property: "parameters.Total Carbon.value",
-    };
+    // this.gradientColorProperty = {
+    //   property: "parameters.Total Carbon.value",
+    // };
+    this.colors = this.materialColors;
   }
 
   back() {

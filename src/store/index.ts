@@ -1,11 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
+import { LoadStreamOut, getChildren } from "@/views/utils/process-report-object";
 import {
-  loadStream,
-  LoadStreamOut,
   loadParent,
-  getChildren,
+  loadStream,
 } from "@/views/utils/viewAssessmentUtils";
 import {
   Login,
@@ -31,7 +30,10 @@ import {
 } from "@/models/newAssessment";
 
 import { BECName } from "@/models/shared";
-import { ParentSpeckleObjectData } from "@/models/graphql/StreamData.interface";
+import {
+  ParentSpeckleObjectData,
+  ParentSpeckleObjectDataV2,
+} from "@/models/graphql/StreamData.interface";
 import { filterOnlyReportBranches } from "./utilities/filters";
 import {
   StreamNameBranches,
@@ -39,17 +41,23 @@ import {
   StreamReferenceObjects,
 } from "@/models/graphql";
 import { BranchItem } from "@/models/graphql/StreamReferenceBranches.interface";
+import {
+  AddParamsModel,
+  IChildObject,
+  IdMapper,
+  IParamsParent,
+} from "@/views/utils/add-params/addParams";
 import { ExcelData, exportToMaterial } from "@/views/utils/ExcelImportUtils";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.10.0 \u00DF",
+    version: "0.11.0 \u00DF",
     speckleFolderName: "actcarbonreport",
     speckleViewer: {
       viewer: undefined,
-      container: undefined
+      container: undefined,
     },
     servers: {
       arup: {
@@ -414,12 +422,13 @@ export default new Vuex.Store({
     },
     async loadActReportData(
       context,
-      { streamId, branchName }: LoadActReportDataInput
+      { streamId, branchName, loadChildren }: LoadActReportDataInput
     ) {
       return await loadStream(
         context,
         streamId,
-        `${context.state.speckleFolderName}/${branchName}`
+        `${context.state.speckleFolderName}/${branchName}`,
+        loadChildren
       );
     },
     async carbonStreams(context) {
@@ -436,46 +445,34 @@ export default new Vuex.Store({
     setDarkMode({ commit }) {
       commit("setDarkMode");
     },
-
     async getObjectDetails(
       context,
       { streamid, objecturl }: ObjectDetailsInput
-    ) {
+    ): Promise<GetObjectDetailsOut> {
       const objectid = objecturl.split("/")[objecturl.split("/").length - 1];
 
-      const response = await fetch(
+      const parent: IParamsParent = await fetch(
         `${context.state.selectedServer.url}/objects/${streamid}/${objectid}/single`,
         {
-          headers: {
-            Accept: "text/plain",
-            Authorization: `Bearer ${context.state.token.token}`,
-          },
-        }
-      );
-      const rawObj = await response.text();
-      const rootObj = JSON.parse(rawObj);
-
-      const childrenIds = Object.keys(rootObj.__closure).sort(
-        (a, b) => rootObj.__closure[a] - rootObj.__closure[b]
-      );
-
-      const childrenObjects = await fetch(
-        `${context.state.selectedServer.url}/api/getobjects/${streamid}`,
-        {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${context.state.token.token}`,
           },
-          body: JSON.stringify({ objects: JSON.stringify(childrenIds) }),
         }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          return data;
-        });
+      ).then((d) => d.json());
 
-      return childrenObjects;
+      const children = await getChildren<IChildObject>(
+        context.state.selectedServer.url,
+        context.state.token.token,
+        streamid,
+        parent
+      );
+
+      return {
+        parent,
+        children,
+      };
     },
     async uploadReport(
       context,
@@ -485,10 +482,31 @@ export default new Vuex.Store({
         reportTotals,
         projectData,
         branchName,
+        newModel,
         selectedObjectGroup,
       }: UploadReportInput
     ) {
+      if (newModel) {
+        const formData = new FormData();
+        formData.append(
+          "batch1",
+          new Blob([JSON.stringify([newModel.parent, ...newModel.children])])
+        );
+        await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${context.state.token.token}`,
+          },
+          body: formData,
+        });
+      }
+
       branchName = `${context.state.speckleFolderName}/${branchName}`;
+
+      const objectIds = await speckleUtil.getStreamObjects(context, streamid);
+      const modelId = newModel
+        ? newModel.parent.id
+        : objectIds.data.stream.branch.commits.items[0].referencedObject;
 
       // TODO: ADD ERROR HANDLING
       const uploadObjectsRes: UploadObjectsRes =
@@ -497,8 +515,9 @@ export default new Vuex.Store({
       const formData = new FormData();
       // below line means that some objects may be given duplicate strings and the report won't save properly
       const objectid = `${new Date().getTime().toString()}-act`;
-      const objectData: ParentSpeckleObjectData = {
+      const objectData: ParentSpeckleObjectDataV2 = {
         id: objectid,
+        version: "2.0.0",
         speckleType: "act-totals",
         speckle_type: "act-totals",
         transportCarbonA4: reportTotals.transportCarbonA4,
@@ -506,10 +525,25 @@ export default new Vuex.Store({
         constructionCarbonA5: reportTotals.constructionCarbonA5,
         totalCO2: reportTotals.totalCO2,
         volume: reportTotals.volume,
+        materials: reportTotals.materials,
+        materialsColors: reportTotals.materialsColors,
+        transportColors: reportTotals.transportColors,
         projectData,
         totalChildrenCount: 0,
+        idMapper: newModel ? newModel.idMapper : ({} as IdMapper),
+        "@children": children.map((child) => ({
+          speckle_type: "reference",
+          referencedId: child,
+        })),
+        "@model": [
+          {
+            speckle_type: "reference",
+            referencedId: modelId,
+          },
+        ],
         selectedObjectGroup
       };
+      children.push(modelId); // add model id to children array so it gets added to __closure properly
       formData.append(
         "batch1",
         new Blob([
@@ -594,7 +628,12 @@ export default new Vuex.Store({
         branches.map(async (branch): Promise<GetAllReportObjectsOutput> => {
           const fullBranchName = `${context.state.speckleFolderName}/${branch.name}`;
 
-          const data = await loadStream(context, streamid, fullBranchName);
+          const data = await loadStream(
+            context,
+            streamid,
+            fullBranchName,
+            false
+          );
           return {
             branch,
             data,
@@ -742,6 +781,16 @@ export default new Vuex.Store({
   modules: {},
 });
 
+export interface GetParentObjectInput {
+  streamid: string;
+  objecturl: string;
+}
+
+export interface GetObjectDetailsOut {
+  parent: IParamsParent;
+  children: IChildObject[];
+}
+
 export interface Region {
   key: string;
   name: string;
@@ -815,6 +864,7 @@ export interface GetActReportBranchInfoInput {
 export interface LoadActReportDataInput {
   streamId: string;
   branchName: string;
+  loadChildren?: boolean;
 }
 
 export interface CheckContainsChlidReportInput {
@@ -880,10 +930,11 @@ export interface UploadReportInput {
   reportTotals: ReportTotals;
   projectData: ProjectDataComplete;
   branchName: string;
+  newModel: AddParamsModel | undefined;
   selectedObjectGroup: string;
 }
 
-interface ObjectDetailsInput {
+export interface ObjectDetailsInput {
   streamid: string;
   objecturl: string;
 }

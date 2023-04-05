@@ -58,23 +58,15 @@ export default class VersionUpdateDialog extends Vue {
 
   features: { title: string; subtitle: string }[] = [
     {
-      title: "Updated Speckle Viewer",
-      subtitle: `Updated the Speckle Viewer to include some of the latest features.
-      It also speeds up the assessment and allows for running assessments on larger models.`,
+      title: "Report Object v2",
+      subtitle: `The way that we store your carbon reports has now changed. The update allows for faster loading, carbon heat maps, and gives you better access to your carbon report data in other apps that support Speckle connectors.`,
     }, {
-      title: "Excel data import",
-      subtitle: `Import your own materials data for use in your reports.
-      Click the "+" icon when making a new assessment or click "More" on the stream reports page.`
+      title: "Carbon Heat Map",
+      subtitle: `View a carbon heat map of your model after running a new report`
     }
   ];
 
-  fixes: { title: string; subtitle: string }[] = [
-    {
-      title: "Login bug",
-      subtitle: `Fixed a bug with login in leading to non-logged in users not being
-      properly redirected to the login page and instead seeing an error.`
-    }
-  ];
+  fixes: { title: string; subtitle: string }[] = [];
 
   @Emit("close")
   close() {

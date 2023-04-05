@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <loading-spinner v-if="loading" />
+    <loading-spinner v-if="loading" :text="loadingSpinnerText" />
     <v-container
       v-else
       fluid
@@ -21,6 +21,7 @@
           @close="close"
           @openFullView="openFullView"
           @createNewGroup="createNewObjectGroup"
+          @groupSelected="materialGroupSelected"
           :modal="modal"
           :streams="availableStreams"
           :types="types"
@@ -37,6 +38,8 @@
           :projectData="projectDataPassdown"
           :selectedObjects="selectedObjects"
           :invalidSelectedObjects="invalidSelectedObjects"
+          :objectGroups="objectGroups"
+          :defaultGroup="selectedObjectGroup"
         />
       </div>
       <Renderer
@@ -80,10 +83,13 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
+import * as AddParams from "./utils/add-params/addParams";
 
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
+
+import { findStringProps } from "./utils/propertyFiltering";
 
 import Renderer from "@/components/shared/Renderer.vue";
 import {
@@ -98,8 +104,7 @@ import {
 import {
   ProjectDataComplete,
   MaterialUpdateOut,
-  SpeckleObject,
-  SpeckleType,
+  MaterialGrouping,
   Step,
   TransportSelected,
   TransportType,
@@ -112,6 +117,8 @@ import {
   ObjectDetails,
   GroupedMaterial,
   SelectedMaterialEmit,
+  ObjectsObj,
+  StringPropertyGroups,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -128,12 +135,13 @@ import {
   GetAllReportBranchesOutput,
   LoadActReportDataInput,
   UploadReportInput,
+  GetObjectDetailsOut,
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
-import { LoadStreamOut } from "./utils/viewAssessmentUtils";
+import { LoadStreamOut } from "./utils/process-report-object";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
+import { ChartData } from "@/models/chart";
 
-type ObjectsObj = { [id: string]: SpeckleObject };
 interface AvailableStream {
   label: string;
   value: string;
@@ -154,6 +162,7 @@ export default class Assessment extends Vue {
   @Prop() modalBranchName!: string;
 
   loading = false;
+  loadingSpinnerText = "";
   loadingModel = false;
   loadingModelText = "";
   saveSuccess = true;
@@ -161,7 +170,7 @@ export default class Assessment extends Vue {
   availableStreams: AvailableStream[] = [];
   objectURLs: string[] = [];
   token = "";
-  types: SpeckleType[] = [];
+  types: MaterialGrouping[] = [];
   objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
@@ -172,9 +181,14 @@ export default class Assessment extends Vue {
   projectDataPassdown: ProjectDataComplete | null = null;
   allIds: string[] = [];
 
+  beenToTransport = false; // var to keep track of whether the user has been to the transport page, otherwise transport colors can be applied on data tab
+
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
+  addParams: AddParams.ParamAdd[] = [];
+  allChildObjs: AddParams.IChildObject[] = [];
+  parentObj: AddParams.IParamsParent | null = null;
   streamId = "";
 
   colors: Color[] = [];
@@ -192,7 +206,10 @@ export default class Assessment extends Vue {
   speckleVol = false; // whether the volume can be got from speckle props
   defaultBranchName = "main";
 
+  groupingProps: StringPropertyGroups[] = [];
+  objectGroups: string[] = [];
   groupedMaterials: GroupedMaterial[] = [];
+  selectedObjectGroup = "Object Type";
 
   update = false;
 
@@ -240,6 +257,12 @@ export default class Assessment extends Vue {
     );
   }
 
+  materialGroupSelected(objectGroup: string) {
+    this.types = this.findTypes(this.groupingProps, objectGroup);
+    this.selectedObjectGroup = objectGroup;
+    this.resetColors();
+  }
+
   async newBranchSelect(name: string) {
     const input: CheckContainsChlidReportInput = {
       streamid: this.streamId,
@@ -264,11 +287,18 @@ export default class Assessment extends Vue {
     this.streamId = streamId;
     this.update = true;
     await this.loadStream(streamId);
-    const input: LoadActReportDataInput = { streamId, branchName };
+    const input: LoadActReportDataInput = {
+      streamId,
+      branchName,
+      loadChildren: true,
+    };
     const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
       "loadActReportData",
       input
     );
+
+    const objGroup = assessmentViewData.data.selectedObjectGroup;
+    this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
     assessmentViewData.data.children.forEach((c) => {
       this.objectsObj[c.act.id] = {
         id: c.act.id,
@@ -278,7 +308,6 @@ export default class Assessment extends Vue {
       };
     });
 
-    this.types = this.findTypes(this.objectsObj);
     this.materialsColors = Object.values(this.objectsObj).map((o) => ({
       id: o.id,
       color: o.formData?.material?.color as string,
@@ -295,6 +324,8 @@ export default class Assessment extends Vue {
 
     this.totalVolume = assessmentViewData.data.projectInfo.volume;
     this.speckleVol = true;
+
+    this.resetColors();
   }
 
   async checkSave() {
@@ -323,12 +354,27 @@ export default class Assessment extends Vue {
   }
   async uploadReport(branchName: string) {
     if (this.report && this.report.reportObjs.length > 0) {
+      this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
+      let newModel: AddParams.AddParamsModel | undefined;
+      if (this.parentObj) {
+        newModel = await AddParams.addParams(
+          this.parentObj,
+          this.addParams,
+          this.$store.state.selectedServer.url,
+          this.token,
+          this.streamId,
+          this.allChildObjs
+        );
+      }
+
       const uploadReportInput: UploadReportInput = {
         streamid: this.streamId,
         objects: this.report.reportObjs,
         reportTotals: this.report.totals,
         projectData: this.projectData,
         branchName,
+        newModel,
+        selectedObjectGroup: this.selectedObjectGroup,
       };
       this.loading = true;
       await this.$store.dispatch("uploadReport", uploadReportInput);
@@ -361,27 +407,35 @@ export default class Assessment extends Vue {
       (p) => p.name.toLowerCase() === "volume"
     );
     this.volProp = volumeFilter ? volumeFilter.rawName : "";
-    if (!this.update) {
-      const res: ObjectDetails[] = await this.$store.dispatch(
-        "getObjectDetails",
-        {
-          streamid: this.streamId,
-          objecturl: this.objectURLs[0],
-        }
-      );
 
-      let totalVol = 0;
-      const filteredRes = res.filter(
-        (r) =>
-          r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
-          r.speckle_type !== "Objects.Geometry.Mesh"
-      );
+    const res: GetObjectDetailsOut = await this.$store.dispatch(
+      "getObjectDetails",
+      {
+        streamid: this.streamId,
+        objecturl: this.objectURLs[0],
+      }
+    );
 
-      if (volumeFilter) {
-        this.speckleVol = true;
-        filteredRes.forEach((r) => {
-          const volume = this.findVolume(r, volumeFilter);
-          if (volume) {
+    this.allChildObjs = res.children;
+    this.parentObj = res.parent;
+
+    let totalVol = 0;
+    const filteredRes = this.allChildObjs.filter(
+      (r) =>
+        r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
+        r.speckle_type !== "Objects.Geometry.Mesh"
+    );
+
+    const speckleObjsPropsSearch: any[] = [];
+
+    if (volumeFilter) {
+      const childObjects: ObjectDetails[] = [];
+      this.speckleVol = true;
+      filteredRes.forEach((r) => {
+        const volume = this.findVolume(r, volumeFilter);
+        if (volume) {
+          speckleObjsPropsSearch.push(r);
+          if (!this.update) {
             this.objectsObj[r.id] = {
               id: r.id,
               speckle_type: r.speckle_type,
@@ -389,21 +443,33 @@ export default class Assessment extends Vue {
                 volume: volume,
               },
             };
+            childObjects.push(r);
             // also find total volume here to avoid needing to loop through objects again
             totalVol += volume;
           }
-        });
-      } else {
-        this.speckleVol = false;
-        filteredRes.forEach((r) => {
+          // also find total volume here to avoid needing to loop through objects again
+          totalVol += volume;
+        }
+      });
+    } else {
+      this.speckleVol = false;
+      filteredRes.forEach((r) => {
+        if (!this.update) {
           this.objectsObj[r.id] = {
             id: r.id,
             speckle_type: r.speckle_type,
           };
-        });
-      }
+        }
+      });
+    }
+    this.groupingProps = findStringProps(
+      speckleObjsPropsSearch,
+      this.objectsObj
+    );
+    this.objectGroups = this.groupingProps.map((gp) => gp.name);
 
-      this.types = this.findTypes(this.objectsObj);
+    this.types = this.findTypes(this.groupingProps, this.selectedObjectGroup);
+    if (!this.update) {
       this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
     }
@@ -462,6 +528,7 @@ export default class Assessment extends Vue {
         this.colors = this.materialsColors;
         break;
       case Step.TRANSPORT:
+        this.beenToTransport = true;
         this.resetColors();
         this.colors = this.transportColors;
         this.groupMaterials();
@@ -590,9 +657,6 @@ export default class Assessment extends Vue {
 
     this.volumeGradient = {
       property: this.volProp,
-      minValue: minVol,
-      maxValue: maxVol,
-      colors: ["#4f7bff", "#ff4f84"],
     };
   }
 
@@ -600,6 +664,7 @@ export default class Assessment extends Vue {
   carbonCalc() {
     // convert objects from SpeckleObject to SpeckleObjectFormComplete
     const objs = this.convertToFormComplete();
+    this.addParams = [];
 
     const reportObjs = objs.map((o): SpeckleObjectComplete => {
       const A1A3 = productStageCarbonA1A3(o);
@@ -610,6 +675,105 @@ export default class Assessment extends Vue {
         site: A5Site,
         waste: A5Waste,
       });
+
+      // make parameter update object
+      this.addParams.push({
+        parentid: o.id,
+        name: "Total Carbon",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Total Carbon",
+          units: "kgCO2e/kg",
+          value: A4 + A1A3 + A5Value,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Product Stage Carbon A1-A3",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Product Stage Carbon A1-A3",
+          units: "kgCO2e/kg",
+          value: A1A3,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Transport Carbon A4",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Transport Carbon A4",
+          units: "kgCO2e/kg",
+          value: A4,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Transport Carbon A4",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Transport Carbon A4",
+          units: "kgCO2e/kg",
+          value: A4,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      this.addParams.push({
+        parentid: o.id,
+        name: "Construction Carbon A5",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Construction Carbon A5",
+          units: "kgCO2e/kg",
+          value: A5Value,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      // end parameter update
+
       return {
         ...o,
         reportData: {
@@ -620,6 +784,7 @@ export default class Assessment extends Vue {
             waste: A5Waste,
             site: A5Site,
           },
+          totalCarbon: A4 + A1A3 + A5Value,
         },
       };
     });
@@ -638,6 +803,9 @@ export default class Assessment extends Vue {
     let A5Site = 0;
     let A5Waste = 0;
     let A5Value = 0;
+    const materialsObj: {
+      [key: string]: { value: number; color: string };
+    } = {};
     reportObjs.forEach((o) => {
       const rd = o.reportData;
       A1A3 += rd.productStageCarbonA1A3;
@@ -645,8 +813,23 @@ export default class Assessment extends Vue {
       A5Site += rd.constructionCarbonA5.site;
       A5Waste += rd.constructionCarbonA5.waste;
       A5Value += rd.constructionCarbonA5.value;
+      const objTotal = A1A3 + A4 + A5Value;
+      const materialName = o.formData.material.name;
+      if (materialName in materialsObj) {
+        materialsObj[materialName].value += objTotal;
+      } else {
+        materialsObj[materialName] = {
+          value: objTotal,
+          color: o.formData.material.color,
+        };
+      }
     });
     let totalCO2 = A1A3 + A4 + A5Value;
+    const materials: ChartData[] = Object.entries(materialsObj).map((m) => ({
+      value: m[1].value,
+      label: m[0],
+      color: m[1].color,
+    }));
 
     return {
       transportCarbonA4: A4,
@@ -658,6 +841,9 @@ export default class Assessment extends Vue {
       },
       totalCO2,
       volume: this.totalVolume,
+      materials,
+      materialsColors: this.materialsColors,
+      transportColors: this.transportColors,
     };
   }
 
@@ -713,26 +899,28 @@ export default class Assessment extends Vue {
   }
 
   transportSelected(selected: TransportSelected) {
-    const ids = selected.material.objects;
-    this.colors = this.colors.filter((c) => !ids.includes(c.id));
-    ids.forEach((id) => {
-      this.colors.push({
-        color: selected.transportType.color,
-        id,
+    if (this.beenToTransport) {
+      const ids = selected.material.objects;
+      this.colors = this.colors.filter((c) => !ids.includes(c.id));
+      ids.forEach((id) => {
+        this.colors.push({
+          color: selected.transportType.color,
+          id,
+        });
       });
-    });
-    this.transportColors = this.colors;
+      this.transportColors = this.colors;
 
-    selected.material.objects.forEach((i) => {
-      const oldObj = this.objectsObj[i];
-      this.objectsObj[i] = {
-        ...oldObj,
-        formData: {
-          ...oldObj.formData,
-          transport: selected.transportType,
-        },
-      };
-    });
+      selected.material.objects.forEach((i) => {
+        const oldObj = this.objectsObj[i];
+        this.objectsObj[i] = {
+          ...oldObj,
+          formData: {
+            ...oldObj.formData,
+            transport: selected.transportType,
+          },
+        };
+      });
+    }
   }
 
   materialUpdated(material: MaterialUpdateOut) {
@@ -740,7 +928,6 @@ export default class Assessment extends Vue {
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
       try {
-        this.objectsObj[id].speckle_type = material.type.type;
         this.colors.push({
           color: material.material.color,
           id,
@@ -764,25 +951,29 @@ export default class Assessment extends Vue {
     });
   }
 
-  findTypes(objects: ObjectsObj): SpeckleType[] {
-    let types: SpeckleType[] = [];
-
-    Object.values(objects).forEach((o) => {
-      let typeIndex = -1;
-      types.forEach((t, i) => {
-        if (t.type === o.speckle_type) typeIndex = i;
-      });
-      if (typeIndex !== -1) types[typeIndex].ids.push(o.id);
-      else
-        types.push({
-          type: o.speckle_type,
-          ids: [o.id],
-          material: o.formData?.material,
-          transport: o.formData?.transport,
-        });
-    });
-
-    return types;
+  // types = material groups, cuz legacy
+  findTypes(
+    propertyGroups: StringPropertyGroups[],
+    selectedGroup: string
+  ): MaterialGrouping[] {
+    const group = propertyGroups.find((pg) => pg.name === selectedGroup);
+    if (group) {
+      // we're assuming that if this.update=true then objectsObj will already be filled by this point
+      const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(
+        (vg) => ({
+          type: vg.value,
+          ids: vg.ids,
+          material: this.update
+            ? this.objectsObj[vg.ids[0]].formData?.material
+            : undefined,
+          transport: this.update
+            ? this.objectsObj[vg.ids[0]].formData?.transport
+            : undefined,
+        })
+      );
+      return materialGrouping;
+    }
+    return [];
   }
 
   uploadData(data: ProjectDataComplete) {

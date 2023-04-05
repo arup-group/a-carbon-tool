@@ -54,9 +54,12 @@
             :materials="materials"
             :selectedObjects="selectedObjects"
             :invalidObjects="invalidSelectedObjects"
+            :objectGroups="objectGroups"
+            :defaultGroup="defaultGroup"
             @materialUpdated="materialUpdated"
             @createNewGroup="createNewGroup"
             @selectMaterial="selectMaterial"
+            @groupSelected="groupSelected"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 1" color="primary">
@@ -192,7 +195,7 @@ import {
   ProjectDataComplete,
   ProjectDataTemp,
   MaterialUpdateOut,
-  SpeckleType,
+  MaterialGrouping,
   Step,
   TransportSelected,
   TransportType,
@@ -208,7 +211,7 @@ import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 })
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
-  @Prop() types!: SpeckleType[];
+  @Prop() types!: MaterialGrouping[];
   @Prop() materials!: MaterialFull[];
   @Prop() transportTypes!: TransportType[];
   @Prop() totalVolume!: number;
@@ -226,6 +229,9 @@ export default class AssessmentStepper extends Vue {
 
   @Prop() selectedObjects!: string[];
   @Prop() invalidSelectedObjects!: boolean;
+
+  @Prop() objectGroups!: string[];
+  @Prop() defaultGroup!: string;
 
   form: ProjectDataTemp = this.update
     ? this.projectData
@@ -344,6 +350,11 @@ export default class AssessmentStepper extends Vue {
   @Emit("checkSave")
   checkSave() {
     return;
+  }
+
+  @Emit("groupSelected")
+  groupSelected(objectGroup: string) {
+    return objectGroup;
   }
 
   @Emit("calcVol")

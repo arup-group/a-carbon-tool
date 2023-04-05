@@ -1,7 +1,14 @@
 <template>
   <div>
     <v-form>
-      <strong>Objects by speckle type</strong>
+      <div class="d-flex align-center">
+        <strong class="mr-3">Objects grouped by:</strong>
+        <v-combobox
+          v-model="objectGroup"
+          :items="objectGroups"
+          @change="groupSelected"
+        ></v-combobox>
+      </div>
       <div v-for="type in loadedTypes" :key="type.type" style="width: 100%">
         <material-type
           :materials="materials"
@@ -13,6 +20,7 @@
     </v-form>
     <v-divider class="pb-4 mt-4"></v-divider>
     <custom-group
+      :key="groupKey"
       :invalidObjects="invalidObjects"
       :selectedObjects="selectedObjects"
       @createNewGroup="createNewGroup"
@@ -21,9 +29,9 @@
 </template>
 
 <script lang="ts">
-import { SelectedMaterialEmit, SpeckleType } from "@/models/newAssessment";
+import { SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 
 import MaterialType from "./MaterialType.vue";
 import CustomGroup from "./CustomGroup.vue";
@@ -32,10 +40,22 @@ import CustomGroup from "./CustomGroup.vue";
   components: { MaterialType, CustomGroup },
 })
 export default class Menu2 extends Vue {
-  @Prop() types!: SpeckleType[];
+  @Prop() types!: MaterialGrouping[];
   @Prop() materials!: MaterialFull[];
   @Prop() selectedObjects!: string[];
   @Prop() invalidObjects!: boolean;
+  @Prop() objectGroups!: string[];
+  @Prop() defaultGroup!: string;
+
+  _objectGroup = "";
+  get objectGroup() {
+    return this.defaultGroup;
+  }
+  set objectGroup(val: string) {
+    this._objectGroup = val;
+  }
+
+  groupKey = 0;
 
   get loadedTypes() {
     return this.types ? this.types : [];
@@ -54,6 +74,12 @@ export default class Menu2 extends Vue {
   @Emit("selectMaterial")
   selectMaterial(selectedMaterial: SelectedMaterialEmit) {
     return selectedMaterial;
+  }
+
+  @Emit("groupSelected")
+  groupSelected() {
+    this.groupKey++;
+    return this._objectGroup;
   }
 }
 </script>

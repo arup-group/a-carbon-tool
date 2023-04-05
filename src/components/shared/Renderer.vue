@@ -93,7 +93,7 @@ function instanceOfStringPropertyInfo(
 }
 
 @Component({
-  components: { RendererLightingOptions }
+  components: { RendererLightingOptions },
 })
 export default class extends Vue {
   @Prop() objecturls!: string[];
@@ -126,9 +126,12 @@ export default class extends Vue {
   }
 
   @Watch("colors")
-  onObjectColorChanged(value: Color[]) {
+  async onObjectColorChanged(value: Color[]) {
     if (value.length === 0 || this.gradientColorProperty) this.resetColors();
-    else this.setColors(value);
+    else {
+      await this.resetColors();
+      this.setColors(value);
+    }
   }
 
   @Watch("selectedIds")
@@ -136,12 +139,12 @@ export default class extends Vue {
     this.setSelect();
   }
 
-  @Watch("gradientColorProperty")
+  @Watch("gradientColorProperty", { deep: true })
   async onGradientChange(value: GradientColor) {
     if (value) {
       const propertyData = this.viewer.getObjectProperties();
       const data = propertyData.find((v) => v.key === value.property);
-      if (data) this.viewer.setColorFilter(data);
+      if (data) await this.viewer.setColorFilter(data);
     }
   }
 
@@ -156,7 +159,6 @@ export default class extends Vue {
     this.renderStream(this.objecturls);
   }
   async beforeDestroy() {
-    await this.viewer.cancelLoad(this.objecturls[0], true);
     await this.viewer.unloadAll();
   }
   @Watch("objecturls")
@@ -169,6 +171,7 @@ export default class extends Vue {
   async renderStream(objecturls: string[]) {
     if (this.$store.state.speckleViewer.viewer) {
       this.viewer = this.$store.state.speckleViewer.viewer;
+      await this.viewer.unloadAll();
 
       this.domElement = this.$store.state.speckleViewer.container;
 
@@ -189,6 +192,8 @@ export default class extends Vue {
         ...DefaultViewerParams,
         showStats: false,
       });
+
+      await this.viewer.unloadAll();
 
       this.$store.commit("setSpeckleViewer", {
         viewer: this.viewer,
@@ -335,7 +340,7 @@ export default class extends Vue {
       objectIds: c[1],
       color: c[0],
     }));
-    const res = await this.viewer.setUserObjectColors(
+    await this.viewer.setUserObjectColors(
       groups as [{ objectIds: string[]; color: string }]
     );
   }

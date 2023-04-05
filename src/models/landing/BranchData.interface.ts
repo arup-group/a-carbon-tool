@@ -1,4 +1,4 @@
-import { LoadStreamOut } from "@/views/utils/viewAssessmentUtils";
+import { LoadStreamOut } from "@/views/utils/process-report-object";
 
 export interface BranchData {
   id: string;

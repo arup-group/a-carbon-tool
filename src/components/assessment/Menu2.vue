@@ -47,13 +47,15 @@ export default class Menu2 extends Vue {
   @Prop() objectGroups!: string[];
   @Prop() defaultGroup!: string;
 
-  groupKey = 0;
-  defaultGroupSet = false;
-  objectGroup = this.defaultGroup ? this.defaultGroup : "Object Type";
-  @Watch("defaultGroup")
-  defaultGroupChange() {
-    this.objectGroup = this.defaultGroup;
+  _objectGroup = "";
+  get objectGroup() {
+    return this.defaultGroup;
   }
+  set objectGroup(val: string) {
+    this._objectGroup = val;
+  }
+
+  groupKey = 0;
 
   get loadedTypes() {
     return this.types ? this.types : [];
@@ -77,7 +79,7 @@ export default class Menu2 extends Vue {
   @Emit("groupSelected")
   groupSelected() {
     this.groupKey++;
-    return this.objectGroup;
+    return this._objectGroup;
   }
 }
 </script>

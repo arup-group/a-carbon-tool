@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <back-button style="z-index: 1;" :overrideRoute="true" @back="back" />
+    <back-button style="z-index: 1" :overrideRoute="true" @back="back" />
     <loading-container :error="error" :loading="loading" @retry="loadReport">
       <template v-slot="{ loaded }">
         <v-container
@@ -10,12 +10,19 @@
         >
           <div class="d-flex flex-column justify-space-between card-container">
             <project-info-card class="card" :projectInfo="projectInfo" />
+            <renderer-cotnrols-card
+              v-if="!isV1"
+              class="card"
+              @selectChanged="selectChanged"
+            />
           </div>
           <Renderer
             v-if="urlsLoaded && chartDataReady"
+            @loaded="rendererLoaded"
             :objecturls="objectUrls"
             :token="token"
             :colors="colors"
+            :gradientColorProperty="gradientColorProperty"
             class="renderer"
           />
           <div
@@ -41,9 +48,11 @@ import Renderer from "@/components/shared/Renderer.vue";
 import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
-import { Color } from "@/models/renderer";
+import RendererCotnrolsCard from "@/components/viewAssessment/RendererControlsCard.vue";
+
+import { Color, GradientColor } from "@/models/renderer";
 import { LoadActReportDataInput } from "@/store";
-import { ILoadStreamData, LoadStreamOut } from "./utils/viewAssessmentUtils";
+import { ILoadStreamData, LoadStreamOut } from "./utils/process-report-object";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 import BackButton from "@/components/shared/BackButton.vue";
@@ -56,6 +65,7 @@ import BackButton from "@/components/shared/BackButton.vue";
     MaterialBreakdownCard,
     LoadingContainer,
     BackButton,
+    RendererCotnrolsCard,
   },
 })
 export default class ViewAssessment extends Vue {
@@ -63,19 +73,38 @@ export default class ViewAssessment extends Vue {
   token!: string;
   chartDataReady = false;
   colors: Color[] = [];
+  materialColors: Color[] = [];
+  gradientColorProperty: GradientColor | null = null;
   assessment!: ILoadStreamData;
   loading = true;
   error = false;
   streamId = this.$route.params.streamId;
+  isV1 = false;
 
   mounted() {
-    this.$store
-      .dispatch("getObjectUrls", this.streamId)
-      .then((res: string[]) => {
-        this.objectUrls = [res[0]];
-      });
-
     this.token = this.$store.state.token.token;
+  }
+
+  selectChanged(property: string) {
+    if (property === "materials") {
+      this.gradientColorProperty = null;
+      this.colors = [];
+      this.colors = this.materialColors;
+    } else if (property === "none") {
+      this.colors = [];
+    } else {
+      this.colors = [];
+      this.gradientColorProperty = {
+        property,
+      };
+    }
+  }
+
+  rendererLoaded() {
+    // this.gradientColorProperty = {
+    //   property: "parameters.Total Carbon.value",
+    // };
+    this.colors = this.materialColors;
   }
 
   back() {
@@ -91,13 +120,33 @@ export default class ViewAssessment extends Vue {
     this.error = false;
     try {
       const { streamId, branchName } = this.$route.params;
-      const input: LoadActReportDataInput = { streamId, branchName };
+      const input: LoadActReportDataInput = {
+        streamId,
+        branchName,
+        loadChildren: true,
+      };
       const assessmentViewData: LoadStreamOut = await this.$store.dispatch(
         "loadActReportData",
         input
       );
+      if (assessmentViewData.version === "v1") {
+        this.isV1 = true;
+        this.$store
+          .dispatch("getObjectUrls", this.streamId)
+          .then((res: string[]) => {
+            this.objectUrls = [res[0]];
+            this.colors = assessmentViewData.colors;
+          });
+      } else {
+        this.objectUrls = [
+          `${this.$store.state.selectedServer.url}/streams/${streamId}/objects/${assessmentViewData.data.modelId}`,
+        ];
+        this.materialColors = assessmentViewData.colors.map((c) => ({
+          ...c,
+          id: assessmentViewData.data.idMapper[c.id],
+        }));
+      }
       this.assessment = assessmentViewData.data;
-      this.colors = assessmentViewData.colors;
       this.chartDataReady = assessmentViewData.ready;
       this.loading = false;
     } catch (err) {

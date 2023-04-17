@@ -9,7 +9,7 @@
     ]"
   >
     <v-row dense align="center">
-      <v-col cols="12" md="4" class="pl-2">
+      <v-col cols="12" md="3" class="pl-2">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
@@ -19,7 +19,7 @@
           <span>Objects: {{ type.ids.length }} </span>
         </v-tooltip>
       </v-col>
-      <v-col coles="12" md="8" class="pr-2">
+      <v-col coles="12" md="7" class="pr-2">
         <v-combobox
           v-model="currentMaterial"
           :items="materials"
@@ -36,6 +36,13 @@
           </template>
         </v-combobox>
       </v-col>
+      <v-col md="2" v-if="expandOption">
+        <v-btn fab small @click="expandSelection">
+          <v-icon>
+            mdi-plus
+          </v-icon>
+        </v-btn>
+      </v-col>
     </v-row>
     <div class="d-flex align-center justify-space-between"></div>
   </v-card>
@@ -49,6 +56,7 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: MaterialGrouping;
+  @Prop() expandOption!: boolean;
 
   currentMaterial = this.type && this.type.material ? this.type.material : null;
   filtered = true;
@@ -63,6 +71,11 @@ export default class MaterialType extends Vue {
       ids: this.type.ids,
       type: this.type.type
     };
+  }
+
+  @Emit("expandSelection")
+  expandSelection() {
+    return this.type;
   }
 
   cleanType(type: string) {

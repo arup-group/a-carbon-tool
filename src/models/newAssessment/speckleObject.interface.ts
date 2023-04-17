@@ -13,9 +13,14 @@ export interface SpeckleObject {
   reportData?: ReportDataChild;
 }
 
+export interface MultiMaterial {
+  material: MaterialFull;
+  percentage: number;
+}
+
 export interface ObjectFormData {
   transport?: TransportType;
-  material?: MaterialFull;
+  material?: MaterialFull;// | MultiMaterial[];
   volume?: number;
 }
 
@@ -29,7 +34,7 @@ export interface SpeckleObjectFormComplete {
 
 export interface ObjectFormDataComplete {
   transport: TransportType;
-  material: MaterialFull;
+  material: MaterialFull;// | MultiMaterial[];
   volume: number;
 }
 

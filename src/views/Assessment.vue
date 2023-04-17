@@ -120,7 +120,10 @@ import {
   ObjectsObj,
   StringPropertyGroups,
 } from "@/models/newAssessment";
-import { MaterialFull } from "@/store/utilities/material-carbon-factors";
+import {
+  instanceOfMaterialFull,
+  MaterialFull,
+} from "@/store/utilities/material-carbon-factors";
 
 import * as THREE from "three";
 import {
@@ -591,22 +594,24 @@ export default class Assessment extends Vue {
 
     // assuming that the materials section has been filled out already
     Object.values(this.objectsObj).forEach((o) => {
-      const material = o.formData?.material?.name;
-      const speckle_type = o.speckle_type;
-      if (material) {
-        if (
-          materialsObj[material] &&
-          materialsObj[material].speckle_types[speckle_type]
-        ) {
-          materialsObj[material].speckle_types[speckle_type].push(o.id);
-        } else if (materialsObj[material]) {
-          materialsObj[material].speckle_types[speckle_type] = [o.id];
-        } else {
-          materialsObj[material] = {
-            speckle_types: {},
-            transportType: o.formData?.transport,
-          };
-          materialsObj[material].speckle_types[speckle_type] = [o.id];
+      if (instanceOfMaterialFull(o.formData?.material)) {
+        const material = o.formData?.material?.name;
+        const speckle_type = o.speckle_type;
+        if (material) {
+          if (
+            materialsObj[material] &&
+            materialsObj[material].speckle_types[speckle_type]
+          ) {
+            materialsObj[material].speckle_types[speckle_type].push(o.id);
+          } else if (materialsObj[material]) {
+            materialsObj[material].speckle_types[speckle_type] = [o.id];
+          } else {
+            materialsObj[material] = {
+              speckle_types: {},
+              transportType: o.formData?.transport,
+            };
+            materialsObj[material].speckle_types[speckle_type] = [o.id];
+          }
         }
       }
     });

@@ -669,12 +669,7 @@ export default class Assessment extends Vue {
     const reportObjs = objs.map((o): SpeckleObjectComplete => {
       const A1A3 = productStageCarbonA1A3(o);
       const A4 = transportCarbonA4(o);
-      const A5Site = constructionCarbonA5Site(this.projectData.cost);
       const A5Waste = constructionCarbonA5Waste(o);
-      const A5Value = constructionCarbonA5({
-        site: A5Site,
-        waste: A5Waste,
-      });
 
       // make parameter update object
       this.addParams.push({
@@ -684,7 +679,7 @@ export default class Assessment extends Vue {
           id: Math.floor(Math.random() * 10000000).toString(),
           name: "Total Carbon",
           units: "kgCO2e/kg",
-          value: A4 + A1A3 + A5Value,
+          value: A4 + A1A3 + A5Waste,
           isShared: false,
           isReadOnly: false,
           speckle_type: "Objects.BuiltElements.Revit.Parameter",
@@ -736,31 +731,12 @@ export default class Assessment extends Vue {
       });
       this.addParams.push({
         parentid: o.id,
-        name: "Transport Carbon A4",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Transport Carbon A4",
-          units: "kgCO2e/kg",
-          value: A4,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
         name: "Construction Carbon A5",
         param: {
           id: Math.floor(Math.random() * 10000000).toString(),
           name: "Construction Carbon A5",
           units: "kgCO2e/kg",
-          value: A5Value,
+          value: A5Waste,
           isShared: false,
           isReadOnly: false,
           speckle_type: "Objects.BuiltElements.Revit.Parameter",
@@ -780,11 +756,13 @@ export default class Assessment extends Vue {
           transportCarbonA4: A4,
           productStageCarbonA1A3: A1A3,
           constructionCarbonA5: {
-            value: A5Value,
+            // site only kept for consistency with old versions of report. Value as refactoring to not include would be a pain
+            value: A5Waste,
             waste: A5Waste,
-            site: A5Site,
+            site: 0,
           },
-          totalCarbon: A4 + A1A3 + A5Value,
+          // only add A5Waste to total carbon for individual child objects as A5Site is applied model-wide
+          totalCarbon: A4 + A1A3 + A5Waste,
         },
       };
     });
@@ -800,9 +778,7 @@ export default class Assessment extends Vue {
   calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {
     let A1A3 = 0;
     let A4 = 0;
-    let A5Site = 0;
     let A5Waste = 0;
-    let A5Value = 0;
     const materialsObj: {
       [key: string]: { value: number; color: string };
     } = {};
@@ -810,10 +786,8 @@ export default class Assessment extends Vue {
       const rd = o.reportData;
       A1A3 += rd.productStageCarbonA1A3;
       A4 += rd.transportCarbonA4;
-      A5Site += rd.constructionCarbonA5.site;
       A5Waste += rd.constructionCarbonA5.waste;
-      A5Value += rd.constructionCarbonA5.value;
-      const objTotal = A1A3 + A4 + A5Value;
+      const objTotal = A1A3 + A4 + A5Waste;
       const materialName = o.formData.material.name;
       if (materialName in materialsObj) {
         materialsObj[materialName].value += objTotal;
@@ -824,6 +798,9 @@ export default class Assessment extends Vue {
         };
       }
     });
+    let A5Site = constructionCarbonA5Site(this.projectData.cost);
+    let A5Value = A5Site + A5Waste
+
     let totalCO2 = A1A3 + A4 + A5Value;
     const materials: ChartData[] = Object.entries(materialsObj).map((m) => ({
       value: m[1].value,

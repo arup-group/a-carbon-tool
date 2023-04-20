@@ -58,7 +58,7 @@ export default class RendererControlsCard extends Vue {
       value: "parameters.Transport Carbon A4.value",
     },
     {
-      name: "Construction Carbon A5",
+      name: "Construction Carbon A5w",
       value: "parameters.Construction Carbon A5.value",
     },
     {

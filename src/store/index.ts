@@ -1,11 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import * as speckleUtil from "./speckle/speckleUtil";
-import { LoadStreamOut, getChildren } from "@/views/utils/process-report-object";
 import {
-  loadParent,
-  loadStream,
-} from "@/views/utils/viewAssessmentUtils";
+  LoadStreamOut,
+  getChildren,
+} from "@/views/utils/process-report-object";
+import { loadParent, loadStream } from "@/views/utils/viewAssessmentUtils";
 import {
   Login,
   Server,
@@ -90,8 +90,12 @@ export default new Vuex.Store({
       : window.matchMedia("(prefers-color-scheme: dark)").matches,
 
     // Carbon data
-    selectedRegion: { key: "UK", name: "UK"} as Region,
-    availableRegions: [{ key: "India", name: "India"}, { key: "Netherlands", name: "Netherlands" }, { key: "UK", name: "UK"}] as Region[],
+    selectedRegion: { key: "UK", name: "UK" } as Region,
+    availableRegions: [
+      { key: "India", name: "India" },
+      { key: "Netherlands", name: "Netherlands" },
+      { key: "UK", name: "UK" },
+    ] as Region[],
     becs: [
       {
         name: "Superstructure" as BECName,
@@ -194,8 +198,8 @@ export default new Vuex.Store({
 
     // needs updating to cover region selection
     materialsArr: (state): MaterialFull[] => {
-      const region: keyof AllMaterialCarbonFactors =
-        state.selectedRegion.key as keyof AllMaterialCarbonFactors;
+      const region: keyof AllMaterialCarbonFactors = state.selectedRegion
+        .key as keyof AllMaterialCarbonFactors;
       const tmparr = (
         Object.keys(materialCarbonFactors[region]) as Array<
           keyof RegionMaterialCarbonFactors
@@ -281,7 +285,7 @@ export default new Vuex.Store({
   },
   actions: {
     changeRegion(context, key) {
-      const region = context.state.availableRegions.find(r => r.key === key);
+      const region = context.state.availableRegions.find((r) => r.key === key);
       context.commit("setRegion", region);
     },
 
@@ -329,7 +333,10 @@ export default new Vuex.Store({
         context.commit("setServerInfo", data.serverInfo);
       } catch (err: any) {
         console.error(err);
-        if (err === AuthError.NOT_SIGNED_IN || err.message === AuthError.NOT_SIGNED_IN)
+        if (
+          err === AuthError.NOT_SIGNED_IN ||
+          err.message === AuthError.NOT_SIGNED_IN
+        )
           throw new Error(AuthError.NOT_SIGNED_IN);
       }
     },
@@ -487,18 +494,37 @@ export default new Vuex.Store({
       }: UploadReportInput
     ) {
       if (newModel) {
-        const formData = new FormData();
-        formData.append(
-          "batch1",
-          new Blob([JSON.stringify([newModel.parent, ...newModel.children])])
+        const combined = [newModel.parent, ...newModel.children];
+        console.log("newModel:", newModel);
+
+        const combinedSplit: (IParamsParent | IChildObject)[][] = [];
+        const batchSize = 100;
+        for (let i = 0; i < combined.length; i += batchSize) {
+          combinedSplit.push(
+            combined.slice(i, Math.min(i + batchSize, combined.length))
+          );
+        }
+        await Promise.all(
+          combinedSplit.map((c) => {
+            const formData = new FormData();
+            formData.append(
+              "batch1",
+              new Blob([
+                JSON.stringify([c]),
+              ])
+            );
+            return fetch(
+              `${context.state.selectedServer.url}/objects/${streamid}`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${context.state.token.token}`,
+                },
+                body: formData,
+              }
+            );
+          })
         );
-        await fetch(`${context.state.selectedServer.url}/objects/${streamid}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${context.state.token.token}`,
-          },
-          body: formData,
-        });
       }
 
       branchName = `${context.state.speckleFolderName}/${branchName}`;
@@ -541,7 +567,7 @@ export default new Vuex.Store({
             referencedId: modelId,
           },
         ],
-        selectedObjectGroup
+        selectedObjectGroup,
       };
       children.push(modelId); // add model id to children array so it gets added to __closure properly
       formData.append(
@@ -770,7 +796,10 @@ export default new Vuex.Store({
               // carbonFactor[branchName] = groups;
 
               materialCarbonFactors[branchName] = groups;
-              const region: Region = { key: branchName, name: branchName.split(" ").slice(0, -1).join(" ") };
+              const region: Region = {
+                key: branchName,
+                name: branchName.split(" ").slice(0, -1).join(" "),
+              };
               context.commit("addRegion", region);
             })
           );

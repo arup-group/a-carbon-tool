@@ -92,10 +92,11 @@ export interface AddParamsModel {
 }
 
 export async function testRun(url: string, token: string, params: ParamAdd[]) {
-  const streamid = "465e7157fe";
-  const parentObjId = "6607c6f15e6057fee92585125a9d015a";
+  console.log("adding params")
+  const streamid1 = "4a48b650af";
+  const parentObjId = "e0965cb466f45fce6d949fb33f8992d7";
   const parent: IParamsParent = await fetch(
-    `${url}/objects/${streamid}/${parentObjId}/single`,
+    `${url}/objects/${streamid1}/${parentObjId}/single`,
     {
       method: "GET",
       headers: {
@@ -105,20 +106,35 @@ export async function testRun(url: string, token: string, params: ParamAdd[]) {
     }
   ).then((d) => d.json());
 
-  const res = await addParams(parent, params, url, token, streamid);
+  const res = await addParams(parent, params, url, token, streamid1);
 
-  const formData = new FormData();
-  formData.append(
-    "batch1",
-    new Blob([JSON.stringify([res.parent, ...res.children])])
-  );
-  await fetch(`${url}/objects/${streamid}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
+  const combined = [res.parent, ...res.children];
+
+  const combinedSplit: (IParamsParent | IChildObject)[][] = [];
+  const batchSize = 100;
+  for (let i = 0; i < combined.length; i+= batchSize) {
+    combinedSplit.push(combined.slice(i, Math.min(i + batchSize, combined.length)));
+  }
+
+  console.log("combinedSplit:", combinedSplit);
+
+  await Promise.all(combinedSplit.map((c) => {
+    const formData = new FormData();
+    formData.append(
+      "batch1",
+      new Blob([JSON.stringify(c)])
+    );
+    const streamid2 = "465e7157fe";
+    return fetch(`${url}/objects/${streamid2}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+  }))
+
+  console.log("res:", res);
 }
 
 export async function addParams(
@@ -194,33 +210,36 @@ export async function addParams(
 
   // 4. create and update new parent object
   // add new id
-  const newParentObj: IParamsParent = {
-    ...parent,
-    id: newParentId,
-  };
+  // const newParentObj: IParamsParent = {
+  //   ...parent,
+  //   id: newParentId,
+  // };
 
   // update __closure to new child id's
   const newClosure: { [key: string]: number } = {};
-  Object.entries(newParentObj.__closure).forEach(([key, value]) => {
+  Object.entries(parent.__closure).forEach(([key, value]) => {
     if (idMapper[key]) {
       newClosure[idMapper[key]] = value;
     } else {
       newClosure[key] = value;
     }
   });
+  const newParentObj: IParamsParent = convertObj(parent, idMapper);
+  newParentObj.id = newParentId;
   newParentObj.__closure = newClosure;
+  // newParentObj.__closure = newClosure;
 
   // update all reference fields (fields that start with an @)
-  Object.keys(newParentObj).forEach((key) => {
-    if (key.startsWith("@")) {
-      const records = newParentObj[key] as ReferenceObject[];
-      const newRecords = records.map((r) => ({
-        ...r,
-        referencedId: idMapper[r.referencedId],
-      }));
-      newParentObj[key] = newRecords;
-    }
-  });
+  // Object.keys(newParentObj).forEach((key) => {
+  //   if (key.startsWith("@")) {
+  //     const records = newParentObj[key] as ReferenceObject[];
+  //     const newRecords = records.map((r) => ({
+  //       ...r,
+  //       referencedId: idMapper[r.referencedId],
+  //     }));
+  //     newParentObj[key] = newRecords;
+  //   }
+  // });
 
   return {
     parent: newParentObj,

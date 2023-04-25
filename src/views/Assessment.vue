@@ -787,7 +787,7 @@ export default class Assessment extends Vue {
       A1A3 += rd.productStageCarbonA1A3;
       A4 += rd.transportCarbonA4;
       A5Waste += rd.constructionCarbonA5.waste;
-      const objTotal = A1A3 + A4 + A5Waste;
+      const objTotal = rd.productStageCarbonA1A3 + rd.transportCarbonA4 + rd.constructionCarbonA5.waste;
       const materialName = o.formData.material.name;
       if (materialName in materialsObj) {
         materialsObj[materialName].value += objTotal;

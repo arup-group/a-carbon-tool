@@ -92,7 +92,7 @@ export interface AddParamsModel {
 }
 
 export async function testRun(url: string, token: string, params: ParamAdd[]) {
-  console.log("adding params")
+  console.log("adding params");
   const streamid1 = "4a48b650af";
   const parentObjId = "e0965cb466f45fce6d949fb33f8992d7";
   const parent: IParamsParent = await fetch(
@@ -112,27 +112,28 @@ export async function testRun(url: string, token: string, params: ParamAdd[]) {
 
   const combinedSplit: (IParamsParent | IChildObject)[][] = [];
   const batchSize = 100;
-  for (let i = 0; i < combined.length; i+= batchSize) {
-    combinedSplit.push(combined.slice(i, Math.min(i + batchSize, combined.length)));
+  for (let i = 0; i < combined.length; i += batchSize) {
+    combinedSplit.push(
+      combined.slice(i, Math.min(i + batchSize, combined.length))
+    );
   }
 
   console.log("combinedSplit:", combinedSplit);
 
-  await Promise.all(combinedSplit.map((c) => {
-    const formData = new FormData();
-    formData.append(
-      "batch1",
-      new Blob([JSON.stringify(c)])
-    );
-    const streamid2 = "465e7157fe";
-    return fetch(`${url}/objects/${streamid2}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-  }))
+  await Promise.all(
+    combinedSplit.map((c) => {
+      const formData = new FormData();
+      formData.append("batch1", new Blob([JSON.stringify(c)]));
+      const streamid2 = "465e7157fe";
+      return fetch(`${url}/objects/${streamid2}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+    })
+  );
 
   console.log("res:", res);
 }

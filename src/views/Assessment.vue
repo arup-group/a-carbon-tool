@@ -234,7 +234,7 @@ export default class Assessment extends Vue {
     this.token = this.$store.state.token.token;
     this.transportTypes = this.$store.state.transportTypes;
     this.becs = this.$store.state.becs;
-    // AddParams.testRun(this.$store.state.selectedServer.url, this.token, [])
+    AddParams.testRun(this.$store.state.selectedServer.url, this.token, [])
     let { streamId, branchName } = this.$route.params;
     if (!streamId) streamId = this.modalStreamid;
     if (!branchName) branchName = this.modalBranchName;

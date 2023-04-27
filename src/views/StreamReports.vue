@@ -71,7 +71,8 @@
       @close="deleteSnackClose"
       :success="deleteSuccess"
       :model="deleteSnack"
-      textError="Something went wrong, please retry"
+      :textError="deleteSnackTextError"
+      :timeout="snackTimeout"
       textSuccess="Report deleted!"
     />
     <excel-import-dialog
@@ -133,6 +134,8 @@ export default class StreamReports extends Vue {
   deleteid = "";
   deleteSuccess = true;
   deleteSnack = false;
+  deleteSnackTextError = "";
+  snackTimeout = 4000;
   streamid = "";
   streamName = "";
   excelImportDialog = false;
@@ -225,15 +228,19 @@ export default class StreamReports extends Vue {
         "deleteBranch",
         input
       );
-      if (deleted.data.branchDelete) {
+      if (deleted?.data?.branchDelete) {
+        this.snackTimeout = 4000;
         this.deleteSuccess = true;
         this.deleteSnack = true;
         this.loadStreams();
       } else {
+        this.snackTimeout = 30000;
         this.deleteSuccess = false;
+        this.deleteSnackTextError = "Something went wrong:" + deleted.errors[0].message;
         this.deleteSnack = true;
       }
     } catch (err) {
+      this.deleteSnackTextError = "Something went wrong here";
       this.deleteSuccess = false;
       this.deleteSnack = true;
     }
@@ -265,6 +272,7 @@ export default class StreamReports extends Vue {
         this.projects = reportObjectsReorder.map((o) => ({
           title: `${o.data.data.projectInfo.name} - ${o.branch.name}`,
           id: o.branch.name,
+          branchId: o.branch.id,
           co2Values: o.data.data.materialBreakdown.materials,
           totalCO2e: o.data.data.projectInfo.totalCO2e,
           link: "",

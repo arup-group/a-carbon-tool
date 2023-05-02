@@ -205,13 +205,6 @@ export async function addParams(
   });
 
   // 4. create and update new parent object
-  // add new id
-  // const newParentObj: IParamsParent = {
-  //   ...parent,
-  //   id: newParentId,
-  // };
-
-  // update __closure to new child id's
   const newClosure: { [key: string]: number } = {};
   Object.entries(parent.__closure).forEach(([key, value]) => {
     if (idMapper[key]) {
@@ -223,19 +216,6 @@ export async function addParams(
   const newParentObj: IParamsParent = convertObj(parent, idMapper);
   newParentObj.id = newParentId;
   newParentObj.__closure = newClosure;
-  // newParentObj.__closure = newClosure;
-
-  // update all reference fields (fields that start with an @)
-  // Object.keys(newParentObj).forEach((key) => {
-  //   if (key.startsWith("@")) {
-  //     const records = newParentObj[key] as ReferenceObject[];
-  //     const newRecords = records.map((r) => ({
-  //       ...r,
-  //       referencedId: idMapper[r.referencedId],
-  //     }));
-  //     newParentObj[key] = newRecords;
-  //   }
-  // });
 
   return {
     parent: newParentObj,

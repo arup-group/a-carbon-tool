@@ -92,7 +92,6 @@ export interface AddParamsModel {
 }
 
 export async function testRun(url: string, token: string, params: ParamAdd[]) {
-  console.log("adding params");
   const streamid1 = "4a48b650af";
   const parentObjId = "e0965cb466f45fce6d949fb33f8992d7";
   const parent: IParamsParent = await fetch(
@@ -118,8 +117,6 @@ export async function testRun(url: string, token: string, params: ParamAdd[]) {
     );
   }
 
-  console.log("combinedSplit:", combinedSplit);
-
   await Promise.all(
     combinedSplit.map((c) => {
       const formData = new FormData();
@@ -134,8 +131,6 @@ export async function testRun(url: string, token: string, params: ParamAdd[]) {
       });
     })
   );
-
-  console.log("res:", res);
 }
 
 export async function addParams(

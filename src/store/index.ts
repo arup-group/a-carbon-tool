@@ -495,7 +495,6 @@ export default new Vuex.Store({
     ) {
       if (newModel) {
         const combined = [newModel.parent, ...newModel.children];
-        console.log("newModel:", newModel);
 
         const combinedSplit: (IParamsParent | IChildObject)[][] = [];
         const batchSize = 100;
@@ -510,7 +509,7 @@ export default new Vuex.Store({
             formData.append(
               "batch1",
               new Blob([
-                JSON.stringify([c]),
+                JSON.stringify(c),
               ])
             );
             return fetch(

@@ -144,6 +144,7 @@ import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/process-report-object";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 import { ChartData } from "@/models/chart";
+import { ChildObjects, ReportController } from "@/models/report";
 
 interface AvailableStream {
   label: string;
@@ -163,6 +164,8 @@ export default class Assessment extends Vue {
   @Prop() modal!: boolean;
   @Prop() modalStreamid!: string;
   @Prop() modalBranchName!: string;
+
+  reportController = new ReportController();
 
   loading = false;
   loadingSpinnerText = "";
@@ -430,6 +433,7 @@ export default class Assessment extends Vue {
     );
 
     const speckleObjsPropsSearch: any[] = [];
+    const childObjs: ChildObjects[] = [];
 
     if (volumeFilter) {
       const childObjects: ObjectDetails[] = [];
@@ -437,6 +441,10 @@ export default class Assessment extends Vue {
       filteredRes.forEach((r) => {
         const volume = this.findVolume(r, volumeFilter);
         if (volume) {
+          childObjs.push({
+            volume,
+            speckleObject: r
+          });
           speckleObjsPropsSearch.push(r);
           if (!this.update) {
             this.objectsObj[r.id] = {
@@ -465,11 +473,14 @@ export default class Assessment extends Vue {
         }
       });
     }
+    this.reportController.setObjects(childObjs);
     this.groupingProps = findStringProps(
       speckleObjsPropsSearch,
       this.objectsObj
     );
     this.objectGroups = this.groupingProps.map((gp) => gp.name);
+    this.reportController.groupObjects(this.groupingProps, this.selectedObjectGroup);
+    console.log("reportController:", this.reportController);
 
     this.types = this.findTypes(this.groupingProps, this.selectedObjectGroup);
     if (!this.update) {
@@ -643,22 +654,22 @@ export default class Assessment extends Vue {
   }
 
   updateVolumeGradient() {
-    let minVol = -1;
-    let maxVol = -1;
+    // let minVol = -1;
+    // let maxVol = -1;
 
-    Object.values(this.objectsObj).forEach((o, i) => {
-      if (o.formData?.volume) {
-        let volume = o.formData.volume;
-        if (i === 0) {
-          // if on the first index, then min and max have not yet been set, so set them to the first vol value
-          minVol = volume;
-          maxVol = volume;
-        } else {
-          if (minVol > volume) minVol = volume;
-          if (maxVol < volume) maxVol = volume;
-        }
-      }
-    });
+    // Object.values(this.objectsObj).forEach((o, i) => {
+    //   if (o.formData?.volume) {
+    //     let volume = o.formData.volume;
+    //     if (i === 0) {
+    //       // if on the first index, then min and max have not yet been set, so set them to the first vol value
+    //       minVol = volume;
+    //       maxVol = volume;
+    //     } else {
+    //       if (minVol > volume) minVol = volume;
+    //       if (maxVol < volume) maxVol = volume;
+    //     }
+    //   }
+    // });
 
     this.volumeGradient = {
       property: this.volProp,
@@ -961,6 +972,7 @@ export default class Assessment extends Vue {
     propertyGroups: StringPropertyGroups[],
     selectedGroup: string
   ): MaterialGrouping[] {
+    console.log("propertyGroups:", propertyGroups)
     const group = propertyGroups.find((pg) => pg.name === selectedGroup);
     if (group) {
       // we're assuming that if this.update=true then objectsObj will already be filled by this point
@@ -984,6 +996,8 @@ export default class Assessment extends Vue {
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
     this.projectData = data;
+    this.reportController.projectInfo = data;
+    console.log("reportController:", this.reportController);
     this.$store.dispatch("changeRegion", data.region).then((res) => {
       this.materials = this.$store.getters.materialsArr;
     });

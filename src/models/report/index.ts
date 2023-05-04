@@ -16,6 +16,10 @@ export interface ReportFullGroup {
   name: string;
   objects: ReportObject[];
 }
+export interface ReportFullTransportGroup {
+  name: string;
+  objects: ReportObject[];
+}
 
 export interface ChildObjects {
   speckleObject: IChildObject;
@@ -34,8 +38,21 @@ export class ReportController {
     }));
   }
 
-  get transportGroups() {
-    return;
+  get transportGroups(): ReportFullTransportGroup[] {
+    const materialGrouping: { [materialName: string]: ReportObject[] } = {};
+    Object.keys(this.objects).forEach(k => {
+      const obj = this.objects[k];
+      if (obj.hasMaterials) {
+        Object.entries(obj.materials).forEach(([k, v]) => {
+          if (materialGrouping[k]) materialGrouping[k].push(obj);
+          else materialGrouping[k] = [obj];
+        });
+      }
+    });
+    return Object.entries(materialGrouping).map(([k, v]) => ({
+      name: k,
+      objects: v
+    }));
   }
 
   get hasProjectInfo() {
@@ -110,12 +127,12 @@ export class ReportMaterial {
   constructor(public volume: number, public material: MaterialFull) {}
   transport: Transport = {} as Transport;
 
-  hasTransport() {
+  get hasTransport() {
     return this.transport && this.transport.name;
   }
 
   setTransport({ name, color, values: { road, rail, sea } }: TransportType) {
-    this.transport = new Transport(name, color, road, rail, sea);
+    this.transport = new Transport(name, color, { road, rail, sea });
   }
   setMaterial(material: MaterialFull) {
     this.material = material;
@@ -124,11 +141,9 @@ export class ReportMaterial {
 
 export class Transport {
   constructor(
-    public name: string,
+    public name: "local" | "regional" | "global" | "custom",
     public color: string,
-    public road: number,
-    public rail: number,
-    public sea: number
+    public values: { road: number; rail: number; sea: number }
   ) {}
 
   calcA4() {

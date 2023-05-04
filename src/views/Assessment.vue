@@ -33,6 +33,7 @@
           :report="report"
           :becs="becs"
           :groupedMaterials="groupedMaterials"
+          :transportGroups="reportController.transportGroups"
           :speckleVol="speckleVol"
           :update="update"
           :streamId="streamId"
@@ -219,6 +220,10 @@ export default class Assessment extends Vue {
   groupingProps: StringPropertyGroups[] = [];
   objectGroups: string[] = [];
   groupedMaterials: GroupedMaterial[] = [];
+  get transportGroups() {
+    console.log("get transportGroups")
+    return this.reportController.transportGroups;
+  }
   selectedObjectGroup = "Object Type";
 
   update = false;
@@ -546,10 +551,11 @@ export default class Assessment extends Vue {
         this.colors = this.materialsColors;
         break;
       case Step.TRANSPORT:
+        console.log("transportGroups:", this.reportController.transportGroups);
         this.beenToTransport = true;
         this.resetColors();
         this.colors = this.transportColors;
-        this.groupMaterials();
+        // this.groupMaterials();
         break;
       case Step.QUANTITIES:
         this.resetColors();
@@ -920,7 +926,17 @@ export default class Assessment extends Vue {
 
   transportSelected(selected: TransportSelected) {
     if (this.beenToTransport) {
-      const ids = selected.material.objects;
+      selected.material.objects.forEach(o => {
+        Object.entries(o.materials).forEach(([k, v]) => {
+          if (k === selected.material.name) {
+            v.setTransport(selected.transportType);
+          }
+        });
+      });
+      console.log("reportController:", this.reportController);
+      console.log("reportController.transportGroups:", this.reportController.transportGroups);
+
+        const ids = selected.material.objects.map(o => o.id);
       this.colors = this.colors.filter((c) => !ids.includes(c.id));
       ids.forEach((id) => {
         this.colors.push({
@@ -929,17 +945,6 @@ export default class Assessment extends Vue {
         });
       });
       this.transportColors = this.colors;
-
-      selected.material.objects.forEach((i) => {
-        const oldObj = this.objectsObj[i];
-        this.objectsObj[i] = {
-          ...oldObj,
-          formData: {
-            ...oldObj.formData,
-            transport: selected.transportType,
-          },
-        };
-      });
     }
   }
 

@@ -38,6 +38,7 @@ import {
   TransportSelected,
   TransportType,
 } from "@/models/newAssessment";
+import { ReportFullTransportGroup } from "@/models/report";
 import { Vue, Prop, Watch, Component, Emit } from "vue-property-decorator";
 
 type Selected = null | TransportType;
@@ -45,11 +46,11 @@ type Selected = null | TransportType;
 @Component
 export default class Item extends Vue {
   @Prop() transportTypes!: TransportType[];
-  @Prop() groupedMaterial!: GroupedMaterial;
+  @Prop() groupedMaterial!: ReportFullTransportGroup;
 
   selected: Selected =
-    this.groupedMaterial && this.groupedMaterial.transportType
-      ? this.groupedMaterial.transportType
+    this.groupedMaterial && this.groupedMaterial.objects[0].hasMaterials && this.groupedMaterial.objects[0].materials[0] && this.groupedMaterial.objects[0].materials[0].hasTransport
+      ? this.groupedMaterial.objects[0].materials[0].transport
       : null;
   road = 0;
   rail = 0;
@@ -58,9 +59,9 @@ export default class Item extends Vue {
 
   mounted() {
     this.selected =
-      this.groupedMaterial && this.groupedMaterial.transportType
-        ? this.groupedMaterial.transportType
-        : null;
+      this.groupedMaterial && this.groupedMaterial.objects[0].hasMaterials && this.groupedMaterial.objects[0].materials[0] && this.groupedMaterial.objects[0].materials[0].hasTransport
+      ? this.groupedMaterial.objects[0].materials[0].transport
+      : null;
   }
 
   @Watch("selected")
@@ -116,7 +117,7 @@ export default class Item extends Vue {
   }
 
   get materialName() {
-    return this.groupedMaterial.material;
+    return this.groupedMaterial.name;
   }
 
   get saveDisabled() {

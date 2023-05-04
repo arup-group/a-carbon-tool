@@ -84,6 +84,7 @@
             @transportSelected="transportSelected"
             :transportTypes="transportTypes"
             :groupedMaterials="groupedMaterials"
+            :transportGroups="transportGroups"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 2" color="primary">
@@ -206,7 +207,7 @@ import {
   SelectedMaterialEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
-import { ReportFullGroup } from "@/models/report";
+import { ReportFullGroup, ReportFullTransportGroup } from "@/models/report";
 
 @Component({
   components: { Menu1b, Menu2, Menu3, Menu4, Menu5, Menu6, Menu7 },
@@ -222,6 +223,7 @@ export default class AssessmentStepper extends Vue {
   @Prop() report!: ReportPassdown;
   @Prop() becs!: string;
   @Prop() groupedMaterials!: GroupedMaterial[];
+  @Prop() transportGroups!: ReportFullTransportGroup[];
   @Prop() speckleVol!: boolean;
 
   @Prop() update!: boolean;

@@ -45,12 +45,14 @@ import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 import MaterialType from "./MaterialType.vue";
 import CustomGroup from "./CustomGroup.vue";
 import ExpandedMaterialType from "./ExpandedMaterialType.vue";
+import { ReportFullGroup } from "@/models/report";
 
 @Component({
   components: { MaterialType, CustomGroup, ExpandedMaterialType },
 })
 export default class Menu2 extends Vue {
   @Prop() types!: MaterialGrouping[];
+  @Prop() fullGroups!: ReportFullGroup[];
   @Prop() materials!: MaterialFull[];
   @Prop() selectedObjects!: string[];
   @Prop() invalidObjects!: boolean;
@@ -70,7 +72,7 @@ export default class Menu2 extends Vue {
   groupKey = 0;
 
   get loadedTypes() {
-    return this.types ? this.types : [];
+    return this.fullGroups ? this.fullGroups : [];
   }
 
   expandSelection(type: MaterialGrouping) {

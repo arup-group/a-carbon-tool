@@ -51,6 +51,7 @@
         <v-stepper-content step="2">
           <Menu2
             :types="types"
+            :fullGroups="fullGroups"
             :materials="materials"
             :selectedObjects="selectedObjects"
             :invalidObjects="invalidSelectedObjects"
@@ -205,6 +206,7 @@ import {
   SelectedMaterialEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
+import { ReportFullGroup } from "@/models/report";
 
 @Component({
   components: { Menu1b, Menu2, Menu3, Menu4, Menu5, Menu6, Menu7 },
@@ -212,6 +214,7 @@ import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
   @Prop() types!: MaterialGrouping[];
+  @Prop() fullGroups!: ReportFullGroup[];
   @Prop() materials!: MaterialFull[];
   @Prop() transportTypes!: TransportType[];
   @Prop() totalVolume!: number;

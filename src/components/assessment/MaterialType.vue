@@ -13,10 +13,10 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
-              {{ cleanType(type.type) }}
+              {{ cleanType(type.name) }}
             </v-chip>
           </template>
-          <span>Objects: {{ type.ids.length }} </span>
+          <span>Objects: {{ type.objects.length }} </span>
         </v-tooltip>
       </v-col>
       <v-col coles="12" md="7" class="pr-2">
@@ -49,27 +49,30 @@
 </template>
 <script lang="ts">
 import { MaterialUpdateOut, SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
+import { ReportFullGroup } from "@/models/report";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component
 export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
-  @Prop() type!: MaterialGrouping;
+  @Prop() type!: ReportFullGroup;
   @Prop() expandOption!: boolean;
 
-  currentMaterial = this.type && this.type.material ? this.type.material : null;
+  oldMaterial: MaterialFull | undefined;
+
+  currentMaterial = this.type && this.type.objects[0].hasMaterials ? this.type.objects[0].materials[0].material.name : null;
   filtered = true;
 
   mounted() {
-    this.currentMaterial = this.type && this.type.material ? this.type.material : null;
+    this.currentMaterial = this.type && this.type.objects[0].hasMaterials ? this.type.objects[0].materials[0].material.name : null;
   }
 
   @Emit("selectMaterial")
   selectMaterial(): SelectedMaterialEmit {
     return {
-      ids: this.type.ids,
-      type: this.type.type
+      ids: this.type.objects.map(o => o.id),
+      type: this.type.name
     };
   }
 
@@ -94,22 +97,18 @@ export default class MaterialType extends Vue {
     return yiq >= 128 ? "black" : "white";
   }
 
-  materialChanged(material: MaterialFull) {
-    if (this.materials.includes(material)) {
-      this.materialUpdated(material);
-    }
-  }
-
   checkMaterialUpdated(material: MaterialFull) {
     if (this.instanceOfMaterialFull(material)) {
-      this.materialUpdated(material);
+      this.materialUpdated(material, this.oldMaterial);
+      this.oldMaterial = material;
     }
   }
 
   @Emit("materialUpdated")
-  materialUpdated(material: MaterialFull): MaterialUpdateOut {
+  materialUpdated(material: MaterialFull, oldMaterial?: MaterialFull): MaterialUpdateOut {
     return {
       material,
+      oldMaterial,
       type: this.type,
     };
   }

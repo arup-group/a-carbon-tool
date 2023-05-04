@@ -25,6 +25,7 @@
           :modal="modal"
           :streams="availableStreams"
           :types="types"
+          :fullGroups="fullGroups"
           :materials="materials"
           :transportTypes="transportTypes"
           :totalVolume="totalVolume"
@@ -177,6 +178,9 @@ export default class Assessment extends Vue {
   objectURLs: string[] = [];
   token = "";
   types: MaterialGrouping[] = [];
+  get fullGroups() {
+    return this.reportController.fullGroups;
+  }
   objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
@@ -940,7 +944,12 @@ export default class Assessment extends Vue {
   }
 
   materialUpdated(material: MaterialUpdateOut) {
-    const ids = material.type.ids;
+    material.type.objects.forEach(o => {
+      o.changeMaterial(material.oldMaterial?.name, material.material);
+    });
+    console.log("reportController:", this.reportController);
+    console.log("reportController.fullGroups:", this.reportController.fullGroups);
+    const ids = material.type.objects.map(o => o.id);
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
       try {
@@ -954,17 +963,17 @@ export default class Assessment extends Vue {
     });
     this.materialsColors = this.colors;
 
-    // update the objects to include this new material
-    material.type.ids.forEach((i) => {
-      const oldObj = this.objectsObj[i];
-      this.objectsObj[i] = {
-        ...oldObj,
-        formData: {
-          ...oldObj.formData,
-          material: material.material,
-        },
-      };
-    });
+    // // update the objects to include this new material
+    // material.type.ids.forEach((i) => {
+    //   const oldObj = this.objectsObj[i];
+    //   this.objectsObj[i] = {
+    //     ...oldObj,
+    //     formData: {
+    //       ...oldObj.formData,
+    //       material: material.material,
+    //     },
+    //   };
+    // });
   }
 
   // types = material groups, cuz legacy

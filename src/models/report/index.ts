@@ -1,6 +1,9 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
-import { ProjectDataComplete, StringPropertyGroups, TransportType } from "../newAssessment";
-import { ChildSpeckleObjectData } from "../graphql";
+import {
+  ProjectDataComplete,
+  StringPropertyGroups,
+  TransportType,
+} from "../newAssessment";
 import { IChildObject, Param } from "@/views/utils/add-params/addParams";
 
 interface ObjectMaterials {
@@ -8,6 +11,10 @@ interface ObjectMaterials {
 }
 interface ReportObjects {
   [id: string]: ReportObject;
+}
+export interface ReportFullGroup {
+  name: string;
+  objects: ReportObject[];
 }
 
 export interface ChildObjects {
@@ -20,10 +27,10 @@ export class ReportController {
   groups: { [groupValue: string]: string[] } = {};
   projectInfo: ProjectDataComplete = {} as ProjectDataComplete;
 
-  get fullGroups() {
-    return Object.keys(this.groups).map(g => ({
-        name: g,
-        objects: this.groups[g].map(id => this.objects[id])
+  get fullGroups(): ReportFullGroup[] {
+    return Object.keys(this.groups).map((g) => ({
+      name: g,
+      objects: this.groups[g].map((id) => this.objects[id]),
     }));
   }
 
@@ -51,15 +58,15 @@ export class ReportController {
     this.groups = {};
     const group = propertyGroups.find((pg) => pg.name === selectedGroup);
     if (group) {
-        group.data.valueGroups.forEach(vg => {
-            if (this.groups[vg.value]) this.groups[vg.value].push(...vg.ids);
-            else this.groups[vg.value] = [...vg.ids];
-        });
+      group.data.valueGroups.forEach((vg) => {
+        if (this.groups[vg.value]) this.groups[vg.value].push(...vg.ids);
+        else this.groups[vg.value] = [...vg.ids];
+      });
     }
   }
 }
 
-class ReportObject {
+export class ReportObject {
   constructor(
     public id: string,
     public speckle_type: string,
@@ -68,6 +75,10 @@ class ReportObject {
   ) {}
 
   materials: ObjectMaterials = {};
+
+  get hasMaterials() {
+    return Object.keys(this.materials).length > 0;
+  }
 
   setTransport(materialName: string, transportType: TransportType) {
     this.materials[materialName].setTransport(transportType);
@@ -82,10 +93,9 @@ class ReportObject {
   updateMaterialVolume(materialName: string, percentage: number) {
     this.materials[materialName].volume = this.volume * percentage;
   }
-  changeMaterial(oldName: string, newMaterial: MaterialFull) {
-    const oldMaterial = this.materials[oldName];
-    this.removeMaterial(oldName);
-    this.addMaterial(newMaterial, oldMaterial.volume);
+  changeMaterial(oldName: string | undefined, newMaterial: MaterialFull) {
+    if (oldName) this.removeMaterial(oldName);
+    this.addMaterial(newMaterial, this.volume);
   }
   removeMaterial(materialName: string) {
     const oldMaterials = this.materials;
@@ -96,7 +106,7 @@ class ReportObject {
   }
 }
 
-class ReportMaterial {
+export class ReportMaterial {
   constructor(public volume: number, public material: MaterialFull) {}
   transport: Transport = {} as Transport;
 
@@ -112,7 +122,7 @@ class ReportMaterial {
   }
 }
 
-class Transport {
+export class Transport {
   constructor(
     public name: string,
     public color: string,

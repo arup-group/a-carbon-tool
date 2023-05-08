@@ -564,7 +564,8 @@ export default class Assessment extends Vue {
         break;
       case Step.REVIEW:
         this.resetColors();
-        this.review();
+        this.emptyProps = this.reportController.isReportComplete();
+        // this.review();
         break;
       case Step.PREVIEW:
         this.carbonCalc();

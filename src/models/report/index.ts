@@ -1,5 +1,7 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import {
+  EmptyProps,
+  EmptyPropsPassdown,
   ProjectDataComplete,
   StringPropertyGroups,
   TransportType,
@@ -30,6 +32,29 @@ export class ReportController {
   objects: ReportObjects = {};
   groups: { [groupValue: string]: string[] } = {};
   projectInfo: ProjectDataComplete = {} as ProjectDataComplete;
+
+  isReportComplete(): EmptyProps {
+    console.log("checking report complete")
+    const projectEmpty: boolean = this.projectInfo && this.projectInfo.name !== undefined; // all project info gets filled in at the same time, so if one contains a value, then they all will
+    const materialsEmpty = Object.entries(this.objects).filter(([k, v]) => !v.hasMaterials).map(([k, v]) => v.id);
+    const transportsEmpty: string[] = [];
+
+    Object.entries(this.objects).forEach(([k, v]) => {
+      if (v.hasMaterials) {
+        Object.entries(v.materials).forEach(([k1, v1]) => {
+          if (!v1.hasTransport) transportsEmpty.push(v.id);
+        });
+      }
+    });
+    const volumesEmpty: string[] = [];
+
+    return {
+      projectEmpty,
+      materialsEmpty,
+      transportsEmpty,
+      volumesEmpty
+    }
+  }
 
   get fullGroups(): ReportFullGroup[] {
     return Object.keys(this.groups).map((g) => ({

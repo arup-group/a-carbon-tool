@@ -3,6 +3,7 @@ import {
   EmptyProps,
   EmptyPropsPassdown,
   ProjectDataComplete,
+  ReportProp,
   StringPropertyGroups,
   TransportType,
 } from "../newAssessment";
@@ -32,6 +33,45 @@ export class ReportController {
   objects: ReportObjects = {};
   groups: { [groupValue: string]: string[] } = {};
   projectInfo: ProjectDataComplete = {} as ProjectDataComplete;
+
+  totalCarbon = 0;
+  totalA1A3 = 0;
+  totalA4 = 0;
+  totalA5w = 0;
+  totalA5a = 0; // A5a only has one component (sys cost), but keeping "total" naming scheme for consistency
+  totalA5 = 0;
+
+  calcCarbon(): ReportProp {
+    this.totalA5a = this.calcA5a();
+
+    this.totalCarbon = 0;
+    this.totalA1A3 = 0;
+    this.totalA4 = 0;
+    this.totalA5w = 0;
+
+    Object.entries(this.objects).forEach(([k, v]) => {
+      const { A1A3, A4, A5w } = v.calcCarbon();
+
+      this.totalA1A3 += A1A3;
+      this.totalA4 += A4;
+      this.totalA5w += A5w;
+    });
+    console.log("this.objects:", this.objects);
+
+    this.totalA5 = this.totalA5w + this.totalA5a
+    this.totalCarbon = this.totalA1A3 + this.totalA4 + this.totalA5;
+
+    return {
+      totalCO2: this.totalCarbon,
+      totalA1A3: this.totalA1A3,
+      totalA4: this.totalA4,
+      totalA5: this.totalA5
+    }
+  }
+
+  calcA5a() {
+    return (this.projectInfo.cost * 1400) / 100000
+  }
 
   isReportComplete(): EmptyProps {
     console.log("checking report complete")
@@ -108,6 +148,12 @@ export class ReportController {
   }
 }
 
+interface CarbonResults {
+  A1A3: number;
+  A4: number;
+  A5w: number;
+}
+
 export class ReportObject {
   constructor(
     public id: string,
@@ -117,6 +163,11 @@ export class ReportObject {
   ) {}
 
   materials: ObjectMaterials = {};
+
+  totalCarbon = 0;
+  totalA1A3 = 0;
+  totalA4 = 0;
+  totalA5w = 0;
 
   get hasMaterials() {
     return Object.keys(this.materials).length > 0;
@@ -136,8 +187,12 @@ export class ReportObject {
     this.materials[materialName].volume = this.volume * percentage;
   }
   changeMaterial(oldName: string | undefined, newMaterial: MaterialFull) {
-    if (oldName) this.removeMaterial(oldName);
-    this.addMaterial(newMaterial, this.volume);
+    let percentage = 1;
+    if (oldName) {
+      percentage = this.materials[oldName].volume / this.volume;
+      this.removeMaterial(oldName);
+    }
+    this.addMaterial(newMaterial, percentage);
   }
   removeMaterial(materialName: string) {
     const oldMaterials = this.materials;
@@ -146,11 +201,39 @@ export class ReportObject {
       if (m !== materialName) this.materials[m] = oldMaterials[m];
     });
   }
+
+  calcCarbon(): CarbonResults {
+    this.totalCarbon = 0;
+    this.totalA1A3 = 0;
+    this.totalA4 = 0;
+    this.totalA5w = 0;
+
+    Object.entries(this.materials).forEach(([k, v]) => {
+      const { A1A3, A4, A5w } = v.calcCarbon();
+
+      this.totalA1A3 += A1A3;
+      this.totalA4 += A4;
+      this.totalA5w += A5w;
+    });
+
+    this.totalCarbon = this.totalA1A3 + this.totalA4 + this.totalA5w;
+
+    return {
+      A1A3: this.totalA1A3,
+      A4: this.totalA4,
+      A5w: this.totalA5w
+    };
+  }
 }
 
 export class ReportMaterial {
   constructor(public volume: number, public material: MaterialFull) {}
   transport: Transport = {} as Transport;
+
+  totalCarbon = 0;
+  A1A3 = 0;
+  A4 = 0;
+  A5w = 0;
 
   get hasTransport() {
     return this.transport && this.transport.name;
@@ -162,6 +245,59 @@ export class ReportMaterial {
   setMaterial(material: MaterialFull) {
     this.material = material;
   }
+
+  calcCarbon(): CarbonResults {
+    this.A1A3 = this.calcA1A3(this.volume, this.material);
+    this.A4 = this.calcA4(this.volume, this.material, this.transport, transportFactors);
+    this.A5w = this.calcA5w(this.volume, this.material, this.transport, transportFactors);
+
+
+    this.totalCarbon = this.A1A3 + this.A4 + this.A5w;
+
+    return {
+      A1A3: this.A1A3,
+      A4: this.A4,
+      A5w: this.A5w
+    }
+  }
+
+  calcA1A3(volume: number, material: MaterialFull) {
+    const mass = volume * material.density;
+    const A1A3 = mass * material.productStageCarbonA1A3;
+
+    return A1A3;
+  }
+  calcA4(volume: number, material: MaterialFull, transport: Transport, factors: TransportFactors) {
+    const A4 =
+      (material.density *
+        volume *
+        (transport.values.road * factors.road + transport.values.sea * factors.sea)) /
+      1000;
+
+    return A4;
+  }
+  // TODO: check whether we should be including C2-C4 (estimates/assumptions) in this calc?
+  // How to Calculate Embodied Carbon does say to use it (and gives assumptions to use given a lack of data), however DesignCheck does not use them
+  calcA5w(volume: number, material: MaterialFull, transport: Transport, factors: TransportFactors) {
+    const wasteVolume = volume * (1 / (1 - material.wastage) - 1);
+
+    const A1A3 = this.calcA1A3(wasteVolume, material);
+    const A4 = this.calcA4(wasteVolume, material, transport, factors);
+
+    const A5w = A1A3 + A4;
+
+    return A5w;
+  }
+}
+
+interface TransportFactors {
+  road: number;
+  sea: number;
+}
+const transportFactors: TransportFactors = {
+  // values taken from RICS guidance
+  road: 0.1136, // gCO2/kg/km
+  sea: 0.016143, // gCO2/kg/km
 }
 
 export class Transport {

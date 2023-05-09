@@ -47,8 +47,10 @@ export interface SpeckleObjectComplete {
 }
 
 export interface ReportProp {
-  reportObjs: SpeckleObjectComplete[];
-  totals: ReportTotals;
+  totalCO2: number;
+  totalA1A3: number;
+  totalA4: number;
+  totalA5: number;
 }
 
 export type ReportPassdown = ReportProp | false;

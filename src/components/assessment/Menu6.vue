@@ -23,7 +23,7 @@ export default class Menu6 extends Vue {
 
   getReport(val: ReportPassdown) {
     if (val) {
-      const tonnesCO2 = Math.round(val.totals.totalCO2 * 0.001);
+      const tonnesCO2 = Math.round(val.totalCO2 * 0.001);
       return `${tonnesCO2} tonnes`;
     }
   }
@@ -34,30 +34,30 @@ export default class Menu6 extends Vue {
         levels: [
           {
             name: "A1-A3",
-            kgCO2e: this.report.totals.productStageCarbonA1A3,
+            kgCO2e: this.report.totalA1A3,
             tCO2e: Math.round(
-              this.report.totals.productStageCarbonA1A3 * 0.001
+              this.report.totalA1A3 * 0.001
             ),
             kgCO2eperm2: Math.round(
-              this.report.totals.productStageCarbonA1A3 / this.floorArea
+              this.report.totalA1A3 / this.floorArea
             ),
           },
           {
             name: "A4",
-            kgCO2e: this.report.totals.transportCarbonA4,
-            tCO2e: Math.round(this.report.totals.transportCarbonA4 * 0.001),
+            kgCO2e: this.report.totalA4,
+            tCO2e: Math.round(this.report.totalA4 * 0.001),
             kgCO2eperm2: Math.round(
-              this.report.totals.transportCarbonA4 / this.floorArea
+              this.report.totalA4 / this.floorArea
             ),
           },
           {
             name: "A5",
-            kgCO2e: this.report.totals.constructionCarbonA5.value,
+            kgCO2e: this.report.totalA5,
             tCO2e: Math.round(
-              this.report.totals.constructionCarbonA5.value * 0.001
+              this.report.totalA5 * 0.001
             ),
             kgCO2eperm2: Math.round(
-              this.report.totals.constructionCarbonA5.value / this.floorArea
+              this.report.totalA5 / this.floorArea
             ),
           },
         ],

@@ -344,60 +344,60 @@ export default class Assessment extends Vue {
   }
 
   async checkSave() {
-    this.loading = true;
-    if (this.report) {
-      if (this.report.reportObjs.length > 0) {
-        const containsReport: boolean = await this.$store.dispatch(
-          "checkContainsReport",
-          this.streamId
-        );
-        if (containsReport) {
-          const getAllReportBranchesOut: GetAllReportBranchesOutput =
-            await this.$store.dispatch("getAllReportBranches", this.streamId);
-          this.branchNames = getAllReportBranchesOut.map((b) => b.name);
-          this.reportName = this.projectData.name;
-          this.newBranchDialog = true;
-        } else {
-          this.uploadReport("main");
-        }
-      } else {
-        this.saveSnack = true;
-        this.saveSuccess = false;
-        this.loading = false;
-      }
-    }
+    // this.loading = true;
+    // if (this.report) {
+    //   if (this.report.reportObjs.length > 0) {
+    //     const containsReport: boolean = await this.$store.dispatch(
+    //       "checkContainsReport",
+    //       this.streamId
+    //     );
+    //     if (containsReport) {
+    //       const getAllReportBranchesOut: GetAllReportBranchesOutput =
+    //         await this.$store.dispatch("getAllReportBranches", this.streamId);
+    //       this.branchNames = getAllReportBranchesOut.map((b) => b.name);
+    //       this.reportName = this.projectData.name;
+    //       this.newBranchDialog = true;
+    //     } else {
+    //       this.uploadReport("main");
+    //     }
+    //   } else {
+    //     this.saveSnack = true;
+    //     this.saveSuccess = false;
+    //     this.loading = false;
+    //   }
+    // }
   }
   async uploadReport(branchName: string) {
-    if (this.report && this.report.reportObjs.length > 0) {
-      this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
-      let newModel: AddParams.AddParamsModel | undefined;
-      if (this.parentObj) {
-        newModel = await AddParams.addParams(
-          this.parentObj,
-          this.addParams,
-          this.$store.state.selectedServer.url,
-          this.token,
-          this.streamId,
-          this.allChildObjs
-        );
-      }
+    // if (this.report && this.report.reportObjs.length > 0) {
+    //   this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
+    //   let newModel: AddParams.AddParamsModel | undefined;
+    //   if (this.parentObj) {
+    //     newModel = await AddParams.addParams(
+    //       this.parentObj,
+    //       this.addParams,
+    //       this.$store.state.selectedServer.url,
+    //       this.token,
+    //       this.streamId,
+    //       this.allChildObjs
+    //     );
+    //   }
 
-      const uploadReportInput: UploadReportInput = {
-        streamid: this.streamId,
-        objects: this.report.reportObjs,
-        reportTotals: this.report.totals,
-        projectData: this.projectData,
-        branchName,
-        newModel,
-        selectedObjectGroup: this.selectedObjectGroup,
-      };
-      this.loading = true;
-      await this.$store.dispatch("uploadReport", uploadReportInput);
-      this.loading = false;
-      this.saveSnack = true;
-      this.finished = true;
-      this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
-    }
+    //   const uploadReportInput: UploadReportInput = {
+    //     streamid: this.streamId,
+    //     objects: this.report.reportObjs,
+    //     reportTotals: this.report.totals,
+    //     projectData: this.projectData,
+    //     branchName,
+    //     newModel,
+    //     selectedObjectGroup: this.selectedObjectGroup,
+    //   };
+    //   this.loading = true;
+    //   await this.$store.dispatch("uploadReport", uploadReportInput);
+    //   this.loading = false;
+    //   this.saveSnack = true;
+    //   this.finished = true;
+    //   this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
+    // }
   }
   saveSnackClose() {
     this.saveSnack = false;
@@ -464,8 +464,6 @@ export default class Assessment extends Vue {
               },
             };
             childObjects.push(r);
-            // also find total volume here to avoid needing to loop through objects again
-            totalVol += volume;
           }
           // also find total volume here to avoid needing to loop through objects again
           totalVol += volume;
@@ -568,7 +566,9 @@ export default class Assessment extends Vue {
         // this.review();
         break;
       case Step.PREVIEW:
-        this.carbonCalc();
+        this.report = this.reportController.calcCarbon();
+        console.log("reportController:", this.reportController);
+        // this.carbonCalc();
         this.resetColors();
         break;
       case Step.SAVE:
@@ -818,10 +818,10 @@ export default class Assessment extends Vue {
 
     const totals = this.calcTotals(reportObjs);
 
-    this.report = {
-      reportObjs,
-      totals,
-    };
+    // this.report = {
+    //   reportObjs,
+    //   totals,
+    // };
   }
 
   calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {

@@ -123,7 +123,7 @@ export default class ProjectCard extends Vue {
 
   @Emit("delete")
   checkDelete() {
-    return this.project.id;
+    return this.project.branchId;
   }
 
   @Emit("edit")

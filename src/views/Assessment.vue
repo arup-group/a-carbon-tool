@@ -314,14 +314,15 @@ export default class Assessment extends Vue {
 
     const objGroup = assessmentViewData.data.selectedObjectGroup;
     this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
-    assessmentViewData.data.children.forEach((c) => {
-      this.objectsObj[c.act.id] = {
-        id: c.act.id,
-        speckle_type: c.act.speckle_type,
-        formData: c.act.formData,
-        reportData: c.act.reportData,
-      };
-    });
+    this.reportController.setObjectsUpdate(assessmentViewData.data.children);
+    // assessmentViewData.data.children.forEach((c) => {
+    //   this.objectsObj[c.act.id] = {
+    //     id: c.act.id,
+    //     speckle_type: c.act.speckle_type,
+    //     formData: c.act.formData,
+    //     reportData: c.act.reportData,
+    //   };
+    // });
 
     this.materialsColors = Object.values(this.objectsObj).map((o) => ({
       id: o.id,
@@ -332,72 +333,64 @@ export default class Assessment extends Vue {
       color: o.formData?.transport?.color as string,
     }));
 
-    this.projectData = assessmentViewData.data.projectInfo;
-    this.projectDataPassdown = assessmentViewData.data.projectInfo;
+    // this.projectData = assessmentViewData.data.projectInfo;
+    this.reportController.projectInfo = assessmentViewData.data.projectInfo;
+    this.projectDataPassdown = this.reportController.projectInfo;
 
-    this.groupMaterials();
+    // this.groupMaterials();
 
     this.totalVolume = assessmentViewData.data.projectInfo.volume;
     this.speckleVol = true;
 
     this.resetColors();
+
+    console.log("updated reportController?", this.reportController);
   }
 
   async checkSave() {
-    // this.loading = true;
-    // if (this.report) {
-    //   if (this.report.reportObjs.length > 0) {
-    //     const containsReport: boolean = await this.$store.dispatch(
-    //       "checkContainsReport",
-    //       this.streamId
-    //     );
-    //     if (containsReport) {
-    //       const getAllReportBranchesOut: GetAllReportBranchesOutput =
-    //         await this.$store.dispatch("getAllReportBranches", this.streamId);
-    //       this.branchNames = getAllReportBranchesOut.map((b) => b.name);
-    //       this.reportName = this.projectData.name;
-    //       this.newBranchDialog = true;
-    //     } else {
-    //       this.uploadReport("main");
-    //     }
-    //   } else {
-    //     this.saveSnack = true;
-    //     this.saveSuccess = false;
-    //     this.loading = false;
-    //   }
-    // }
+    this.loading = true;
+    const containsReport: boolean = await this.$store.dispatch(
+      "checkContainsReport",
+      this.streamId
+    );
+    if (containsReport) {
+      const getAllReportBranchesOut: GetAllReportBranchesOutput =
+        await this.$store.dispatch("getAllReportBranches", this.streamId);
+      this.branchNames = getAllReportBranchesOut.map((b) => b.name);
+      this.reportName = this.projectData.name;
+      this.newBranchDialog = true;
+    } else {
+      this.uploadReport("main");
+    }
   }
   async uploadReport(branchName: string) {
-    // if (this.report && this.report.reportObjs.length > 0) {
-    //   this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
-    //   let newModel: AddParams.AddParamsModel | undefined;
-    //   if (this.parentObj) {
-    //     newModel = await AddParams.addParams(
-    //       this.parentObj,
-    //       this.addParams,
-    //       this.$store.state.selectedServer.url,
-    //       this.token,
-    //       this.streamId,
-    //       this.allChildObjs
-    //     );
-    //   }
+    console.log("upload report to branch:", branchName);
+    this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
+    let newModel: AddParams.AddParamsModel | undefined;
+    if (this.parentObj) {
+      newModel = await AddParams.addParams(
+        this.parentObj,
+        this.reportController.addParams,
+        this.$store.state.selectedServer.url,
+        this.token,
+        this.streamId,
+        this.allChildObjs
+      );
+    }
 
-    //   const uploadReportInput: UploadReportInput = {
-    //     streamid: this.streamId,
-    //     objects: this.report.reportObjs,
-    //     reportTotals: this.report.totals,
-    //     projectData: this.projectData,
-    //     branchName,
-    //     newModel,
-    //     selectedObjectGroup: this.selectedObjectGroup,
-    //   };
-    //   this.loading = true;
-    //   await this.$store.dispatch("uploadReport", uploadReportInput);
-    //   this.loading = false;
-    //   this.saveSnack = true;
-    //   this.finished = true;
-    //   this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
-    // }
+    const upload = this.reportController.convToUpload(this.totalVolume, this.materialsColors, this.transportColors);
+    const uploadReportInput: UploadReportInput = {
+      streamid: this.streamId,
+      objects: upload.reportObjs,
+      reportTotals: upload.totals,
+      projectData: this.projectData,
+      branchName,
+      newModel,
+      selectedObjectGroup: this.selectedObjectGroup,
+    };
+    this.loading = true;
+    await this.$store.dispatch("uploadReport", uploadReportInput);
+    this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
   }
   saveSnackClose() {
     this.saveSnack = false;
@@ -450,12 +443,12 @@ export default class Assessment extends Vue {
       filteredRes.forEach((r) => {
         const volume = this.findVolume(r, volumeFilter);
         if (volume) {
-          childObjs.push({
-            volume,
-            speckleObject: r
-          });
           speckleObjsPropsSearch.push(r);
           if (!this.update) {
+            childObjs.push({
+              volume,
+              speckleObject: r
+            });
             this.objectsObj[r.id] = {
               id: r.id,
               speckle_type: r.speckle_type,
@@ -480,10 +473,11 @@ export default class Assessment extends Vue {
         }
       });
     }
-    this.reportController.setObjects(childObjs);
+    // if childObjs.length === 0 then the report is being updated, so no need to set objects here
+    if (childObjs.length !== 0) this.reportController.setObjects(childObjs);
     this.groupingProps = findStringProps(
       speckleObjsPropsSearch,
-      this.objectsObj
+      this.reportController.objects // technically not the right type, but it works so...
     );
     this.objectGroups = this.groupingProps.map((gp) => gp.name);
     this.reportController.groupObjects(this.groupingProps, this.selectedObjectGroup);
@@ -690,133 +684,133 @@ export default class Assessment extends Vue {
   // for now we're just assuming that all data is filled in if the user reaches this step TODO: ONLY ALLOW USER ON THIS PAGE IF REVIEW IS SUCCESSFUL
   carbonCalc() {
     // convert objects from SpeckleObject to SpeckleObjectFormComplete
-    const objs = this.convertToFormComplete();
-    this.addParams = [];
+    // const objs = this.convertToFormComplete();
+    // this.addParams = [];
 
-    const reportObjs = objs.map((o): SpeckleObjectComplete => {
-      const A1A3 = productStageCarbonA1A3(o);
-      const A4 = transportCarbonA4(o);
-      const A5Site = constructionCarbonA5Site(this.projectData.cost);
-      const A5Waste = constructionCarbonA5Waste(o);
-      const A5Value = constructionCarbonA5({
-        site: A5Site,
-        waste: A5Waste,
-      });
+    // const reportObjs = objs.map((o): SpeckleObjectComplete => {
+    //   const A1A3 = productStageCarbonA1A3(o);
+    //   const A4 = transportCarbonA4(o);
+    //   const A5Site = constructionCarbonA5Site(this.projectData.cost);
+    //   const A5Waste = constructionCarbonA5Waste(o);
+    //   const A5Value = constructionCarbonA5({
+    //     site: A5Site,
+    //     waste: A5Waste,
+    //   });
 
-      // make parameter update object
-      this.addParams.push({
-        parentid: o.id,
-        name: "Total Carbon",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Total Carbon",
-          units: "kgCO2e/kg",
-          value: A4 + A1A3 + A5Value,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
-        name: "Product Stage Carbon A1-A3",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Product Stage Carbon A1-A3",
-          units: "kgCO2e/kg",
-          value: A1A3,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
-        name: "Transport Carbon A4",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Transport Carbon A4",
-          units: "kgCO2e/kg",
-          value: A4,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
-        name: "Transport Carbon A4",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Transport Carbon A4",
-          units: "kgCO2e/kg",
-          value: A4,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
-        name: "Construction Carbon A5",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Construction Carbon A5",
-          units: "kgCO2e/kg",
-          value: A5Value,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      // end parameter update
+    //   // make parameter update object
+    //   this.addParams.push({
+    //     parentid: o.id,
+    //     name: "Total Carbon",
+    //     param: {
+    //       id: Math.floor(Math.random() * 10000000).toString(),
+    //       name: "Total Carbon",
+    //       units: "kgCO2e/kg",
+    //       value: A4 + A1A3 + A5Value,
+    //       isShared: false,
+    //       isReadOnly: false,
+    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
+    //       applicationId: null,
+    //       applicationUnit: null,
+    //       isTypeParameter: false,
+    //       totalChildrenCount: 0,
+    //       applicationUnitType: "string",
+    //       applicationInternalName: "string",
+    //     },
+    //   });
+    //   this.addParams.push({
+    //     parentid: o.id,
+    //     name: "Product Stage Carbon A1-A3",
+    //     param: {
+    //       id: Math.floor(Math.random() * 10000000).toString(),
+    //       name: "Product Stage Carbon A1-A3",
+    //       units: "kgCO2e/kg",
+    //       value: A1A3,
+    //       isShared: false,
+    //       isReadOnly: false,
+    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
+    //       applicationId: null,
+    //       applicationUnit: null,
+    //       isTypeParameter: false,
+    //       totalChildrenCount: 0,
+    //       applicationUnitType: "string",
+    //       applicationInternalName: "string",
+    //     },
+    //   });
+    //   this.addParams.push({
+    //     parentid: o.id,
+    //     name: "Transport Carbon A4",
+    //     param: {
+    //       id: Math.floor(Math.random() * 10000000).toString(),
+    //       name: "Transport Carbon A4",
+    //       units: "kgCO2e/kg",
+    //       value: A4,
+    //       isShared: false,
+    //       isReadOnly: false,
+    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
+    //       applicationId: null,
+    //       applicationUnit: null,
+    //       isTypeParameter: false,
+    //       totalChildrenCount: 0,
+    //       applicationUnitType: "string",
+    //       applicationInternalName: "string",
+    //     },
+    //   });
+    //   this.addParams.push({
+    //     parentid: o.id,
+    //     name: "Transport Carbon A4",
+    //     param: {
+    //       id: Math.floor(Math.random() * 10000000).toString(),
+    //       name: "Transport Carbon A4",
+    //       units: "kgCO2e/kg",
+    //       value: A4,
+    //       isShared: false,
+    //       isReadOnly: false,
+    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
+    //       applicationId: null,
+    //       applicationUnit: null,
+    //       isTypeParameter: false,
+    //       totalChildrenCount: 0,
+    //       applicationUnitType: "string",
+    //       applicationInternalName: "string",
+    //     },
+    //   });
+    //   this.addParams.push({
+    //     parentid: o.id,
+    //     name: "Construction Carbon A5",
+    //     param: {
+    //       id: Math.floor(Math.random() * 10000000).toString(),
+    //       name: "Construction Carbon A5",
+    //       units: "kgCO2e/kg",
+    //       value: A5Value,
+    //       isShared: false,
+    //       isReadOnly: false,
+    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
+    //       applicationId: null,
+    //       applicationUnit: null,
+    //       isTypeParameter: false,
+    //       totalChildrenCount: 0,
+    //       applicationUnitType: "string",
+    //       applicationInternalName: "string",
+    //     },
+    //   });
+    //   // end parameter update
 
-      return {
-        ...o,
-        reportData: {
-          transportCarbonA4: A4,
-          productStageCarbonA1A3: A1A3,
-          constructionCarbonA5: {
-            value: A5Value,
-            waste: A5Waste,
-            site: A5Site,
-          },
-          totalCarbon: A4 + A1A3 + A5Value,
-        },
-      };
-    });
+    //   return {
+    //     ...o,
+    //     reportData: {
+    //       transportCarbonA4: A4,
+    //       productStageCarbonA1A3: A1A3,
+    //       constructionCarbonA5: {
+    //         value: A5Value,
+    //         waste: A5Waste,
+    //         site: A5Site,
+    //       },
+    //       totalCarbon: A4 + A1A3 + A5Value,
+    //     },
+    //   };
+    // });
 
-    const totals = this.calcTotals(reportObjs);
+    // const totals = this.calcTotals(reportObjs);
 
     // this.report = {
     //   reportObjs,
@@ -824,55 +818,55 @@ export default class Assessment extends Vue {
     // };
   }
 
-  calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {
-    let A1A3 = 0;
-    let A4 = 0;
-    let A5Site = 0;
-    let A5Waste = 0;
-    let A5Value = 0;
-    const materialsObj: {
-      [key: string]: { value: number; color: string };
-    } = {};
-    reportObjs.forEach((o) => {
-      const rd = o.reportData;
-      A1A3 += rd.productStageCarbonA1A3;
-      A4 += rd.transportCarbonA4;
-      A5Site += rd.constructionCarbonA5.site;
-      A5Waste += rd.constructionCarbonA5.waste;
-      A5Value += rd.constructionCarbonA5.value;
-      const objTotal = A1A3 + A4 + A5Value;
-      const materialName = o.formData.material.name;
-      if (materialName in materialsObj) {
-        materialsObj[materialName].value += objTotal;
-      } else {
-        materialsObj[materialName] = {
-          value: objTotal,
-          color: o.formData.material.color,
-        };
-      }
-    });
-    let totalCO2 = A1A3 + A4 + A5Value;
-    const materials: ChartData[] = Object.entries(materialsObj).map((m) => ({
-      value: m[1].value,
-      label: m[0],
-      color: m[1].color,
-    }));
+  // calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {
+  //   let A1A3 = 0;
+  //   let A4 = 0;
+  //   let A5Site = 0;
+  //   let A5Waste = 0;
+  //   let A5Value = 0;
+  //   const materialsObj: {
+  //     [key: string]: { value: number; color: string };
+  //   } = {};
+  //   reportObjs.forEach((o) => {
+  //     const rd = o.reportData;
+  //     A1A3 += rd.productStageCarbonA1A3;
+  //     A4 += rd.transportCarbonA4;
+  //     A5Site += rd.constructionCarbonA5.site;
+  //     A5Waste += rd.constructionCarbonA5.waste;
+  //     A5Value += rd.constructionCarbonA5.value;
+  //     const objTotal = A1A3 + A4 + A5Value;
+  //     const materialName = o.formData.material.name;
+  //     if (materialName in materialsObj) {
+  //       materialsObj[materialName].value += objTotal;
+  //     } else {
+  //       materialsObj[materialName] = {
+  //         value: objTotal,
+  //         color: o.formData.material.color,
+  //       };
+  //     }
+  //   });
+  //   let totalCO2 = A1A3 + A4 + A5Value;
+  //   const materials: ChartData[] = Object.entries(materialsObj).map((m) => ({
+  //     value: m[1].value,
+  //     label: m[0],
+  //     color: m[1].color,
+  //   }));
 
-    return {
-      transportCarbonA4: A4,
-      productStageCarbonA1A3: A1A3,
-      constructionCarbonA5: {
-        value: A5Value,
-        waste: A5Waste,
-        site: A5Site,
-      },
-      totalCO2,
-      volume: this.totalVolume,
-      materials,
-      materialsColors: this.materialsColors,
-      transportColors: this.transportColors,
-    };
-  }
+  //   return {
+  //     transportCarbonA4: A4,
+  //     productStageCarbonA1A3: A1A3,
+  //     constructionCarbonA5: {
+  //       value: A5Value,
+  //       waste: A5Waste,
+  //       site: A5Site,
+  //     },
+  //     totalCO2,
+  //     volume: this.totalVolume,
+  //     materials,
+  //     materialsColors: this.materialsColors,
+  //     transportColors: this.transportColors,
+  //   };
+  // }
 
   convertToFormComplete() {
     const objs: SpeckleObjectFormComplete[] = [];
@@ -987,24 +981,24 @@ export default class Assessment extends Vue {
     propertyGroups: StringPropertyGroups[],
     selectedGroup: string
   ): MaterialGrouping[] {
-    console.log("propertyGroups:", propertyGroups)
-    const group = propertyGroups.find((pg) => pg.name === selectedGroup);
-    if (group) {
-      // we're assuming that if this.update=true then objectsObj will already be filled by this point
-      const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(
-        (vg) => ({
-          type: vg.value,
-          ids: vg.ids,
-          material: this.update
-            ? this.objectsObj[vg.ids[0]].formData?.material
-            : undefined,
-          transport: this.update
-            ? this.objectsObj[vg.ids[0]].formData?.transport
-            : undefined,
-        })
-      );
-      return materialGrouping;
-    }
+    // console.log("propertyGroups:", propertyGroups)
+    // const group = propertyGroups.find((pg) => pg.name === selectedGroup);
+    // if (group) {
+    //   // we're assuming that if this.update=true then objectsObj will already be filled by this point
+    //   const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(
+    //     (vg) => ({
+    //       type: vg.value,
+    //       ids: vg.ids,
+    //       material: this.update
+    //         ? this.objectsObj[vg.ids[0]].formData?.material
+    //         : undefined,
+    //       transport: this.update
+    //         ? this.objectsObj[vg.ids[0]].formData?.transport
+    //         : undefined,
+    //     })
+    //   );
+    //   return materialGrouping;
+    // }
     return [];
   }
 

@@ -2,12 +2,19 @@ import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import {
   EmptyProps,
   EmptyPropsPassdown,
+  ObjectsObj,
   ProjectDataComplete,
   ReportProp,
+  ReportTotals,
+  SpeckleObjectComplete,
   StringPropertyGroups,
   TransportType,
 } from "../newAssessment";
 import { IChildObject, Param } from "@/views/utils/add-params/addParams";
+import * as AddParams from "@/views/utils/add-params/addParams";
+import { Color } from "../renderer";
+import { ChartData } from "../chart";
+import { ChildSpeckleObjectData } from "../graphql";
 
 interface ObjectMaterials {
   [materialName: string]: ReportMaterial;
@@ -29,6 +36,11 @@ export interface ChildObjects {
   volume: number;
 }
 
+interface ReportToUpload {
+  reportObjs: SpeckleObjectComplete[];
+  totals: ReportTotals;
+}
+
 export class ReportController {
   objects: ReportObjects = {};
   groups: { [groupValue: string]: string[] } = {};
@@ -41,6 +53,33 @@ export class ReportController {
   totalA5a = 0; // A5a only has one component (sys cost), but keeping "total" naming scheme for consistency
   totalA5 = 0;
 
+  addParams: AddParams.ParamAdd[] = [];
+
+  materials: ChartData[] = [];
+  reportObjs: SpeckleObjectComplete[] = [];
+
+  convToUpload(volume: number, materialsColors: Color[], transportColors: Color[]): ReportToUpload {
+    const totals: ReportTotals = {
+      totalCO2: this.totalCarbon,
+      volume,
+      materials: this.materials,
+      materialsColors,
+      transportColors,
+      transportCarbonA4: this.totalA4,
+      productStageCarbonA1A3: this.totalA1A3,
+      constructionCarbonA5: {
+        value: this.totalA5,
+        waste: this.totalA5w,
+        site: this.totalA5a
+      }
+    }
+
+    return {
+      totals,
+      reportObjs: this.reportObjs
+    };
+  }
+
   calcCarbon(): ReportProp {
     this.totalA5a = this.calcA5a();
 
@@ -49,13 +88,114 @@ export class ReportController {
     this.totalA4 = 0;
     this.totalA5w = 0;
 
+    const materialsObj: {
+      [key: string]: { value: number; color: string };
+    } = {};
+    this.reportObjs = [];
+
     Object.entries(this.objects).forEach(([k, v]) => {
       const { A1A3, A4, A5w } = v.calcCarbon();
 
       this.totalA1A3 += A1A3;
       this.totalA4 += A4;
       this.totalA5w += A5w;
+
+      // update materialsObj
+      Object.entries(v.materials).forEach(([k1, v1]) => {
+        if (materialsObj[k1]) materialsObj[k1].value += v1.totalCarbon;
+        else materialsObj[k1] = {
+          color: v1.material.color,
+          value: v1.totalCarbon
+        }
+      });
+
+      // update reportObjs
+      this.reportObjs.push(v.convToSpeckleObjectComplete());
+
+      // make parameter update object
+      this.addParams.push({
+        parentid: v.id,
+        name: "Total Carbon",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Total Carbon",
+          units: "kgCO2e/kg",
+          value: A4 + A1A3 + A5w,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      this.addParams.push({
+        parentid: v.id,
+        name: "Product Stage Carbon A1-A3",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Product Stage Carbon A1-A3",
+          units: "kgCO2e/kg",
+          value: A1A3,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      this.addParams.push({
+        parentid: v.id,
+        name: "Transport Carbon A4",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Transport Carbon A4",
+          units: "kgCO2e/kg",
+          value: A4,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      this.addParams.push({
+        parentid: v.id,
+        name: "Construction Carbon A5",
+        param: {
+          id: Math.floor(Math.random() * 10000000).toString(),
+          name: "Construction Carbon A5",
+          units: "kgCO2e/kg",
+          value: A5w,
+          isShared: false,
+          isReadOnly: false,
+          speckle_type: "Objects.BuiltElements.Revit.Parameter",
+          applicationId: null,
+          applicationUnit: null,
+          isTypeParameter: false,
+          totalChildrenCount: 0,
+          applicationUnitType: "string",
+          applicationInternalName: "string",
+        },
+      });
+      // end parameter update
     });
+    this.materials = Object.entries(materialsObj).map(([k, v]) => ({
+      value: v.value,
+      label: k,
+      color: v.color,
+    }));
     console.log("this.objects:", this.objects);
 
     this.totalA5 = this.totalA5w + this.totalA5a
@@ -124,26 +264,44 @@ export class ReportController {
     return this.projectInfo && this.projectInfo.cost;
   }
 
+  // method used on new assessment page when updating an existing report
+  setObjectsUpdate(childObjects: ChildSpeckleObjectData[]) {
+    childObjects.forEach((c) => {
+      const newObj = new ReportObject(
+        c.id,
+        c.speckleType,
+        c.act.formData.volume
+      );
+        newObj.updateUsingReport(c);
+
+        this.objects[c.id] = newObj;
+    })
+  }
+
   setObjects(childObjects: ChildObjects[]) {
     childObjects.forEach((c) => {
       const speckleObject = c.speckleObject;
       this.objects[speckleObject.id] = new ReportObject(
         speckleObject.id,
         speckleObject.speckle_type,
-        c.volume,
-        speckleObject.parameters
+        c.volume
       );
     });
   }
 
   groupObjects(propertyGroups: StringPropertyGroups[], selectedGroup: string) {
+    console.log("grouping objects?");
+    console.log("propertyGroups:", propertyGroups);
+    console.log("selectedGroup:", selectedGroup);
     this.groups = {};
     const group = propertyGroups.find((pg) => pg.name === selectedGroup);
+    console.log("group:", group);
     if (group) {
       group.data.valueGroups.forEach((vg) => {
         if (this.groups[vg.value]) this.groups[vg.value].push(...vg.ids);
         else this.groups[vg.value] = [...vg.ids];
       });
+      console.log("this.groups:", this.groups);
     }
   }
 }
@@ -158,8 +316,7 @@ export class ReportObject {
   constructor(
     public id: string,
     public speckle_type: string,
-    public volume: number,
-    public properties: { [key: string]: Param }
+    public volume: number
   ) {}
 
   materials: ObjectMaterials = {};
@@ -171,6 +328,52 @@ export class ReportObject {
 
   get hasMaterials() {
     return Object.keys(this.materials).length > 0;
+  }
+
+  updateUsingReport(c: ChildSpeckleObjectData) {
+    // add materials
+    //    add transport to materials
+    const material = c.act.formData.material;
+    if (Array.isArray(material)) {
+      material;
+      const transport = c.act.formData.transport as TransportType[]; // if material is an array then we know that transport will be too
+      material.forEach((m, i) => {
+        if (m.volume) // we can be _pretty_ certain that m.volume exists (hopefully)
+          this.addMaterial(m, m.volume / this.volume);
+        this.setTransport(m.name, transport[i]); // transport and materials should have been added to their arrays in the same order, so index should link the two
+      })
+    } else {
+      this.addMaterial(material, 1);
+      this.setTransport(material.name, c.act.formData.transport as TransportType); // if material is not an array then we know that transport won't be either
+    }
+    // pull in carbon values
+    const reportData = c.act.reportData;
+    this.totalCarbon = reportData.totalCarbon;
+    this.totalA1A3 = reportData.productStageCarbonA1A3;
+    this.totalA4 = reportData.transportCarbonA4;
+    this.totalA5w = reportData.constructionCarbonA5.waste;
+  }
+
+  convToSpeckleObjectComplete(): SpeckleObjectComplete {
+    return {
+      id: this.id,
+      speckle_type: this.speckle_type,
+      formData: {
+        transport: Object.entries(this.materials).map(([k, v]) => v.transport),
+        material: Object.entries(this.materials).map(([k, v]) => v.material),
+        volume: this.volume
+      },
+      reportData: {
+        totalCarbon: this.totalCarbon,
+        transportCarbonA4: this.totalA4,
+        productStageCarbonA1A3: this.totalA1A3,
+        constructionCarbonA5: {
+          value: this.totalA5w,
+          site: 0,
+          waste: this.totalA5w
+        }
+      }
+    };
   }
 
   setTransport(materialName: string, transportType: TransportType) {
@@ -227,8 +430,10 @@ export class ReportObject {
 }
 
 export class ReportMaterial {
-  constructor(public volume: number, public material: MaterialFull) {}
-  transport: Transport = {} as Transport;
+  constructor(public volume: number, public material: MaterialFull) {
+    this.material.volume = this.volume;
+  }
+  transport: TransportType = {} as TransportType;
 
   totalCarbon = 0;
   A1A3 = 0;
@@ -239,11 +444,12 @@ export class ReportMaterial {
     return this.transport && this.transport.name;
   }
 
-  setTransport({ name, color, values: { road, rail, sea } }: TransportType) {
-    this.transport = new Transport(name, color, { road, rail, sea });
+  setTransport(transport: TransportType) {
+    this.transport = transport;
   }
   setMaterial(material: MaterialFull) {
     this.material = material;
+    this.material.volume = this.volume;
   }
 
   calcCarbon(): CarbonResults {
@@ -267,7 +473,7 @@ export class ReportMaterial {
 
     return A1A3;
   }
-  calcA4(volume: number, material: MaterialFull, transport: Transport, factors: TransportFactors) {
+  calcA4(volume: number, material: MaterialFull, transport: TransportType, factors: TransportFactors) {
     const A4 =
       (material.density *
         volume *
@@ -278,7 +484,7 @@ export class ReportMaterial {
   }
   // TODO: check whether we should be including C2-C4 (estimates/assumptions) in this calc?
   // How to Calculate Embodied Carbon does say to use it (and gives assumptions to use given a lack of data), however DesignCheck does not use them
-  calcA5w(volume: number, material: MaterialFull, transport: Transport, factors: TransportFactors) {
+  calcA5w(volume: number, material: MaterialFull, transport: TransportType, factors: TransportFactors) {
     const wasteVolume = volume * (1 / (1 - material.wastage) - 1);
 
     const A1A3 = this.calcA1A3(wasteVolume, material);
@@ -298,16 +504,4 @@ const transportFactors: TransportFactors = {
   // values taken from RICS guidance
   road: 0.1136, // gCO2/kg/km
   sea: 0.016143, // gCO2/kg/km
-}
-
-export class Transport {
-  constructor(
-    public name: "local" | "regional" | "global" | "custom",
-    public color: string,
-    public values: { road: number; rail: number; sea: number }
-  ) {}
-
-  calcA4() {
-    return -1;
-  }
 }

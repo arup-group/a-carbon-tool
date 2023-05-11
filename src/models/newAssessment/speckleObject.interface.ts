@@ -33,8 +33,8 @@ export interface SpeckleObjectFormComplete {
 }
 
 export interface ObjectFormDataComplete {
-  transport: TransportType;
-  material: MaterialFull;// | MultiMaterial[];
+  transport: TransportType | TransportType[]; // single object only used in legacy reports
+  material: MaterialFull | MaterialFull[];// single object only used in legacy reports
   volume: number;
 }
 

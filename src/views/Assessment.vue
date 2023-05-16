@@ -113,8 +113,6 @@ import {
   EmptyProps,
   EmptyPropsPassdown,
   SpeckleObjectFormComplete,
-  SpeckleObjectComplete,
-  ReportTotals,
   ReportPassdown,
   ObjectDetails,
   GroupedMaterial,
@@ -129,13 +127,6 @@ import {
 
 import * as THREE from "three";
 import {
-  constructionCarbonA5,
-  constructionCarbonA5Site,
-  constructionCarbonA5Waste,
-  productStageCarbonA1A3,
-  transportCarbonA4,
-} from "@/store/utilities/carbonCalculator";
-import {
   CheckContainsChlidReportInput,
   GetAllReportBranchesOutput,
   LoadActReportDataInput,
@@ -145,7 +136,6 @@ import {
 import { VolCalculator } from "./utils/VolCalculator";
 import { LoadStreamOut } from "./utils/process-report-object";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
-import { ChartData } from "@/models/chart";
 import { ChildObjects, ReportController } from "@/models/report";
 
 interface AvailableStream {
@@ -221,7 +211,7 @@ export default class Assessment extends Vue {
   objectGroups: string[] = [];
   groupedMaterials: GroupedMaterial[] = [];
   get transportGroups() {
-    console.log("get transportGroups")
+    console.log("get transportGroups");
     return this.reportController.transportGroups;
   }
   selectedObjectGroup = "Object Type";
@@ -273,7 +263,6 @@ export default class Assessment extends Vue {
   }
 
   materialGroupSelected(objectGroup: string) {
-    // this.types = this.findTypes(this.groupingProps, objectGroup);
     this.reportController.groupObjects(this.groupingProps, objectGroup);
     this.selectedObjectGroup = objectGroup;
     this.resetColors();
@@ -316,32 +305,12 @@ export default class Assessment extends Vue {
     const objGroup = assessmentViewData.data.selectedObjectGroup;
     this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
     this.reportController.setObjectsUpdate(assessmentViewData.data.children);
-    // assessmentViewData.data.children.forEach((c) => {
-    //   this.objectsObj[c.act.id] = {
-    //     id: c.act.id,
-    //     speckle_type: c.act.speckle_type,
-    //     formData: c.act.formData,
-    //     reportData: c.act.reportData,
-    //   };
-    // });
 
     this.materialsColors = this.reportController.materialsColors;
     this.transportColors = this.reportController.transportColors;
 
-    // this.materialsColors = Object.values(this.objectsObj).map((o) => ({
-    //   id: o.id,
-    //   color: o.formData?.material?.color as string,
-    // }));
-    // this.transportColors = Object.values(this.objectsObj).map((o) => ({
-    //   id: o.id,
-    //   color: o.formData?.transport?.color as string,
-    // }));
-
-    // this.projectData = assessmentViewData.data.projectInfo;
     this.reportController.projectInfo = assessmentViewData.data.projectInfo;
     this.projectDataPassdown = this.reportController.projectInfo;
-
-    // this.groupMaterials();
 
     this.totalVolume = assessmentViewData.data.projectInfo.volume;
     this.speckleVol = true;
@@ -382,7 +351,11 @@ export default class Assessment extends Vue {
       );
     }
 
-    const upload = this.reportController.convToUpload(this.totalVolume, this.materialsColors, this.transportColors);
+    const upload = this.reportController.convToUpload(
+      this.totalVolume,
+      this.materialsColors,
+      this.transportColors
+    );
     const uploadReportInput: UploadReportInput = {
       streamid: this.streamId,
       objects: upload.reportObjs,
@@ -451,7 +424,7 @@ export default class Assessment extends Vue {
           if (!this.update) {
             childObjs.push({
               volume,
-              speckleObject: r
+              speckleObject: r,
             });
             this.objectsObj[r.id] = {
               id: r.id,
@@ -484,18 +457,21 @@ export default class Assessment extends Vue {
       this.reportController.objects // technically not the right type, but it works so...
     );
     this.objectGroups = this.groupingProps.map((gp) => gp.name);
-    this.reportController.groupObjects(this.groupingProps, this.selectedObjectGroup);
+    this.reportController.groupObjects(
+      this.groupingProps,
+      this.selectedObjectGroup
+    );
     console.log("reportController:", this.reportController);
 
-    this.types = this.findTypes(this.groupingProps, this.selectedObjectGroup);
     this.allIds = Object.keys(this.reportController.objects);
     console.log("this.allIds:", this.allIds);
     if (!this.update) {
-      // this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
     }
 
-    this.updateVolumeGradient();
+    this.volumeGradient = {
+      property: this.volProp,
+    };
     this.resetColors();
     this.loadingModel = false;
   }
@@ -553,7 +529,6 @@ export default class Assessment extends Vue {
         this.beenToTransport = true;
         this.resetColors();
         this.colors = this.transportColors;
-        // this.groupMaterials();
         break;
       case Step.QUANTITIES:
         this.resetColors();
@@ -563,12 +538,10 @@ export default class Assessment extends Vue {
       case Step.REVIEW:
         this.resetColors();
         this.emptyProps = this.reportController.isReportComplete();
-        // this.review();
         break;
       case Step.PREVIEW:
         this.report = this.reportController.calcCarbon();
         console.log("reportController:", this.reportController);
-        // this.carbonCalc();
         this.resetColors();
         break;
       case Step.SAVE:
@@ -594,329 +567,11 @@ export default class Assessment extends Vue {
 
   createNewObjectGroup(name: string) {
     this.reportController.addNewGroup(name, this.selectedObjects);
-    // this.types = this.types.map((t) => ({
-    //   ...t,
-    //   ids: t.ids.filter((i) => !this.selectedObjects.includes(i)),
-    // }));
-    // this.types.push({
-    //   ids: this.selectedObjects,
-    //   material: undefined,
-    //   transport: undefined,
-    //   type: name,
-    // });
-  }
-
-  groupMaterials() {
-    let materialsObj: {
-      [material: string]: {
-        transportType?: TransportType;
-        speckle_types: {
-          [speckle_type: string]: string[] /* array should be object id's */;
-        };
-      };
-    } = {};
-
-    // assuming that the materials section has been filled out already
-    Object.values(this.objectsObj).forEach((o) => {
-      if (instanceOfMaterialFull(o.formData?.material)) {
-        const material = o.formData?.material?.name;
-        const speckle_type = o.speckle_type;
-        if (material) {
-          if (
-            materialsObj[material] &&
-            materialsObj[material].speckle_types[speckle_type]
-          ) {
-            materialsObj[material].speckle_types[speckle_type].push(o.id);
-          } else if (materialsObj[material]) {
-            materialsObj[material].speckle_types[speckle_type] = [o.id];
-          } else {
-            materialsObj[material] = {
-              speckle_types: {},
-              transportType: o.formData?.transport,
-            };
-            materialsObj[material].speckle_types[speckle_type] = [o.id];
-          }
-        }
-      }
-    });
-
-    const materialsArr: GroupedMaterial[] = Object.keys(materialsObj).map(
-      (m) => {
-        const ids: string[] = [];
-        const speckle_types = Object.keys(materialsObj[m].speckle_types).map(
-          (s) => {
-            ids.push(...materialsObj[m].speckle_types[s]);
-            return s;
-          }
-        );
-        return {
-          material: m,
-          objects: ids,
-          speckle_types,
-          transportType: materialsObj[m].transportType,
-        };
-      }
-    );
-
-    this.groupedMaterials = materialsArr;
   }
 
   resetColors() {
     this.colors = [];
     this.volumeGradientPassdown = null;
-  }
-
-  updateVolumeGradient() {
-    // let minVol = -1;
-    // let maxVol = -1;
-
-    // Object.values(this.objectsObj).forEach((o, i) => {
-    //   if (o.formData?.volume) {
-    //     let volume = o.formData.volume;
-    //     if (i === 0) {
-    //       // if on the first index, then min and max have not yet been set, so set them to the first vol value
-    //       minVol = volume;
-    //       maxVol = volume;
-    //     } else {
-    //       if (minVol > volume) minVol = volume;
-    //       if (maxVol < volume) maxVol = volume;
-    //     }
-    //   }
-    // });
-
-    this.volumeGradient = {
-      property: this.volProp,
-    };
-  }
-
-  // for now we're just assuming that all data is filled in if the user reaches this step TODO: ONLY ALLOW USER ON THIS PAGE IF REVIEW IS SUCCESSFUL
-  carbonCalc() {
-    // convert objects from SpeckleObject to SpeckleObjectFormComplete
-    // const objs = this.convertToFormComplete();
-    // this.addParams = [];
-
-    // const reportObjs = objs.map((o): SpeckleObjectComplete => {
-    //   const A1A3 = productStageCarbonA1A3(o);
-    //   const A4 = transportCarbonA4(o);
-    //   const A5Site = constructionCarbonA5Site(this.projectData.cost);
-    //   const A5Waste = constructionCarbonA5Waste(o);
-    //   const A5Value = constructionCarbonA5({
-    //     site: A5Site,
-    //     waste: A5Waste,
-    //   });
-
-    //   // make parameter update object
-    //   this.addParams.push({
-    //     parentid: o.id,
-    //     name: "Total Carbon",
-    //     param: {
-    //       id: Math.floor(Math.random() * 10000000).toString(),
-    //       name: "Total Carbon",
-    //       units: "kgCO2e/kg",
-    //       value: A4 + A1A3 + A5Value,
-    //       isShared: false,
-    //       isReadOnly: false,
-    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
-    //       applicationId: null,
-    //       applicationUnit: null,
-    //       isTypeParameter: false,
-    //       totalChildrenCount: 0,
-    //       applicationUnitType: "string",
-    //       applicationInternalName: "string",
-    //     },
-    //   });
-    //   this.addParams.push({
-    //     parentid: o.id,
-    //     name: "Product Stage Carbon A1-A3",
-    //     param: {
-    //       id: Math.floor(Math.random() * 10000000).toString(),
-    //       name: "Product Stage Carbon A1-A3",
-    //       units: "kgCO2e/kg",
-    //       value: A1A3,
-    //       isShared: false,
-    //       isReadOnly: false,
-    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
-    //       applicationId: null,
-    //       applicationUnit: null,
-    //       isTypeParameter: false,
-    //       totalChildrenCount: 0,
-    //       applicationUnitType: "string",
-    //       applicationInternalName: "string",
-    //     },
-    //   });
-    //   this.addParams.push({
-    //     parentid: o.id,
-    //     name: "Transport Carbon A4",
-    //     param: {
-    //       id: Math.floor(Math.random() * 10000000).toString(),
-    //       name: "Transport Carbon A4",
-    //       units: "kgCO2e/kg",
-    //       value: A4,
-    //       isShared: false,
-    //       isReadOnly: false,
-    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
-    //       applicationId: null,
-    //       applicationUnit: null,
-    //       isTypeParameter: false,
-    //       totalChildrenCount: 0,
-    //       applicationUnitType: "string",
-    //       applicationInternalName: "string",
-    //     },
-    //   });
-    //   this.addParams.push({
-    //     parentid: o.id,
-    //     name: "Transport Carbon A4",
-    //     param: {
-    //       id: Math.floor(Math.random() * 10000000).toString(),
-    //       name: "Transport Carbon A4",
-    //       units: "kgCO2e/kg",
-    //       value: A4,
-    //       isShared: false,
-    //       isReadOnly: false,
-    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
-    //       applicationId: null,
-    //       applicationUnit: null,
-    //       isTypeParameter: false,
-    //       totalChildrenCount: 0,
-    //       applicationUnitType: "string",
-    //       applicationInternalName: "string",
-    //     },
-    //   });
-    //   this.addParams.push({
-    //     parentid: o.id,
-    //     name: "Construction Carbon A5",
-    //     param: {
-    //       id: Math.floor(Math.random() * 10000000).toString(),
-    //       name: "Construction Carbon A5",
-    //       units: "kgCO2e/kg",
-    //       value: A5Value,
-    //       isShared: false,
-    //       isReadOnly: false,
-    //       speckle_type: "Objects.BuiltElements.Revit.Parameter",
-    //       applicationId: null,
-    //       applicationUnit: null,
-    //       isTypeParameter: false,
-    //       totalChildrenCount: 0,
-    //       applicationUnitType: "string",
-    //       applicationInternalName: "string",
-    //     },
-    //   });
-    //   // end parameter update
-
-    //   return {
-    //     ...o,
-    //     reportData: {
-    //       transportCarbonA4: A4,
-    //       productStageCarbonA1A3: A1A3,
-    //       constructionCarbonA5: {
-    //         value: A5Value,
-    //         waste: A5Waste,
-    //         site: A5Site,
-    //       },
-    //       totalCarbon: A4 + A1A3 + A5Value,
-    //     },
-    //   };
-    // });
-
-    // const totals = this.calcTotals(reportObjs);
-
-    // this.report = {
-    //   reportObjs,
-    //   totals,
-    // };
-  }
-
-  // calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {
-  //   let A1A3 = 0;
-  //   let A4 = 0;
-  //   let A5Site = 0;
-  //   let A5Waste = 0;
-  //   let A5Value = 0;
-  //   const materialsObj: {
-  //     [key: string]: { value: number; color: string };
-  //   } = {};
-  //   reportObjs.forEach((o) => {
-  //     const rd = o.reportData;
-  //     A1A3 += rd.productStageCarbonA1A3;
-  //     A4 += rd.transportCarbonA4;
-  //     A5Site += rd.constructionCarbonA5.site;
-  //     A5Waste += rd.constructionCarbonA5.waste;
-  //     A5Value += rd.constructionCarbonA5.value;
-  //     const objTotal = A1A3 + A4 + A5Value;
-  //     const materialName = o.formData.material.name;
-  //     if (materialName in materialsObj) {
-  //       materialsObj[materialName].value += objTotal;
-  //     } else {
-  //       materialsObj[materialName] = {
-  //         value: objTotal,
-  //         color: o.formData.material.color,
-  //       };
-  //     }
-  //   });
-  //   let totalCO2 = A1A3 + A4 + A5Value;
-  //   const materials: ChartData[] = Object.entries(materialsObj).map((m) => ({
-  //     value: m[1].value,
-  //     label: m[0],
-  //     color: m[1].color,
-  //   }));
-
-  //   return {
-  //     transportCarbonA4: A4,
-  //     productStageCarbonA1A3: A1A3,
-  //     constructionCarbonA5: {
-  //       value: A5Value,
-  //       waste: A5Waste,
-  //       site: A5Site,
-  //     },
-  //     totalCO2,
-  //     volume: this.totalVolume,
-  //     materials,
-  //     materialsColors: this.materialsColors,
-  //     transportColors: this.transportColors,
-  //   };
-  // }
-
-  convertToFormComplete() {
-    const objs: SpeckleObjectFormComplete[] = [];
-    Object.values(this.objectsObj).forEach((o) => {
-      if (
-        o.formData &&
-        o.formData.transport &&
-        o.formData.material &&
-        o.formData.volume
-      ) {
-        objs.push({
-          ...o,
-          formData: {
-            transport: o.formData.transport,
-            material: o.formData.material,
-            volume: o.formData.volume,
-          },
-        });
-      }
-    });
-    return objs;
-  }
-
-  review() {
-    const emptyProps: EmptyProps = {
-      projectEmpty: this.projectData ? true : false,
-      materialsEmpty: [] as string[],
-      transportsEmpty: [] as string[],
-      volumesEmpty: [] as string[],
-    };
-
-    Object.values(this.objectsObj).forEach((o) => {
-      const formData = o.formData;
-
-      if (formData?.material === undefined)
-        emptyProps.materialsEmpty.push(o.id);
-      if (formData?.transport === undefined)
-        emptyProps.transportsEmpty.push(o.id);
-      if (formData?.volume === undefined) emptyProps.volumesEmpty.push(o.id);
-    });
-
-    this.emptyProps = emptyProps;
   }
 
   async loadStream(id: string) {
@@ -929,18 +584,16 @@ export default class Assessment extends Vue {
 
   transportSelected(selected: TransportSelected) {
     if (this.beenToTransport) {
-      selected.material.objects.forEach(o => {
+      selected.material.objects.forEach((o) => {
         o.setTransport(selected.transportType);
-        // Object.entries(o.materials).forEach(([k, v]) => {
-        //   if (k === selected.material.name) {
-        //     v.setTransport(selected.transportType);
-        //   }
-        // });
       });
       console.log("reportController:", this.reportController);
-      console.log("reportController.transportGroups:", this.reportController.transportGroups);
+      console.log(
+        "reportController.transportGroups:",
+        this.reportController.transportGroups
+      );
 
-        const ids = selected.material.objects.map(o => o.parentId);
+      const ids = selected.material.objects.map((o) => o.parentId);
       this.colors = this.colors.filter((c) => !ids.includes(c.id));
       ids.forEach((id) => {
         this.colors.push({
@@ -953,12 +606,15 @@ export default class Assessment extends Vue {
   }
 
   materialUpdated(material: MaterialUpdateOut) {
-    material.type.objects.forEach(o => {
+    material.type.objects.forEach((o) => {
       o.changeMaterial(material.oldMaterial?.name, material.material);
     });
     console.log("reportController:", this.reportController);
-    console.log("reportController.fullGroups:", this.reportController.fullGroups);
-    const ids = material.type.objects.map(o => o.id);
+    console.log(
+      "reportController.fullGroups:",
+      this.reportController.fullGroups
+    );
+    const ids = material.type.objects.map((o) => o.id);
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
       try {
@@ -971,44 +627,6 @@ export default class Assessment extends Vue {
       }
     });
     this.materialsColors = this.colors;
-
-    // // update the objects to include this new material
-    // material.type.ids.forEach((i) => {
-    //   const oldObj = this.objectsObj[i];
-    //   this.objectsObj[i] = {
-    //     ...oldObj,
-    //     formData: {
-    //       ...oldObj.formData,
-    //       material: material.material,
-    //     },
-    //   };
-    // });
-  }
-
-  // types = material groups, cuz legacy
-  findTypes(
-    propertyGroups: StringPropertyGroups[],
-    selectedGroup: string
-  ): MaterialGrouping[] {
-    // console.log("propertyGroups:", propertyGroups)
-    // const group = propertyGroups.find((pg) => pg.name === selectedGroup);
-    // if (group) {
-    //   // we're assuming that if this.update=true then objectsObj will already be filled by this point
-    //   const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(
-    //     (vg) => ({
-    //       type: vg.value,
-    //       ids: vg.ids,
-    //       material: this.update
-    //         ? this.objectsObj[vg.ids[0]].formData?.material
-    //         : undefined,
-    //       transport: this.update
-    //         ? this.objectsObj[vg.ids[0]].formData?.transport
-    //         : undefined,
-    //     })
-    //   );
-    //   return materialGrouping;
-    // }
-    return [];
   }
 
   uploadData(data: ProjectDataComplete) {

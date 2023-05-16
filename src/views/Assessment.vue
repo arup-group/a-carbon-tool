@@ -273,7 +273,8 @@ export default class Assessment extends Vue {
   }
 
   materialGroupSelected(objectGroup: string) {
-    this.types = this.findTypes(this.groupingProps, objectGroup);
+    // this.types = this.findTypes(this.groupingProps, objectGroup);
+    this.reportController.groupObjects(this.groupingProps, objectGroup);
     this.selectedObjectGroup = objectGroup;
     this.resetColors();
   }

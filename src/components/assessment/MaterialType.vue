@@ -66,41 +66,20 @@ export default class MaterialType extends Vue {
   currentMaterial =
     this.type &&
     this.type.objects.length > 0 &&
-    this.type.objects[0].hasMaterials
-      ? this.type.objects[0].materials[0].material
+    this.type.objects[0].hasMaterials &&
+    Object.values(this.type.objects[0].materials)[0].material.name
+      ? Object.values(this.type.objects[0].materials)[0].material
       : null;
   filtered = true;
 
   mounted() {
-    console.log("mounted, this.type:", this.type);
-    if (this.type) {
-      console.log("this.type")
-      if (this.type.objects.length > 0) {
-        console.log("this.type.objects.length > 0")
-        if (this.type.objects[0].hasMaterials) {
-          console.log("this.type.objects[0].hasMaterials")
-          console.log("this.type.objects[0]:", this.type.objects[0])
-          console.log("this.type.objects[0].materials[0]:", this.type.objects[0].materials[0])
-          console.log("Object.values(this.type.objects[0].materials)[0].material.name:", Object.values(this.type.objects[0].materials)[0].material.name);
-          // console.log("this.type.objects[0].materials[0].material:", this.type.objects[0].materials[0].material)
-          // console.log("this.type.objects[0].materials[0].material.name:", this.type.objects[0].materials[0].material.name)
-          if (Object.values(this.type.objects[0].materials)[0].material.name) {
-            console.log("this.type.objects[0].materials[0].material.name")
-            this.currentMaterial =
-              Object.values(this.type.objects[0].materials)[0].material;
-          } else {
-            this.currentMaterial = null;
-          }
-        } else {
-          this.currentMaterial = null;
-        }
-      } else {
-        this.currentMaterial = null;
-      }
-    } else {
-      this.currentMaterial = null;
-    }
-    // this.currentMaterial = this.type && this.type.objects.length > 0 && this.type.objects[0].hasMaterials ? this.type.objects[0].materials[0].material.name : null;
+    this.currentMaterial =
+      this.type &&
+      this.type.objects.length > 0 &&
+      this.type.objects[0].hasMaterials &&
+      Object.values(this.type.objects[0].materials)[0].material.name
+        ? Object.values(this.type.objects[0].materials)[0].material
+        : null;
   }
 
   @Emit("selectMaterial")
@@ -122,8 +101,6 @@ export default class MaterialType extends Vue {
   }
 
   getContrastYIQ(hexcolor: string, item: any) {
-    console.log("hexcolor:", hexcolor)
-    console.log("item:", item);
     if (hexcolor.slice(0, 1) === "#") {
       hexcolor = hexcolor.slice(1);
     }

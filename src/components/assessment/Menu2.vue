@@ -75,7 +75,6 @@ export default class Menu2 extends Vue {
   }
 
   expandSelection(type: MaterialGrouping) {
-    console.log("parent expand!", type);
     this.expandedTypes.push(type.type);
   }
 

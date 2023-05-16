@@ -41,7 +41,7 @@ interface ReportToUpload {
   totals: ReportTotals;
 }
 interface ReportControllerGroups {
-  [groupValue: string]: string[]
+  [groupValue: string]: string[];
 }
 
 export class ReportController {
@@ -61,7 +61,11 @@ export class ReportController {
   materials: ChartData[] = [];
   reportObjs: SpeckleObjectComplete[] = [];
 
-  convToUpload(volume: number, materialsColors: Color[], transportColors: Color[]): ReportToUpload {
+  convToUpload(
+    volume: number,
+    materialsColors: Color[],
+    transportColors: Color[]
+  ): ReportToUpload {
     const totals: ReportTotals = {
       totalCO2: this.totalCarbon,
       volume,
@@ -73,27 +77,27 @@ export class ReportController {
       constructionCarbonA5: {
         value: this.totalA5,
         waste: this.totalA5w,
-        site: this.totalA5a
-      }
-    }
+        site: this.totalA5a,
+      },
+    };
 
     return {
       totals,
-      reportObjs: this.reportObjs
+      reportObjs: this.reportObjs,
     };
   }
 
   get materialsColors(): Color[] {
     return Object.entries(this.objects).map(([k, v]) => ({
       id: v.id,
-      color: v.objectMaterialColor
+      color: v.objectMaterialColor,
     }));
   }
   get transportColors(): Color[] {
     return Object.entries(this.objects).map(([k, v]) => ({
       id: v.id,
-      color: v.objectTransportColor
-    }))
+      color: v.objectTransportColor,
+    }));
   }
 
   calcCarbon(): ReportProp {
@@ -119,10 +123,11 @@ export class ReportController {
       // update materialsObj
       Object.entries(v.materials).forEach(([k1, v1]) => {
         if (materialsObj[k1]) materialsObj[k1].value += v1.totalCarbon;
-        else materialsObj[k1] = {
-          color: v1.material.color,
-          value: v1.totalCarbon
-        }
+        else
+          materialsObj[k1] = {
+            color: v1.material.color,
+            value: v1.totalCarbon,
+          };
       });
 
       // update reportObjs
@@ -212,27 +217,28 @@ export class ReportController {
       label: k,
       color: v.color,
     }));
-    console.log("this.objects:", this.objects);
 
-    this.totalA5 = this.totalA5w + this.totalA5a
+    this.totalA5 = this.totalA5w + this.totalA5a;
     this.totalCarbon = this.totalA1A3 + this.totalA4 + this.totalA5;
 
     return {
       totalCO2: this.totalCarbon,
       totalA1A3: this.totalA1A3,
       totalA4: this.totalA4,
-      totalA5: this.totalA5
-    }
+      totalA5: this.totalA5,
+    };
   }
 
   calcA5a() {
-    return (this.projectInfo.cost * 1400) / 100000
+    return (this.projectInfo.cost * 1400) / 100000;
   }
 
   isReportComplete(): EmptyProps {
-    console.log("checking report complete")
-    const projectEmpty: boolean = this.projectInfo && this.projectInfo.name !== undefined; // all project info gets filled in at the same time, so if one contains a value, then they all will
-    const materialsEmpty = Object.entries(this.objects).filter(([k, v]) => !v.hasMaterials).map(([k, v]) => v.id);
+    const projectEmpty: boolean =
+      this.projectInfo && this.projectInfo.name !== undefined; // all project info gets filled in at the same time, so if one contains a value, then they all will
+    const materialsEmpty = Object.entries(this.objects)
+      .filter(([k, v]) => !v.hasMaterials)
+      .map(([k, v]) => v.id);
     const transportsEmpty: string[] = [];
 
     Object.entries(this.objects).forEach(([k, v]) => {
@@ -248,25 +254,21 @@ export class ReportController {
       projectEmpty,
       materialsEmpty,
       transportsEmpty,
-      volumesEmpty
-    }
+      volumesEmpty,
+    };
   }
 
   get fullGroups(): ReportFullGroup[] {
-    console.log("full groups!");
     let res = Object.keys(this.groups).map((g) => ({
       name: g,
       objects: this.groups[g].map((id) => this.objects[id]),
     }));
-    console.log("full group res:", res);
-    console.log("full group groups:", this.groups);
-    console.log("full group objects:", this.objects);
     return res;
   }
 
   get transportGroups(): ReportFullTransportGroup[] {
     const materialGrouping: { [materialName: string]: ReportMaterial[] } = {};
-    Object.keys(this.objects).forEach(k => {
+    Object.keys(this.objects).forEach((k) => {
       const obj = this.objects[k];
       if (obj.hasMaterials) {
         Object.entries(obj.materials).forEach(([k, v]) => {
@@ -277,7 +279,7 @@ export class ReportController {
     });
     return Object.entries(materialGrouping).map(([k, v]) => ({
       name: k,
-      objects: v
+      objects: v,
     }));
   }
 
@@ -293,10 +295,10 @@ export class ReportController {
         c.speckleType,
         c.act.formData.volume
       );
-        newObj.updateUsingReport(c);
+      newObj.updateUsingReport(c);
 
-        this.objects[c.act.id] = newObj;
-    })
+      this.objects[c.act.id] = newObj;
+    });
   }
 
   setObjects(childObjects: ChildObjects[]) {
@@ -312,12 +314,14 @@ export class ReportController {
 
   addNewGroup(name: string, selectedObjects: string[]) {
     // remove selected objects from their current group
-    const oldGroups: ReportControllerGroups = JSON.parse(JSON.stringify(this.groups));
+    const oldGroups: ReportControllerGroups = JSON.parse(
+      JSON.stringify(this.groups)
+    );
 
     this.groups = {};
 
     Object.entries(oldGroups).forEach(([k, v]) => {
-      this.groups[k] = v.filter(v => !selectedObjects.includes(v))
+      this.groups[k] = v.filter((v) => !selectedObjects.includes(v));
     });
 
     // add new group with the selected object id's
@@ -325,18 +329,13 @@ export class ReportController {
   }
 
   groupObjects(propertyGroups: StringPropertyGroups[], selectedGroup: string) {
-    console.log("grouping objects?");
-    console.log("propertyGroups:", propertyGroups);
-    console.log("selectedGroup:", selectedGroup);
     this.groups = {};
     const group = propertyGroups.find((pg) => pg.name === selectedGroup);
-    console.log("group:", group);
     if (group) {
       group.data.valueGroups.forEach((vg) => {
         if (this.groups[vg.value]) this.groups[vg.value].push(...vg.ids);
         else this.groups[vg.value] = [...vg.ids];
       });
-      console.log("this.groups:", this.groups);
     }
   }
 }
@@ -377,19 +376,21 @@ export class ReportObject {
       this.objectMaterialColor = material[0].color;
       this.objectTransportColor = transport[0].color;
       material.forEach((m, i) => {
-        if (m.volume) // we can be _pretty_ certain that m.volume exists (hopefully)
-          {
-            console.log("m.volume:", m.volume);
-            console.log("this.volume:", this.volume);
-            this.addMaterial(m, m.volume / this.volume);
-          }
+        if (m.volume)
+          // we can be _pretty_ certain that m.volume exists (hopefully)
+          this.addMaterial(m, m.volume / this.volume);
         this.setTransport(m.name, transport[i]); // transport and materials should have been added to their arrays in the same order, so index should link the two
-      })
+      });
     } else {
       this.objectMaterialColor = material.color;
-      this.objectTransportColor = (c.act.formData.transport as TransportType).color; // if material is not an array then we know that transport won't be either
+      this.objectTransportColor = (
+        c.act.formData.transport as TransportType
+      ).color; // if material is not an array then we know that transport won't be either
       this.addMaterial(material, 1);
-      this.setTransport(material.name, c.act.formData.transport as TransportType); // if material is not an array then we know that transport won't be either
+      this.setTransport(
+        material.name,
+        c.act.formData.transport as TransportType
+      ); // if material is not an array then we know that transport won't be either
     }
     // pull in carbon values
     const reportData = c.act.reportData;
@@ -406,7 +407,7 @@ export class ReportObject {
       formData: {
         transport: Object.entries(this.materials).map(([k, v]) => v.transport),
         material: Object.entries(this.materials).map(([k, v]) => v.material),
-        volume: this.volume
+        volume: this.volume,
       },
       reportData: {
         totalCarbon: this.totalCarbon,
@@ -415,9 +416,9 @@ export class ReportObject {
         constructionCarbonA5: {
           value: this.totalA5w,
           site: 0,
-          waste: this.totalA5w
-        }
-      }
+          waste: this.totalA5w,
+        },
+      },
     };
   }
 
@@ -426,8 +427,6 @@ export class ReportObject {
   }
 
   addMaterial(material: MaterialFull, percentage: number) {
-    console.log("percentage:", percentage)
-    console.log("this.volume:", this.volume);
     this.materials[material.name] = new ReportMaterial(
       this.volume * percentage,
       JSON.parse(JSON.stringify(material)), // make sure to do a deep copy of material otherwise problems pop up
@@ -472,14 +471,17 @@ export class ReportObject {
     return {
       A1A3: this.totalA1A3,
       A4: this.totalA4,
-      A5w: this.totalA5w
+      A5w: this.totalA5w,
     };
   }
 }
 
 export class ReportMaterial {
-  constructor(public volume: number, public material: MaterialFull, public parentId: string) {
-    console.log("ReportMaterial volume:", this.volume)
+  constructor(
+    public volume: number,
+    public material: MaterialFull,
+    public parentId: string
+  ) {
     this.material.volume = this.volume;
   }
   transport: TransportType = {} as TransportType;
@@ -503,17 +505,26 @@ export class ReportMaterial {
 
   calcCarbon(): CarbonResults {
     this.A1A3 = this.calcA1A3(this.volume, this.material);
-    this.A4 = this.calcA4(this.volume, this.material, this.transport, transportFactors);
-    this.A5w = this.calcA5w(this.volume, this.material, this.transport, transportFactors);
-
+    this.A4 = this.calcA4(
+      this.volume,
+      this.material,
+      this.transport,
+      transportFactors
+    );
+    this.A5w = this.calcA5w(
+      this.volume,
+      this.material,
+      this.transport,
+      transportFactors
+    );
 
     this.totalCarbon = this.A1A3 + this.A4 + this.A5w;
 
     return {
       A1A3: this.A1A3,
       A4: this.A4,
-      A5w: this.A5w
-    }
+      A5w: this.A5w,
+    };
   }
 
   calcA1A3(volume: number, material: MaterialFull) {
@@ -522,18 +533,29 @@ export class ReportMaterial {
 
     return A1A3;
   }
-  calcA4(volume: number, material: MaterialFull, transport: TransportType, factors: TransportFactors) {
+  calcA4(
+    volume: number,
+    material: MaterialFull,
+    transport: TransportType,
+    factors: TransportFactors
+  ) {
     const A4 =
       (material.density *
         volume *
-        (transport.values.road * factors.road + transport.values.sea * factors.sea)) /
+        (transport.values.road * factors.road +
+          transport.values.sea * factors.sea)) /
       1000;
 
     return A4;
   }
   // TODO: check whether we should be including C2-C4 (estimates/assumptions) in this calc?
   // How to Calculate Embodied Carbon does say to use it (and gives assumptions to use given a lack of data), however DesignCheck does not use them
-  calcA5w(volume: number, material: MaterialFull, transport: TransportType, factors: TransportFactors) {
+  calcA5w(
+    volume: number,
+    material: MaterialFull,
+    transport: TransportType,
+    factors: TransportFactors
+  ) {
     const wasteVolume = volume * (1 / (1 - material.wastage) - 1);
 
     const A1A3 = this.calcA1A3(wasteVolume, material);
@@ -553,4 +575,4 @@ const transportFactors: TransportFactors = {
   // values taken from RICS guidance
   road: 0.1136, // gCO2/kg/km
   sea: 0.016143, // gCO2/kg/km
-}
+};

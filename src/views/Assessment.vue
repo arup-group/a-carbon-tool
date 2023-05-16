@@ -103,26 +103,19 @@ import {
 import {
   ProjectDataComplete,
   MaterialUpdateOut,
-  MaterialGrouping,
   Step,
   TransportSelected,
   TransportType,
-  EmptyProps,
   EmptyPropsPassdown,
-  SpeckleObjectFormComplete,
   ReportPassdown,
   ObjectDetails,
-  GroupedMaterial,
   SelectedMaterialEmit,
-  ObjectsObj,
   StringPropertyGroups,
 } from "@/models/newAssessment";
 import {
-  instanceOfMaterialFull,
   MaterialFull,
 } from "@/store/utilities/material-carbon-factors";
 
-import * as THREE from "three";
 import {
   CheckContainsChlidReportInput,
   GetAllReportBranchesOutput,
@@ -130,7 +123,6 @@ import {
   UploadReportInput,
   GetObjectDetailsOut,
 } from "@/store";
-import { VolCalculator } from "./utils/VolCalculator";
 import { BECName } from "@/models/shared";
 import { LoadStreamOut } from "./utils/process-report-object";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
@@ -207,7 +199,6 @@ export default class Assessment extends Vue {
   groupingProps: StringPropertyGroups[] = [];
   objectGroups: string[] = [];
   get transportGroups() {
-    console.log("get transportGroups");
     return this.reportController.transportGroups;
   }
   selectedObjectGroup = "Object Type";
@@ -312,8 +303,6 @@ export default class Assessment extends Vue {
     this.speckleVol = true;
 
     this.resetColors();
-
-    console.log("updated reportController?", this.reportController);
   }
 
   async checkSave() {
@@ -333,7 +322,6 @@ export default class Assessment extends Vue {
     }
   }
   async uploadReport(branchName: string) {
-    console.log("upload report to branch:", branchName);
     this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
     let newModel: AddParams.AddParamsModel | undefined;
     if (this.parentObj) {
@@ -439,10 +427,8 @@ export default class Assessment extends Vue {
       this.groupingProps,
       this.selectedObjectGroup
     );
-    console.log("reportController:", this.reportController);
 
     this.allIds = Object.keys(this.reportController.objects);
-    console.log("this.allIds:", this.allIds);
     if (!this.update) {
       this.totalVolume = totalVol;
     }
@@ -479,7 +465,6 @@ export default class Assessment extends Vue {
         this.colors = this.materialsColors;
         break;
       case Step.TRANSPORT:
-        console.log("transportGroups:", this.reportController.transportGroups);
         this.beenToTransport = true;
         this.resetColors();
         this.colors = this.transportColors;
@@ -495,7 +480,6 @@ export default class Assessment extends Vue {
         break;
       case Step.PREVIEW:
         this.report = this.reportController.calcCarbon();
-        console.log("reportController:", this.reportController);
         this.resetColors();
         break;
       case Step.SAVE:
@@ -508,7 +492,6 @@ export default class Assessment extends Vue {
   }
 
   objectsSelected(objects: UserData[]) {
-    console.log("objectsSelected, objects:", objects);
     if (this.step === Step.MATERIALS) {
       const keys = Object.keys(this.reportController.objects);
       this.selectedObjects = objects
@@ -541,11 +524,6 @@ export default class Assessment extends Vue {
       selected.material.objects.forEach((o) => {
         o.setTransport(selected.transportType);
       });
-      console.log("reportController:", this.reportController);
-      console.log(
-        "reportController.transportGroups:",
-        this.reportController.transportGroups
-      );
 
       const ids = selected.material.objects.map((o) => o.parentId);
       this.colors = this.colors.filter((c) => !ids.includes(c.id));
@@ -563,11 +541,6 @@ export default class Assessment extends Vue {
     material.type.objects.forEach((o) => {
       o.changeMaterial(material.oldMaterial?.name, material.material);
     });
-    console.log("reportController:", this.reportController);
-    console.log(
-      "reportController.fullGroups:",
-      this.reportController.fullGroups
-    );
     const ids = material.type.objects.map((o) => o.id);
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
@@ -586,7 +559,6 @@ export default class Assessment extends Vue {
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
     this.reportController.projectInfo = data;
-    console.log("reportController:", this.reportController);
     this.$store.dispatch("changeRegion", data.region).then((res) => {
       this.materials = this.$store.getters.materialsArr;
     });

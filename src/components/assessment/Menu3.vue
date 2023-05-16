@@ -28,10 +28,6 @@ export default class Menu3 extends Vue {
   @Prop() transportTypes!: TransportType[];
   @Prop() transportGroups!: ReportFullTransportGroup[];
 
-  mounted() {
-    console.log("mounted transportGroups:", this.transportGroups)
-  }
-
   @Emit("transportSelected")
   transportSelected(selected: TransportSelected) {
     return selected;

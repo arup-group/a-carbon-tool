@@ -40,10 +40,13 @@ interface ReportToUpload {
   reportObjs: SpeckleObjectComplete[];
   totals: ReportTotals;
 }
+interface ReportControllerGroups {
+  [groupValue: string]: string[]
+}
 
 export class ReportController {
   objects: ReportObjects = {};
-  groups: { [groupValue: string]: string[] } = {};
+  groups: ReportControllerGroups = {};
   projectInfo: ProjectDataComplete = {} as ProjectDataComplete;
 
   totalCarbon = 0;
@@ -305,6 +308,20 @@ export class ReportController {
         c.volume
       );
     });
+  }
+
+  addNewGroup(name: string, selectedObjects: string[]) {
+    // remove selected objects from their current group
+    const oldGroups: ReportControllerGroups = JSON.parse(JSON.stringify(this.groups));
+
+    this.groups = {};
+
+    Object.entries(oldGroups).forEach(([k, v]) => {
+      this.groups[k] = v.filter(v => !selectedObjects.includes(v))
+    });
+
+    // add new group with the selected object id's
+    this.groups[name] = selectedObjects;
   }
 
   groupObjects(propertyGroups: StringPropertyGroups[], selectedGroup: string) {

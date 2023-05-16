@@ -487,8 +487,10 @@ export default class Assessment extends Vue {
     console.log("reportController:", this.reportController);
 
     this.types = this.findTypes(this.groupingProps, this.selectedObjectGroup);
+    this.allIds = Object.keys(this.reportController.objects);
+    console.log("this.allIds:", this.allIds);
     if (!this.update) {
-      this.allIds = this.types.map((t) => t.ids).flat();
+      // this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
     }
 
@@ -578,8 +580,9 @@ export default class Assessment extends Vue {
   }
 
   objectsSelected(objects: UserData[]) {
+    console.log("objectsSelected, objects:", objects);
     if (this.step === Step.MATERIALS) {
-      const keys = Object.keys(this.objectsObj);
+      const keys = Object.keys(this.reportController.objects);
       this.selectedObjects = objects
         .filter((o) => keys.includes(o.id))
         .map((o) => o.id);
@@ -589,16 +592,17 @@ export default class Assessment extends Vue {
   }
 
   createNewObjectGroup(name: string) {
-    this.types = this.types.map((t) => ({
-      ...t,
-      ids: t.ids.filter((i) => !this.selectedObjects.includes(i)),
-    }));
-    this.types.push({
-      ids: this.selectedObjects,
-      material: undefined,
-      transport: undefined,
-      type: name,
-    });
+    this.reportController.addNewGroup(name, this.selectedObjects);
+    // this.types = this.types.map((t) => ({
+    //   ...t,
+    //   ids: t.ids.filter((i) => !this.selectedObjects.includes(i)),
+    // }));
+    // this.types.push({
+    //   ids: this.selectedObjects,
+    //   material: undefined,
+    //   transport: undefined,
+    //   type: name,
+    // });
   }
 
   groupMaterials() {

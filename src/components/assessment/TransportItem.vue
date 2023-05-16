@@ -49,8 +49,10 @@ export default class Item extends Vue {
   @Prop() groupedMaterial!: ReportFullTransportGroup;
 
   selected: Selected =
-    this.groupedMaterial && this.groupedMaterial.objects[0].hasMaterials && this.groupedMaterial.objects[0].materials[0] && this.groupedMaterial.objects[0].materials[0].hasTransport
-      ? this.groupedMaterial.objects[0].materials[0].transport
+    this.groupedMaterial &&
+    this.groupedMaterial.objects[0].hasTransport &&
+    this.groupedMaterial.objects[0].transport
+      ? this.groupedMaterial.objects[0].transport
       : null;
   road = 0;
   rail = 0;
@@ -59,9 +61,11 @@ export default class Item extends Vue {
 
   mounted() {
     this.selected =
-      this.groupedMaterial && this.groupedMaterial.objects[0].hasMaterials && this.groupedMaterial.objects[0].materials[0] && this.groupedMaterial.objects[0].materials[0].hasTransport
-      ? this.groupedMaterial.objects[0].materials[0].transport
-      : null;
+      this.groupedMaterial &&
+      this.groupedMaterial.objects[0].hasTransport &&
+      this.groupedMaterial.objects[0].transport
+        ? this.groupedMaterial.objects[0].transport
+        : null;
   }
 
   @Watch("selected")

@@ -30,7 +30,7 @@
           <template #selection="{ item }">
             <v-chip
               :color="item.color"
-              :textColor="getContrastYIQ(item.color)"
+              :textColor="getContrastYIQ(item.color, item)"
               >{{ item.name }}</v-chip
             >
           </template>
@@ -38,9 +38,7 @@
       </v-col>
       <v-col md="2" v-if="expandOption">
         <v-btn fab small @click="expandSelection">
-          <v-icon>
-            mdi-plus
-          </v-icon>
+          <v-icon> mdi-plus </v-icon>
         </v-btn>
       </v-col>
     </v-row>
@@ -48,7 +46,11 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MaterialUpdateOut, SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
+import {
+  MaterialUpdateOut,
+  SelectedMaterialEmit,
+  MaterialGrouping,
+} from "@/models/newAssessment";
 import { ReportFullGroup } from "@/models/report";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
@@ -61,18 +63,51 @@ export default class MaterialType extends Vue {
 
   oldMaterial: MaterialFull | undefined;
 
-  currentMaterial = this.type && this.type.objects[0].hasMaterials ? this.type.objects[0].materials[0].material.name : null;
+  currentMaterial =
+    this.type &&
+    this.type.objects.length > 0 &&
+    this.type.objects[0].hasMaterials
+      ? this.type.objects[0].materials[0].material
+      : null;
   filtered = true;
 
   mounted() {
-    this.currentMaterial = this.type && this.type.objects[0].hasMaterials ? this.type.objects[0].materials[0].material.name : null;
+    console.log("mounted, this.type:", this.type);
+    if (this.type) {
+      console.log("this.type")
+      if (this.type.objects.length > 0) {
+        console.log("this.type.objects.length > 0")
+        if (this.type.objects[0].hasMaterials) {
+          console.log("this.type.objects[0].hasMaterials")
+          console.log("this.type.objects[0]:", this.type.objects[0])
+          console.log("this.type.objects[0].materials[0]:", this.type.objects[0].materials[0])
+          console.log("Object.values(this.type.objects[0].materials)[0].material.name:", Object.values(this.type.objects[0].materials)[0].material.name);
+          // console.log("this.type.objects[0].materials[0].material:", this.type.objects[0].materials[0].material)
+          // console.log("this.type.objects[0].materials[0].material.name:", this.type.objects[0].materials[0].material.name)
+          if (Object.values(this.type.objects[0].materials)[0].material.name) {
+            console.log("this.type.objects[0].materials[0].material.name")
+            this.currentMaterial =
+              Object.values(this.type.objects[0].materials)[0].material;
+          } else {
+            this.currentMaterial = null;
+          }
+        } else {
+          this.currentMaterial = null;
+        }
+      } else {
+        this.currentMaterial = null;
+      }
+    } else {
+      this.currentMaterial = null;
+    }
+    // this.currentMaterial = this.type && this.type.objects.length > 0 && this.type.objects[0].hasMaterials ? this.type.objects[0].materials[0].material.name : null;
   }
 
   @Emit("selectMaterial")
   selectMaterial(): SelectedMaterialEmit {
     return {
-      ids: this.type.objects.map(o => o.id),
-      type: this.type.name
+      ids: this.type.objects.map((o) => o.id),
+      type: this.type.name,
     };
   }
 
@@ -86,7 +121,9 @@ export default class MaterialType extends Vue {
     return typeArr[typeArr.length - 1];
   }
 
-  getContrastYIQ(hexcolor: string) {
+  getContrastYIQ(hexcolor: string, item: any) {
+    console.log("hexcolor:", hexcolor)
+    console.log("item:", item);
     if (hexcolor.slice(0, 1) === "#") {
       hexcolor = hexcolor.slice(1);
     }
@@ -105,7 +142,10 @@ export default class MaterialType extends Vue {
   }
 
   @Emit("materialUpdated")
-  materialUpdated(material: MaterialFull, oldMaterial?: MaterialFull): MaterialUpdateOut {
+  materialUpdated(
+    material: MaterialFull,
+    oldMaterial?: MaterialFull
+  ): MaterialUpdateOut {
     return {
       material,
       oldMaterial,
@@ -113,8 +153,7 @@ export default class MaterialType extends Vue {
     };
   }
 
-
-instanceOfMaterialFull(object: any): object is MaterialFull {
+  instanceOfMaterialFull(object: any): object is MaterialFull {
     return "name" in object;
   }
 }

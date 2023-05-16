@@ -28,7 +28,7 @@ export interface ReportFullGroup {
 }
 export interface ReportFullTransportGroup {
   name: string;
-  objects: ReportObject[];
+  objects: ReportMaterial[];
 }
 
 export interface ChildObjects {
@@ -78,6 +78,19 @@ export class ReportController {
       totals,
       reportObjs: this.reportObjs
     };
+  }
+
+  get materialsColors(): Color[] {
+    return Object.entries(this.objects).map(([k, v]) => ({
+      id: v.id,
+      color: v.objectMaterialColor
+    }));
+  }
+  get transportColors(): Color[] {
+    return Object.entries(this.objects).map(([k, v]) => ({
+      id: v.id,
+      color: v.objectTransportColor
+    }))
   }
 
   calcCarbon(): ReportProp {
@@ -237,20 +250,25 @@ export class ReportController {
   }
 
   get fullGroups(): ReportFullGroup[] {
-    return Object.keys(this.groups).map((g) => ({
+    console.log("full groups!");
+    let res = Object.keys(this.groups).map((g) => ({
       name: g,
       objects: this.groups[g].map((id) => this.objects[id]),
     }));
+    console.log("full group res:", res);
+    console.log("full group groups:", this.groups);
+    console.log("full group objects:", this.objects);
+    return res;
   }
 
   get transportGroups(): ReportFullTransportGroup[] {
-    const materialGrouping: { [materialName: string]: ReportObject[] } = {};
+    const materialGrouping: { [materialName: string]: ReportMaterial[] } = {};
     Object.keys(this.objects).forEach(k => {
       const obj = this.objects[k];
       if (obj.hasMaterials) {
         Object.entries(obj.materials).forEach(([k, v]) => {
-          if (materialGrouping[k]) materialGrouping[k].push(obj);
-          else materialGrouping[k] = [obj];
+          if (materialGrouping[k]) materialGrouping[k].push(v);
+          else materialGrouping[k] = [v];
         });
       }
     });
@@ -268,13 +286,13 @@ export class ReportController {
   setObjectsUpdate(childObjects: ChildSpeckleObjectData[]) {
     childObjects.forEach((c) => {
       const newObj = new ReportObject(
-        c.id,
+        c.act.id,
         c.speckleType,
         c.act.formData.volume
       );
         newObj.updateUsingReport(c);
 
-        this.objects[c.id] = newObj;
+        this.objects[c.act.id] = newObj;
     })
   }
 
@@ -320,6 +338,8 @@ export class ReportObject {
   ) {}
 
   materials: ObjectMaterials = {};
+  objectMaterialColor = ""; // object will just have one material colour, even if it has multiple materials assigned to it
+  objectTransportColor = ""; // object will just have one transport colour, even if it has multiple transports assigned to it
 
   totalCarbon = 0;
   totalA1A3 = 0;
@@ -335,14 +355,22 @@ export class ReportObject {
     //    add transport to materials
     const material = c.act.formData.material;
     if (Array.isArray(material)) {
-      material;
       const transport = c.act.formData.transport as TransportType[]; // if material is an array then we know that transport will be too
+      // just make the default colour the first material/transport colour
+      this.objectMaterialColor = material[0].color;
+      this.objectTransportColor = transport[0].color;
       material.forEach((m, i) => {
         if (m.volume) // we can be _pretty_ certain that m.volume exists (hopefully)
-          this.addMaterial(m, m.volume / this.volume);
+          {
+            console.log("m.volume:", m.volume);
+            console.log("this.volume:", this.volume);
+            this.addMaterial(m, m.volume / this.volume);
+          }
         this.setTransport(m.name, transport[i]); // transport and materials should have been added to their arrays in the same order, so index should link the two
       })
     } else {
+      this.objectMaterialColor = material.color;
+      this.objectTransportColor = (c.act.formData.transport as TransportType).color; // if material is not an array then we know that transport won't be either
       this.addMaterial(material, 1);
       this.setTransport(material.name, c.act.formData.transport as TransportType); // if material is not an array then we know that transport won't be either
     }
@@ -381,9 +409,12 @@ export class ReportObject {
   }
 
   addMaterial(material: MaterialFull, percentage: number) {
+    console.log("percentage:", percentage)
+    console.log("this.volume:", this.volume);
     this.materials[material.name] = new ReportMaterial(
       this.volume * percentage,
-      material
+      JSON.parse(JSON.stringify(material)), // make sure to do a deep copy of material otherwise problems pop up
+      this.id
     );
   }
   updateMaterialVolume(materialName: string, percentage: number) {
@@ -395,7 +426,7 @@ export class ReportObject {
       percentage = this.materials[oldName].volume / this.volume;
       this.removeMaterial(oldName);
     }
-    this.addMaterial(newMaterial, percentage);
+    this.addMaterial(JSON.parse(JSON.stringify(newMaterial)), percentage); // make sure to do a deep copy of material otherwise problems pop up
   }
   removeMaterial(materialName: string) {
     const oldMaterials = this.materials;
@@ -430,7 +461,8 @@ export class ReportObject {
 }
 
 export class ReportMaterial {
-  constructor(public volume: number, public material: MaterialFull) {
+  constructor(public volume: number, public material: MaterialFull, public parentId: string) {
+    console.log("ReportMaterial volume:", this.volume)
     this.material.volume = this.volume;
   }
   transport: TransportType = {} as TransportType;

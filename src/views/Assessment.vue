@@ -324,14 +324,17 @@ export default class Assessment extends Vue {
     //   };
     // });
 
-    this.materialsColors = Object.values(this.objectsObj).map((o) => ({
-      id: o.id,
-      color: o.formData?.material?.color as string,
-    }));
-    this.transportColors = Object.values(this.objectsObj).map((o) => ({
-      id: o.id,
-      color: o.formData?.transport?.color as string,
-    }));
+    this.materialsColors = this.reportController.materialsColors;
+    this.transportColors = this.reportController.transportColors;
+
+    // this.materialsColors = Object.values(this.objectsObj).map((o) => ({
+    //   id: o.id,
+    //   color: o.formData?.material?.color as string,
+    // }));
+    // this.transportColors = Object.values(this.objectsObj).map((o) => ({
+    //   id: o.id,
+    //   color: o.formData?.transport?.color as string,
+    // }));
 
     // this.projectData = assessmentViewData.data.projectInfo;
     this.reportController.projectInfo = assessmentViewData.data.projectInfo;
@@ -922,16 +925,17 @@ export default class Assessment extends Vue {
   transportSelected(selected: TransportSelected) {
     if (this.beenToTransport) {
       selected.material.objects.forEach(o => {
-        Object.entries(o.materials).forEach(([k, v]) => {
-          if (k === selected.material.name) {
-            v.setTransport(selected.transportType);
-          }
-        });
+        o.setTransport(selected.transportType);
+        // Object.entries(o.materials).forEach(([k, v]) => {
+        //   if (k === selected.material.name) {
+        //     v.setTransport(selected.transportType);
+        //   }
+        // });
       });
       console.log("reportController:", this.reportController);
       console.log("reportController.transportGroups:", this.reportController.transportGroups);
 
-        const ids = selected.material.objects.map(o => o.id);
+        const ids = selected.material.objects.map(o => o.parentId);
       this.colors = this.colors.filter((c) => !ids.includes(c.id));
       ids.forEach((id) => {
         this.colors.push({

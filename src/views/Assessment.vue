@@ -17,14 +17,12 @@
           @uploadData="uploadData"
           @selectMaterial="selectMaterial"
           @checkSave="checkSave"
-          @calcVol="calcVol"
           @close="close"
           @openFullView="openFullView"
           @createNewGroup="createNewObjectGroup"
           @groupSelected="materialGroupSelected"
           :modal="modal"
           :streams="availableStreams"
-          :types="types"
           :fullGroups="fullGroups"
           :materials="materials"
           :transportTypes="transportTypes"
@@ -32,7 +30,6 @@
           :emptyProps="emptyProps"
           :report="report"
           :becs="becs"
-          :groupedMaterials="groupedMaterials"
           :transportGroups="reportController.transportGroups"
           :speckleVol="speckleVol"
           :update="update"
@@ -134,6 +131,7 @@ import {
   GetObjectDetailsOut,
 } from "@/store";
 import { VolCalculator } from "./utils/VolCalculator";
+import { BECName } from "@/models/shared";
 import { LoadStreamOut } from "./utils/process-report-object";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
 import { ChildObjects, ReportController } from "@/models/report";
@@ -168,17 +166,17 @@ export default class Assessment extends Vue {
   availableStreams: AvailableStream[] = [];
   objectURLs: string[] = [];
   token = "";
-  types: MaterialGrouping[] = [];
   get fullGroups() {
     return this.reportController.fullGroups;
   }
-  objectsObj: ObjectsObj = {};
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
-  becs: TransportType[] = [];
+  becs: {
+    name: BECName;
+    color: string;
+    backgroundColor: string;
+  }[] = [];
   totalVolume = -1;
-  allMesh: THREE.Mesh[] = [];
-  projectData!: ProjectDataComplete;
   projectDataPassdown: ProjectDataComplete | null = null;
   allIds: string[] = [];
 
@@ -187,7 +185,6 @@ export default class Assessment extends Vue {
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
-  addParams: AddParams.ParamAdd[] = [];
   allChildObjs: AddParams.IChildObject[] = [];
   parentObj: AddParams.IParamsParent | null = null;
   streamId = "";
@@ -209,7 +206,6 @@ export default class Assessment extends Vue {
 
   groupingProps: StringPropertyGroups[] = [];
   objectGroups: string[] = [];
-  groupedMaterials: GroupedMaterial[] = [];
   get transportGroups() {
     console.log("get transportGroups");
     return this.reportController.transportGroups;
@@ -330,7 +326,7 @@ export default class Assessment extends Vue {
       const getAllReportBranchesOut: GetAllReportBranchesOutput =
         await this.$store.dispatch("getAllReportBranches", this.streamId);
       this.branchNames = getAllReportBranchesOut.map((b) => b.name);
-      this.reportName = this.projectData.name;
+      this.reportName = this.reportController.projectInfo.name;
       this.newBranchDialog = true;
     } else {
       this.uploadReport("main");
@@ -360,7 +356,7 @@ export default class Assessment extends Vue {
       streamid: this.streamId,
       objects: upload.reportObjs,
       reportTotals: upload.totals,
-      projectData: this.projectData,
+      projectData: this.reportController.projectInfo,
       branchName,
       newModel,
       selectedObjectGroup: this.selectedObjectGroup,
@@ -384,9 +380,8 @@ export default class Assessment extends Vue {
     this.filteredType = material.type;
   }
 
-  async rendererLoaded({ properties, allMesh }: RendererLoaded) {
+  async rendererLoaded({ properties }: RendererLoaded) {
     this.loadingModelText = "Loading data from model...";
-    this.allMesh = allMesh;
 
     const volumeFilter = properties.find(
       (p) => p.name.toLowerCase() === "volume"
@@ -415,7 +410,6 @@ export default class Assessment extends Vue {
     const childObjs: ChildObjects[] = [];
 
     if (volumeFilter) {
-      const childObjects: ObjectDetails[] = [];
       this.speckleVol = true;
       filteredRes.forEach((r) => {
         const volume = this.findVolume(r, volumeFilter);
@@ -426,14 +420,6 @@ export default class Assessment extends Vue {
               volume,
               speckleObject: r,
             });
-            this.objectsObj[r.id] = {
-              id: r.id,
-              speckle_type: r.speckle_type,
-              formData: {
-                volume: volume,
-              },
-            };
-            childObjects.push(r);
           }
           // also find total volume here to avoid needing to loop through objects again
           totalVol += volume;
@@ -441,14 +427,6 @@ export default class Assessment extends Vue {
       });
     } else {
       this.speckleVol = false;
-      filteredRes.forEach((r) => {
-        if (!this.update) {
-          this.objectsObj[r.id] = {
-            id: r.id,
-            speckle_type: r.speckle_type,
-          };
-        }
-      });
     }
     // if childObjs.length === 0 then the report is being updated, so no need to set objects here
     if (childObjs.length !== 0) this.reportController.setObjects(childObjs);
@@ -488,30 +466,6 @@ export default class Assessment extends Vue {
       }
     });
     return curr;
-  }
-
-  calcVol() {
-    let totalVol = 0;
-    this.allMesh.forEach((m) => {
-      const volume = VolCalculator.getMeshVolume(m);
-      if (volume) {
-        try {
-          const id: string = m.userData.id;
-          this.objectsObj[id] = {
-            ...this.objectsObj[id],
-            formData: {
-              ...this.objectsObj[id].formData,
-              volume,
-            },
-          };
-        } catch (err) {
-          console.warn(err);
-        }
-        totalVol += volume;
-      }
-    });
-    this.totalVolume = totalVol;
-    this.speckleVol = true;
   }
 
   stepperUpdate(step: Step) {
@@ -631,7 +585,6 @@ export default class Assessment extends Vue {
 
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
-    this.projectData = data;
     this.reportController.projectInfo = data;
     console.log("reportController:", this.reportController);
     this.$store.dispatch("changeRegion", data.region).then((res) => {

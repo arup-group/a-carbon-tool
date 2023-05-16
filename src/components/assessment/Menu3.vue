@@ -26,7 +26,6 @@ import TransportItem from "./TransportItem.vue";
 })
 export default class Menu3 extends Vue {
   @Prop() transportTypes!: TransportType[];
-  @Prop() groupedMaterials!: GroupedMaterial[];
   @Prop() transportGroups!: ReportFullTransportGroup[];
 
   mounted() {

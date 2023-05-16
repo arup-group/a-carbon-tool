@@ -50,7 +50,6 @@
         </v-stepper-step>
         <v-stepper-content step="2">
           <Menu2
-            :types="types"
             :fullGroups="fullGroups"
             :materials="materials"
             :selectedObjects="selectedObjects"
@@ -83,7 +82,6 @@
           <Menu3
             @transportSelected="transportSelected"
             :transportTypes="transportTypes"
-            :groupedMaterials="groupedMaterials"
             :transportGroups="transportGroups"
           />
           <v-card-actions>
@@ -105,7 +103,6 @@
         </v-stepper-step>
         <v-stepper-content step="4">
           <menu-4
-            @calcVol="calcVol"
             :totalVolume="totalVolume"
             :speckleVol="speckleVol"
           />
@@ -214,7 +211,6 @@ import { ReportFullGroup, ReportFullTransportGroup } from "@/models/report";
 })
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
-  @Prop() types!: MaterialGrouping[];
   @Prop() fullGroups!: ReportFullGroup[];
   @Prop() materials!: MaterialFull[];
   @Prop() transportTypes!: TransportType[];
@@ -222,7 +218,6 @@ export default class AssessmentStepper extends Vue {
   @Prop() emptyProps!: EmptyPropsPassdown;
   @Prop() report!: ReportPassdown;
   @Prop() becs!: string;
-  @Prop() groupedMaterials!: GroupedMaterial[];
   @Prop() transportGroups!: ReportFullTransportGroup[];
   @Prop() speckleVol!: boolean;
 
@@ -362,10 +357,6 @@ export default class AssessmentStepper extends Vue {
     return objectGroup;
   }
 
-  @Emit("calcVol")
-  calcVol() {
-    return;
-  }
   @Watch("form.notes")
   notesUpdate() {
     this.uploadData({

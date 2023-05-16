@@ -51,7 +51,6 @@ import { ReportFullGroup } from "@/models/report";
   components: { MaterialType, CustomGroup, ExpandedMaterialType },
 })
 export default class Menu2 extends Vue {
-  @Prop() types!: MaterialGrouping[];
   @Prop() fullGroups!: ReportFullGroup[];
   @Prop() materials!: MaterialFull[];
   @Prop() selectedObjects!: string[];

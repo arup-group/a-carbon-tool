@@ -85,11 +85,6 @@ export default class ExpandedMaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: ReportFullGroup;
 
-  @Watch("type", { deep: true })
-  watchDefault() {
-    console.log("type changed:", this.type);
-  }
-
   partMaterial: PartMaterial[] = [{ id: 0 }];
   changed = true;
 
@@ -97,7 +92,6 @@ export default class ExpandedMaterialType extends Vue {
   invalidMessage = "";
 
   mounted() {
-    console.log("type:", this.type);
     this.partMaterial = Object.entries(this.type.objects[0].materials).map(
       ([k, v], i) => ({
         id: i,
@@ -121,8 +115,6 @@ export default class ExpandedMaterialType extends Vue {
       this.invalid = true;
       return;
     } else if (totalPercentage !== 100) {
-      console.log("totalPercentage:", totalPercentage);
-      console.log("this.partMaterial:", this.partMaterial);
       this.invalidMessage = "Percentages must equal 100";
       this.invalid = true;
       return;
@@ -149,13 +141,11 @@ export default class ExpandedMaterialType extends Vue {
   }
 
   checkMaterialUpdated() {
-    console.log("material updated");
     this.changed = true;
     this.invalid = false;
   }
 
   percentageChanged(part: PartMaterial) {
-    console.log("percentage changed");
     if (part.percentage) {
       if (+part.percentage > 100) part.percentage = "100";
       else if (+part.percentage < 0) part.percentage = "0";

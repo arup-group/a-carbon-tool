@@ -70,13 +70,8 @@ export default class Menu2 extends Vue {
 
   expandedTypes: string[] = [];
 
-  mounted() {
-    console.log("fullGroups:", this.fullGroups);
-  }
-
   @Watch("fullGroups", { deep: true })
   watchFullGroups() {
-    console.log("fullGroups changed:", this.fullGroups)
     if (!this.updated) {
       this.fullGroups.forEach(fg => {
         if (Object.keys(fg.objects[0].materials).length > 1) this.expandSelection(fg);

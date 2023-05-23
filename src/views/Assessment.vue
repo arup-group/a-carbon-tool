@@ -114,9 +114,7 @@ import {
   StringPropertyGroups,
   SelectedBuildupEmit,
 } from "@/models/newAssessment";
-import {
-  MaterialFull,
-} from "@/store/utilities/material-carbon-factors";
+import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 import {
   CheckContainsChlidReportInput,
@@ -522,14 +520,10 @@ export default class Assessment extends Vue {
   }
 
   transportSelected(selected: TransportSelected) {
-    console.log("selected:", selected)
     if (this.beenToTransport) {
-      console.log("past if")
       selected.material.objects.forEach((o) => {
         o.setTransport(selected.transportType);
       });
-      console.log("selected post forEach:", selected);
-      console.log("reportController:", this.reportController);
 
       const ids = selected.material.objects.map((o) => o.parentId);
       this.colors = this.colors.filter((c) => !ids.includes(c.id));
@@ -544,28 +538,28 @@ export default class Assessment extends Vue {
   }
 
   selectBuildup(selectedBuildup: SelectedBuildupEmit) {
-    console.log("selectedBuildup:", selectedBuildup)
     const objects = this.reportController.getObjectsByIds(selectedBuildup.ids);
 
     objects.forEach((o) => {
       // get transport of any materials that were already present
       const oldTransports: { [material: string]: TransportType } = {};
-      Object.entries(o.materials).forEach(([k, v]) => oldTransports[k] = v.transport);
+      Object.entries(o.materials).forEach(
+        ([k, v]) => (oldTransports[k] = v.transport)
+      );
 
       o.removeAllMaterials();
-      selectedBuildup.materials.forEach(b => {
+      selectedBuildup.materials.forEach((b) => {
         if (b.material && b.percentage) {
-          o.addMaterial(b.material, (+b.percentage) / 100);
+          o.addMaterial(b.material, +b.percentage / 100);
           const oldTransport = oldTransports[b.material.name];
           if (oldTransport) o.setTransport(b.material.name, oldTransport);
         }
       });
     });
 
-    console.log("objects:", objects);
-    console.log("reportController:", this.reportController);
-
-    this.colors = this.colors.filter((c) => !selectedBuildup.ids.includes(c.id));
+    this.colors = this.colors.filter(
+      (c) => !selectedBuildup.ids.includes(c.id)
+    );
 
     selectedBuildup.ids.forEach((id) => {
       try {

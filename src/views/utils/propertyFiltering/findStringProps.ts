@@ -1,11 +1,11 @@
 import { PropertyInfo } from "@speckle/viewer";
 import { flattenObject } from "./";
-import { ObjectsObj, StringPropertyGroups } from "@/models/newAssessment";
+import { StringPropertyGroups } from "@/models/newAssessment";
 
 // source: https://github.com/specklesystems/speckle-server
 export function findStringProps(
   speckleObjsPropsSearch: any[],
-  objectsObj: ObjectsObj
+  objectsObj: { [key: string]: any } // we can probably figure out a way to no longer need this...
 ): StringPropertyGroups[] {
   const propValues: any = {};
   speckleObjsPropsSearch.forEach((obj) => {

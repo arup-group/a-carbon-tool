@@ -1,8 +1,6 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import {
   EmptyProps,
-  EmptyPropsPassdown,
-  ObjectsObj,
   ProjectDataComplete,
   ReportProp,
   ReportTotals,

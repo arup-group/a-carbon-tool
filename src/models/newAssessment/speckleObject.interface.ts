@@ -1,36 +1,7 @@
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { TransportType } from ".";
 import { ChartData } from "../chart";
-import { IABreakdown } from "@/views/utils/process-report-object";
 import { Color } from "../renderer";
-
-export type ObjectsObj = { [id: string]: SpeckleObject };
-
-export interface SpeckleObject {
-  id: string;
-  speckle_type: string;
-  formData?: ObjectFormData;
-  reportData?: ReportDataChild;
-}
-
-export interface MultiMaterial {
-  material: MaterialFull;
-  percentage: number;
-}
-
-export interface ObjectFormData {
-  transport?: TransportType;
-  material?: MaterialFull;// | MultiMaterial[];
-  volume?: number;
-}
-
-// repeat of SpeckleObject, but forces formData to be present
-export interface SpeckleObjectFormComplete {
-  id: string;
-  speckle_type: string;
-  formData: ObjectFormDataComplete;
-  reportData?: ReportDataChild;
-}
 
 export interface ObjectFormDataComplete {
   transport: TransportType | TransportType[]; // single object only used in legacy reports

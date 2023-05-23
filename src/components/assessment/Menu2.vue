@@ -11,9 +11,9 @@
       </div>
       <div v-for="type in loadedTypes" :key="type.type" style="width: 100%">
         <expanded-material-type
-          v-if="expandedTypes.includes(type.type)"
+          v-if="expandedTypes.includes(type.name)"
           :materials="materials"
-          @selectMaterial="selectMaterial"
+          @selectBuildup="selectBuildup"
           :type="type"
         />
         <material-type
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
+import { SelectedMaterialEmit, SelectedBuildupEmit } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 
@@ -58,6 +58,8 @@ export default class Menu2 extends Vue {
   @Prop() objectGroups!: string[];
   @Prop() defaultGroup!: string;
 
+  updated = false; // for when a report is being updated
+
   _objectGroup = "";
   get objectGroup() {
     return this.defaultGroup;
@@ -68,14 +70,29 @@ export default class Menu2 extends Vue {
 
   expandedTypes: string[] = [];
 
+  mounted() {
+    console.log("fullGroups:", this.fullGroups);
+  }
+
+  @Watch("fullGroups", { deep: true })
+  watchFullGroups() {
+    console.log("fullGroups changed:", this.fullGroups)
+    if (!this.updated) {
+      this.fullGroups.forEach(fg => {
+        if (Object.keys(fg.objects[0].materials).length > 1) this.expandSelection(fg);
+      });
+      this.updated = true;
+    }
+  }
+
   groupKey = 0;
 
   get loadedTypes() {
     return this.fullGroups ? this.fullGroups : [];
   }
 
-  expandSelection(type: MaterialGrouping) {
-    this.expandedTypes.push(type.type);
+  expandSelection(type: ReportFullGroup) {
+    this.expandedTypes.push(type.name);
   }
 
   @Emit("createNewGroup")
@@ -91,6 +108,11 @@ export default class Menu2 extends Vue {
   @Emit("selectMaterial")
   selectMaterial(selectedMaterial: SelectedMaterialEmit) {
     return selectedMaterial;
+  }
+
+  @Emit("selectBuildup")
+  selectBuildup(selectedBuildup: SelectedBuildupEmit) {
+    return selectedBuildup;
   }
 
   @Emit("groupSelected")

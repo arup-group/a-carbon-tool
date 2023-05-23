@@ -60,6 +60,7 @@
             @createNewGroup="createNewGroup"
             @selectMaterial="selectMaterial"
             @groupSelected="groupSelected"
+            @selectBuildup="selectBuildup"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 1" color="primary">
@@ -202,6 +203,7 @@ import {
   ReportPassdown,
   GroupedMaterial,
   SelectedMaterialEmit,
+  SelectedBuildupEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { ReportFullGroup, ReportFullTransportGroup } from "@/models/report";
@@ -294,6 +296,11 @@ export default class AssessmentStepper extends Vue {
 
   get canSave() {
     return this.report ? true : false;
+  }
+
+  @Emit("selectBuildup")
+  selectBuildup(selectedBuildup: SelectedBuildupEmit) {
+    return selectedBuildup;
   }
 
   @Emit("createNewGroup")

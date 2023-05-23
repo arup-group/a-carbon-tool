@@ -10,13 +10,13 @@
   >
     <v-card-title>
       <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
-              {{ cleanType(type.type) }}
-            </v-chip>
-          </template>
-          <span>Objects: {{ type.ids.length }} </span>
-        </v-tooltip>
+        <template v-slot:activator="{ on, attrs }">
+          <v-chip v-bind="attrs" v-on="on">
+            {{ cleanType(type.name) }}
+          </v-chip>
+        </template>
+        <span>Objects: {{ type.objects.length }} </span>
+      </v-tooltip>
     </v-card-title>
     <v-card-text>
       <v-row v-for="part in partMaterial" :key="part.id" dense align="end">
@@ -58,7 +58,7 @@
           <v-icon> mdi-plus </v-icon>
         </v-btn>
       </div>
-      <p v-if="invalid" style="color: red;">{{ invalidMessage }}</p>
+      <p v-if="invalid" style="color: red">{{ invalidMessage }}</p>
     </v-card-text>
     <v-card-actions>
       <v-btn :disabled="!changed" @click="save">Save</v-btn>
@@ -68,23 +68,22 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 
-import { MaterialGrouping, SelectedMaterialEmit } from "@/models/newAssessment";
+import {
+  MaterialGrouping,
+  PartMaterial,
+  SelectedBuildupEmit,
+} from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 import MaterialType from "./MaterialType.vue";
-
-interface PartMaterial {
-  id: number;
-  material?: MaterialFull;
-  percentage?: number;
-}
+import { ReportFullGroup } from "@/models/report";
 
 @Component({
   components: { MaterialType },
 })
 export default class ExpandedMaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
-  @Prop() type!: MaterialGrouping;
+  @Prop() type!: ReportFullGroup;
 
   @Watch("type", { deep: true })
   watchDefault() {
@@ -99,14 +98,21 @@ export default class ExpandedMaterialType extends Vue {
 
   mounted() {
     console.log("type:", this.type);
+    this.partMaterial = Object.entries(this.type.objects[0].materials).map(
+      ([k, v], i) => ({
+        id: i,
+        material: v.material,
+        percentage: (100 * (v.volume / this.type.objects[0].volume)).toString(),
+      })
+    );
   }
 
   save() {
     this.changed = false;
     let pass = true;
     let totalPercentage = 0;
-    this.partMaterial.forEach(p => {
-      if (p.percentage !== undefined) totalPercentage += +p.percentage
+    this.partMaterial.forEach((p) => {
+      if (p.percentage !== undefined) totalPercentage += +p.percentage;
       else pass = false;
       if (!p.material) pass = false;
     });
@@ -115,12 +121,14 @@ export default class ExpandedMaterialType extends Vue {
       this.invalid = true;
       return;
     } else if (totalPercentage !== 100) {
-      console.log("totalPercentage:", totalPercentage)
-      console.log("this.partMaterial:", this.partMaterial)
+      console.log("totalPercentage:", totalPercentage);
+      console.log("this.partMaterial:", this.partMaterial);
       this.invalidMessage = "Percentages must equal 100";
       this.invalid = true;
       return;
     }
+
+    this.selectBuildup();
   }
 
   getType(type: MaterialGrouping) {
@@ -149,8 +157,8 @@ export default class ExpandedMaterialType extends Vue {
   percentageChanged(part: PartMaterial) {
     console.log("percentage changed");
     if (part.percentage) {
-      if (part.percentage > 100) part.percentage = 100;
-      else if (part.percentage < 0) part.percentage = 0;
+      if (+part.percentage > 100) part.percentage = "100";
+      else if (+part.percentage < 0) part.percentage = "0";
     }
 
     this.changed = true;
@@ -168,11 +176,11 @@ export default class ExpandedMaterialType extends Vue {
     return yiq >= 128 ? "black" : "white";
   }
 
-  @Emit("selectMaterial")
-  selectMaterial(): SelectedMaterialEmit {
+  @Emit("selectBuildup")
+  selectBuildup(): SelectedBuildupEmit {
     return {
-      ids: this.type.ids,
-      type: this.type.type
+      ids: this.type.objects.map((o) => o.id),
+      materials: this.partMaterial,
     };
   }
 }

@@ -21,6 +21,7 @@
           @openFullView="openFullView"
           @createNewGroup="createNewObjectGroup"
           @groupSelected="materialGroupSelected"
+          @selectBuildup="selectBuildup"
           :modal="modal"
           :streams="availableStreams"
           :fullGroups="fullGroups"
@@ -111,6 +112,7 @@ import {
   ObjectDetails,
   SelectedMaterialEmit,
   StringPropertyGroups,
+  SelectedBuildupEmit,
 } from "@/models/newAssessment";
 import {
   MaterialFull,
@@ -520,10 +522,14 @@ export default class Assessment extends Vue {
   }
 
   transportSelected(selected: TransportSelected) {
+    console.log("selected:", selected)
     if (this.beenToTransport) {
+      console.log("past if")
       selected.material.objects.forEach((o) => {
         o.setTransport(selected.transportType);
       });
+      console.log("selected post forEach:", selected);
+      console.log("reportController:", this.reportController);
 
       const ids = selected.material.objects.map((o) => o.parentId);
       this.colors = this.colors.filter((c) => !ids.includes(c.id));
@@ -537,8 +543,48 @@ export default class Assessment extends Vue {
     }
   }
 
+  selectBuildup(selectedBuildup: SelectedBuildupEmit) {
+    console.log("selectedBuildup:", selectedBuildup)
+    const objects = this.reportController.getObjectsByIds(selectedBuildup.ids);
+
+    objects.forEach((o) => {
+      // get transport of any materials that were already present
+      const oldTransports: { [material: string]: TransportType } = {};
+      Object.entries(o.materials).forEach(([k, v]) => oldTransports[k] = v.transport);
+
+      o.removeAllMaterials();
+      selectedBuildup.materials.forEach(b => {
+        if (b.material && b.percentage) {
+          o.addMaterial(b.material, (+b.percentage) / 100);
+          const oldTransport = oldTransports[b.material.name];
+          if (oldTransport) o.setTransport(b.material.name, oldTransport);
+        }
+      });
+    });
+
+    console.log("objects:", objects);
+    console.log("reportController:", this.reportController);
+
+    this.colors = this.colors.filter((c) => !selectedBuildup.ids.includes(c.id));
+
+    selectedBuildup.ids.forEach((id) => {
+      try {
+        // colour by the first material as that's easiest
+        if (selectedBuildup.materials[0].material)
+          this.colors.push({
+            color: selectedBuildup.materials[0].material.color,
+            id,
+          });
+      } catch (err) {
+        console.error("err:", id);
+      }
+    });
+    this.materialsColors = this.colors;
+  }
+
   materialUpdated(material: MaterialUpdateOut) {
     material.type.objects.forEach((o) => {
+      o.removeAllMaterials();
       o.changeMaterial(material.oldMaterial?.name, material.material);
     });
     const ids = material.type.objects.map((o) => o.id);

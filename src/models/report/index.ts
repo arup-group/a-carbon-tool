@@ -100,6 +100,10 @@ export class ReportController {
     }));
   }
 
+  getObjectsByIds(ids: string[]) {
+    return ids.map(i => this.objects[i]);
+  }
+
   calcCarbon(): ReportProp {
     this.totalA5a = this.calcA5a();
 
@@ -426,6 +430,11 @@ export class ReportObject {
     this.materials[materialName].setTransport(transportType);
   }
 
+  /**
+   * 
+   * @param material 
+   * @param percentage should be in decimal format
+   */
   addMaterial(material: MaterialFull, percentage: number) {
     this.materials[material.name] = new ReportMaterial(
       this.volume * percentage,
@@ -443,6 +452,9 @@ export class ReportObject {
       this.removeMaterial(oldName);
     }
     this.addMaterial(JSON.parse(JSON.stringify(newMaterial)), percentage); // make sure to do a deep copy of material otherwise problems pop up
+  }
+  removeAllMaterials() {
+    this.materials = {};
   }
   removeMaterial(materialName: string) {
     const oldMaterials = this.materials;

@@ -49,7 +49,6 @@
 import {
   MaterialUpdateOut,
   SelectedMaterialEmit,
-  MaterialGrouping,
 } from "@/models/newAssessment";
 import { ReportFullGroup } from "@/models/report";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";

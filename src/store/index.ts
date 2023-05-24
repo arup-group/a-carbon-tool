@@ -497,22 +497,39 @@ export default new Vuex.Store({
         const combined = [newModel.parent, ...newModel.children];
 
         const combinedSplit: (IParamsParent | IChildObject)[][] = [];
-        const batchSize = 100;
+
+        // some models can have weirdly large objects, so we limit the batch sizes to make sure we don't break the speckle server...
+        const BATCH_SIZES = {
+          REGULAR: 100,
+          SMALL: 50,
+          TINY: 25,
+        };
+        let batchSize = BATCH_SIZES.REGULAR;
+        const TEN_MB = 10000000;
+        const THIRTY_MB = 30000000;
+        const firstBatch = new Blob([
+          JSON.stringify(
+            combined.slice(0, Math.min(0 + batchSize, combined.length))
+          ),
+        ]);
+        if (firstBatch.size > THIRTY_MB) batchSize = BATCH_SIZES.TINY;
+        else if (firstBatch.size > TEN_MB) batchSize = BATCH_SIZES.SMALL;
+
         for (let i = 0; i < combined.length; i += batchSize) {
           combinedSplit.push(
             combined.slice(i, Math.min(i + batchSize, combined.length))
           );
         }
-        await Promise.all(
-          combinedSplit.map((c) => {
+
+        // if the batch size has been made to be smaller then tread carefully...
+        if (batchSize !== BATCH_SIZES.REGULAR) {
+          for (let i = 0; i < combinedSplit.length; i++) {
             const formData = new FormData();
             formData.append(
               "batch1",
-              new Blob([
-                JSON.stringify(c),
-              ])
+              new Blob([JSON.stringify(combinedSplit[i])])
             );
-            return fetch(
+            await fetch(
               `${context.state.selectedServer.url}/objects/${streamid}`,
               {
                 method: "POST",
@@ -522,8 +539,25 @@ export default new Vuex.Store({
                 body: formData,
               }
             );
-          })
-        );
+          }
+        } else {
+          await Promise.all(
+            combinedSplit.map((c) => {
+              const formData = new FormData();
+              formData.append("batch1", new Blob([JSON.stringify(c)]));
+              return fetch(
+                `${context.state.selectedServer.url}/objects/${streamid}`,
+                {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${context.state.token.token}`,
+                  },
+                  body: formData,
+                }
+              );
+            })
+          );
+        }
       }
 
       branchName = `${context.state.speckleFolderName}/${branchName}`;

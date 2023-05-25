@@ -14,6 +14,7 @@
           v-if="expandedTypes.includes(type.name)"
           :materials="materials"
           @selectBuildup="selectBuildup"
+          @selectMaterial="selectMaterial"
           :type="type"
         />
         <material-type

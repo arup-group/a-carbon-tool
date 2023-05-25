@@ -11,7 +11,7 @@
     <v-card-title>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-chip v-bind="attrs" v-on="on">
+          <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
             {{ cleanType(type.name) }}
           </v-chip>
         </template>
@@ -66,12 +66,13 @@
   </v-card>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import {
   MaterialGrouping,
   PartMaterial,
   SelectedBuildupEmit,
+  SelectedMaterialEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
@@ -100,6 +101,14 @@ export default class ExpandedMaterialType extends Vue {
       })
     );
     if (this.partMaterial.length === 0) this.partMaterial = [{ id: 0 }];
+  }
+
+  @Emit("selectMaterial")
+  selectMaterial(): SelectedMaterialEmit {
+    return {
+      ids: this.type.objects.map((o) => o.id),
+      type: this.type.name,
+    };
   }
 
   save() {

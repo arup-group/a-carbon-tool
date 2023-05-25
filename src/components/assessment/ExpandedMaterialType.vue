@@ -85,7 +85,7 @@ export default class ExpandedMaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
   @Prop() type!: ReportFullGroup;
 
-  partMaterial: PartMaterial[] = [{ id: 0 }];
+  partMaterial: PartMaterial[] = [];
   changed = true;
 
   invalid = false;
@@ -99,6 +99,7 @@ export default class ExpandedMaterialType extends Vue {
         percentage: (100 * (v.volume / this.type.objects[0].volume)).toString(),
       })
     );
+    if (this.partMaterial.length === 0) this.partMaterial = [{ id: 0 }];
   }
 
   save() {

@@ -60,8 +60,8 @@ export default class VersionUpdateDialog extends Vue {
 
   fixes: { title: string; subtitle: string }[] = [
     {
-      title: "Fixed bug in A5 calculations",
-      subtitle: "Fixed a bug causing very high A5 values in reports",
+      title: "Fixed bug in report models",
+      subtitle: "Fixed a bug that would cause some models to not be saved properly in reports",
     },
   ];
 

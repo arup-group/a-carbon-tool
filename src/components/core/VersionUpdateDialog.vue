@@ -56,12 +56,19 @@ export default class VersionUpdateDialog extends Vue {
   @Prop() dialog!: boolean;
   @Prop() version!: string;
 
-  features: { title: string; subtitle: string }[] = [];
+  features: { title: string; subtitle: string }[] = [
+    {
+      title: "Material buildup",
+      subtitle:
+        "Objects in assessments can now have multiple materials assigned to them, allowing for material buildups to be used instead of single materials",
+    },
+  ];
 
   fixes: { title: string; subtitle: string }[] = [
     {
-      title: "Fixed bug in report models",
-      subtitle: "Fixed a bug that would cause some models to not be saved properly in reports",
+      title: "Fixed bug with reported volume",
+      subtitle:
+        "Fixed a bug that would cause the volume in assessments to be shown as double what they really are. NOTE: while the volume shown was incorrect, the volume used for calculations was still correct",
     },
   ];
 

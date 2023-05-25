@@ -16,9 +16,21 @@
       </v-col>
       <v-col cols="6">
         <v-card-subtitle class="text-left pa-2">
-          created by <strong>Arup</strong>
+          <a
+            href="https://www.arup.com/"
+            target="_blank"
+            class="text-decoration-none"
+            style="color: inherit"
+            >created by <strong>Arup</strong></a
+          >
           <br />
-          powered by <strong>Speckle</strong>
+          <a
+            href="https://speckle.systems/"
+            target="_blank"
+            class="text-decoration-none"
+            style="color: inherit"
+            >powered by <strong>Speckle</strong></a
+          >
         </v-card-subtitle>
       </v-col>
     </v-row>

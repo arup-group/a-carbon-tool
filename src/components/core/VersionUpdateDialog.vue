@@ -56,7 +56,10 @@ export default class VersionUpdateDialog extends Vue {
   @Prop() dialog!: boolean;
   @Prop() version!: string;
 
-  features: { title: string; subtitle: string }[] = [];
+  features: { title: string; subtitle: string }[] = [{
+    title: "Updated Speckle Viewer",
+    subtitle: "Updated the version of the Speckle Viewer to get the latest features"
+  }];
 
   fixes: { title: string; subtitle: string }[] = [
     {

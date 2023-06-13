@@ -53,7 +53,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.11.4 \u00DF",
+    version: "0.11.5 \u00DF",
     speckleFolderName: "actcarbonreport",
     speckleViewer: {
       viewer: undefined,

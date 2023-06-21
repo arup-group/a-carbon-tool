@@ -64,13 +64,7 @@ export default class VersionUpdateDialog extends Vue {
     },
   ];
 
-  fixes: { title: string; subtitle: string }[] = [
-    {
-      title: "Fixed bug with reported volume",
-      subtitle:
-        "Fixed a bug that would cause the volume in assessments to be shown as double what they really are. NOTE: while the volume shown was incorrect, the volume used for calculations was still correct",
-    },
-  ];
+  fixes: { title: string; subtitle: string }[] = [];
 
   @Emit("close")
   close() {

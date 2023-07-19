@@ -64,7 +64,12 @@ export default class VersionUpdateDialog extends Vue {
     },
   ];
 
-  fixes: { title: string; subtitle: string }[] = [];
+  fixes: { title: string; subtitle: string }[] = [
+    {
+      title: "Large models bug",
+      subtitle: "Fixed a bug causing an 'out of memory' error to sometimes occur when loading large models"
+    }
+  ];
 
   @Emit("close")
   close() {

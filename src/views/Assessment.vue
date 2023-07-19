@@ -149,6 +149,8 @@ export default class Assessment extends Vue {
 
   reportController = new ReportController();
 
+  allStreamObjs: GetObjectDetailsOut;
+
   loading = false;
   loadingSpinnerText = "";
   loadingModel = false;
@@ -177,8 +179,6 @@ export default class Assessment extends Vue {
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
-  allChildObjs: AddParams.IChildObject[] = [];
-  parentObj: AddParams.IParamsParent | null = null;
   streamId = "";
 
   colors: Color[] = [];
@@ -324,14 +324,14 @@ export default class Assessment extends Vue {
   async uploadReport(branchName: string) {
     this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
     let newModel: AddParams.AddParamsModel | undefined;
-    if (this.parentObj) {
+    if (this.allStreamObjs.parent) {
       newModel = await AddParams.addParams(
-        this.parentObj,
+        this.allStreamObjs.parent,
         this.reportController.addParams,
         this.$store.state.selectedServer.url,
         this.token,
         this.streamId,
-        this.allChildObjs
+        this.allStreamObjs.children
       );
     }
 
@@ -384,11 +384,10 @@ export default class Assessment extends Vue {
       }
     );
 
-    this.allChildObjs = res.children;
-    this.parentObj = res.parent;
+    this.allStreamObjs = res;
 
     let totalVol = 0;
-    const filteredRes = this.allChildObjs.filter(
+    const filteredRes = this.allStreamObjs.children.filter(
       (r) =>
         r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
         r.speckle_type !== "Objects.Geometry.Mesh"

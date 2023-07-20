@@ -13,6 +13,7 @@ import {
 import { getChildren } from "./utils";
 import * as speckleUtil from "../../../store/speckle/speckleUtil";
 import { IdMapper } from "../add-params/addParams";
+import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
 export async function calcV1(
   branchData: HTTPStreamDataParentV1,
@@ -69,7 +70,8 @@ export async function calcV1(
     Math.ceil(levelsUpdated.levels[2].tCO2e * 100) / 100;
 
   const objectIds = await speckleUtil.getStreamObjects(context, streamId);
-  const modelId = objectIds.data.stream.branch.commits.items[0].referencedObject;
+  const modelId =
+    objectIds.data.stream.branch.commits.items[0].referencedObject;
 
   return {
     ready: true,
@@ -84,7 +86,7 @@ export async function calcV1(
       aBreakdown: levelsUpdated,
       children: childrenData,
       idMapper: {} as IdMapper,
-      selectedObjectGroup: branchData.selectedObjectGroup
+      selectedObjectGroup: branchData.selectedObjectGroup,
     },
   };
 }
@@ -137,8 +139,9 @@ export function extractCo2Data(
       object.act.reportData.transportCarbonA4 +
       object.act.reportData.constructionCarbonA5.value;
 
-    const materialKey = object.act.formData.material.name;
-    const materialColor = object.act.formData.material.color;
+    const material = object.act.formData.material as MaterialFull; // for v1 reports we know that only one material will be used
+    const materialKey = material.name;
+    const materialColor = material.color;
     if (Object.prototype.hasOwnProperty.call(co2Obj, materialKey)) {
       co2Obj[materialKey] = {
         value: co2Obj[materialKey].value + totalObjectCarbon,
@@ -154,7 +157,7 @@ export function extractCo2Data(
     }
     colorsArr.push({
       id: object.act.id,
-      color: object.act.formData.material.color,
+      color: material.color,
     });
   });
   const co2Arr = Object.entries(co2Obj);

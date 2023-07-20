@@ -69,7 +69,7 @@ export interface ParamAdd {
   param: Param;
 }
 
-interface Param {
+export interface Param {
   id: string;
   name: string;
   units: string | null;

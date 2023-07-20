@@ -1,6 +1,11 @@
+export function instanceOfMaterialFull(object: any): object is MaterialFull {
+  return "name" in object && "color" in object && "productStageCarbonA1A3" in object;
+}
+
 export interface MaterialFull extends Material {
   name: string;
   color: string; // will be a color hex code
+  volume?: number; // will only be used once uploaded to report
 }
 
 export interface Material {

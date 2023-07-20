@@ -53,7 +53,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.11.5 \u00DF",
+    version: "0.12.2 \u00DF",
     speckleFolderName: "actcarbonreport",
     speckleViewer: {
       viewer: undefined,
@@ -132,27 +132,6 @@ export default new Vuex.Store({
         color: "black",
         backgroundColor: "#82c7f1",
       },
-    ],
-    materialCategories: [
-      "Aluminium",
-      "Brick",
-      "Blockwork",
-      "Cement",
-      "Coating",
-      "Concrete",
-      "Copper",
-      "Fire",
-      "Fill Materials",
-      "Glass",
-      "Gypsum",
-      "Insulation",
-      "Natural materials",
-      "Plasterboard",
-      "Plastic",
-      "Soil",
-      "Steel",
-      "Stone",
-      "Timber",
     ],
     transportTypes: [
       {

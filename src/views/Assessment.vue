@@ -17,21 +17,21 @@
           @uploadData="uploadData"
           @selectMaterial="selectMaterial"
           @checkSave="checkSave"
-          @calcVol="calcVol"
           @close="close"
           @openFullView="openFullView"
           @createNewGroup="createNewObjectGroup"
           @groupSelected="materialGroupSelected"
+          @selectBuildup="selectBuildup"
           :modal="modal"
           :streams="availableStreams"
-          :types="types"
+          :fullGroups="fullGroups"
           :materials="materials"
           :transportTypes="transportTypes"
           :totalVolume="totalVolume"
           :emptyProps="emptyProps"
           :report="report"
           :becs="becs"
-          :groupedMaterials="groupedMaterials"
+          :transportGroups="reportController.transportGroups"
           :speckleVol="speckleVol"
           :update="update"
           :streamId="streamId"
@@ -104,32 +104,18 @@ import {
 import {
   ProjectDataComplete,
   MaterialUpdateOut,
-  MaterialGrouping,
   Step,
   TransportSelected,
   TransportType,
-  EmptyProps,
   EmptyPropsPassdown,
-  SpeckleObjectFormComplete,
-  SpeckleObjectComplete,
-  ReportTotals,
   ReportPassdown,
   ObjectDetails,
-  GroupedMaterial,
   SelectedMaterialEmit,
-  ObjectsObj,
   StringPropertyGroups,
+  SelectedBuildupEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 
-import * as THREE from "three";
-import {
-  constructionCarbonA5,
-  constructionCarbonA5Site,
-  constructionCarbonA5Waste,
-  productStageCarbonA1A3,
-  transportCarbonA4,
-} from "@/store/utilities/carbonCalculator";
 import {
   CheckContainsChlidReportInput,
   GetAllReportBranchesOutput,
@@ -137,10 +123,10 @@ import {
   UploadReportInput,
   GetObjectDetailsOut,
 } from "@/store";
-import { VolCalculator } from "./utils/VolCalculator";
+import { BECName } from "@/models/shared";
 import { LoadStreamOut } from "./utils/process-report-object";
 import LoadingSpinner from "@/components/shared/LoadingSpinner.vue";
-import { ChartData } from "@/models/chart";
+import { ChildObjects, ReportController } from "@/models/report";
 
 interface AvailableStream {
   label: string;
@@ -161,6 +147,10 @@ export default class Assessment extends Vue {
   @Prop() modalStreamid!: string;
   @Prop() modalBranchName!: string;
 
+  reportController = new ReportController();
+
+  allStreamObjs: GetObjectDetailsOut;
+
   loading = false;
   loadingSpinnerText = "";
   loadingModel = false;
@@ -170,14 +160,17 @@ export default class Assessment extends Vue {
   availableStreams: AvailableStream[] = [];
   objectURLs: string[] = [];
   token = "";
-  types: MaterialGrouping[] = [];
-  objectsObj: ObjectsObj = {};
+  get fullGroups() {
+    return this.reportController.fullGroups;
+  }
   materials: MaterialFull[] = this.$store.getters.materialsArr;
   transportTypes: TransportType[] = [];
-  becs: TransportType[] = [];
+  becs: {
+    name: BECName;
+    color: string;
+    backgroundColor: string;
+  }[] = [];
   totalVolume = -1;
-  allMesh: THREE.Mesh[] = [];
-  projectData!: ProjectDataComplete;
   projectDataPassdown: ProjectDataComplete | null = null;
   allIds: string[] = [];
 
@@ -186,9 +179,6 @@ export default class Assessment extends Vue {
   emptyProps: EmptyPropsPassdown = false; // setting to false initially to get vue to detect changes
 
   report: ReportPassdown = false;
-  addParams: AddParams.ParamAdd[] = [];
-  allChildObjs: AddParams.IChildObject[] = [];
-  parentObj: AddParams.IParamsParent | null = null;
   streamId = "";
 
   colors: Color[] = [];
@@ -208,7 +198,9 @@ export default class Assessment extends Vue {
 
   groupingProps: StringPropertyGroups[] = [];
   objectGroups: string[] = [];
-  groupedMaterials: GroupedMaterial[] = [];
+  get transportGroups() {
+    return this.reportController.transportGroups;
+  }
   selectedObjectGroup = "Object Type";
 
   update = false;
@@ -258,7 +250,7 @@ export default class Assessment extends Vue {
   }
 
   materialGroupSelected(objectGroup: string) {
-    this.types = this.findTypes(this.groupingProps, objectGroup);
+    this.reportController.groupObjects(this.groupingProps, objectGroup);
     this.selectedObjectGroup = objectGroup;
     this.resetColors();
   }
@@ -299,28 +291,13 @@ export default class Assessment extends Vue {
 
     const objGroup = assessmentViewData.data.selectedObjectGroup;
     this.selectedObjectGroup = objGroup ? objGroup : "Object Type";
-    assessmentViewData.data.children.forEach((c) => {
-      this.objectsObj[c.act.id] = {
-        id: c.act.id,
-        speckle_type: c.act.speckle_type,
-        formData: c.act.formData,
-        reportData: c.act.reportData,
-      };
-    });
+    this.reportController.setObjectsUpdate(assessmentViewData.data.children);
 
-    this.materialsColors = Object.values(this.objectsObj).map((o) => ({
-      id: o.id,
-      color: o.formData?.material?.color as string,
-    }));
-    this.transportColors = Object.values(this.objectsObj).map((o) => ({
-      id: o.id,
-      color: o.formData?.transport?.color as string,
-    }));
+    this.materialsColors = this.reportController.materialsColors;
+    this.transportColors = this.reportController.transportColors;
 
-    this.projectData = assessmentViewData.data.projectInfo;
-    this.projectDataPassdown = assessmentViewData.data.projectInfo;
-
-    this.groupMaterials();
+    this.reportController.projectInfo = assessmentViewData.data.projectInfo;
+    this.projectDataPassdown = this.reportController.projectInfo;
 
     this.totalVolume = assessmentViewData.data.projectInfo.volume;
     this.speckleVol = true;
@@ -330,59 +307,51 @@ export default class Assessment extends Vue {
 
   async checkSave() {
     this.loading = true;
-    if (this.report) {
-      if (this.report.reportObjs.length > 0) {
-        const containsReport: boolean = await this.$store.dispatch(
-          "checkContainsReport",
-          this.streamId
-        );
-        if (containsReport) {
-          const getAllReportBranchesOut: GetAllReportBranchesOutput =
-            await this.$store.dispatch("getAllReportBranches", this.streamId);
-          this.branchNames = getAllReportBranchesOut.map((b) => b.name);
-          this.reportName = this.projectData.name;
-          this.newBranchDialog = true;
-        } else {
-          this.uploadReport("main");
-        }
-      } else {
-        this.saveSnack = true;
-        this.saveSuccess = false;
-        this.loading = false;
-      }
+    const containsReport: boolean = await this.$store.dispatch(
+      "checkContainsReport",
+      this.streamId
+    );
+    if (containsReport) {
+      const getAllReportBranchesOut: GetAllReportBranchesOutput =
+        await this.$store.dispatch("getAllReportBranches", this.streamId);
+      this.branchNames = getAllReportBranchesOut.map((b) => b.name);
+      this.reportName = this.reportController.projectInfo.name;
+      this.newBranchDialog = true;
+    } else {
+      this.uploadReport("main");
     }
   }
   async uploadReport(branchName: string) {
-    if (this.report && this.report.reportObjs.length > 0) {
-      this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
-      let newModel: AddParams.AddParamsModel | undefined;
-      if (this.parentObj) {
-        newModel = await AddParams.addParams(
-          this.parentObj,
-          this.addParams,
-          this.$store.state.selectedServer.url,
-          this.token,
-          this.streamId,
-          this.allChildObjs
-        );
-      }
-
-      const uploadReportInput: UploadReportInput = {
-        streamid: this.streamId,
-        objects: this.report.reportObjs,
-        reportTotals: this.report.totals,
-        projectData: this.projectData,
-        branchName,
-        newModel,
-        selectedObjectGroup: this.selectedObjectGroup,
-      };
-      this.loading = true;
-      await this.$store.dispatch("uploadReport", uploadReportInput);
-      this.loading = false;
-      this.saveSnack = true;
-      this.finished = true;
-      this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
+    this.loadingSpinnerText = "DO NOT REFRESH. Saving report";
+    let newModel: AddParams.AddParamsModel | undefined;
+    if (this.allStreamObjs.parent) {
+      newModel = await AddParams.addParams(
+        this.allStreamObjs.parent,
+        this.reportController.addParams,
+        this.$store.state.selectedServer.url,
+        this.token,
+        this.streamId,
+        this.allStreamObjs.children
+      );
     }
+
+    const upload = this.reportController.convToUpload(
+      this.totalVolume,
+      this.materialsColors,
+      this.transportColors
+    );
+    const uploadReportInput: UploadReportInput = {
+      streamid: this.streamId,
+      objects: upload.reportObjs,
+      reportTotals: upload.totals,
+      projectData: this.reportController.projectInfo,
+      branchName,
+      newModel,
+      selectedObjectGroup: this.selectedObjectGroup,
+    };
+    this.loading = true;
+    await this.$store.dispatch("uploadReport", uploadReportInput);
+    this.$router.push(`/assessment/view/${this.streamId}/${branchName}`);
   }
   saveSnackClose() {
     this.saveSnack = false;
@@ -399,9 +368,8 @@ export default class Assessment extends Vue {
     this.filteredType = material.type;
   }
 
-  async rendererLoaded({ properties, allMesh }: RendererLoaded) {
+  async rendererLoaded({ properties }: RendererLoaded) {
     this.loadingModelText = "Loading data from model...";
-    this.allMesh = allMesh;
 
     const volumeFilter = properties.find(
       (p) => p.name.toLowerCase() === "volume"
@@ -416,36 +384,29 @@ export default class Assessment extends Vue {
       }
     );
 
-    this.allChildObjs = res.children;
-    this.parentObj = res.parent;
+    this.allStreamObjs = res;
 
     let totalVol = 0;
-    const filteredRes = this.allChildObjs.filter(
+    const filteredRes = this.allStreamObjs.children.filter(
       (r) =>
         r.speckle_type !== "Speckle.Core.Models.DataChunk" &&
         r.speckle_type !== "Objects.Geometry.Mesh"
     );
 
     const speckleObjsPropsSearch: any[] = [];
+    const childObjs: ChildObjects[] = [];
 
     if (volumeFilter) {
-      const childObjects: ObjectDetails[] = [];
       this.speckleVol = true;
       filteredRes.forEach((r) => {
         const volume = this.findVolume(r, volumeFilter);
         if (volume) {
           speckleObjsPropsSearch.push(r);
           if (!this.update) {
-            this.objectsObj[r.id] = {
-              id: r.id,
-              speckle_type: r.speckle_type,
-              formData: {
-                volume: volume,
-              },
-            };
-            childObjects.push(r);
-            // also find total volume here to avoid needing to loop through objects again
-            totalVol += volume;
+            childObjs.push({
+              volume,
+              speckleObject: r,
+            });
           }
           // also find total volume here to avoid needing to loop through objects again
           totalVol += volume;
@@ -453,28 +414,27 @@ export default class Assessment extends Vue {
       });
     } else {
       this.speckleVol = false;
-      filteredRes.forEach((r) => {
-        if (!this.update) {
-          this.objectsObj[r.id] = {
-            id: r.id,
-            speckle_type: r.speckle_type,
-          };
-        }
-      });
     }
+    // if childObjs.length === 0 then the report is being updated, so no need to set objects here
+    if (childObjs.length !== 0) this.reportController.setObjects(childObjs);
     this.groupingProps = findStringProps(
       speckleObjsPropsSearch,
-      this.objectsObj
+      this.reportController.objects // technically not the right type, but it works so...
     );
     this.objectGroups = this.groupingProps.map((gp) => gp.name);
+    this.reportController.groupObjects(
+      this.groupingProps,
+      this.selectedObjectGroup
+    );
 
-    this.types = this.findTypes(this.groupingProps, this.selectedObjectGroup);
+    this.allIds = Object.keys(this.reportController.objects);
     if (!this.update) {
-      this.allIds = this.types.map((t) => t.ids).flat();
       this.totalVolume = totalVol;
     }
 
-    this.updateVolumeGradient();
+    this.volumeGradient = {
+      property: this.volProp,
+    };
     this.resetColors();
     this.loadingModel = false;
   }
@@ -493,30 +453,6 @@ export default class Assessment extends Vue {
     return curr;
   }
 
-  calcVol() {
-    let totalVol = 0;
-    this.allMesh.forEach((m) => {
-      const volume = VolCalculator.getMeshVolume(m);
-      if (volume) {
-        try {
-          const id: string = m.userData.id;
-          this.objectsObj[id] = {
-            ...this.objectsObj[id],
-            formData: {
-              ...this.objectsObj[id].formData,
-              volume,
-            },
-          };
-        } catch (err) {
-          console.warn(err);
-        }
-        totalVol += volume;
-      }
-    });
-    this.totalVolume = totalVol;
-    this.speckleVol = true;
-  }
-
   stepperUpdate(step: Step) {
     this.step = step;
     switch (step) {
@@ -531,7 +467,6 @@ export default class Assessment extends Vue {
         this.beenToTransport = true;
         this.resetColors();
         this.colors = this.transportColors;
-        this.groupMaterials();
         break;
       case Step.QUANTITIES:
         this.resetColors();
@@ -540,10 +475,10 @@ export default class Assessment extends Vue {
         break;
       case Step.REVIEW:
         this.resetColors();
-        this.review();
+        this.emptyProps = this.reportController.isReportComplete();
         break;
       case Step.PREVIEW:
-        this.carbonCalc();
+        this.report = this.reportController.calcCarbon();
         this.resetColors();
         break;
       case Step.SAVE:
@@ -557,7 +492,7 @@ export default class Assessment extends Vue {
 
   objectsSelected(objects: UserData[]) {
     if (this.step === Step.MATERIALS) {
-      const keys = Object.keys(this.objectsObj);
+      const keys = Object.keys(this.reportController.objects);
       this.selectedObjects = objects
         .filter((o) => keys.includes(o.id))
         .map((o) => o.id);
@@ -567,304 +502,12 @@ export default class Assessment extends Vue {
   }
 
   createNewObjectGroup(name: string) {
-    this.types = this.types.map((t) => ({
-      ...t,
-      ids: t.ids.filter((i) => !this.selectedObjects.includes(i)),
-    }));
-    this.types.push({
-      ids: this.selectedObjects,
-      material: undefined,
-      transport: undefined,
-      type: name,
-    });
-  }
-
-  groupMaterials() {
-    let materialsObj: {
-      [material: string]: {
-        transportType?: TransportType;
-        speckle_types: {
-          [speckle_type: string]: string[] /* array should be object id's */;
-        };
-      };
-    } = {};
-
-    // assuming that the materials section has been filled out already
-    Object.values(this.objectsObj).forEach((o) => {
-      const material = o.formData?.material?.name;
-      const speckle_type = o.speckle_type;
-      if (material) {
-        if (
-          materialsObj[material] &&
-          materialsObj[material].speckle_types[speckle_type]
-        ) {
-          materialsObj[material].speckle_types[speckle_type].push(o.id);
-        } else if (materialsObj[material]) {
-          materialsObj[material].speckle_types[speckle_type] = [o.id];
-        } else {
-          materialsObj[material] = {
-            speckle_types: {},
-            transportType: o.formData?.transport,
-          };
-          materialsObj[material].speckle_types[speckle_type] = [o.id];
-        }
-      }
-    });
-
-    const materialsArr: GroupedMaterial[] = Object.keys(materialsObj).map(
-      (m) => {
-        const ids: string[] = [];
-        const speckle_types = Object.keys(materialsObj[m].speckle_types).map(
-          (s) => {
-            ids.push(...materialsObj[m].speckle_types[s]);
-            return s;
-          }
-        );
-        return {
-          material: m,
-          objects: ids,
-          speckle_types,
-          transportType: materialsObj[m].transportType,
-        };
-      }
-    );
-
-    this.groupedMaterials = materialsArr;
+    this.reportController.addNewGroup(name, this.selectedObjects);
   }
 
   resetColors() {
     this.colors = [];
     this.volumeGradientPassdown = null;
-  }
-
-  updateVolumeGradient() {
-    let minVol = -1;
-    let maxVol = -1;
-
-    Object.values(this.objectsObj).forEach((o, i) => {
-      if (o.formData?.volume) {
-        let volume = o.formData.volume;
-        if (i === 0) {
-          // if on the first index, then min and max have not yet been set, so set them to the first vol value
-          minVol = volume;
-          maxVol = volume;
-        } else {
-          if (minVol > volume) minVol = volume;
-          if (maxVol < volume) maxVol = volume;
-        }
-      }
-    });
-
-    this.volumeGradient = {
-      property: this.volProp,
-    };
-  }
-
-  // for now we're just assuming that all data is filled in if the user reaches this step TODO: ONLY ALLOW USER ON THIS PAGE IF REVIEW IS SUCCESSFUL
-  carbonCalc() {
-    // convert objects from SpeckleObject to SpeckleObjectFormComplete
-    const objs = this.convertToFormComplete();
-    this.addParams = [];
-
-    const reportObjs = objs.map((o): SpeckleObjectComplete => {
-      const A1A3 = productStageCarbonA1A3(o);
-      const A4 = transportCarbonA4(o);
-      const A5Waste = constructionCarbonA5Waste(o);
-
-      // make parameter update object
-      this.addParams.push({
-        parentid: o.id,
-        name: "Total Carbon",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Total Carbon",
-          units: "kgCO2e/kg",
-          value: A4 + A1A3 + A5Waste,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
-        name: "Product Stage Carbon A1-A3",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Product Stage Carbon A1-A3",
-          units: "kgCO2e/kg",
-          value: A1A3,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
-        name: "Transport Carbon A4",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Transport Carbon A4",
-          units: "kgCO2e/kg",
-          value: A4,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      this.addParams.push({
-        parentid: o.id,
-        name: "Construction Carbon A5",
-        param: {
-          id: Math.floor(Math.random() * 10000000).toString(),
-          name: "Construction Carbon A5",
-          units: "kgCO2e/kg",
-          value: A5Waste,
-          isShared: false,
-          isReadOnly: false,
-          speckle_type: "Objects.BuiltElements.Revit.Parameter",
-          applicationId: null,
-          applicationUnit: null,
-          isTypeParameter: false,
-          totalChildrenCount: 0,
-          applicationUnitType: "string",
-          applicationInternalName: "string",
-        },
-      });
-      // end parameter update
-
-      return {
-        ...o,
-        reportData: {
-          transportCarbonA4: A4,
-          productStageCarbonA1A3: A1A3,
-          constructionCarbonA5: {
-            // site only kept for consistency with old versions of report. Value as refactoring to not include would be a pain
-            value: A5Waste,
-            waste: A5Waste,
-            site: 0,
-          },
-          // only add A5Waste to total carbon for individual child objects as A5Site is applied model-wide
-          totalCarbon: A4 + A1A3 + A5Waste,
-        },
-      };
-    });
-
-    const totals = this.calcTotals(reportObjs);
-
-    this.report = {
-      reportObjs,
-      totals,
-    };
-  }
-
-  calcTotals(reportObjs: SpeckleObjectComplete[]): ReportTotals {
-    let A1A3 = 0;
-    let A4 = 0;
-    let A5Waste = 0;
-    const materialsObj: {
-      [key: string]: { value: number; color: string };
-    } = {};
-    reportObjs.forEach((o) => {
-      const rd = o.reportData;
-      A1A3 += rd.productStageCarbonA1A3;
-      A4 += rd.transportCarbonA4;
-      A5Waste += rd.constructionCarbonA5.waste;
-      const objTotal = rd.productStageCarbonA1A3 + rd.transportCarbonA4 + rd.constructionCarbonA5.waste;
-      const materialName = o.formData.material.name;
-      if (materialName in materialsObj) {
-        materialsObj[materialName].value += objTotal;
-      } else {
-        materialsObj[materialName] = {
-          value: objTotal,
-          color: o.formData.material.color,
-        };
-      }
-    });
-    let A5Site = constructionCarbonA5Site(this.projectData.cost);
-    let A5Value = A5Site + A5Waste
-
-    let totalCO2 = A1A3 + A4 + A5Value;
-    const materials: ChartData[] = Object.entries(materialsObj).map((m) => ({
-      value: m[1].value,
-      label: m[0],
-      color: m[1].color,
-    }));
-
-    return {
-      transportCarbonA4: A4,
-      productStageCarbonA1A3: A1A3,
-      constructionCarbonA5: {
-        value: A5Value,
-        waste: A5Waste,
-        site: A5Site,
-      },
-      totalCO2,
-      volume: this.totalVolume,
-      materials,
-      materialsColors: this.materialsColors,
-      transportColors: this.transportColors,
-    };
-  }
-
-  convertToFormComplete() {
-    const objs: SpeckleObjectFormComplete[] = [];
-    Object.values(this.objectsObj).forEach((o) => {
-      if (
-        o.formData &&
-        o.formData.transport &&
-        o.formData.material &&
-        o.formData.volume
-      ) {
-        objs.push({
-          ...o,
-          formData: {
-            transport: o.formData.transport,
-            material: o.formData.material,
-            volume: o.formData.volume,
-          },
-        });
-      }
-    });
-    return objs;
-  }
-
-  review() {
-    const emptyProps: EmptyProps = {
-      projectEmpty: this.projectData ? true : false,
-      materialsEmpty: [] as string[],
-      transportsEmpty: [] as string[],
-      volumesEmpty: [] as string[],
-    };
-
-    Object.values(this.objectsObj).forEach((o) => {
-      const formData = o.formData;
-
-      if (formData?.material === undefined)
-        emptyProps.materialsEmpty.push(o.id);
-      if (formData?.transport === undefined)
-        emptyProps.transportsEmpty.push(o.id);
-      if (formData?.volume === undefined) emptyProps.volumesEmpty.push(o.id);
-    });
-
-    this.emptyProps = emptyProps;
   }
 
   async loadStream(id: string) {
@@ -877,7 +520,11 @@ export default class Assessment extends Vue {
 
   transportSelected(selected: TransportSelected) {
     if (this.beenToTransport) {
-      const ids = selected.material.objects;
+      selected.material.objects.forEach((o) => {
+        o.setTransport(selected.transportType);
+      });
+
+      const ids = selected.material.objects.map((o) => o.parentId);
       this.colors = this.colors.filter((c) => !ids.includes(c.id));
       ids.forEach((id) => {
         this.colors.push({
@@ -886,22 +533,54 @@ export default class Assessment extends Vue {
         });
       });
       this.transportColors = this.colors;
-
-      selected.material.objects.forEach((i) => {
-        const oldObj = this.objectsObj[i];
-        this.objectsObj[i] = {
-          ...oldObj,
-          formData: {
-            ...oldObj.formData,
-            transport: selected.transportType,
-          },
-        };
-      });
     }
   }
 
+  selectBuildup(selectedBuildup: SelectedBuildupEmit) {
+    const objects = this.reportController.getObjectsByIds(selectedBuildup.ids);
+
+    objects.forEach((o) => {
+      // get transport of any materials that were already present
+      const oldTransports: { [material: string]: TransportType } = {};
+      Object.entries(o.materials).forEach(
+        ([k, v]) => (oldTransports[k] = v.transport)
+      );
+
+      o.removeAllMaterials();
+      selectedBuildup.materials.forEach((b) => {
+        if (b.material && b.percentage) {
+          o.addMaterial(b.material, +b.percentage / 100);
+          const oldTransport = oldTransports[b.material.name];
+          if (oldTransport) o.setTransport(b.material.name, oldTransport);
+        }
+      });
+    });
+
+    this.colors = this.colors.filter(
+      (c) => !selectedBuildup.ids.includes(c.id)
+    );
+
+    selectedBuildup.ids.forEach((id) => {
+      try {
+        // colour by the first material as that's easiest
+        if (selectedBuildup.materials[0].material)
+          this.colors.push({
+            color: selectedBuildup.materials[0].material.color,
+            id,
+          });
+      } catch (err) {
+        console.error("err:", id);
+      }
+    });
+    this.materialsColors = this.colors;
+  }
+
   materialUpdated(material: MaterialUpdateOut) {
-    const ids = material.type.ids;
+    material.type.objects.forEach((o) => {
+      o.removeAllMaterials();
+      o.changeMaterial(material.oldMaterial?.name, material.material);
+    });
+    const ids = material.type.objects.map((o) => o.id);
     this.colors = this.colors.filter((c) => !ids.includes(c.id));
     ids.forEach((id) => {
       try {
@@ -914,48 +593,11 @@ export default class Assessment extends Vue {
       }
     });
     this.materialsColors = this.colors;
-
-    // update the objects to include this new material
-    material.type.ids.forEach((i) => {
-      const oldObj = this.objectsObj[i];
-      this.objectsObj[i] = {
-        ...oldObj,
-        formData: {
-          ...oldObj.formData,
-          material: material.material,
-        },
-      };
-    });
-  }
-
-  // types = material groups, cuz legacy
-  findTypes(
-    propertyGroups: StringPropertyGroups[],
-    selectedGroup: string
-  ): MaterialGrouping[] {
-    const group = propertyGroups.find((pg) => pg.name === selectedGroup);
-    if (group) {
-      // we're assuming that if this.update=true then objectsObj will already be filled by this point
-      const materialGrouping: MaterialGrouping[] = group.data.valueGroups.map(
-        (vg) => ({
-          type: vg.value,
-          ids: vg.ids,
-          material: this.update
-            ? this.objectsObj[vg.ids[0]].formData?.material
-            : undefined,
-          transport: this.update
-            ? this.objectsObj[vg.ids[0]].formData?.transport
-            : undefined,
-        })
-      );
-      return materialGrouping;
-    }
-    return [];
   }
 
   uploadData(data: ProjectDataComplete) {
     // form data from step 1
-    this.projectData = data;
+    this.reportController.projectInfo = data;
     this.$store.dispatch("changeRegion", data.region).then((res) => {
       this.materials = this.$store.getters.materialsArr;
     });

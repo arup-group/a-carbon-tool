@@ -50,7 +50,7 @@
         </v-stepper-step>
         <v-stepper-content step="2">
           <Menu2
-            :types="types"
+            :fullGroups="fullGroups"
             :materials="materials"
             :selectedObjects="selectedObjects"
             :invalidObjects="invalidSelectedObjects"
@@ -60,6 +60,7 @@
             @createNewGroup="createNewGroup"
             @selectMaterial="selectMaterial"
             @groupSelected="groupSelected"
+            @selectBuildup="selectBuildup"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 1" color="primary">
@@ -82,7 +83,7 @@
           <Menu3
             @transportSelected="transportSelected"
             :transportTypes="transportTypes"
-            :groupedMaterials="groupedMaterials"
+            :transportGroups="transportGroups"
           />
           <v-card-actions>
             <v-btn :style="colStyle" @click="step = 2" color="primary">
@@ -103,7 +104,6 @@
         </v-stepper-step>
         <v-stepper-content step="4">
           <menu-4
-            @calcVol="calcVol"
             :totalVolume="totalVolume"
             :speckleVol="speckleVol"
           />
@@ -203,22 +203,24 @@ import {
   ReportPassdown,
   GroupedMaterial,
   SelectedMaterialEmit,
+  SelectedBuildupEmit,
 } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
+import { ReportFullGroup, ReportFullTransportGroup } from "@/models/report";
 
 @Component({
   components: { Menu1b, Menu2, Menu3, Menu4, Menu5, Menu6, Menu7 },
 })
 export default class AssessmentStepper extends Vue {
   @Prop() streams!: any;
-  @Prop() types!: MaterialGrouping[];
+  @Prop() fullGroups!: ReportFullGroup[];
   @Prop() materials!: MaterialFull[];
   @Prop() transportTypes!: TransportType[];
   @Prop() totalVolume!: number;
   @Prop() emptyProps!: EmptyPropsPassdown;
   @Prop() report!: ReportPassdown;
   @Prop() becs!: string;
-  @Prop() groupedMaterials!: GroupedMaterial[];
+  @Prop() transportGroups!: ReportFullTransportGroup[];
   @Prop() speckleVol!: boolean;
 
   @Prop() update!: boolean;
@@ -296,6 +298,11 @@ export default class AssessmentStepper extends Vue {
     return this.report ? true : false;
   }
 
+  @Emit("selectBuildup")
+  selectBuildup(selectedBuildup: SelectedBuildupEmit) {
+    return selectedBuildup;
+  }
+
   @Emit("createNewGroup")
   createNewGroup(groupName: string) {
     return groupName;
@@ -357,10 +364,6 @@ export default class AssessmentStepper extends Vue {
     return objectGroup;
   }
 
-  @Emit("calcVol")
-  calcVol() {
-    return;
-  }
   @Watch("form.notes")
   notesUpdate() {
     this.uploadData({

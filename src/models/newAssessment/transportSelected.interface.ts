@@ -1,6 +1,7 @@
-import { GroupedMaterial, TransportType } from ".";
+import { TransportType } from ".";
+import { ReportFullTransportGroup } from "../report";
 
 export interface TransportSelected {
-  material: GroupedMaterial;
+  material: ReportFullTransportGroup;
   transportType: TransportType;
 }

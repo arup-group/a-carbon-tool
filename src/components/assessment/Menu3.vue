@@ -2,7 +2,7 @@
   <div>
     <p>Objects grouped by material</p>
     <transport-item
-      v-for="material in groupedMaterials"
+      v-for="material in transportGroups"
       :key="material.name"
       @transportSelected="transportSelected"
       :transportTypes="transportTypes"
@@ -17,6 +17,7 @@ import {
   TransportSelected,
   TransportType,
 } from "@/models/newAssessment";
+import { ReportFullTransportGroup } from "@/models/report";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import TransportItem from "./TransportItem.vue";
 
@@ -25,7 +26,7 @@ import TransportItem from "./TransportItem.vue";
 })
 export default class Menu3 extends Vue {
   @Prop() transportTypes!: TransportType[];
-  @Prop() groupedMaterials!: GroupedMaterial[];
+  @Prop() transportGroups!: ReportFullTransportGroup[];
 
   @Emit("transportSelected")
   transportSelected(selected: TransportSelected) {

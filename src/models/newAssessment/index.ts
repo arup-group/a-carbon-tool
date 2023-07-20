@@ -9,5 +9,5 @@ export { ProjectDataTemp, ProjectDataComplete } from "./projectData.interface";
 export { EmptyProps, EmptyPropsPassdown } from "./emptyProps.interface";
 export { ObjectDetails } from "./objectDetails.interface";
 export { GroupedMaterial } from "./groupedMaterial.interface";
-export { SelectedMaterialEmit } from "./selectedMaterialEmit.interface";
+export * from "./selectedMaterialEmit.interface";
 export * from "./stringPropertyGroups.interface";

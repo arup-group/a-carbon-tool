@@ -10,11 +10,21 @@
         ></v-combobox>
       </div>
       <div v-for="type in loadedTypes" :key="type.type" style="width: 100%">
+        <expanded-material-type
+          v-if="expandedTypes.includes(type.name)"
+          :materials="materials"
+          @selectBuildup="selectBuildup"
+          @selectMaterial="selectMaterial"
+          :type="type"
+        />
         <material-type
+          v-else
           :materials="materials"
           :type="type"
+          :expandOption="true"
           @materialUpdated="materialUpdated"
           @selectMaterial="selectMaterial"
+          @expandSelection="expandSelection"
         />
       </div>
     </v-form>
@@ -29,23 +39,27 @@
 </template>
 
 <script lang="ts">
-import { SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
+import { SelectedMaterialEmit, SelectedBuildupEmit } from "@/models/newAssessment";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
 
 import MaterialType from "./MaterialType.vue";
 import CustomGroup from "./CustomGroup.vue";
+import ExpandedMaterialType from "./ExpandedMaterialType.vue";
+import { ReportFullGroup } from "@/models/report";
 
 @Component({
-  components: { MaterialType, CustomGroup },
+  components: { MaterialType, CustomGroup, ExpandedMaterialType },
 })
 export default class Menu2 extends Vue {
-  @Prop() types!: MaterialGrouping[];
+  @Prop() fullGroups!: ReportFullGroup[];
   @Prop() materials!: MaterialFull[];
   @Prop() selectedObjects!: string[];
   @Prop() invalidObjects!: boolean;
   @Prop() objectGroups!: string[];
   @Prop() defaultGroup!: string;
+
+  updated = false; // for when a report is being updated
 
   _objectGroup = "";
   get objectGroup() {
@@ -55,10 +69,26 @@ export default class Menu2 extends Vue {
     this._objectGroup = val;
   }
 
+  expandedTypes: string[] = [];
+
+  @Watch("fullGroups", { deep: true })
+  watchFullGroups() {
+    if (!this.updated) {
+      this.fullGroups.forEach(fg => {
+        if (Object.keys(fg.objects[0].materials).length > 1) this.expandSelection(fg);
+      });
+      this.updated = true;
+    }
+  }
+
   groupKey = 0;
 
   get loadedTypes() {
-    return this.types ? this.types : [];
+    return this.fullGroups ? this.fullGroups : [];
+  }
+
+  expandSelection(type: ReportFullGroup) {
+    this.expandedTypes.push(type.name);
   }
 
   @Emit("createNewGroup")
@@ -74,6 +104,11 @@ export default class Menu2 extends Vue {
   @Emit("selectMaterial")
   selectMaterial(selectedMaterial: SelectedMaterialEmit) {
     return selectedMaterial;
+  }
+
+  @Emit("selectBuildup")
+  selectBuildup(selectedBuildup: SelectedBuildupEmit) {
+    return selectedBuildup;
   }
 
   @Emit("groupSelected")

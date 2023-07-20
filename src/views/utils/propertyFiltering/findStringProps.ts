@@ -1,11 +1,11 @@
 import { PropertyInfo } from "@speckle/viewer";
 import { flattenObject } from "./";
-import { ObjectsObj, StringPropertyGroups } from "@/models/newAssessment";
+import { StringPropertyGroups } from "@/models/newAssessment";
 
 // source: https://github.com/specklesystems/speckle-server
 export function findStringProps(
   speckleObjsPropsSearch: any[],
-  objectsObj: ObjectsObj
+  objectsObj: { [key: string]: any } // we can probably figure out a way to no longer need this...
 ): StringPropertyGroups[] {
   const propValues: any = {};
   speckleObjsPropsSearch.forEach((obj) => {
@@ -119,11 +119,32 @@ export function findStringProps(
     filter.targetKey = key;
     filters.push(filter);
   }
-  const stringFilters = filters.filter(
-    (f) =>
-      f.data.type === "string" &&
-      f.data.objectCount === Object.keys(objectsObj).length
-  );
+
+  // filter out number filters and add in an "undefined" option for those that need it
+  const stringFilters = filters.filter((f) => f.data.type === "string");
+  stringFilters.forEach((f) => {
+    if (f.data.objectCount !== Object.keys(objectsObj).length) {
+      const ids2d = (
+        f.data.valueGroups as { value: string; ids: string[] }[]
+      ).map((v: { value: string; ids: string[] }) => v.ids);
+      const ids: string[] = [];
+      ids2d.forEach((i) => ids.push(...i));
+
+      let allIds = Object.keys(objectsObj);
+
+      ids.forEach((i) => {
+        const index = allIds.indexOf(i);
+        if (index > -1) {
+          allIds.splice(index, 1);
+        }
+      });
+
+      f.data.valueGroups.push({
+        value: "undefined",
+        ids: [...allIds],
+      });
+    }
+  });
 
   return stringFilters;
 }

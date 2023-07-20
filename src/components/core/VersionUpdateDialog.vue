@@ -56,15 +56,24 @@ export default class VersionUpdateDialog extends Vue {
   @Prop() dialog!: boolean;
   @Prop() version!: string;
 
-  features: { title: string; subtitle: string }[] = [{
-    title: "Updated Speckle Viewer",
-    subtitle: "Updated the version of the Speckle Viewer to get the latest features"
-  }];
+  features: { title: string; subtitle: string }[] = [
+    {
+      title: "Material buildup",
+      subtitle:
+        "Objects in assessments can now have multiple materials assigned to them, allowing for material buildups to be used instead of single materials",
+    },
+    {
+      title: "Grouping filters update",
+      subtitle:
+        "Grouping filters that require it now have an 'undefined' field, meaning that a filter will not need to appear on every object to allow it to be used for object grouping",
+    },
+  ];
 
   fixes: { title: string; subtitle: string }[] = [
     {
-      title: "Fixed bug in report models",
-      subtitle: "Fixed a bug that would cause some models to not be saved properly in reports",
+      title: "Large models bug",
+      subtitle:
+        "Fixed a bug causing an 'out of memory' error to sometimes occur when loading large models",
     },
   ];
 

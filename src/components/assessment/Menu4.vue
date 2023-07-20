@@ -33,9 +33,8 @@ export default class Menu4 extends Vue {
     return Math.round(this.totalVolume * 100) / 100;
   }
 
-  @Emit("calcVol")
   calcVol() {
-    return;
+    throw new Error("we do not support calculating volume on the model. Volume props must be supplied");
   }
 }
 </script>

@@ -9,17 +9,17 @@
     ]"
   >
     <v-row dense align="center">
-      <v-col cols="12" md="4" class="pl-2">
+      <v-col cols="12" md="3" class="pl-2">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-chip v-bind="attrs" v-on="on" @click="selectMaterial">
-              {{ cleanType(type.type) }}
+              {{ cleanType(type.name) }}
             </v-chip>
           </template>
-          <span>Objects: {{ type.ids.length }} </span>
+          <span>Objects: {{ type.objects.length }} </span>
         </v-tooltip>
       </v-col>
-      <v-col coles="12" md="8" class="pr-2">
+      <v-col coles="12" md="7" class="pr-2">
         <v-combobox
           v-model="currentMaterial"
           :items="materials"
@@ -30,39 +30,68 @@
           <template #selection="{ item }">
             <v-chip
               :color="item.color"
-              :textColor="getContrastYIQ(item.color)"
+              :textColor="getContrastYIQ(item.color, item)"
               >{{ item.name }}</v-chip
             >
           </template>
         </v-combobox>
+      </v-col>
+      <v-col md="2" v-if="expandOption">
+        <v-btn fab small @click="expandSelection">
+          <v-icon> mdi-plus </v-icon>
+        </v-btn>
       </v-col>
     </v-row>
     <div class="d-flex align-center justify-space-between"></div>
   </v-card>
 </template>
 <script lang="ts">
-import { MaterialUpdateOut, SelectedMaterialEmit, MaterialGrouping } from "@/models/newAssessment";
+import {
+  MaterialUpdateOut,
+  SelectedMaterialEmit,
+} from "@/models/newAssessment";
+import { ReportFullGroup } from "@/models/report";
 import { MaterialFull } from "@/store/utilities/material-carbon-factors";
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 @Component
 export default class MaterialType extends Vue {
   @Prop() materials!: MaterialFull[];
-  @Prop() type!: MaterialGrouping;
+  @Prop() type!: ReportFullGroup;
+  @Prop() expandOption!: boolean;
 
-  currentMaterial = this.type && this.type.material ? this.type.material : null;
+  oldMaterial: MaterialFull | undefined;
+
+  currentMaterial =
+    this.type &&
+    this.type.objects.length > 0 &&
+    this.type.objects[0].hasMaterials &&
+    Object.values(this.type.objects[0].materials)[0].material.name
+      ? Object.values(this.type.objects[0].materials)[0].material
+      : null;
   filtered = true;
 
   mounted() {
-    this.currentMaterial = this.type && this.type.material ? this.type.material : null;
+    this.currentMaterial =
+      this.type &&
+      this.type.objects.length > 0 &&
+      this.type.objects[0].hasMaterials &&
+      Object.values(this.type.objects[0].materials)[0].material.name
+        ? Object.values(this.type.objects[0].materials)[0].material
+        : null;
   }
 
   @Emit("selectMaterial")
   selectMaterial(): SelectedMaterialEmit {
     return {
-      ids: this.type.ids,
-      type: this.type.type
+      ids: this.type.objects.map((o) => o.id),
+      type: this.type.name,
     };
+  }
+
+  @Emit("expandSelection")
+  expandSelection() {
+    return this.type;
   }
 
   cleanType(type: string) {
@@ -70,7 +99,7 @@ export default class MaterialType extends Vue {
     return typeArr[typeArr.length - 1];
   }
 
-  getContrastYIQ(hexcolor: string) {
+  getContrastYIQ(hexcolor: string, item: any) {
     if (hexcolor.slice(0, 1) === "#") {
       hexcolor = hexcolor.slice(1);
     }
@@ -81,28 +110,26 @@ export default class MaterialType extends Vue {
     return yiq >= 128 ? "black" : "white";
   }
 
-  materialChanged(material: MaterialFull) {
-    if (this.materials.includes(material)) {
-      this.materialUpdated(material);
-    }
-  }
-
   checkMaterialUpdated(material: MaterialFull) {
     if (this.instanceOfMaterialFull(material)) {
-      this.materialUpdated(material);
+      this.materialUpdated(material, this.oldMaterial);
+      this.oldMaterial = material;
     }
   }
 
   @Emit("materialUpdated")
-  materialUpdated(material: MaterialFull): MaterialUpdateOut {
+  materialUpdated(
+    material: MaterialFull,
+    oldMaterial?: MaterialFull
+  ): MaterialUpdateOut {
     return {
       material,
+      oldMaterial,
       type: this.type,
     };
   }
 
-
-instanceOfMaterialFull(object: any): object is MaterialFull {
+  instanceOfMaterialFull(object: any): object is MaterialFull {
     return "name" in object;
   }
 }

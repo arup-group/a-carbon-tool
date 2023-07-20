@@ -62,13 +62,19 @@ export default class VersionUpdateDialog extends Vue {
       subtitle:
         "Objects in assessments can now have multiple materials assigned to them, allowing for material buildups to be used instead of single materials",
     },
+    {
+      title: "Grouping filters update",
+      subtitle:
+        "Grouping filters that require it now have an 'undefined' field, meaning that a filter will not need to appear on every object to allow it to be used for object grouping",
+    },
   ];
 
   fixes: { title: string; subtitle: string }[] = [
     {
       title: "Large models bug",
-      subtitle: "Fixed a bug causing an 'out of memory' error to sometimes occur when loading large models"
-    }
+      subtitle:
+        "Fixed a bug causing an 'out of memory' error to sometimes occur when loading large models",
+    },
   ];
 
   @Emit("close")

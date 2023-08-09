@@ -2,7 +2,7 @@
   <v-main>
     <loading-spinner v-if="loading" :text="loadingSpinnerText" />
     <v-container
-      v-else
+      v-else-if="availableStreams.length !== 0"
       fluid
       class="d-flex justify-flex-start flex-row"
       style="margin: 10px; padding: 10px; width: 100%"
@@ -59,6 +59,7 @@
         :loadingBar="false"
       />
     </v-container>
+    <NoStreams :serverUrl="$store.state.selectedServer.url" v-else />
     <new-branch-dialog
       :dialog="newBranchDialog"
       :branchNames="branchNames"
@@ -88,6 +89,7 @@ import * as AddParams from "./utils/add-params/addParams";
 import AssessmentStepper from "@/components/assessment/AssessmentStepper.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import NewBranchDialog from "@/components/assessment/NewBranchDialog.vue";
+import NoStreams from "@/components/assessment/NoStreams.vue";
 
 import { findStringProps } from "./utils/propertyFiltering";
 
@@ -140,6 +142,7 @@ interface AvailableStream {
     SESnackBar,
     NewBranchDialog,
     LoadingSpinner,
+    NoStreams,
   },
 })
 export default class Assessment extends Vue {

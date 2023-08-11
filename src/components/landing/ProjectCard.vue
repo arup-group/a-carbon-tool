@@ -36,12 +36,10 @@
           </span>
           <span v-else></span>
           <span>
+            <v-btn icon color="primary" @click="share">
+              <v-icon>mdi-share</v-icon>
+            </v-btn>
             <landing-options @delete="checkDelete" @edit="edit" />
-            <v-select
-              :menu-props="{ value: options }"
-              v-if="options"
-              :items="['one', 'two']"
-            />
             <v-btn icon color="primary" @click="open">
               <v-icon>mdi-open-in-new</v-icon>
             </v-btn>
@@ -119,6 +117,11 @@ export default class ProjectCard extends Vue {
   }
   get category() {
     return this.project.category;
+  }
+
+  @Emit("share")
+  share() {
+    return this.project;
   }
 
   @Emit("delete")

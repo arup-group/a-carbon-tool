@@ -33,6 +33,12 @@ export const streamsQuery = () => `query {
     }
   }`;
 
+export const streamIsPublicQuery = (streamId: string) => `query {
+  stream(id: "${streamId}") {
+    isPublic
+  }
+}`
+
 export const streamsDataQuery = (streamId: string, objId: string) => `query {
   stream(id: "${streamId}") {
     object(id: "${objId}") {

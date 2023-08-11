@@ -3,6 +3,7 @@ import { ProjectComponent } from "../newAssessment/projectData.interface";
 
 export interface Project {
   title: string;
+  name: string;
   id: string;
   branchId: string;
   co2Values: ChartData[];

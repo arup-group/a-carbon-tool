@@ -431,6 +431,11 @@ export default new Vuex.Store({
     setDarkMode({ commit }) {
       commit("setDarkMode");
     },
+    async checkStreamPublic(context, { streamid }): Promise<boolean> {
+      const res = await speckleUtil.streamIsPublicQuery(context, streamid);
+
+      return res.data.stream.isPublic;
+    },
     async getObjectDetails(
       context,
       { streamid, objecturl }: ObjectDetailsInput

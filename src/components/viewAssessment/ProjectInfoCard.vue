@@ -7,6 +7,9 @@
       </v-btn>
     </v-card-title>
     <v-card-subtitle class="pa-0">
+      <v-btn icon color="primary" @click="share">
+        <v-icon>mdi-share</v-icon>
+      </v-btn>
       <BECChipGroup v-if="type.length !== 0" :categories="type" />
     </v-card-subtitle>
     <v-card-text>
@@ -65,7 +68,7 @@
 </template>
 <script lang="ts">
 import { IProjectInfo } from "@/views/utils/process-report-object";
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import BECChipGroup from "../shared/BECChipGroup.vue";
 
 @Component({
@@ -75,6 +78,11 @@ export default class ProjectInfoCard extends Vue {
   @Prop() projectInfo!: IProjectInfo;
 
   show = true;
+
+  @Emit("share")
+  share() {
+    return;
+  }
 
   get name() {
     return this.projectInfo.name;

@@ -9,7 +9,7 @@
           fluid
         >
           <div class="d-flex flex-column justify-space-between card-container">
-            <project-info-card class="card" :projectInfo="projectInfo" />
+            <project-info-card class="card" :projectInfo="projectInfo" @share="openShareReportDialog" />
             <renderer-cotnrols-card
               v-if="!isV1"
               class="card"
@@ -38,6 +38,13 @@
         </v-container>
       </template>
     </loading-container>
+    <share-report-dialog
+      :dialog="shareReportDialog"
+      :shareLink="shareLink"
+      :streamid="streamid"
+      :reportName="shareReportName"
+      @close="closeShareReportDialog"
+    />
   </v-main>
 </template>
 
@@ -56,6 +63,7 @@ import { ILoadStreamData, LoadStreamOut } from "./utils/process-report-object";
 
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 import BackButton from "@/components/shared/BackButton.vue";
+import ShareReportDialog from "@/components/shared/ShareReportDialog.vue";
 
 @Component({
   components: {
@@ -66,6 +74,7 @@ import BackButton from "@/components/shared/BackButton.vue";
     LoadingContainer,
     BackButton,
     RendererCotnrolsCard,
+    ShareReportDialog,
   },
 })
 export default class ViewAssessment extends Vue {
@@ -80,6 +89,23 @@ export default class ViewAssessment extends Vue {
   error = false;
   streamId = this.$route.params.streamId;
   isV1 = false;
+
+  shareReportDialog = false;
+  shareLink = "";
+  shareReportName = "";
+  streamid = "";
+
+  openShareReportDialog() {
+    const { streamId, branchName } = this.$route.params;
+    this.streamid = streamId;
+    this.shareLink = `${window.origin}/assessment/view/${streamId}/${branchName}`;
+    this.shareReportName = this.projectInfo.name;
+    this.shareReportDialog = true;
+  }
+
+  closeShareReportDialog() {
+    this.shareReportDialog = false;
+  }
 
   mounted() {
     this.token = this.$store.state.token.token;

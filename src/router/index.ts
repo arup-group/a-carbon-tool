@@ -90,13 +90,14 @@ router.beforeEach(async (to, from, next) => {
         // redirect to login page if the user is not signed in
         if (err.message === AuthError.NOT_SIGNED_IN) {
           if (to.name === "ViewAssessment") {
-            console.log("was going to view assessment...")
             const { server } = to.query;
 
             if (server) {
               let fullReportServer = {} as Server;
               let serverSet = false;
-              Object.values(store.state.servers as { [server: string]: Server }).forEach(s => {
+              Object.values(
+                store.state.servers as { [server: string]: Server }
+              ).forEach((s) => {
                 if (s.url === server) {
                   fullReportServer = s;
                   serverSet = true;
@@ -107,15 +108,14 @@ router.beforeEach(async (to, from, next) => {
                 fullReportServer.url = server as string;
               }
 
-              localStorage.setItem("redirect-path", to.fullPath)
+              localStorage.setItem("redirect-path", to.fullPath);
 
               store.dispatch("redirectToAuth", fullReportServer);
               next();
             }
           }
           next("/login");
-        }
-        else next("/");
+        } else next("/");
       }
     }
   }

@@ -132,17 +132,11 @@ export default class ViewAssessment extends Vue {
     this.token = this.$store.state.token.token;
     const { server } = this.$route.query;
     if (server) {
-      console.log("server:", server);
-      console.log("selectedServer:", this.$store.state.selectedServer);
       const selectedServer: Server = this.$store.state.selectedServer;
       if (selectedServer.url != server) {
-        console.log("server does not match, attempt other sign in");
-
         this.currentServer = selectedServer.url;
         this.reportServer = server as string; // server should always be a string, if not then the user has probably done something weird
-
         this.changeServerDialog = true;
-
         return;
       }
     }
@@ -151,11 +145,11 @@ export default class ViewAssessment extends Vue {
   }
 
   attemptLogin(reportServer: string) {
-    console.log("attempt login to server:", reportServer)
-    console.log("all servers:", this.$store.state.servers)
     let fullReportServer = {} as Server;
     let serverSet = false;
-    Object.values(this.$store.state.servers as { [server: string]: Server }).forEach(s => {
+    Object.values(
+      this.$store.state.servers as { [server: string]: Server }
+    ).forEach((s) => {
       if (s.url === reportServer) {
         fullReportServer = s;
         serverSet = true;
@@ -166,10 +160,7 @@ export default class ViewAssessment extends Vue {
       fullReportServer.url = reportServer;
     }
 
-    console.log("fullReportServer:", fullReportServer);
-    console.log("this.$route", this.$route)
-
-    localStorage.setItem("redirect-path", this.$route.fullPath)
+    localStorage.setItem("redirect-path", this.$route.fullPath);
 
     this.$store.dispatch("redirectToAuth", fullReportServer);
   }

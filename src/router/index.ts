@@ -1,4 +1,4 @@
-import { AuthError } from "@/models/auth";
+import { AuthError, Server } from "@/models/auth";
 import store from "@/store";
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
@@ -79,10 +79,42 @@ router.beforeEach(async (to, from, next) => {
       // if the user is going to a page that isn't the login page, check that they're logged in
       try {
         await store.dispatch("getUser");
+        // if there is a redirect path set then move the user there
+        const redirectPath = localStorage.getItem("redirect-path");
+        if (redirectPath !== null && redirectPath !== "") {
+          localStorage.setItem("redirect-path", "");
+          next(redirectPath);
+        }
         next();
       } catch (err: any) {
         // redirect to login page if the user is not signed in
-        if (err.message === AuthError.NOT_SIGNED_IN) next("/login");
+        if (err.message === AuthError.NOT_SIGNED_IN) {
+          if (to.name === "ViewAssessment") {
+            console.log("was going to view assessment...")
+            const { server } = to.query;
+
+            if (server) {
+              let fullReportServer = {} as Server;
+              let serverSet = false;
+              Object.values(store.state.servers as { [server: string]: Server }).forEach(s => {
+                if (s.url === server) {
+                  fullReportServer = s;
+                  serverSet = true;
+                }
+              });
+              if (!serverSet) {
+                fullReportServer = store.state.servers.custom;
+                fullReportServer.url = server as string;
+              }
+
+              localStorage.setItem("redirect-path", to.fullPath)
+
+              store.dispatch("redirectToAuth", fullReportServer);
+              next();
+            }
+          }
+          next("/login");
+        }
         else next("/");
       }
     }

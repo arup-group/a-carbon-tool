@@ -76,7 +76,7 @@ export default class ShareReportDialog extends Vue {
 
   highlighted(event: any) {
     event.target.select();
-    navigator.clipboard.writeText(this.shareLink);
+    navigator.clipboard.writeText(this.fullShareLink);
     this.successMessage();
   }
 

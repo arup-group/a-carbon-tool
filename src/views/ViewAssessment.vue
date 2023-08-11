@@ -9,7 +9,11 @@
           fluid
         >
           <div class="d-flex flex-column justify-space-between card-container">
-            <project-info-card class="card" :projectInfo="projectInfo" @share="openShareReportDialog" />
+            <project-info-card
+              class="card"
+              :projectInfo="projectInfo"
+              @share="openShareReportDialog"
+            />
             <renderer-cotnrols-card
               v-if="!isV1"
               class="card"
@@ -45,6 +49,13 @@
       :reportName="shareReportName"
       @close="closeShareReportDialog"
     />
+    <change-server-dialog
+      :dialog="changeServerDialog"
+      :currentServer="currentServer"
+      :reportServer="reportServer"
+      @close="closeChangeServerDialog"
+      @attemptLogin="attemptLogin"
+    />
   </v-main>
 </template>
 
@@ -56,6 +67,7 @@ import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
 import RendererCotnrolsCard from "@/components/viewAssessment/RendererControlsCard.vue";
+import ChangeServerDialog from "@/components/viewAssessment/ChangeServerDialog.vue";
 
 import { Color, GradientColor } from "@/models/renderer";
 import { LoadActReportDataInput } from "@/store";
@@ -64,6 +76,7 @@ import { ILoadStreamData, LoadStreamOut } from "./utils/process-report-object";
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
 import BackButton from "@/components/shared/BackButton.vue";
 import ShareReportDialog from "@/components/shared/ShareReportDialog.vue";
+import { Server } from "@/models/auth";
 
 @Component({
   components: {
@@ -75,6 +88,7 @@ import ShareReportDialog from "@/components/shared/ShareReportDialog.vue";
     BackButton,
     RendererCotnrolsCard,
     ShareReportDialog,
+    ChangeServerDialog,
   },
 })
 export default class ViewAssessment extends Vue {
@@ -95,6 +109,10 @@ export default class ViewAssessment extends Vue {
   shareReportName = "";
   streamid = "";
 
+  changeServerDialog = false;
+  currentServer = "";
+  reportServer = "";
+
   openShareReportDialog() {
     const { streamId, branchName } = this.$route.params;
     this.streamid = streamId;
@@ -106,9 +124,54 @@ export default class ViewAssessment extends Vue {
   closeShareReportDialog() {
     this.shareReportDialog = false;
   }
+  closeChangeServerDialog() {
+    this.changeServerDialog = false;
+  }
 
   mounted() {
     this.token = this.$store.state.token.token;
+    const { server } = this.$route.query;
+    if (server) {
+      console.log("server:", server);
+      console.log("selectedServer:", this.$store.state.selectedServer);
+      const selectedServer: Server = this.$store.state.selectedServer;
+      if (selectedServer.url != server) {
+        console.log("server does not match, attempt other sign in");
+
+        this.currentServer = selectedServer.url;
+        this.reportServer = server as string; // server should always be a string, if not then the user has probably done something weird
+
+        this.changeServerDialog = true;
+
+        return;
+      }
+    }
+
+    this.loadReport();
+  }
+
+  attemptLogin(reportServer: string) {
+    console.log("attempt login to server:", reportServer)
+    console.log("all servers:", this.$store.state.servers)
+    let fullReportServer = {} as Server;
+    let serverSet = false;
+    Object.values(this.$store.state.servers as { [server: string]: Server }).forEach(s => {
+      if (s.url === reportServer) {
+        fullReportServer = s;
+        serverSet = true;
+      }
+    });
+    if (!serverSet) {
+      fullReportServer = this.$store.state.servers.custom;
+      fullReportServer.url = reportServer;
+    }
+
+    console.log("fullReportServer:", fullReportServer);
+    console.log("this.$route", this.$route)
+
+    localStorage.setItem("redirect-path", this.$route.fullPath)
+
+    this.$store.dispatch("redirectToAuth", fullReportServer);
   }
 
   selectChanged(property: string) {
@@ -135,10 +198,6 @@ export default class ViewAssessment extends Vue {
 
   back() {
     this.$router.push(`/${this.streamId}`);
-  }
-
-  created() {
-    this.loadReport();
   }
 
   async loadReport() {

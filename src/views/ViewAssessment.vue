@@ -55,6 +55,7 @@
       :reportServer="reportServer"
       @close="closeChangeServerDialog"
       @attemptLogin="attemptLogin"
+      @toDashboard="toDashboard"
     />
   </v-main>
 </template>
@@ -189,6 +190,9 @@ export default class ViewAssessment extends Vue {
 
   back() {
     this.$router.push(`/${this.streamId}`);
+  }
+  toDashboard() {
+    this.$router.push("/");
   }
 
   async loadReport() {

@@ -53,7 +53,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    version: "0.12.3 \u00DF",
+    version: "0.13.0 \u00DF",
     speckleFolderName: "actcarbonreport",
     speckleViewer: {
       viewer: undefined,
@@ -430,6 +430,11 @@ export default new Vuex.Store({
 
     setDarkMode({ commit }) {
       commit("setDarkMode");
+    },
+    async checkStreamPublic(context, { streamid }): Promise<boolean> {
+      const res = await speckleUtil.streamIsPublicQuery(context, streamid);
+
+      return res.data.stream.isPublic;
     },
     async getObjectDetails(
       context,

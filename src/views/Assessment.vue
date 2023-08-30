@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <loading-spinner v-if="loading" :text="loadingSpinnerText" />
+    <loading-spinner v-if="loading || loadingAvailableStreams" :text="loadingSpinnerText" />
     <v-container
       v-else-if="availableStreams.length !== 0"
       fluid
@@ -158,6 +158,7 @@ export default class Assessment extends Vue {
   loadingSpinnerText = "";
   loadingModel = false;
   loadingModelText = "";
+  loadingAvailableStreams = true;
   saveSuccess = true;
   saveSnack = false;
   availableStreams: AvailableStream[] = [];
@@ -244,6 +245,7 @@ export default class Assessment extends Vue {
       this.availableStreams = res.data.user.streams.items.map((i: any) => {
         return { label: i.name, value: i.id };
       });
+      this.loadingAvailableStreams = false;
     });
   }
   openFullView() {

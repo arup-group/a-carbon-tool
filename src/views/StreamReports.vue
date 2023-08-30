@@ -39,6 +39,7 @@
                     @delete="checkDelete"
                     @edit="edit"
                     @open="openViewAssessment"
+                    @share="openShare"
                   ></project-card>
                 </v-col>
               </v-row>
@@ -81,6 +82,13 @@
       :streamId="streamid"
       @close="closeAddData"
     />
+    <share-report-dialog
+      :dialog="shareReportDialog"
+      :shareLink="shareLink"
+      :streamid="streamid"
+      :reportName="shareReportName"
+      @close="closeShareReportDialog"
+    />
   </v-main>
 </template>
 <script lang="ts">
@@ -100,6 +108,7 @@ import QuickReport from "@/components/landing/QuickReport.vue";
 import ConfirmDialog from "@/components/shared/ConfirmDialog.vue";
 import SESnackBar from "@/components/shared/SESnackBar.vue";
 import LoadingContainer from "@/components/shared/LoadingContainer.vue";
+import ShareReportDialog from "@/components/shared/ShareReportDialog.vue";
 
 import ExcelImportDialog from "@/components/shared/ExcelImportDialog.vue";
 
@@ -116,6 +125,7 @@ import StreamReportsHeader from "@/components/streamReports/StreamReportsHeader.
     LoadingContainer,
     ExcelImportDialog,
     StreamReportsHeader,
+    ShareReportDialog,
   },
 })
 export default class StreamReports extends Vue {
@@ -140,6 +150,9 @@ export default class StreamReports extends Vue {
   streamName = "";
   excelImportDialog = false;
   excelImportKey = 1; // used to force refresh the modal
+  shareReportDialog = false;
+  shareLink = "";
+  shareReportName = "";
 
   async mounted() {
     this.token = this.$store.state.token.token;
@@ -203,6 +216,15 @@ export default class StreamReports extends Vue {
 
   get projectData() {
     return [{ title: "New Assessment" }, ...this.projects];
+  }
+
+  openShare(project: Project) {
+    this.shareLink = `${window.origin}/assessment/view/${this.streamid}/${project.id}`;
+    this.shareReportName = project.name;
+    this.shareReportDialog = true;
+  }
+  closeShareReportDialog() {
+    this.shareReportDialog = false;
   }
 
   nextPage() {
@@ -271,6 +293,7 @@ export default class StreamReports extends Vue {
         ];
         this.projects = reportObjectsReorder.map((o) => ({
           title: `${o.data.data.projectInfo.name} - ${o.branch.name}`,
+          name: o.data.data.projectInfo.name,
           id: o.branch.name,
           branchId: o.branch.id,
           co2Values: o.data.data.materialBreakdown.materials,

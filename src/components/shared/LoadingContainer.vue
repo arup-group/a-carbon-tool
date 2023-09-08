@@ -12,11 +12,11 @@
         color="primary"
       ></v-progress-linear>
     </div>
-    <error-retry v-else @retry="retry" />
+    <error-retry v-else :errorMessage="errorMessage" @retry="retry" />
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import ErrorRetry from "./ErrorRetry.vue";
 
@@ -26,6 +26,7 @@ import ErrorRetry from "./ErrorRetry.vue";
 export default class LoadingContainer extends Vue {
   @Prop() loading!: boolean;
   @Prop() error!: boolean;
+  @Prop() errorMessage!: string;
   @Prop() line!: boolean;
 
   get loaded() {

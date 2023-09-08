@@ -23,7 +23,7 @@
         </div>
       </v-card-text>
       <v-card-actions class="d-flex justify-end">
-        <v-btn @click="toDashboard">Back to dashboard</v-btn>
+        <v-btn href="/">Back to dashboard</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -45,11 +45,6 @@ export default class ChangeServerDialog extends Vue {
   @Emit("attemptLogin")
   attemptLogin() {
     return this.reportServer;
-  }
-
-  @Emit("toDashboard")
-  toDashboard() {
-    return;
   }
 }
 </script>

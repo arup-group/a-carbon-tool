@@ -2,7 +2,7 @@
   <v-main class="mr-7 ml-7 pb-4">
     <loading-container
       :error="error"
-      errorMessage="Stream not found, make sure you are signed into the correct server"
+      errorMessage="Stream not found. Please make sure you are signed into the correct server."
       :loading="loading"
       @retry="loadStreams"
     >

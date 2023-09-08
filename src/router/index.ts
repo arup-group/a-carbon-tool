@@ -114,6 +114,11 @@ router.beforeEach(async (to, from, next) => {
               next();
             }
           }
+          else {
+            if (to.fullPath !== "/") {
+              localStorage.setItem("redirect-path", to.fullPath);
+            }
+          }
           next("/login");
         } else next("/");
       }

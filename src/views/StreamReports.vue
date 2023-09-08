@@ -1,6 +1,11 @@
 <template>
   <v-main class="mr-7 ml-7 pb-4">
-    <loading-container :error="error" :loading="loading" @retry="loadStreams">
+    <loading-container
+      :error="error"
+      errorMessage="Stream not found. Please make sure you are signed into the correct server."
+      :loading="loading"
+      @retry="loadStreams"
+    >
       <template v-slot="{ loaded }">
         <v-container v-if="loaded">
           <v-data-iterator
@@ -192,9 +197,7 @@ export default class StreamReports extends Vue {
     // this.quickBranchName = branchName;
     // this.quickReport = true;
     // this.$router.push({ name: "UpdateAssessmentBranch"})
-    this.$router.push(
-      `assessment/${this.streamid}/${branchName}`
-    );
+    this.$router.push(`assessment/${this.streamid}/${branchName}`);
   }
   quickReportClose() {
     this.quickReport = false;
@@ -258,7 +261,8 @@ export default class StreamReports extends Vue {
       } else {
         this.snackTimeout = 30000;
         this.deleteSuccess = false;
-        this.deleteSnackTextError = "Something went wrong:" + deleted.errors[0].message;
+        this.deleteSnackTextError =
+          "Something went wrong:" + deleted.errors[0].message;
         this.deleteSnack = true;
       }
     } catch (err) {

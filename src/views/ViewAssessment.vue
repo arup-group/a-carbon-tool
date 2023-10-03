@@ -14,7 +14,7 @@
               :projectInfo="projectInfo"
               @share="openShareReportDialog"
             />
-            <renderer-cotnrols-card
+            <renderer-controls-card
               v-if="!isV1"
               class="card"
               @selectChanged="selectChanged"
@@ -66,7 +66,7 @@ import Renderer from "@/components/shared/Renderer.vue";
 import ProjectInfoCard from "@/components/viewAssessment/ProjectInfoCard.vue";
 import ABreakdownCard from "@/components/viewAssessment/ABreakdownCard.vue";
 import MaterialBreakdownCard from "@/components/viewAssessment/MaterialBreakdownCard.vue";
-import RendererCotnrolsCard from "@/components/viewAssessment/RendererControlsCard.vue";
+import RendererControlsCard from "@/components/viewAssessment/RendererControlsCard.vue";
 import ChangeServerDialog from "@/components/viewAssessment/ChangeServerDialog.vue";
 
 import { Color, GradientColor } from "@/models/renderer";
@@ -86,7 +86,7 @@ import { Server } from "@/models/auth";
     MaterialBreakdownCard,
     LoadingContainer,
     BackButton,
-    RendererCotnrolsCard,
+    RendererControlsCard,
     ShareReportDialog,
     ChangeServerDialog,
   },

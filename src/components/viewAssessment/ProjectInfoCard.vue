@@ -2,9 +2,14 @@
   <v-card width="" flat outlined>
     <v-card-title class="d-flex justify-space-between">
       <span class="text-h5">{{ name }}</span>
-      <v-btn icon @click="show = !show">
-        <v-icon>{{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}</v-icon>
-      </v-btn>
+      <div>
+        <v-btn icon color="primary" @click="share">
+          <v-icon>mdi-share</v-icon>
+        </v-btn>
+        <v-btn icon @click="show = !show">
+          <v-icon>{{ show ? "mdi-chevron-up" : "mdi-chevron-down" }}</v-icon>
+        </v-btn>
+      </div>
     </v-card-title>
     <v-card-subtitle class="pa-0">
       <BECChipGroup v-if="type.length !== 0" :categories="type" />
@@ -65,7 +70,7 @@
 </template>
 <script lang="ts">
 import { IProjectInfo } from "@/views/utils/process-report-object";
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import BECChipGroup from "../shared/BECChipGroup.vue";
 
 @Component({
@@ -75,6 +80,11 @@ export default class ProjectInfoCard extends Vue {
   @Prop() projectInfo!: IProjectInfo;
 
   show = true;
+
+  @Emit("share")
+  share() {
+    return;
+  }
 
   get name() {
     return this.projectInfo.name;

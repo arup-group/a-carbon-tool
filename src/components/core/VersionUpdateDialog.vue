@@ -56,15 +56,15 @@ export default class VersionUpdateDialog extends Vue {
   @Prop() dialog!: boolean;
   @Prop() version!: string;
 
-  features: { title: string; subtitle: string }[] = [];
-
-  fixes: { title: string; subtitle: string }[] = [
+  features: { title: string; subtitle: string }[] = [
     {
-      title: "Assessment page bug",
+      title: "Report sharing",
       subtitle:
-        "Fixed a bug leading to the assessment page not showing anything when a user is not assigned to any Speckle streams",
+        "Report sharing has been added back in. This can be done from either the report view page or on the stream reports page.",
     },
   ];
+
+  fixes: { title: string; subtitle: string }[] = [];
 
   @Emit("close")
   close() {

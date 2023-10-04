@@ -1,6 +1,5 @@
 <template>
   <v-main>
-    <back-button style="z-index: 1" :overrideRoute="true" @back="back" />
     <loading-container :error="error" :loading="loading" @retry="loadReport">
       <template v-slot="{ loaded }">
         <v-container
@@ -8,11 +7,18 @@
           class="d-flex justify-space-between container"
           fluid
         >
-          <div class="d-flex flex-column justify-space-between card-container">
+          <div
+            class="d-flex flex-column justify-space-between align-items-start card-container"
+          >
             <project-info-card
               class="card"
               :projectInfo="projectInfo"
               @share="openShareReportDialog"
+            />
+            <back-button
+              style="z-index: 1; width: fit-content"
+              :overrideRoute="true"
+              @back="back"
             />
             <renderer-controls-card
               v-if="!isV1"
